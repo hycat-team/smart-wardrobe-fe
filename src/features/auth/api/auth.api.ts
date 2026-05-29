@@ -1,33 +1,47 @@
 import api from '@/lib/axios';
-import { AuthResponse, LoginPayload, User } from '../types';
+import { APIResponse } from '@/types/api';
+import {
+  LoginReq,
+  RegisterReq,
+  ConfirmRegisterOtpReq,
+  SendForgotPasswordOtpReq,
+  ConfirmForgotPasswordOtpReq,
+  ResetPasswordReq,
+  AuthTokenRes,
+} from '../types';
 
 export const authApi = {
-  // POST: Đăng nhập
-  login: async (payload: LoginPayload): Promise<AuthResponse> => {
-    const { data } = await api.post('/auth/login', payload);
-    return data;
+  login: async (data: LoginReq): Promise<AuthTokenRes> => {
+    const res = await api.post<APIResponse<AuthTokenRes>>('/auth/login', data);
+    return res.data.data!;
   },
 
-  // POST: Làm mới token
-  refreshToken: async (refreshToken: string): Promise<{ accessToken: string; refreshToken?: string }> => {
-    const { data } = await api.post('/auth/refresh-token', { refreshToken });
-    return data;
+  register: async (data: RegisterReq): Promise<void> => {
+    await api.post<APIResponse>('/auth/register', data);
   },
 
-  // POST: Đăng xuất
+  confirmRegisterOtp: async (data: ConfirmRegisterOtpReq): Promise<void> => {
+    await api.post<APIResponse>('/auth/register/confirm-otp', data);
+  },
+
   logout: async (): Promise<void> => {
-    await api.post('/auth/logout');
+    await api.post<APIResponse>('/auth/logout');
   },
 
-  // GET: Lấy thông tin user hiện tại (Me)
-  getProfile: async (): Promise<User> => {
-    const { data } = await api.get('/auth/me');
-    return data;
+  refreshToken: async (): Promise<AuthTokenRes> => {
+    const res = await api.post<APIResponse<AuthTokenRes>>('/auth/refresh-token');
+    return res.data.data!;
   },
 
-  // PUT: Cập nhật thông tin user
-  updateProfile: async (payload: Partial<User>): Promise<User> => {
-    const { data } = await api.put('/auth/me', payload);
-    return data;
+  forgotPassword: async (data: SendForgotPasswordOtpReq): Promise<void> => {
+    await api.post<APIResponse>('/auth/forgot-password', data);
+  },
+
+  confirmForgotPasswordOtp: async (data: ConfirmForgotPasswordOtpReq): Promise<void> => {
+    await api.post<APIResponse>('/auth/forgot-password/confirm-otp', data);
+  },
+
+  resetPassword: async (data: ResetPasswordReq): Promise<void> => {
+    await api.post<APIResponse>('/auth/reset-password', data);
   },
 };

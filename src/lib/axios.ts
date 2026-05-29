@@ -5,8 +5,9 @@ import { authApi } from '@/features/auth/api/auth.api';
 import { ErrorResponse } from '@/types/api';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api', // adjust this as needed
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1',
   timeout: 10000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -79,8 +80,9 @@ api.interceptors.response.use(
 
         try {
           // Gọi API refresh token
-          const data = await authApi.refreshToken(refreshToken);
+          const data = await authApi.refreshToken();
           Cookies.set('accessToken', data.accessToken, { expires: 1 }); // Lưu 1 ngày
+          // Note: Backend set refreshToken cookie directly, but we can also manage it if returned
           if (data.refreshToken) {
             Cookies.set('refreshToken', data.refreshToken, { expires: 7 }); // Lưu 7 ngày
           }

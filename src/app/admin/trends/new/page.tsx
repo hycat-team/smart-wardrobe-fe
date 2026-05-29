@@ -1,0 +1,234 @@
+"use client";
+import { useState, useRef } from "react";
+import { UploadCloud, CheckCircle2, LayoutTemplate, Zap, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+const TARGET_AUDIENCES = ["Tất cả", "Nam", "Nữ", "Unisex", "Gen Z", "Office Worker"];
+
+export default function TrendPublishing() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [tags, setTags] = useState("");
+  const [selectedAudience, setSelectedAudience] = useState("Tất cả");
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [published, setPublished] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newImages = Array.from(e.target.files).map(file => URL.createObjectURL(file));
+      setImages(prev => [...prev, ...newImages].slice(0, 10)); // Max 10 images
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handlePublish = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !description) {
+      toast.error("Vui lòng điền tiêu đề và mô tả cho Trend này.");
+      return;
+    }
+
+    setIsPublishing(true);
+    setTimeout(() => {
+      setIsPublishing(false);
+      setPublished(true);
+      toast.success("Đã phát hành Style Trend mới đến cộng đồng!");
+    }, 1500);
+  };
+
+  if (published) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center gap-4 animate-in zoom-in-95 duration-500">
+        <div className="size-20 rounded-full bg-green-500/10 flex items-center justify-center text-green-500">
+          <CheckCircle2 className="size-10" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-heading font-bold text-foreground">Phát hành thành công!</h2>
+          <p className="text-muted-foreground max-w-sm">
+            Xu hướng <span className="font-bold text-foreground">"{title}"</span> đã được đẩy lên Feed và cập nhật vào mô hình AI gợi ý.
+          </p>
+        </div>
+        <Button 
+          onClick={() => {
+            setPublished(false);
+            setTitle("");
+            setDescription("");
+            setTags("");
+            setImages([]);
+          }}
+          className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90 px-8"
+        >
+          Tạo Trend Mới
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500 font-sans pb-16 max-w-5xl mx-auto">
+      
+      {/* Header */}
+      <div className="space-y-1 border-b border-border pb-6">
+        <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground flex items-center gap-2">
+          <Zap className="size-6 text-primary" /> Tạo Xu Hướng Mới
+        </h1>
+        <p className="text-sm text-muted-foreground">Đăng tải phong cách mới, hệ thống AI sẽ học và gợi ý phối đồ theo xu hướng này cho người dùng.</p>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 pt-4">
+        
+        {/* Editor Form */}
+        <form onSubmit={handlePublish} className="space-y-8">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tên Xu Hướng</Label>
+              <Input 
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="VD: Y2K Revival, Minimalist Summer..."
+                className="h-12 bg-card border-border focus-visible:ring-1 focus-visible:ring-primary text-base"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="desc" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Mô Tả Định Hướng AI</Label>
+              <Textarea 
+                id="desc"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Mô tả chi tiết các item đặc trưng, màu sắc chủ đạo, cách phối để AI có thể hiểu và gợi ý cho người dùng..."
+                className="min-h-[160px] resize-none bg-card border-border focus-visible:ring-1 focus-visible:ring-primary text-sm leading-relaxed"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tags" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Keywords (Cách nhau bởi dấu phẩy)</Label>
+              <Input 
+                id="tags"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                placeholder="VD: denim, oversize, vintage, earth tone"
+                className="bg-card border-border focus-visible:ring-1 focus-visible:ring-primary font-mono text-sm"
+              />
+            </div>
+
+            <div className="space-y-2 pt-2">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Đối Tượng Áp Dụng</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {TARGET_AUDIENCES.map(aud => (
+                  <button
+                    key={aud}
+                    type="button"
+                    onClick={() => setSelectedAudience(aud)}
+                    className={cn(
+                      "px-4 py-2 rounded-full text-xs font-medium transition-all border",
+                      selectedAudience === aud 
+                        ? "bg-primary border-primary text-primary-foreground shadow-sm" 
+                        : "bg-transparent border-border text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                    )}
+                  >
+                    {aud}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <Button 
+            type="submit" 
+            disabled={isPublishing}
+            className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-bold tracking-widest text-sm rounded-xl shadow-md"
+          >
+            {isPublishing ? "ĐANG HUẤN LUYỆN AI..." : "XUẤT BẢN XU HƯỚNG"}
+          </Button>
+        </form>
+
+        {/* Media & Preview */}
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Moodboard & Hình Ảnh Trực Quan</Label>
+            
+            <input 
+              type="file" 
+              multiple 
+              accept="image/*" 
+              className="hidden" 
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+            />
+
+            {images.length === 0 ? (
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-border rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-3 bg-card/50 hover:bg-secondary/20 transition-colors cursor-pointer group h-[300px]"
+              >
+                <div className="size-14 rounded-full bg-secondary flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <UploadCloud className="size-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Tải lên bộ sưu tập ảnh</p>
+                  <p className="text-xs text-muted-foreground mt-1 max-w-[250px] leading-relaxed">
+                    Tối đa 10 ảnh. AI sẽ phân tích hình ảnh để tự động trích xuất bảng màu và form dáng.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="border border-border rounded-2xl p-4 bg-card/50">
+                <div className="grid grid-cols-3 gap-2">
+                  {images.map((img, i) => (
+                    <div key={i} className="aspect-square rounded-lg overflow-hidden relative group border border-border">
+                      <img src={img} alt={`Upload ${i}`} className="w-full h-full object-cover" />
+                      <button 
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        className="absolute top-1 right-1 size-5 bg-black/60 text-white rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                  
+                  {images.length < 10 && (
+                    <div 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="aspect-square rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-secondary/20 transition-colors"
+                    >
+                      <UploadCloud className="size-5 text-muted-foreground" />
+                      <span className="text-[10px] font-medium text-muted-foreground">Thêm ảnh</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-primary/10 border border-primary/20 rounded-2xl p-6 relative overflow-hidden">
+            <div className="absolute -top-4 -right-4 text-primary/20">
+              <LayoutTemplate className="size-24" />
+            </div>
+            <h4 className="font-heading font-bold text-primary mb-2 relative z-10">Lưu ý khi tạo Trend</h4>
+            <ul className="text-xs text-muted-foreground space-y-2 relative z-10 leading-relaxed list-disc list-inside">
+              <li>Trend mới sẽ xuất hiện ở đầu bảng xếp hạng "Explore" trong trang AI Stylist.</li>
+              <li>Người dùng có thể bấm "Thử Style Này" để AI tự phối đồ từ tủ của họ.</li>
+              <li>Nên có ít nhất 3 keywords để tăng độ chính xác khi AI map với item trong tủ đồ.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+

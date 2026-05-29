@@ -1,84 +1,80 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { authApi } from '../api/auth.api';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
-import { useAuthStore } from '@/store/useAuthStore';
-
-// 1. Quản lý chung toàn bộ Query Keys của module Auth
-export const authKeys = {
-  all: ['auth'] as const,
-  profile: () => [...authKeys.all, 'profile'] as const,
-};
-
-// 2. Custom Hooks: Bọc các API lại bằng useQuery / useMutation
-export const useAuthProfile = () => {
-  const setUser = useAuthStore((state) => state.setUser);
-  return useQuery({
-    queryKey: authKeys.profile(),
-    queryFn: async () => {
-      const data = await authApi.getProfile();
-      setUser(data); // Cập nhật store Zustand
-      return data;
-    },
-    // Không refetch lại thông tin user quá thường xuyên
-    staleTime: 5 * 60 * 1000, 
-  });
-};
 
 export const useLogin = () => {
-  const setUser = useAuthStore((state) => state.setUser);
-  
   return useMutation({
     mutationFn: authApi.login,
     onSuccess: (data) => {
-      toast.success('Đăng nhập thành công!');
-      
-      // Lưu token vào Cookies (Secure, dễ dùng SSR)
-      Cookies.set('accessToken', data.accessToken, { expires: 1 }); // Lưu 1 ngày
-      Cookies.set('refreshToken', data.refreshToken, { expires: 7 }); // Lưu 7 ngày
-      
-      // Lưu thông tin user vào store Zustand
-      setUser(data.user);
+      Cookies.set('accessToken', data.accessToken, { expires: 1 });
+      if (data.refreshToken) {
+        Cookies.set('refreshToken', data.refreshToken, { expires: 7 });
+      }
+      toast.success('Đăng nhập thành công');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || 'Tài khoản hoặc mật khẩu không chính xác!';
-      toast.error(message);
-    }
+  });
+};
+
+export const useRegister = () => {
+  return useMutation({
+    mutationFn: authApi.register,
+    onSuccess: () => {
+      toast.success('Đăng ký thành công. Vui lòng kiểm tra email để nhận mã OTP.');
+    },
+  });
+};
+
+export const useConfirmRegisterOtp = () => {
+  return useMutation({
+    mutationFn: authApi.confirmRegisterOtp,
+    onSuccess: () => {
+      toast.success('Xác thực tài khoản thành công. Bạn có thể đăng nhập ngay.');
+    },
   });
 };
 
 export const useLogout = () => {
-  const logout = useAuthStore((state) => state.logout);
-
   return useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      toast.success('Đăng xuất thành công!');
       Cookies.remove('accessToken');
       Cookies.remove('refreshToken');
-      logout(); // Xoá store
+      toast.success('Đã đăng xuất');
+      window.location.href = '/login';
     },
     onError: () => {
-      // Dù API logout lỗi thì vẫn nên xóa token ở client
+      // Dù lỗi ở phía server thì client vẫn nên xoá token
       Cookies.remove('accessToken');
       Cookies.remove('refreshToken');
-      logout();
+      window.location.href = '/login';
     }
   });
 };
 
-export const useUpdateProfile = () => {
-  const setUser = useAuthStore((state) => state.setUser);
-
+export const useForgotPassword = () => {
   return useMutation({
-    mutationFn: authApi.updateProfile,
-    onSuccess: (updatedUser) => {
-      toast.success('Cập nhật hồ sơ thành công!');
-      setUser(updatedUser); // Cập nhật store Zustand mới nhất
+    mutationFn: authApi.forgotPassword,
+    onSuccess: () => {
+      toast.success('Đã gửi mã OTP khôi phục đến email của bạn.');
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || 'Cập nhật thất bại!';
-      toast.error(message);
-    }
+  });
+};
+
+export const useConfirmForgotPasswordOtp = () => {
+  return useMutation({
+    mutationFn: authApi.confirmForgotPasswordOtp,
+    onSuccess: () => {
+      toast.success('Xác thực OTP thành công. Vui lòng đặt mật khẩu mới.');
+    },
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: authApi.resetPassword,
+    onSuccess: () => {
+      toast.success('Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.');
+    },
   });
 };
