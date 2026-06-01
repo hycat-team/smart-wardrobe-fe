@@ -5,7 +5,11 @@ import { UserRes, UpdateProfileReq, ChangePasswordReq } from '../types';
 export const profileApi = {
   getProfile: async (): Promise<UserRes> => {
     const res = await api.get<APIResponse<UserRes>>('/me');
-    return res.data.data!;
+    const responseData = res.data as any;
+    if (responseData && responseData.data) {
+      return responseData.data;
+    }
+    return responseData as UserRes;
   },
 
   updateProfile: async (data: UpdateProfileReq): Promise<UserRes> => {

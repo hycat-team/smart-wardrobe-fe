@@ -40,7 +40,7 @@ export function Sidebar() {
             <div className="text-[10px] text-primary tracking-widest mt-1">✦ PREMIUM MEMBER</div>
           </>
         ) : (
-          <Link href="/dashboard" className="text-2xl font-heading font-bold text-sidebar-foreground tracking-tight">
+          <Link href="/" className="text-2xl font-heading font-bold text-sidebar-foreground tracking-tight">
             Smart Wardrobe
           </Link>
         )}

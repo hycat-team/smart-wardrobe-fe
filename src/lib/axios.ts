@@ -1,11 +1,11 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { toast } from 'sonner';
-import Cookies from 'js-cookie';
 import { authApi } from '@/features/auth/api/auth.api';
 import { ErrorResponse } from '@/types/api';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1',
+  // Point to Next.js proxy instead of direct backend
+  baseURL: '/api/v1',
   timeout: 10000,
   withCredentials: true,
   headers: {
@@ -13,19 +13,8 @@ const api = axios.create({
   },
 });
 
-// Request interceptor: Gắn token vào header
-api.interceptors.request.use(
-  (config) => {
-    const token = Cookies.get('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// Remove request interceptor that adds Bearer token.
+// The middleware.ts will read HttpOnly cookie and attach the token.
 
 // Tránh tình trạng gọi refresh token nhiều lần cùng lúc
 let isRefreshing = false;
@@ -71,31 +60,21 @@ api.interceptors.response.use(
         originalRequest._retry = true;
         isRefreshing = true;
 
-        const refreshToken = Cookies.get('refreshToken');
-        if (!refreshToken) {
-          toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-          // Có thể import useAuthStore và gọi useAuthStore.getState().logout() ở đây
-          return Promise.reject(error);
-        }
-
+        // Since we cannot read refreshToken from HttpOnly cookie on the client,
+        // we just blindly call the refresh endpoint. If it fails, the server didn't have a valid refresh token.
         try {
-          // Gọi API refresh token
+          // Gọi API refresh token (Next.js route)
           const data = await authApi.refreshToken();
-          Cookies.set('accessToken', data.accessToken, { expires: 1 }); // Lưu 1 ngày
-          // Note: Backend set refreshToken cookie directly, but we can also manage it if returned
-          if (data.refreshToken) {
-            Cookies.set('refreshToken', data.refreshToken, { expires: 7 }); // Lưu 7 ngày
-          }
+          // The Next.js API route will automatically set the new HttpOnly cookies
 
           processQueue(null, data.accessToken);
-          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+          // Retry original request (middleware will attach new token)
           return api(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
-          Cookies.remove('accessToken');
-          Cookies.remove('refreshToken');
           toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-          // Force logout redirect có thể dùng window.location.href = '/login'
+          // Redirect will be handled by components, or we can force it
+          window.location.href = '/auth/login';
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;

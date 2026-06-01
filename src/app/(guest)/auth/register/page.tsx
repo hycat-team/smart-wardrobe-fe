@@ -53,7 +53,7 @@ export default function Register() {
 
     confirmOtp({ email: formData.email, otpCode }, {
       onSuccess: () => {
-        router.push("/auth/register/preferences");
+        router.push("/auth/login");
       }
     });
   };

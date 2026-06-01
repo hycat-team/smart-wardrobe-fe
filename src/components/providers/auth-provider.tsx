@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useProfile } from "@/features/profile/queries/profile.queries";
 import { useAuthStore } from "@/store/useAuthStore";
-import Cookies from "js-cookie";
+
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: profileData, isError, isLoading } = useProfile();
@@ -22,18 +22,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ...profileData,
         name: profileData.firstName + (profileData.lastName ? ` ${profileData.lastName}` : ""),
         avatar: `https://api.dicebear.com/7.x/notionists/svg?seed=${profileData.username}`,
-        isPremium: !!profileData.subscription?.planId && profileData.subscription.planId !== "free"
+        isPremium: (!!profileData.subscription?.planSlug && profileData.subscription.planSlug !== "free") || 
+                   (!!(profileData as any).planSlug && (profileData as any).planSlug !== "free")
       };
       setUser(userToStore);
     }
   }, [profileData, setUser]);
 
   useEffect(() => {
-    // If the token is invalid or missing, we can clear the user state.
-    // The Axios interceptor will also handle 401 and clear cookies.
-    if (isError || !Cookies.get("accessToken")) {
-      setUser(null);
-    }
+    // Check if the auth token is missing using our internal API status route
+    // If it's missing (e.g. after a logout or token expiration), clear the user state.
+    fetch('/api/auth/status')
+      .then(res => res.json())
+      .then(data => {
+        if (!data || !data.hasToken) {
+          setUser(null);
+        }
+      })
+      .catch(() => {
+        // If the API status check fails, assume no token
+        setUser(null);
+      });
   }, [isError, setUser]);
 
   // Optionally, you can return null while loading if you want to block rendering

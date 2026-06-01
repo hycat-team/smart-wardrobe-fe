@@ -1,16 +1,23 @@
 import { useMutation } from '@tanstack/react-query';
 import { authApi } from '../api/auth.api';
 import { toast } from 'sonner';
-import Cookies from 'js-cookie';
+import { useQueryClient } from '@tanstack/react-query';
+import { PROFILE_QUERY_KEY } from '@/features/profile/queries/profile.queries';
+import { profileApi } from '@/features/profile/api/profile.api';
 
 export const useLogin = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: (data) => {
-      Cookies.set('accessToken', data.accessToken, { expires: 1 });
-      if (data.refreshToken) {
-        Cookies.set('refreshToken', data.refreshToken, { expires: 7 });
-      }
+    onSuccess: () => {
+      // Invalidate auth status so it refetches immediately
+      queryClient.invalidateQueries({ queryKey: ['authStatus'] });
+      
+      // Fetch the profile imperatively to populate the cache,
+      // which will trigger auth-provider to update the user state.
+      queryClient.fetchQuery({ queryKey: PROFILE_QUERY_KEY, queryFn: profileApi.getProfile }).catch(console.error);
+      
+      queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
       toast.success('Đăng nhập thành công');
     },
   });
@@ -38,16 +45,12 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      Cookies.remove('accessToken');
-      Cookies.remove('refreshToken');
-      toast.success('Đã đăng xuất');
-      window.location.href = '/login';
+      queryClient.invalidateQueries({ queryKey: ['authStatus'] });
+      toast.success('Đăng xuất thành công');
+      window.location.href = '/auth/login';
     },
     onError: () => {
-      // Dù lỗi ở phía server thì client vẫn nên xoá token
-      Cookies.remove('accessToken');
-      Cookies.remove('refreshToken');
-      window.location.href = '/login';
+      window.location.href = '/auth/login';
     }
   });
 };

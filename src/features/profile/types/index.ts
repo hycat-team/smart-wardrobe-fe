@@ -12,7 +12,7 @@ export interface UserBodyProfileRes {
 }
 
 export interface UserSubscriptionRes {
-  planId?: string;
+  planSlug?: string;
   planName?: string;
   aiChatDailyQuota?: number;
   aiOutfitDailyQuota?: number;

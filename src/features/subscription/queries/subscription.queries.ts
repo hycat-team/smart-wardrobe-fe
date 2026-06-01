@@ -1,24 +1,19 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { subscriptionApi } from '../api/subscription.api';
 import { toast } from 'sonner';
 
-export const SUBSCRIPTION_QUOTA_KEY = ['daily-quota'];
-
-export const useDailyQuota = () => {
-  return useQuery({
-    queryKey: SUBSCRIPTION_QUOTA_KEY,
-    queryFn: subscriptionApi.getDailyQuota,
-  });
-};
-
-export const useToggleAutoRenew = () => {
+export const useToggleAutoRenewMutation = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: subscriptionApi.toggleAutoRenew,
-    onSuccess: () => {
-      toast.success('Cập nhật trạng thái tự động gia hạn thành công');
-      // Invalidate query to refresh data if necessary
-      queryClient.invalidateQueries({ queryKey: ['me'] }); // Profile API also returns subscription
+    mutationFn: (autoRenew: boolean) => subscriptionApi.toggleAutoRenew(autoRenew),
+    onSuccess: (data) => {
+      toast.success(data ? 'Đã bật tự động gia hạn' : 'Đã tắt tự động gia hạn');
+      // Invalidate the subscription query to refresh data
+      queryClient.invalidateQueries({ queryKey: ['subscription', 'me'] });
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi thay đổi cài đặt tự động gia hạn');
     },
   });
 };

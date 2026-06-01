@@ -13,7 +13,7 @@ export function Topbar() {
     <>
       {/* Mobile Topbar */}
       <header className="md:hidden h-16 border-b border-border flex items-center justify-between px-4 sticky top-0 bg-background/80 backdrop-blur-md z-40">
-        <Link href="/dashboard" className={cn("text-xl font-heading font-bold text-ink", isPremium && "tracking-[2px]")}>
+        <Link href="/" className={cn("text-xl font-heading font-bold text-ink", isPremium && "tracking-[2px]")}>
           {isPremium ? "S W" : "SW"}
         </Link>
         <div className="flex items-center gap-3">

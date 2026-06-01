@@ -27,63 +27,49 @@ function parseJwt(token: string) {
   }
 }
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Intercept API calls intended for the backend
+  if (pathname.startsWith('/api/v1/')) {
+    const token = request.cookies.get('accessToken')?.value;
+    
+    // Create a new URL pointing to the backend
+    // Remove the /api/v1 prefix from the frontend request since BACKEND_URL already includes it
+    // Wait, if BACKEND_URL is http://localhost:8080/api/v1, and request is /api/v1/me
+    // We should append the remaining path.
+    const remainingPath = pathname.replace('/api/v1', '');
+    const backendUrl = new URL(`${BACKEND_URL}${remainingPath}${request.nextUrl.search}`);
+
+    // Clone request headers to modify them
+    const requestHeaders = new Headers(request.headers);
+    if (token) {
+      requestHeaders.set('Authorization', `Bearer ${token}`);
+    }
+
+    // Forward the request to the backend with the modified headers
+    return NextResponse.rewrite(backendUrl, {
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
+
   // =====================================================================
   // CHẾ ĐỘ MOCK: Cho phép tất cả các route đi qua mà không kiểm tra JWT.
   // Khi kết nối Backend thật (có API login trả JWT cookie), hãy bỏ comment
   // đoạn logic bên dưới và xóa dòng return NextResponse.next() này.
   // =====================================================================
   return NextResponse.next();
-
-  // --- LOGIC GỐC (bật lại khi có Backend) ---
-  // const { pathname } = request.nextUrl;
-  // const token = request.cookies.get('accessToken')?.value;
-  // let role = null;
-  //
-  // if (token) {
-  //   const payload = parseJwt(token);
-  //   role = payload?.role; 
-  // }
-  //
-  // // 1. Auth Routes
-  // const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
-  // if (isAuthRoute) {
-  //   if (token) {
-  //     if (role === 'ADMIN') {
-  //       return NextResponse.redirect(new URL('/dashboard', request.url));
-  //     }
-  //     return NextResponse.redirect(new URL('/wardrobe', request.url));
-  //   }
-  //   return NextResponse.next();
-  // }
-  //
-  // // 2. Protected Routes
-  // const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
-  // if (isProtectedRoute) {
-  //   if (!token) {
-  //     return NextResponse.redirect(new URL('/login', request.url));
-  //   }
-  //   return NextResponse.next();
-  // }
-  //
-  // // 3. Admin Routes
-  // const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
-  // if (isAdminRoute) {
-  //   if (!token) {
-  //     return NextResponse.redirect(new URL('/login', request.url));
-  //   }
-  //   if (role !== 'ADMIN') {
-  //     return NextResponse.redirect(new URL('/wardrobe', request.url)); 
-  //   }
-  //   return NextResponse.next();
-  // }
-  //
-  // return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    // Bắt thêm cả API routes
+    '/api/v1/:path*',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
 

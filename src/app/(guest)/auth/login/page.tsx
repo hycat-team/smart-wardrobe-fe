@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useLogin } from "@/features/auth/queries/auth.queries";
+import Image from "next/image";
 
 export default function Login() {
   const router = useRouter();
@@ -34,14 +35,15 @@ export default function Login() {
       {/* Left Panel - Image */}
       <div className="hidden lg:flex w-1/2 relative bg-muted">
         <div className="absolute inset-0 bg-black/20 z-10" />
-        <img 
+        <Image 
           src="https://images.unsplash.com/photo-1550614000-4b95d466f119?auto=format&fit=crop&q=80&w=1200" 
           alt="Fashion editorial" 
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
         <div className="absolute bottom-12 left-12 z-20 text-white max-w-md">
           <p className="font-heading text-4xl italic leading-tight mb-2">
-            "Fashion is architecture: it is a matter of proportions."
+            Fashion is architecture: it is a matter of proportions.
           </p>
           <p className="text-white/80 font-medium">— Coco Chanel</p>
         </div>
