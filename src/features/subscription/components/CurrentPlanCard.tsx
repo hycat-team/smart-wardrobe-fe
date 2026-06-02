@@ -13,7 +13,7 @@ interface CurrentPlanCardProps {
 
 export const CurrentPlanCard: React.FC<CurrentPlanCardProps> = ({ subscription, quota }) => {
   const toggleMutation = useToggleAutoRenewMutation();
-  const [autoRenew, setAutoRenew] = React.useState(subscription.autoRenew);
+  const [autoRenew, setAutoRenew] = React.useState(subscription.isAutoRenewEnabled || subscription.IsAutoRenewEnabled || false);
 
   const handleToggle = () => {
     const newValue = !autoRenew;
@@ -23,10 +23,11 @@ export const CurrentPlanCard: React.FC<CurrentPlanCardProps> = ({ subscription, 
     });
   };
 
-  const daysRemaining = Math.max(
+  const expiresAtStr = subscription.expiresAt || subscription.ExpiresAt;
+  const daysRemaining = expiresAtStr ? Math.max(
     0, 
-    Math.ceil((new Date(subscription.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
-  );
+    Math.ceil((new Date(expiresAtStr).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+  ) : 'Vô hạn';
 
   return (
     <div className="bg-zinc-900/50 backdrop-blur-xl border border-white/5 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
@@ -39,10 +40,10 @@ export const CurrentPlanCard: React.FC<CurrentPlanCardProps> = ({ subscription, 
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h2 className="text-3xl font-bold text-white tracking-tight">
-              {subscription.plan.name}
+              {subscription.planName || subscription.PlanName || 'Gói Premium'}
             </h2>
             <span className="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-bold uppercase rounded-full tracking-wider border border-green-500/20">
-              {subscription.status}
+              {subscription.status || 'ACTIVE'}
             </span>
           </div>
           
@@ -50,7 +51,7 @@ export const CurrentPlanCard: React.FC<CurrentPlanCardProps> = ({ subscription, 
             <div className="flex items-center gap-3 text-zinc-400">
               <Calendar size={18} className="text-purple-400" />
               <span>
-                Còn lại <strong className="text-white">{daysRemaining} ngày</strong> (Hết hạn: {new Date(subscription.endDate).toLocaleDateString('vi-VN')})
+                Còn lại <strong className="text-white">{daysRemaining} ngày</strong> {expiresAtStr && `(Hết hạn: ${new Date(expiresAtStr).toLocaleDateString('vi-VN')})`}
               </span>
             </div>
             
@@ -89,12 +90,12 @@ export const CurrentPlanCard: React.FC<CurrentPlanCardProps> = ({ subscription, 
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="flex items-center gap-2 text-zinc-300"><Layers size={16} /> Tạo phối đồ</span>
-                <span className="font-mono text-white">{quota.outfitsCreated} / {quota.maxOutfits}</span>
+                <span className="font-mono text-white">{quota.outfitRecommendCount || quota.OutfitRecommendCount || 0} / {quota.maxOutfits || quota.MaxOutfits || '∞'}</span>
               </div>
               <div className="w-full bg-zinc-800 rounded-full h-2">
                 <div 
                   className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-1000"
-                  style={{ width: `${Math.min(100, (quota.outfitsCreated / quota.maxOutfits) * 100)}%` }}
+                  style={{ width: `${Math.min(100, ((quota.outfitRecommendCount || quota.OutfitRecommendCount || 0) / (quota.maxOutfits || quota.MaxOutfits || 1)) * 100)}%` }}
                 />
               </div>
             </div>
@@ -102,13 +103,13 @@ export const CurrentPlanCard: React.FC<CurrentPlanCardProps> = ({ subscription, 
             {/* Scans Quota */}
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span className="flex items-center gap-2 text-zinc-300"><ScanLine size={16} /> Quét ảnh</span>
-                <span className="font-mono text-white">{quota.scansUsed} / {quota.maxScans}</span>
+                <span className="flex items-center gap-2 text-zinc-300"><ScanLine size={16} /> Quét ảnh / Chat AI</span>
+                <span className="font-mono text-white">{quota.aiUsageCount || quota.AiUsageCount || 0} / {quota.aiOutfitDailyQuota || quota.AiOutfitDailyQuota || quota.aiChatDailyQuota || quota.AiChatDailyQuota || '∞'}</span>
               </div>
               <div className="w-full bg-zinc-800 rounded-full h-2">
                 <div 
                   className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-1000"
-                  style={{ width: `${Math.min(100, (quota.scansUsed / quota.maxScans) * 100)}%` }}
+                  style={{ width: `${Math.min(100, ((quota.aiUsageCount || quota.AiUsageCount || 0) / (quota.aiOutfitDailyQuota || quota.AiOutfitDailyQuota || 1)) * 100)}%` }}
                 />
               </div>
             </div>

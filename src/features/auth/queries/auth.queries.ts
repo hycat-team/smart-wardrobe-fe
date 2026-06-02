@@ -42,10 +42,12 @@ export const useConfirmRegisterOtp = () => {
 };
 
 export const useLogout = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['authStatus'] });
+      // queryClient.invalidateQueries({ queryKey: ['authStatus'] });
+      queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
       toast.success('Đăng xuất thành công');
       window.location.href = '/auth/login';
     },

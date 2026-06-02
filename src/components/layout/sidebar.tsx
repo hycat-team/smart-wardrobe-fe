@@ -100,7 +100,7 @@ export function Sidebar() {
             <p className="text-xs text-muted-foreground mb-3 leading-relaxed relative z-10">
               Mở khóa không giới hạn lượt AI và tủ đồ của bạn.
             </p>
-            <Link href="/upgrade" className="block text-center w-full py-2 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm relative z-10">
+            <Link href="/pricing" className="block text-center w-full py-2 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm relative z-10">
               Nâng cấp ngay
             </Link>
           </div>

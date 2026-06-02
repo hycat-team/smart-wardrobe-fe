@@ -16,6 +16,7 @@ PUT	/api/v1/me	Cập nhật thông tin cá nhân
 PUT	/api/v1/me/change-password	Đổi mật khẩu
 
 Subscription
+GET /api/v1/subscriptions/me Lẩy thông tin gói hội viên hiện tại
 GET	/api/v1/subscriptions/me/daily-quota	Lẩy hạn ngạch sử dụng hàng ngày
 PATCH /api/v1/subscriptions/me/toggle-auto-renew	Bật/Tắt tự động gia hạn gói cước
 GET	/api/v1/subscriptions/plans	Lẩy danh sách các gói Premium

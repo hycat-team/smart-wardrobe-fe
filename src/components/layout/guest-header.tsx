@@ -21,20 +21,7 @@ export function GuestHeader() {
   const isLoginPage = pathname === '/auth/login';
   const user = useAuthStore((state) => state.user);
   const { mutate: logout } = useLogout();
-  const [hasToken, setHasToken] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/auth/status')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.hasToken) {
-          setHasToken(true);
-        }
-      })
-      .catch(() => setHasToken(false));
-  }, []);
-
-  const isLoggedIn = !!user || hasToken;
+  const isLoggedIn = !!user;
 
   return (
     <header className="h-16 px-4 md:px-8 lg:px-12 flex items-center justify-between absolute top-0 w-full z-50 bg-transparent">

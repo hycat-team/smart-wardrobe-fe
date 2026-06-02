@@ -5,24 +5,11 @@ import { toast } from 'sonner';
 
 export const PROFILE_QUERY_KEY = ['me'];
 
-export const useAuthStatus = () => {
-  return useQuery({
-    queryKey: ['authStatus'],
-    queryFn: async () => {
-      const res = await fetch('/api/auth/status');
-      return res.json();
-    },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-  });
-};
-
 export const useProfile = () => {
-  const { data: status } = useAuthStatus();
-  
   return useQuery({
     queryKey: PROFILE_QUERY_KEY,
     queryFn: profileApi.getProfile,
-    enabled: !!status?.hasToken,
+    retry: 0, // Do not retry if unauthorized
   });
 };
 

@@ -1,34 +1,37 @@
 export interface SubscriptionPlan {
-  id: string;
-  planSlug: string;
-  name: string;
-  description: string;
-  price: number;
-  durationDays: number;
-  maxOutfits: number;
-  maxScans: number;
-  features: string[];
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  id?: string; ID?: string;
+  slug?: string; Slug?: string;
+  name?: string; Name?: string;
+  description?: string; Description?: string;
+  price?: number; Price?: number;
+  durationDays?: number; DurationDays?: number;
+  maxWardrobeItems?: number; MaxWardrobeItems?: number;
+  maxOutfits?: number; MaxOutfits?: number;
+  aiOutfitDailyQuota?: number; AiOutfitDailyQuota?: number;
+  aiChatDailyQuota?: number; AiChatDailyQuota?: number;
+  features?: string[];
+  isActive?: boolean; IsActive?: boolean;
 }
 
 export interface UserSubscription {
-  id: string;
-  userId: string;
-  planId: string;
-  plan: SubscriptionPlan;
-  startDate: string;
-  endDate: string;
-  autoRenew: boolean;
-  status: 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
+  planId?: string; PlanID?: string;
+  planName?: string; PlanName?: string;
+  planSlug?: string; PlanSlug?: string;
+  expiresAt?: string; ExpiresAt?: string;
+  isAutoRenewEnabled?: boolean; IsAutoRenewEnabled?: boolean;
+  maxWardrobeItems?: number; MaxWardrobeItems?: number;
+  maxOutfits?: number; MaxOutfits?: number;
+  aiOutfitDailyQuota?: number; AiOutfitDailyQuota?: number;
+  aiChatDailyQuota?: number; AiChatDailyQuota?: number;
+  status?: string;
 }
 
 export interface DailyQuota {
-  userId: string;
-  date: string;
-  outfitsCreated: number;
-  scansUsed: number;
-  maxOutfits: number;
-  maxScans: number;
+  outfitRecommendCount?: number; OutfitRecommendCount?: number;
+  aiUsageCount?: number; AiUsageCount?: number;
+  lastResetDate?: string; LastResetDate?: string;
+  maxWardrobeItems?: number; MaxWardrobeItems?: number;
+  maxOutfits?: number; MaxOutfits?: number;
+  aiOutfitDailyQuota?: number; AiOutfitDailyQuota?: number;
+  aiChatDailyQuota?: number; AiChatDailyQuota?: number;
 }

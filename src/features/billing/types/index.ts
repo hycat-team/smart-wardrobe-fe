@@ -24,6 +24,7 @@ export interface TopUpReq {
 }
 
 export interface PaymentLinkRes {
-  checkoutUrl: string;
-  paymentLinkId: string;
+  checkoutUrl?: string;
+  paymentUrl?: string;
+  paymentLinkId?: string;
 }

@@ -17,11 +17,11 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, isPopular }) => 
   const purchaseWallet = usePurchaseWithWalletMutation();
 
   const handlePurchaseDirect = () => {
-    purchaseDirect.mutate({ planSlug: plan.planSlug });
+    purchaseDirect.mutate({ planSlug: plan.slug || (plan as any).planSlug });
   };
 
   const handlePurchaseWallet = () => {
-    purchaseWallet.mutate({ planSlug: plan.planSlug });
+    purchaseWallet.mutate({ planSlug: plan.slug || (plan as any).planSlug });
   };
 
   return (
@@ -40,15 +40,15 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, isPopular }) => 
       )}
 
       <div className="mb-6">
-        <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
-        <p className="text-sm text-zinc-400 min-h-[40px]">{plan.description}</p>
+        <h3 className="text-2xl font-bold text-white mb-2">{plan.name || plan.Name}</h3>
+        <p className="text-sm text-zinc-400 min-h-[40px]">{plan.description || plan.Description || 'Gói hội viên thông minh giúp quản lý tủ đồ dễ dàng hơn.'}</p>
       </div>
 
       <div className="mb-6 flex items-baseline gap-1">
         <span className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-400">
-          {plan.price.toLocaleString('vi-VN')}đ
+          {(plan.price || plan.Price || 0).toLocaleString('vi-VN')}đ
         </span>
-        <span className="text-zinc-500 font-medium">/{plan.durationDays} ngày</span>
+        <span className="text-zinc-500 font-medium">/{plan.durationDays || plan.DurationDays || 30} ngày</span>
       </div>
 
       <div className="flex-1">
@@ -57,13 +57,19 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, isPopular }) => 
             <div className="mt-1 bg-purple-500/20 p-1 rounded-full text-purple-400">
               <Check size={14} strokeWidth={3} />
             </div>
-            <span className="text-zinc-300 text-sm">Tối đa <strong className="text-white">{plan.maxOutfits}</strong> bộ phối đồ</span>
+            <span className="text-zinc-300 text-sm">Tối đa <strong className="text-white">{plan.maxOutfits || plan.MaxOutfits}</strong> bộ phối đồ</span>
           </li>
           <li className="flex items-start gap-3">
             <div className="mt-1 bg-purple-500/20 p-1 rounded-full text-purple-400">
               <Check size={14} strokeWidth={3} />
             </div>
-            <span className="text-zinc-300 text-sm">Lượt quét ảnh/ngày: <strong className="text-white">{plan.maxScans}</strong></span>
+            <span className="text-zinc-300 text-sm">Lượt AI tạo phối đồ: <strong className="text-white">{plan.aiOutfitDailyQuota || plan.AiOutfitDailyQuota || '∞'}</strong></span>
+          </li>
+          <li className="flex items-start gap-3">
+            <div className="mt-1 bg-purple-500/20 p-1 rounded-full text-purple-400">
+              <Check size={14} strokeWidth={3} />
+            </div>
+            <span className="text-zinc-300 text-sm">Lượt Chat AI: <strong className="text-white">{plan.aiChatDailyQuota || plan.AiChatDailyQuota || '∞'}</strong></span>
           </li>
           {plan.features?.map((feature, idx) => (
             <li key={idx} className="flex items-start gap-3">
@@ -93,6 +99,8 @@ export const PricingCard: React.FC<PricingCardProps> = ({ plan, isPopular }) => 
             <DialogTitle className="text-xl">Chọn phương thức thanh toán</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-4">
+            <p className="text-zinc-400 mb-2">Bạn sẽ thanh toán gói <strong className="text-white">{plan.name || plan.Name}</strong> với giá <strong className="text-white">{(plan.price || plan.Price || 0).toLocaleString('vi-VN')}đ</strong>.</p>
+            
             <Button 
               onClick={handlePurchaseDirect} 
               disabled={purchaseDirect.isPending}

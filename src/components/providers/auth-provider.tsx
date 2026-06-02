@@ -30,19 +30,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [profileData, setUser]);
 
   useEffect(() => {
-    // Check if the auth token is missing using our internal API status route
-    // If it's missing (e.g. after a logout or token expiration), clear the user state.
-    fetch('/api/auth/status')
-      .then(res => res.json())
-      .then(data => {
-        if (!data || !data.hasToken) {
-          setUser(null);
-        }
-      })
-      .catch(() => {
-        // If the API status check fails, assume no token
-        setUser(null);
-      });
+    if (isError) {
+      setUser(null);
+    }
   }, [isError, setUser]);
 
   // Optionally, you can return null while loading if you want to block rendering

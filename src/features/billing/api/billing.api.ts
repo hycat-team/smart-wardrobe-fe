@@ -24,6 +24,7 @@ export const billingApi = {
     return res.data.data!;
   },
 
+
   purchasePlanWithWallet: async (data: DirectPurchaseReq): Promise<boolean> => {
     const res = await api.post<APIResponse<boolean>>('/subscriptions/me/purchase-with-wallet', data);
     return res.data.data!;

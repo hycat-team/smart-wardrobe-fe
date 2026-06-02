@@ -8,8 +8,9 @@ export const useTopupMutation = () => {
     mutationFn: (data: TopUpReq) => billingApi.topupWallet(data),
     onSuccess: (data) => {
       // Redirect to PayOS
-      if (data && data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
+      const targetUrl = data?.paymentUrl || data?.checkoutUrl;
+      if (targetUrl) {
+        window.location.href = targetUrl;
       }
     },
     onError: () => {
@@ -23,8 +24,9 @@ export const usePurchaseDirectMutation = () => {
     mutationFn: (data: DirectPurchaseReq) => billingApi.purchasePlanDirect(data),
     onSuccess: (data) => {
       // Redirect to PayOS
-      if (data && data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
+      const targetUrl = data?.paymentUrl || data?.checkoutUrl;
+      if (targetUrl) {
+        window.location.href = targetUrl;
       }
     },
     onError: () => {
@@ -32,6 +34,7 @@ export const usePurchaseDirectMutation = () => {
     },
   });
 };
+
 
 export const usePurchaseWithWalletMutation = () => {
   const queryClient = useQueryClient();

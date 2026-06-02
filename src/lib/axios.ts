@@ -41,8 +41,22 @@ api.interceptors.response.use(
 
     // Handle global errors here
     if (error.response) {
-      // Bắt lỗi 401: Token hết hạn hoặc không hợp lệ
-      if (error.response.status === 401 && !originalRequest._retry) {
+      // Bắt lỗi 401: Token hết hạn hoặc không hợp lệ (Bao gồm workaround cho lỗi 500 từ backend)
+      const isAuthError = 
+        error.response.status === 401 || 
+        (error.response.status === 500 && 
+          ((error.response.data as any)?.detail === "Vui lòng đăng nhập" || 
+           (error.response.data as any)?.Detail === "Vui lòng đăng nhập" ||
+           (error.response.data as any)?.detail === "Đã xảy ra lỗi hệ thống" // Fallback if WrapError swallowed it completely
+          )
+        );
+
+      if (
+        isAuthError && 
+        !originalRequest._retry &&
+        !originalRequest.url?.includes('/auth/refresh-token') &&
+        !originalRequest.url?.includes('/auth/login')
+      ) {
         if (isRefreshing) {
           // Nếu đang refresh, đưa request hiện tại vào hàng đợi
           return new Promise(function (resolve, reject) {
@@ -72,9 +86,9 @@ api.interceptors.response.use(
           return api(originalRequest);
         } catch (refreshError) {
           processQueue(refreshError, null);
-          toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-          // Redirect will be handled by components, or we can force it
-          window.location.href = '/auth/login';
+          // Only show error if they are on a protected route or explicitly trying to do something
+          // toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+          // window.location.href = '/auth/login';
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
@@ -82,6 +96,11 @@ api.interceptors.response.use(
       } 
       // Xử lý các lỗi khác có format ErrorResponse từ server
       else {
+        // Tắt thông báo lỗi cho API refresh-token để tránh hiện toast khi người dùng chưa đăng nhập
+        if (originalRequest.url?.includes('/auth/refresh-token')) {
+          return Promise.reject(error);
+        }
+
         const errorData = error.response.data;
         if (errorData && errorData.detail) {
           toast.error(errorData.detail);
