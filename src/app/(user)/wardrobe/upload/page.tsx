@@ -40,10 +40,14 @@ export default function Upload() {
   // Helper to transform URL with Cloudinary AI background removal + compression
   function getOptimizedBackgroundRemovedUrl(url: string): string {
     if (!url || !url.includes("cloudinary.com")) return url;
-    if (url.includes("/upload/")) {
-      return url.replace("/upload/", "/upload/e_background_removal,f_auto,q_auto/");
+    let newUrl = url;
+    // Đổi đuôi file thành .png để giữ nền trong suốt
+    newUrl = newUrl.replace(/\.[^/.]+$/, ".png");
+    if (newUrl.includes("/upload/")) {
+      // Bắt buộc dùng f_png thay vì f_auto để đảm bảo Cloudinary trả về định dạng hỗ trợ trong suốt
+      return newUrl.replace("/upload/", "/upload/e_background_removal,f_png,q_auto/");
     }
-    return url;
+    return newUrl;
   }
 
   const handleUploadAndAnalyze = async () => {
