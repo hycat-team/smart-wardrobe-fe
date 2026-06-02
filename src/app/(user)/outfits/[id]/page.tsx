@@ -1,15 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { ArrowLeft, Sparkles, Save, X, Grid, AlertCircle, ZoomIn, ZoomOut, CloudRain, Sun } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
+import { ArrowLeft, Sparkles, Save, X, Grid, AlertCircle, ZoomIn, ZoomOut, CloudRain, Sun, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { MOCK_ITEMS } from "../../wardrobe/page";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useMyWardrobe } from "@/features/wardrobe/queries/wardrobe.queries";
+import { useOutfitDetail, useUpdateOutfit } from "@/features/outfits/queries/outfits.queries";
+import { WardrobeItemStatus } from "@/features/wardrobe/types";
+import { getWardrobeItemName } from "../../wardrobe/page";
 
 const OCCASIONS = ["Casual", "Workwear", "Summer", "Party", "Formal", "Sporty"];
 
@@ -22,10 +25,14 @@ const MOODBOARDS = [
   { id: "y2k", name: "Y2K Revival", img: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&q=80&w=200" },
 ];
 
-export default function CreateOutfit() {
+function EditOutfitContent() {
   const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
+
   const user = useAuthStore((state) => state.user);
   const isPremium = user?.isPremium;
+
   const [outfitName, setOutfitName] = useState("");
   const [occasion, setOccasion] = useState("Casual");
   const [customOccasion, setCustomOccasion] = useState("");
@@ -34,13 +41,39 @@ export default function CreateOutfit() {
   const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("Tất cả");
 
+  // Load real wardrobe items and outfit detail
+  const { data: realItems = [], isLoading: isLoadingWardrobe } = useMyWardrobe();
+  const { data: outfit, isLoading: isLoadingOutfit } = useOutfitDetail(id);
+  const updateOutfitMutation = useUpdateOutfit();
+
+  // Populate data when outfit is loaded
+  useEffect(() => {
+    if (outfit) {
+      setOutfitName(outfit.name);
+      if (OCCASIONS.includes(outfit.description || "")) {
+        setOccasion(outfit.description || "Casual");
+        setCustomOccasion("");
+      } else {
+        setOccasion("Casual");
+        setCustomOccasion(outfit.description || "");
+      }
+      
+      const initialItems = (outfit.items || []).map(item => ({
+        ...(item.wardrobe_item || {}),
+        scale: Math.round((item.scale || 1) * 100),
+      })).filter(x => x.id);
+      
+      setSelectedItems(initialItems);
+    }
+  }, [outfit]);
+
   // Selection handler
   const handleItemToggle = (item: any) => {
     if (selectedItems.some(x => x.id === item.id)) {
       setSelectedItems(prev => prev.filter(x => x.id !== item.id));
     } else {
-      setSelectedItems(prev => [...prev, { ...item, scale: 100, rotation: 0 }]);
-      toast.success(`Đã thêm ${item.name} vào canvas!`);
+      setSelectedItems(prev => [...prev, { ...item, scale: 100 }]);
+      toast.success(`Đã thêm ${getWardrobeItemName(item)} vào bàn phối!`);
     }
   };
 
@@ -55,13 +88,12 @@ export default function CreateOutfit() {
 
   // AI Auto-matching magic button
   const handleAIMatch = () => {
-    // Pick 1 Top, 1 Bottom, and 1 Shoes from the wardrobe mocks
-    const tops = MOCK_ITEMS.filter(x => x.category === "Áo");
-    const bottoms = MOCK_ITEMS.filter(x => x.category === "Quần");
-    const shoes = MOCK_ITEMS.filter(x => x.category === "Giày");
+    const tops = realItems.filter(x => x.category?.name === "Áo" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe);
+    const bottoms = realItems.filter(x => x.category?.name === "Quần" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe);
+    const shoes = realItems.filter(x => x.category?.name === "Giày" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe);
 
     if (tops.length === 0 || bottoms.length === 0) {
-      toast.error("Không đủ quần áo trong tủ đồ để thực hiện AI match!");
+      toast.error("Không đủ quần áo trong tủ đồ để thực hiện AI match! Cần có ít nhất 1 Áo và 1 Quần.");
       return;
     }
 
@@ -70,21 +102,21 @@ export default function CreateOutfit() {
     const randomShoes = shoes.length > 0 ? shoes[Math.floor(Math.random() * shoes.length)] : null;
 
     const matched = [
-      { ...randomTop, scale: 100, rotation: 0 },
-      { ...randomBottom, scale: 100, rotation: 0 }
+      { ...randomTop, scale: 100 },
+      { ...randomBottom, scale: 100 }
     ];
 
     if (randomShoes) {
-      matched.push({ ...randomShoes, scale: 95, rotation: 0 });
+      matched.push({ ...randomShoes, scale: 95 });
     }
 
     setSelectedItems(matched);
-    setOutfitName("AI Suggested Outfit " + Math.floor(Math.random() * 100));
+    setOutfitName("AI Styled Outfit " + Math.floor(Math.random() * 100));
     toast.success("AI Stylist đã gợi ý bộ phối hợp hoàn chỉnh!");
   };
 
-  // Submit
-  const handleSaveOutfit = (e: React.FormEvent) => {
+  // Submit Update
+  const handleSaveOutfit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedItems.length < 2) {
       toast.error("Vui lòng chọn tối thiểu 2 món đồ để tạo thành một Outfit phối hợp.");
@@ -95,15 +127,46 @@ export default function CreateOutfit() {
       return;
     }
 
-    toast.success("Đã tạo mới bộ phối đồ thành công!");
-    router.push("/outfits");
+    try {
+      const payload = {
+        name: outfitName,
+        description: customOccasion || occasion,
+        cover_image_url: selectedItems[0]?.imageUrl || "", // use first item image as cover
+        items: selectedItems.map((item, index) => ({
+          wardrobe_item_id: item.id,
+          position_x: (index + 1) / (selectedItems.length + 1), // distributed on X axis
+          position_y: 0.5,
+          scale: (item.scale || 100) / 100, // scale standard 0.1 to 10
+          layer_order: index + 1,
+        })),
+      };
+
+      await updateOutfitMutation.mutateAsync({ id, data: payload });
+      router.push("/outfits");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // Filter closet items by category
+  // Filter closet items by category, status InWardrobe, and isLocked === false
   const categories = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
+  
+  const activeClosetItems = realItems.filter(
+    item => item.status === WardrobeItemStatus.InWardrobe && !item.isLocked
+  );
+
   const filteredCloset = activeCategory === "Tất cả" 
-    ? MOCK_ITEMS 
-    : MOCK_ITEMS.filter(x => x.category === activeCategory);
+    ? activeClosetItems 
+    : activeClosetItems.filter(x => x.category?.name === activeCategory);
+
+  if (isLoadingOutfit) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="size-10 text-terracotta animate-spin" />
+        <p className="text-sm text-ink-muted font-mono">Đang tải bộ phối đồ...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto flex flex-col gap-6 animate-in fade-in duration-500 pb-16 font-sans">
@@ -117,7 +180,7 @@ export default function CreateOutfit() {
           >
             <ArrowLeft className="size-3.5" /> QUAY LẠI OUTFITS
           </Link>
-          <h1 className={cn("text-2xl font-heading font-medium tracking-wide text-ink")}>Mix & Match Canvas</h1>
+          <h1 className={cn("text-2xl font-heading font-medium tracking-wide text-ink")}>Cập Nhật Canvas Phối Đồ</h1>
         </div>
 
         {/* Action triggers */}
@@ -135,7 +198,7 @@ export default function CreateOutfit() {
             onClick={handleSaveOutfit}
             className="flex-1 sm:flex-none h-11 rounded-xl bg-ink text-cream hover:bg-ink/90 px-6 text-xs font-mono tracking-wider flex items-center justify-center gap-1.5"
           >
-            <Save className="size-4" /> LƯU PHỐI ĐỒ
+            <Save className="size-4" /> CẬP NHẬT PHỐI ĐỒ
           </Button>
         </div>
       </div>
@@ -171,33 +234,44 @@ export default function CreateOutfit() {
             </div>
 
             {/* Closet Items Grid */}
-            <div className="grid grid-cols-3 gap-3 max-h-[380px] overflow-y-auto pr-1 no-scrollbar">
-              {filteredCloset.map(item => {
-                const isSelected = selectedItems.some(x => x.id === item.id);
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => handleItemToggle(item)}
-                    className={cn(
-                      "relative rounded-xl overflow-hidden aspect-square border cursor-pointer bg-cream-dark/20 transition-all select-none",
-                      isSelected 
-                        ? "border-terracotta ring-1 ring-terracotta" 
-                        : "border-cream-dark/80 hover:border-ink/20"
-                    )}
-                  >
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
-                    <div className="absolute inset-x-0 bottom-0 bg-black/40 text-[9px] text-white p-1 text-center font-mono truncate">
-                      {item.brand}
-                    </div>
-                    {isSelected && (
-                      <div className="absolute inset-0 bg-terracotta/25 flex items-center justify-center">
-                        <span className="bg-cream text-terracotta size-5 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">✓</span>
+            {isLoadingWardrobe ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-2">
+                <Loader2 className="size-6 text-terracotta animate-spin" />
+                <span className="text-xs text-ink-muted font-mono">Đang tải tủ đồ...</span>
+              </div>
+            ) : filteredCloset.length > 0 ? (
+              <div className="grid grid-cols-3 gap-3 max-h-[380px] overflow-y-auto pr-1 no-scrollbar">
+                {filteredCloset.map(item => {
+                  const isSelected = selectedItems.some(x => x.id === item.id);
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleItemToggle(item)}
+                      className={cn(
+                        "relative rounded-xl overflow-hidden aspect-square border cursor-pointer bg-cream-dark/20 transition-all select-none",
+                        isSelected 
+                          ? "border-terracotta ring-1 ring-terracotta" 
+                          : "border-cream-dark/80 hover:border-ink/20"
+                      )}
+                    >
+                      <img src={item.imageUrl} alt={getWardrobeItemName(item)} className="w-full h-full object-cover" />
+                      <div className="absolute inset-x-0 bottom-0 bg-black/40 text-[9px] text-white p-1 text-center font-mono truncate">
+                        {item.style || "Hàng ngày"}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                      {isSelected && (
+                        <div className="absolute inset-0 bg-terracotta/25 flex items-center justify-center">
+                          <span className="bg-cream text-terracotta size-5 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">✓</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-xs text-ink-muted font-mono">
+                Không có trang phục khả dụng.
+              </div>
+            )}
 
           </div>
 
@@ -336,7 +410,7 @@ export default function CreateOutfit() {
             {/* Canvas viewport space */}
             <div className="flex-1 relative flex items-center justify-center p-8 select-none">
               {selectedItems.length > 0 ? (
-                <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 max-w-full">
+                <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 max-w-full animate-in zoom-in-95 duration-300">
                   {selectedItems.map(item => (
                     <div 
                       key={item.id} 
@@ -356,11 +430,11 @@ export default function CreateOutfit() {
 
                       {/* Image */}
                       <div className="w-20 md:w-24 aspect-[4/5] rounded-xl overflow-hidden bg-cream-dark/20">
-                        <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                        <img src={item.imageUrl} alt={getWardrobeItemName(item)} className="w-full h-full object-cover" />
                       </div>
 
                       {/* Info & Adjuster */}
-                      <p className="text-[10px] font-medium text-ink truncate w-full text-center mt-2">{item.name}</p>
+                      <p className="text-[10px] font-medium text-ink truncate w-full text-center mt-2">{getWardrobeItemName(item)}</p>
                       
                       <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-cream-dark/40 w-full justify-between">
                         <button 
@@ -414,5 +488,15 @@ export default function CreateOutfit() {
   );
 }
 
-
-
+export default function EditOutfit() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="size-10 text-terracotta animate-spin" />
+        <p className="text-sm text-ink-muted font-mono">Đang tải bộ phối đồ...</p>
+      </div>
+    }>
+      <EditOutfitContent />
+    </Suspense>
+  );
+}

@@ -1,16 +1,33 @@
 "use client";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { UploadCloud, X, Sparkles, Check, ChevronRight } from "lucide-react";
+import { UploadCloud, X, Sparkles, Check, ChevronRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useBatchUploadWardrobeItems } from "@/features/wardrobe/queries/wardrobe.queries";
+import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+// Seeded Categories from DB migrations
+const SEEDED_CATEGORIES = [
+  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a01", name: "Áo", slug: "ao" },
+  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a02", name: "Quần", slug: "quan" },
+  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a06", name: "Váy", slug: "vay" },
+  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a04", name: "Giày", slug: "giay" },
+  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a03", name: "Mũ", slug: "mu" },
+  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a07", name: "Áo khoác", slug: "ao-khoac" },
+  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a05", name: "Phụ kiện", slug: "phu-kien" },
+];
 
 export default function Upload() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<{ category: string, color: string, style: string } | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>(SEEDED_CATEGORIES[0].id);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const batchUploadMutation = useBatchUploadWardrobeItems();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -20,35 +37,115 @@ export default function Upload() {
     }
   };
 
-  const handleUpload = () => {
-    if (!file) return;
-    setIsScanning(true);
-    
-    // Simulate AI scanning delay
-    setTimeout(() => {
-      setIsScanning(false);
-      setScanResult({
-        category: "Áo thun",
-        color: "Trắng",
-        style: "Minimalist"
+  // Helper to transform URL with Cloudinary AI background removal + compression
+  function getOptimizedBackgroundRemovedUrl(url: string): string {
+    if (!url || !url.includes("cloudinary.com")) return url;
+    if (url.includes("/upload/")) {
+      return url.replace("/upload/", "/upload/e_background_removal,f_auto,q_auto/");
+    }
+    return url;
+  }
+
+  const handleUploadAndAnalyze = async () => {
+    if (!file) {
+      toast.error("Vui lòng chọn ảnh trước!");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      // 1. Get secure upload signature
+      const signatureResult = await wardrobeApi.getUploadSignature();
+
+      // 2. Upload direct to Cloudinary
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", signatureResult.apiKey);
+      formData.append("timestamp", signatureResult.timestamp.toString());
+      formData.append("signature", signatureResult.signature);
+      formData.append("folder", signatureResult.folder);
+      if (signatureResult.publicId) {
+        formData.append("public_id", signatureResult.publicId);
+      }
+
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST",
+        body: formData,
       });
-    }, 3000);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Cloudinary upload error details:", errorText);
+        throw new Error("Không thể upload ảnh lên Cloudinary");
+      }
+
+      const uploadResData = await response.json();
+      const originalUrl = uploadResData.secure_url;
+      const publicId = uploadResData.public_id;
+
+      // 3. Apply background removal & format/quality optimization transformations
+      const optimizedUrl = getOptimizedBackgroundRemovedUrl(originalUrl);
+
+      // 4. Send crop & analysis request to backend
+      await batchUploadMutation.mutateAsync({
+        items: [
+          {
+            categoryId: selectedCategory,
+            imagePublicId: publicId,
+            imageUrl: optimizedUrl,
+          },
+        ],
+      });
+
+      // 5. Success redirect to wardrobe
+      toast.success("Upload ảnh và bắt đầu số hóa AI thành công!");
+      router.push("/wardrobe");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Đã xảy ra lỗi trong quá trình upload.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const handleSave = () => {
-    // Navigate to wardrobe dashboard
-    router.push("/wardrobe");
+  const handleReset = () => {
+    setFile(null);
+    setPreview(null);
   };
 
   return (
     <div className="max-w-4xl mx-auto h-[calc(100dvh-150px)] flex flex-col items-center justify-center animate-in fade-in duration-500 py-8">
-      
       {!preview ? (
         // Step 1: Upload Area
         <div className="w-full text-center space-y-8">
           <div>
             <h1 className="text-3xl font-heading font-bold text-ink mb-2">Thêm Đồ Mới</h1>
-            <p className="text-ink-muted">Tải ảnh lên và để AI tự động phân loại, gắn tag cho bạn.</p>
+            <p className="text-ink-muted">Tải ảnh lên và để AI tự động phân loại, tách nền & tối ưu dung lượng.</p>
+          </div>
+
+          {/* Category Selector */}
+          <div className="max-w-md mx-auto space-y-3 bg-cream-dark/20 p-6 rounded-2xl border border-cream-dark">
+            <label className="block text-xs font-mono uppercase tracking-wider text-ink font-semibold">
+              Chọn danh mục trước khi tải lên
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {SEEDED_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={cn(
+                    "px-3 py-2 rounded-xl text-xs font-medium border transition-all truncate",
+                    selectedCategory === cat.id
+                      ? "border-ink bg-ink text-cream font-semibold"
+                      : "border-cream-dark bg-transparent text-ink-muted hover:bg-cream-dark/50"
+                  )}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div 
@@ -73,110 +170,62 @@ export default function Upload() {
           />
         </div>
       ) : (
-        // Step 2 & 3: Preview & Scan Result
+        // Step 2: Preview & Send Action
         <div className="w-full h-full grid md:grid-cols-2 gap-8 items-center">
-          
           <div className="relative w-full aspect-[4/5] bg-muted rounded-3xl overflow-hidden shadow-lg border border-border">
             <img src={preview} alt="Preview" className="w-full h-full object-cover" />
             
-            {/* Scanning Animation Overlay */}
-            {isScanning && (
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-10">
-                <div className="absolute top-0 w-full h-1 bg-primary shadow-[0_0_20px_rgba(201,113,74,0.8)] animate-[scan_2s_ease-in-out_infinite]" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white space-y-4">
-                   <Sparkles className="size-8 animate-pulse text-primary" />
-                   <p className="font-heading font-bold text-xl animate-pulse">AI đang phân tích ảnh...</p>
-                </div>
+            {/* Uploading Animation Overlay */}
+            {isUploading && (
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-white space-y-4">
+                 <Loader2 className="size-10 text-primary animate-spin" />
+                 <p className="font-heading font-bold text-xl animate-pulse">Đang tải lên và phân tích...</p>
+                 <span className="text-xs opacity-75 font-mono text-center px-4">
+                   (Tự động xóa nền & tối ưu dung lượng qua Cloudinary AI)
+                 </span>
               </div>
             )}
             
             <button 
-              onClick={() => { setFile(null); setPreview(null); setScanResult(null); }}
+              onClick={handleReset}
               className="absolute top-4 right-4 size-10 bg-background/50 backdrop-blur-md rounded-full flex items-center justify-center text-ink hover:bg-background transition-colors z-20"
-              disabled={isScanning}
+              disabled={isUploading}
             >
               <X className="size-5" />
             </button>
           </div>
 
           <div className="space-y-8 flex flex-col justify-center">
-            {isScanning ? (
-               <div className="space-y-6">
-                 <h2 className="text-2xl font-heading font-bold text-ink">Đang xử lý hình ảnh</h2>
-                 <div className="space-y-3">
-                   <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                     <div className="h-full bg-primary w-1/2 animate-[progress_2s_ease-in-out_infinite]" />
-                   </div>
-                   <p className="text-sm text-ink-muted">Đang bóc tách màu sắc & phong cách...</p>
-                 </div>
-               </div>
-            ) : !scanResult ? (
-              <div className="space-y-6 text-center md:text-left">
-                <h2 className="text-3xl font-heading font-bold text-ink">Bắt đầu phân tích</h2>
-                <p className="text-ink-muted">AI sẽ tự động nhận diện loại quần áo, màu sắc và phong cách để thêm vào tủ đồ của bạn.</p>
-                <Button onClick={handleUpload} className="w-full md:w-auto h-12 rounded-full px-8 bg-primary text-primary-foreground text-base shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
-                  <Sparkles className="size-5 mr-2" /> Dùng AI Phân Tích
+            <div className="space-y-6 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cream-dark text-ink text-xs font-mono border border-cream-dark/50">
+                Danh mục: {SEEDED_CATEGORIES.find(x => x.id === selectedCategory)?.name}
+              </div>
+              <h2 className="text-3xl font-heading font-bold text-ink">Bắt đầu phân tích AI</h2>
+              <p className="text-ink-muted leading-relaxed">
+                Hệ thống sẽ tải ảnh lên Cloudinary bảo mật, tự động kích hoạt **Cloudinary AI Background Removal** để xóa sạch nền và nén dung lượng, sau đó đẩy về backend để AI phân tích chất liệu, màu sắc và phong cách.
+              </p>
+              
+              <div className="flex gap-4">
+                <Button 
+                  variant="outline" 
+                  onClick={handleReset} 
+                  disabled={isUploading}
+                  className="flex-1 h-12 rounded-xl border-cream-dark hover:bg-cream-dark/50"
+                >
+                  Chọn lại
+                </Button>
+                <Button 
+                  onClick={handleUploadAndAnalyze} 
+                  disabled={isUploading}
+                  className="flex-1 h-12 rounded-xl bg-ink text-cream hover:bg-ink/90 shadow-lg shadow-ink/20 group flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="size-5" /> Tải lên tủ đồ
                 </Button>
               </div>
-            ) : (
-              <div className="space-y-6 animate-in slide-in-from-right-8 duration-500">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20">
-                  <Check className="size-4" /> Phân tích thành công
-                </div>
-                
-                <h2 className="text-3xl font-heading font-bold text-ink">Kết Quả AI</h2>
-                
-                <div className="bg-card p-6 rounded-2xl border border-border shadow-sm space-y-4">
-                  <div className="flex items-center justify-between py-2 border-b border-border">
-                    <span className="text-ink-muted font-medium">Danh mục</span>
-                    <span className="font-bold text-ink">{scanResult.category}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2 border-b border-border">
-                    <span className="text-ink-muted font-medium">Màu sắc chủ đạo</span>
-                    <div className="flex items-center gap-2">
-                      <div className="size-4 rounded-full bg-white border border-border" />
-                      <span className="font-bold text-ink">{scanResult.color}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-ink-muted font-medium">Phong cách</span>
-                    <span className="font-bold text-ink">{scanResult.style}</span>
-                  </div>
-                </div>
-
-                <div className="text-sm text-muted-foreground pb-4">
-                  *Bạn có thể chỉnh sửa lại các thông tin này nếu AI nhận diện chưa chính xác.
-                </div>
-
-                <div className="flex gap-4">
-                   <Button variant="outline" className="flex-1 h-12 rounded-xl">Sửa thủ công</Button>
-                   <Button onClick={handleSave} className="flex-1 h-12 rounded-xl bg-ink text-cream hover:bg-ink/90 shadow-lg shadow-ink/20 group">
-                     Lưu vào Tủ <ChevronRight className="size-5 ml-1 group-hover:translate-x-1 transition-transform" />
-                   </Button>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
-
         </div>
       )}
-
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes scan {
-          0% { top: 0%; opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { top: 100%; opacity: 0; }
-        }
-        @keyframes progress {
-          0% { width: 0%; }
-          50% { width: 70%; }
-          100% { width: 100%; }
-        }
-      `}} />
     </div>
   );
 }
-
-
-

@@ -1,14 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 import { 
   Plus, Edit2, Tag, Search, Filter, 
-  X, Eye 
+  X, Eye, Lock, Loader2 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   Sheet,
   SheetContent,
@@ -17,6 +16,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useMyWardrobe, useSearchWardrobeItems } from "@/features/wardrobe/queries/wardrobe.queries";
+import { WardrobeItemStatus } from "@/features/wardrobe/types";
+import { toast } from "sonner";
 
 const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
 
@@ -32,93 +34,49 @@ const COLORS = [
 
 const TAGS = ["Casual", "Minimalist", "Denim", "Elegant", "Summer", "Formal", "Workwear", "Sporty"];
 
-export const MOCK_ITEMS = [
-  { 
-    id: "1", 
-    name: "Áo Thun Basic", 
-    category: "Áo", 
-    color: "white", 
-    img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=400", 
-    tags: ["Casual", "Minimalist"],
-    brand: "Uniqlo",
-    timesWorn: 18,
-    dateAdded: "2026-04-10"
-  },
-  { 
-    id: "2", 
-    name: "Quần Jeans Xanh Slim", 
-    category: "Quần", 
-    color: "blue", 
-    img: "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=400", 
-    tags: ["Casual", "Denim"],
-    brand: "Levi's",
-    timesWorn: 34,
-    dateAdded: "2026-03-15"
-  },
-  { 
-    id: "3", 
-    name: "Váy Liền Trắng Dáng Dài", 
-    category: "Váy", 
-    color: "white", 
-    img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=400", 
-    tags: ["Elegant", "Summer"],
-    brand: "Zara",
-    timesWorn: 8,
-    dateAdded: "2026-05-02"
-  },
-  { 
-    id: "4", 
-    name: "Blazer Xám Công Sở", 
-    category: "Áo", 
-    color: "gray", 
-    img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&q=80&w=400", 
-    tags: ["Formal", "Workwear"],
-    brand: "Mango",
-    timesWorn: 12,
-    dateAdded: "2026-04-20"
-  },
-  { 
-    id: "5", 
-    name: "Sneaker Trắng Classic", 
-    category: "Giày", 
-    color: "white", 
-    img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=400", 
-    tags: ["Casual", "Sporty"], 
-    selling: true,
-    brand: "Adidas",
-    timesWorn: 45,
-    dateAdded: "2026-01-20"
-  },
-  { 
-    id: "6", 
-    name: "Áo Sơ Mi Linen Cổ Tàu", 
-    category: "Áo", 
-    color: "beige", 
-    img: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=400", 
-    tags: ["Minimalist", "Summer"], 
-    brand: "Muji",
-    timesWorn: 15,
-    dateAdded: "2026-05-10"
-  },
-  { 
-    id: "7", 
-    name: "Quần Kaki Đen", 
-    category: "Quần", 
-    color: "black", 
-    img: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&q=80&w=400", 
-    tags: ["Casual", "Workwear"], 
-    brand: "Dickies",
-    timesWorn: 22,
-    dateAdded: "2026-02-18"
-  },
-];
 
-export default function Wardrobe() {
+// Helper to format item display name
+export function getWardrobeItemName(item: any): string {
+  if (item.name) return item.name;
+  const categoryName = item.category?.name || "Trang phục";
+  const colorStr = item.color ? `màu ${item.color}` : "";
+  const styleStr = item.style ? `phong cách ${item.style}` : "";
+  return [categoryName, colorStr, styleStr].filter(Boolean).join(" ");
+}
+
+// Helper to normalize color to HEX
+export function getColorHex(colorName: string): string {
+  const c = COLORS.find(x => x.name.toLowerCase() === colorName.toLowerCase() || x.value === colorName.toLowerCase());
+  return c ? c.hex : "#CCCCCC";
+}
+
+// Helper to map color string to standard filter value
+const getColorValue = (color: string) => {
+  const map: Record<string, string> = {
+    "Trắng": "white",
+    "Đen": "black",
+    "Xanh dương": "blue",
+    "Xanh": "blue",
+    "Xám": "gray",
+    "Đỏ": "red",
+    "Vàng": "yellow",
+    "Be": "beige",
+  };
+  return map[color] || color?.toLowerCase() || "";
+};
+
+function WardrobeContent() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const isPremium = user?.isPremium;
   const searchParams = useSearchParams();
-  const setSearchParams = (p: any) => { const q = new URLSearchParams(searchParams.toString()); for(const k in p) q.set(k, p[k]); router.push('?' + q.toString()); };
+  
+  const setSearchParams = (p: any) => { 
+    const q = new URLSearchParams(searchParams.toString()); 
+    for(const k in p) q.set(k, p[k]); 
+    router.push('?' + q.toString()); 
+  };
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Sync Search state with query params
@@ -129,6 +87,11 @@ export default function Wardrobe() {
   const searchParam = searchParams.get("q") || "";
 
   const [searchInput, setSearchInput] = useState(searchParam);
+
+  // Load real wardrobe items
+  const { data: realItems = [], isLoading: isLoadingItems } = useMyWardrobe();
+  // Load ES search results if search is active
+  const { data: searchResults = [], isLoading: isSearching } = useSearchWardrobeItems(searchParam);
 
   // Update local search input state when searchParam changes in URL
   useEffect(() => {
@@ -180,30 +143,36 @@ export default function Wardrobe() {
     (tagParam ? 1 : 0) + 
     (searchParam ? 1 : 0);
 
+  // Choose source database (Search results vs normal lists)
+  const activeSourceItems = searchParam ? searchResults : realItems;
+
   // Filter & Sort Logic
-  const filteredItems = MOCK_ITEMS.filter(item => {
-    const matchesCategory = categoryParam === "Tất cả" || item.category === categoryParam;
-    const matchesColor = !colorParam || item.color === colorParam;
-    const matchesTag = !tagParam || item.tags.includes(tagParam);
-    const matchesSearch = !searchParam || 
-      item.name.toLowerCase().includes(searchParam.toLowerCase()) ||
-      item.brand.toLowerCase().includes(searchParam.toLowerCase());
+  const filteredItems = activeSourceItems.filter(item => {
+    const itemCatName = item.category?.name || "";
+    const matchesCategory = categoryParam === "Tất cả" || itemCatName === categoryParam;
     
-    return matchesCategory && matchesColor && matchesTag && matchesSearch;
+    const matchesColor = !colorParam || getColorValue(item.color || "") === colorParam;
+    
+    // Tag filter (for mock tags backward compatibility, or matching backend style/material)
+    const mockTags = (item as any).tags || [];
+    const backendTags = [item.style, item.material, item.pattern, item.seasonality].filter(Boolean);
+    const matchesTag = !tagParam || mockTags.includes(tagParam) || backendTags.includes(tagParam);
+    
+    return matchesCategory && matchesColor && matchesTag;
   });
 
   const sortedItems = [...filteredItems].sort((a, b) => {
+    const timeA = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : ((a as any).dateAdded ? new Date((a as any).dateAdded).getTime() : 0);
+    const timeB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : ((b as any).dateAdded ? new Date((b as any).dateAdded).getTime() : 0);
+
     if (sortParam === "newest") {
-      return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
+      return timeB - timeA;
     }
     if (sortParam === "oldest") {
-      return new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime();
-    }
-    if (sortParam === "worn-most") {
-      return b.timesWorn - a.timesWorn;
+      return timeA - timeB;
     }
     if (sortParam === "name") {
-      return a.name.localeCompare(b.name);
+      return getWardrobeItemName(a).localeCompare(getWardrobeItemName(b));
     }
     return 0;
   });
@@ -218,16 +187,16 @@ export default function Wardrobe() {
           {isPremium ? (
             <div className="mt-4 max-w-lg border-l-2 border-primary pl-4 py-1">
               <p className="text-sm font-heading italic text-muted-foreground leading-relaxed">
-                "Bạn có {MOCK_ITEMS.length} item — hôm nay bạn nên thử phong cách Capsule Wardrobe với 2 item đã lâu không mặc. <a href="#" className="text-primary not-italic font-sans text-xs uppercase tracking-widest font-bold hover:underline ml-2">✦ Xem gợi ý</a>"
+                "Bạn có {realItems.length} item — hôm nay bạn nên thử phong cách Capsule Wardrobe với 2 item đã lâu không mặc. <a href="#" className="text-primary not-italic font-sans text-xs uppercase tracking-widest font-bold hover:underline ml-2">✦ Xem gợi ý</a>"
               </p>
             </div>
           ) : (
             <div className="mt-2 flex items-center gap-4 text-xs font-mono text-ink-muted">
-              <span>Sức chứa: {MOCK_ITEMS.length} / 50 món</span>
+              <span>Sức chứa: {realItems.length} / 50 món</span>
               <div className="w-32 h-1 bg-cream-dark rounded-full overflow-hidden">
-                <div className="h-full bg-terracotta transition-all" style={{ width: `${(MOCK_ITEMS.length / 50) * 100}%` }} />
+                <div className="h-full bg-terracotta transition-all" style={{ width: `${(realItems.length / 50) * 100}%` }} />
               </div>
-              <span>{Math.round((MOCK_ITEMS.length / 50) * 100)}%</span>
+              <span>{Math.round((realItems.length / 50) * 100)}%</span>
             </div>
           )}
         </div>
@@ -266,12 +235,16 @@ export default function Wardrobe() {
           {/* Quick Search & Filter Drawer Trigger */}
           <div className="flex items-center gap-2 shrink-0">
             <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-48">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-ink-muted" />
+              {isSearching ? (
+                <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-ink-muted animate-spin" />
+              ) : (
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-ink-muted" />
+              )}
               <input 
                 type="text" 
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Tìm sản phẩm, nhãn hiệu..." 
+                placeholder="Tìm trang phục thông minh..." 
                 className="h-9 pl-9 pr-4 rounded-xl bg-cream-dark/50 border-transparent focus:ring-1 focus:ring-terracotta focus:border-terracotta text-xs w-full transition-all"
               />
             </form>
@@ -374,7 +347,6 @@ export default function Wardrobe() {
                       {[
                         { label: "Mới nhất", value: "newest" },
                         { label: "Cũ nhất", value: "oldest" },
-                        { label: "Mặc nhiều nhất", value: "worn-most" },
                         { label: "Tên A-Z", value: "name" },
                       ].map(opt => {
                         const isSelected = sortParam === opt.value;
@@ -449,126 +421,147 @@ export default function Wardrobe() {
       </div>
 
       {/* Grid Content */}
-      {sortedItems.length > 0 ? (
+      {isLoadingItems ? (
+        <div className="flex flex-col items-center justify-center p-12 space-y-4">
+          <Loader2 className="size-10 text-terracotta animate-spin" />
+          <p className="text-sm text-ink-muted font-mono">Đang tải tủ đồ...</p>
+        </div>
+      ) : sortedItems.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {sortedItems.map(item => {
-            const isForgotten = item.timesWorn < 10;
+          {sortedItems.map((item: any) => {
+            const isProcessing = item.status === WardrobeItemStatus.Processing;
+            const isFailed = item.status === WardrobeItemStatus.Failed;
+            const isLocked = item.isLocked;
+
+            const handleCardClick = () => {
+              if (isLocked) {
+                toast.error("Trang phục bị khóa do vượt quá hạn ngạch. Vui lòng nâng cấp gói cước!");
+                return;
+              }
+              if (isProcessing) {
+                toast.info("AI đang xử lý hình ảnh này. Vui lòng đợi trong giây lát!");
+                return;
+              }
+              router.push(`/wardrobe/item/${item.id}`);
+            };
+
             return (
-            <div 
-              key={item.id} 
-              className={cn(
-                "group relative rounded-2xl overflow-hidden border transition-all duration-300",
-                isPremium 
-                  ? "bg-card hover:border-primary/50 border-border" 
-                  : "bg-cream-dark/20 hover:bg-cream-dark/30 border-cream-dark/50 hover:border-ink-subtle"
-              )}
-            >
-              {item.selling && (
-                <div className="absolute top-3 left-3 z-10 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg text-[9px] font-mono font-bold text-terracotta flex items-center gap-1 shadow-sm border border-terracotta-light">
-                  <Tag className="size-3 text-terracotta" /> SALE
-                </div>
-              )}
-              {isPremium && isForgotten && (
-                <div className="absolute top-3 right-3 z-10 bg-secondary/80 backdrop-blur-sm px-2 py-1 rounded text-[9px] font-heading italic text-primary border border-primary/20">
-                  FORGOTTEN
-                </div>
-              )}
-              
               <div 
-                onClick={() => router.push(`/wardrobe/item/${item.id}`)}
+                key={item.id} 
                 className={cn(
-                  "aspect-[4/5] relative overflow-hidden cursor-pointer",
-                  isPremium ? "bg-muted" : "bg-cream-dark/40"
+                  "group relative rounded-2xl overflow-hidden border transition-all duration-300",
+                  isPremium 
+                    ? "bg-card hover:border-primary/50 border-border" 
+                    : "bg-cream-dark/20 hover:bg-cream-dark/30 border-cream-dark/50 hover:border-ink-subtle",
+                  isLocked && "opacity-75"
                 )}
               >
-                <img 
-                  src={item.img} 
-                  alt={item.name} 
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" 
-                />
+                {/* Lock overlay */}
+                {isLocked && (
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center text-white gap-2 p-4 text-center">
+                    <Lock className="size-6 text-yellow-500" />
+                    <span className="text-xs font-bold font-mono tracking-wider">ĐÃ KHÓA</span>
+                    <span className="text-[10px] opacity-80">Gói Free hết hạn ngạch</span>
+                  </div>
+                )}
+
+                {/* Processing overlay */}
+                {isProcessing && (
+                  <div className="absolute inset-0 bg-cream/70 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center text-ink gap-2">
+                    <Loader2 className="size-6 text-terracotta animate-spin" />
+                    <span className="text-[10px] font-mono font-bold text-ink-muted">AI ĐANG PHÂN TÍCH...</span>
+                  </div>
+                )}
+
+                {isFailed && (
+                  <div className="absolute top-3 left-3 z-10 bg-red-500 text-white px-2 py-0.5 rounded text-[9px] font-mono font-bold">
+                    AI LỖI
+                  </div>
+                )}
                 
-                {/* Elegant Hover overlay */}
-                <div className="absolute inset-0 bg-ink/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/wardrobe/item/${item.id}`);
-                    }}
-                    className={cn(
-                      "size-10 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-md",
-                      isPremium ? "bg-primary text-primary-foreground" : "bg-cream text-ink hover:bg-ink hover:text-cream"
-                    )}
-                    title="Chi tiết"
-                  >
-                    <Eye className="size-4" />
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/wardrobe/item/${item.id}/edit`);
-                    }}
-                    className={cn(
-                      "size-10 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-md",
-                      isPremium ? "bg-primary text-primary-foreground" : "bg-cream text-ink hover:bg-ink hover:text-cream"
-                    )}
-                    title="Chỉnh sửa"
-                  >
-                    <Edit2 className="size-4" />
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/wardrobe/item/${item.id}/sell`);
-                    }}
-                    className={cn(
-                      "size-10 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-md",
-                      isPremium 
-                        ? "bg-primary text-primary-foreground"
-                        : (item.selling ? "bg-terracotta text-cream hover:bg-terracotta/90" : "bg-cream text-ink hover:bg-ink hover:text-cream")
-                    )}
-                    title={item.selling ? "Quản lý bài đăng bán" : "Đăng bán đồ"}
-                  >
-                    <Tag className="size-4" />
-                  </button>
-                </div>
-              </div>
-              
-              {/* Product Info */}
-              <div className="p-4 space-y-2">
-                <div className="flex items-start justify-between gap-1.5">
-                  <h3 
-                    onClick={() => router.push(`/wardrobe/item/${item.id}`)}
-                    className={cn(
-                      "font-semibold text-sm md:text-base leading-tight hover:underline cursor-pointer truncate text-ink",
-                      isPremium ? "font-sans font-light" : "font-heading"
-                    )}
-                  >
-                    {item.name}
-                  </h3>
-                  <span 
-                    className="size-3 rounded-full border border-black/10 shrink-0 inline-block mt-1" 
-                    style={{ backgroundColor: COLORS.find(c => c.value === item.color)?.hex || "#CCCCCC" }}
+                <div 
+                  onClick={handleCardClick}
+                  className={cn(
+                    "aspect-[4/5] relative overflow-hidden cursor-pointer",
+                    isPremium ? "bg-muted" : "bg-cream-dark/40"
+                  )}
+                >
+                  <img 
+                    src={item.imageUrl} 
+                    alt={getWardrobeItemName(item)} 
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" 
                   />
+                  
+                  {/* Elegant Hover overlay (hide when locked or processing) */}
+                  {!isLocked && !isProcessing && (
+                    <div className="absolute inset-0 bg-ink/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/wardrobe/item/${item.id}`);
+                        }}
+                        className={cn(
+                          "size-10 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-md",
+                          isPremium ? "bg-primary text-primary-foreground" : "bg-cream text-ink hover:bg-ink hover:text-cream"
+                        )}
+                        title="Chi tiết"
+                      >
+                        <Eye className="size-4" />
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/wardrobe/item/${item.id}/edit`);
+                        }}
+                        className={cn(
+                          "size-10 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-md",
+                          isPremium ? "bg-primary text-primary-foreground" : "bg-cream text-ink hover:bg-ink hover:text-cream"
+                        )}
+                        title="Chỉnh sửa"
+                      >
+                        <Edit2 className="size-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
-
-                <div className="flex items-center justify-between text-[11px] font-mono text-ink-muted">
-                  <span className="font-medium">{item.brand}</span>
-                  <span>Mặc: {item.timesWorn} lần</span>
-                </div>
-
-                <div className={cn("flex flex-wrap gap-1 pt-1", isPremium && "opacity-60")}>
-                  {item.tags.map(t => (
-                    <span 
-                      key={t} 
-                      onClick={() => handleTagChange(t)}
-                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground hover:text-primary hover:bg-primary/20 cursor-pointer transition-colors"
+                
+                {/* Product Info */}
+                <div className="p-4 space-y-2">
+                  <div className="flex items-start justify-between gap-1.5">
+                    <h3 
+                      onClick={handleCardClick}
+                      className={cn(
+                        "font-semibold text-sm md:text-base leading-tight hover:underline cursor-pointer truncate text-ink",
+                        isPremium ? "font-sans font-light" : "font-heading"
+                      )}
                     >
-                      #{t}
-                    </span>
-                  ))}
+                      {getWardrobeItemName(item)}
+                    </h3>
+                    <span 
+                      className="size-3 rounded-full border border-black/10 shrink-0 inline-block mt-1" 
+                      style={{ backgroundColor: getColorHex(item.color || "") }}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] font-mono text-ink-muted">
+                    <span className="font-medium">{item.style || "Hàng ngày"}</span>
+                    <span>{item.material || "Chưa rõ"}</span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1 pt-1 opacity-70">
+                    {item.fit && (
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                        #{item.fit}
+                      </span>
+                    )}
+                    {item.seasonality && (
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                        #{item.seasonality}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
             );
           })}
 
@@ -612,5 +605,15 @@ export default function Wardrobe() {
   );
 }
 
-
-
+export default function Wardrobe() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="size-10 text-terracotta animate-spin" />
+        <p className="text-sm text-ink-muted font-mono">Đang khởi tạo tủ đồ...</p>
+      </div>
+    }>
+      <WardrobeContent />
+    </Suspense>
+  );
+}

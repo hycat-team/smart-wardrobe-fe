@@ -19,7 +19,7 @@ export default function BillingSettings() {
   };
 
   const handleToggleAutoRenew = () => {
-    toggleAutoRenew();
+    toggleAutoRenew(undefined);
   };
 
   if (isPremium) {

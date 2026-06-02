@@ -1,74 +1,58 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { Plus, Sparkles, User, Heart, Trash2, ArrowRight } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Plus, Sparkles, User, Heart, Trash2, ArrowRight, Loader2, Shirt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { MOCK_ITEMS } from "../wardrobe/page";
+import { useMyOutfits, useDeleteOutfit } from "@/features/outfits/queries/outfits.queries";
 
-// Mock outfits database
-export const MOCK_OUTFITS = [
-  {
-    id: "o1",
-    name: "Casual Dạo Phố Mùa Hè",
-    occasion: "Casual",
-    source: "manual", // manual or ai
-    favorite: true,
-    items: ["1", "2", "5"], // IDs from MOCK_ITEMS
-    dateCreated: "2026-05-12"
-  },
-  {
-    id: "o2",
-    name: "Công Sở Thanh Lịch",
-    occasion: "Workwear",
-    source: "ai",
-    favorite: true,
-    items: ["4", "6", "7"],
-    dateCreated: "2026-05-18"
-  },
-  {
-    id: "o3",
-    name: "Summer Picnic Chic",
-    occasion: "Summer",
-    source: "manual",
-    favorite: false,
-    items: ["3", "6", "5"],
-    dateCreated: "2026-05-24"
-  }
-];
-
-export default function Outfits() {
+function OutfitsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const setSearchParams = (p: any) => { const q = new URLSearchParams(searchParams.toString()); for(const k in p) q.set(k, p[k]); router.push('?' + q.toString()); };
   const filterParam = searchParams.get("filter") || "all";
   
-  const [outfitsList, setOutfitsList] = useState(MOCK_OUTFITS);
+  const { data: outfits = [], isLoading } = useMyOutfits();
+  const deleteOutfitMutation = useDeleteOutfit();
 
-  const handleFilterChange = (filter: string) => {
-    setSearchParams({ filter });
-  };
+  const [favorites, setFavorites] = useState<Record<string, boolean>>({});
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setOutfitsList(prev => prev.map(o => o.id === id ? { ...o, favorite: !o.favorite } : o));
+    setFavorites(prev => ({ ...prev, [id]: !prev[id] }));
     toast.success("Đã cập nhật trạng thái yêu thích!");
   };
 
-  const deleteOutfit = (id: string, e: React.MouseEvent) => {
+  const handleDeleteOutfit = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setOutfitsList(prev => prev.filter(o => o.id !== id));
-    toast.success("Đã xóa bộ trang phục!");
+    if (confirm("Bạn có chắc chắn muốn xóa bộ phối đồ này không?")) {
+      try {
+        await deleteOutfitMutation.mutateAsync(id);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
+  const handleFilterChange = (filter: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (filter === "all") {
+      params.delete("filter");
+    } else {
+      params.set("filter", filter);
+    }
+    router.push("?" + params.toString());
   };
 
   // Filter outfits logic
-  const filteredOutfits = outfitsList.filter(o => {
+  const filteredOutfits = outfits.filter(o => {
+    const isFavorite = favorites[o.id] || false;
+    
     if (filterParam === "all") return true;
-    if (filterParam === "ai") return o.source === "ai";
-    if (filterParam === "manual") return o.source === "manual";
-    if (filterParam === "saved") return o.favorite;
+    if (filterParam === "ai") return o.status === 1; // Assuming status 1 indicates AI generated in backend
+    if (filterParam === "manual") return o.status === 0 || o.status === 2;
+    if (filterParam === "saved") return isFavorite;
     return true;
   });
 
@@ -80,7 +64,7 @@ export default function Outfits() {
         <div>
           <h1 className="text-3xl font-heading font-medium tracking-wide text-ink">Bộ trang phục (Outfits)</h1>
           <p className="text-xs text-ink-muted font-mono uppercase tracking-wider mt-1">
-            Tổng số: {outfitsList.length} bộ đã lưu phối
+            Tổng số: {outfits.length} bộ đã lưu phối
           </p>
         </div>
         
@@ -132,13 +116,19 @@ export default function Outfits() {
       </div>
 
       {/* Outfits Grid */}
-      {filteredOutfits.length > 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center p-12 space-y-4">
+          <Loader2 className="size-10 text-terracotta animate-spin" />
+          <p className="text-sm text-ink-muted font-mono">Đang tải danh sách phối đồ...</p>
+        </div>
+      ) : filteredOutfits.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredOutfits.map(outfit => {
-            // Map outfit item IDs to actual items
-            const itemsInOutfit = outfit.items
-              .map(id => MOCK_ITEMS.find(item => item.id === id))
-              .filter(Boolean);
+            const itemsInOutfit = outfit.items || [];
+            const isFavorite = favorites[outfit.id] || false;
+
+            // Fallback preview cover image: either cover_image_url or first item's image
+            const coverImage = outfit.cover_image_url || itemsInOutfit[0]?.wardrobe_item?.imageUrl;
 
             return (
               <div 
@@ -149,13 +139,13 @@ export default function Outfits() {
                 
                 {/* Outfit Collage Preview */}
                 <div className="p-4 bg-cream-dark/20 border-b border-cream-dark/40 aspect-[4/3] flex gap-2">
-                  {itemsInOutfit.length > 0 ? (
+                  {coverImage ? (
                     <>
-                      {/* First large item */}
+                      {/* First large item / cover */}
                       <div className="flex-1 rounded-xl overflow-hidden bg-cream-dark/30 border border-cream-dark/60 relative">
                         <img 
-                          src={itemsInOutfit[0]?.img} 
-                          alt={itemsInOutfit[0]?.name}
+                          src={coverImage} 
+                          alt={outfit.name}
                           className="w-full h-full object-cover" 
                         />
                       </div>
@@ -166,8 +156,8 @@ export default function Outfits() {
                           {itemsInOutfit.slice(1, 3).map((item, idx) => (
                             <div key={idx} className="flex-1 rounded-lg overflow-hidden bg-cream-dark/30 border border-cream-dark/60">
                               <img 
-                                src={item?.img} 
-                                alt={item?.name} 
+                                src={item.wardrobe_item?.imageUrl} 
+                                alt={item.wardrobe_item?.style} 
                                 className="w-full h-full object-cover" 
                               />
                             </div>
@@ -182,8 +172,9 @@ export default function Outfits() {
                       )}
                     </>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs text-ink-muted">
-                      Trống
+                    <div className="w-full h-full flex flex-col items-center justify-center text-xs text-ink-muted gap-2">
+                      <Shirt className="size-8 stroke-1 text-ink-subtle" />
+                      Không có trang phục
                     </div>
                   )}
                 </div>
@@ -193,15 +184,15 @@ export default function Outfits() {
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-mono text-ink-muted uppercase tracking-wider">
-                        Dành cho: {outfit.occasion}
+                        Dịp: {outfit.description || "Hàng ngày"}
                       </span>
                       <span className={cn(
                         "text-[9px] font-mono px-2 py-0.5 rounded-full font-bold flex items-center gap-1",
-                        outfit.source === "ai" 
+                        outfit.status === 1 
                           ? "bg-terracotta-light/20 text-terracotta border border-terracotta/25" 
                           : "bg-ink-muted/10 text-ink-muted border border-ink-muted/10"
                       )}>
-                        {outfit.source === "ai" ? (
+                        {outfit.status === 1 ? (
                           <>
                             <Sparkles className="size-2.5" /> AI STYLIST
                           </>
@@ -221,7 +212,7 @@ export default function Outfits() {
                   {/* Actions */}
                   <div className="flex items-center justify-between border-t border-cream-dark/30 pt-3">
                     <span className="text-[10px] font-mono text-ink-muted">
-                      Tạo ngày: {outfit.dateCreated}
+                      Tạo ngày: {outfit.created_at ? new Date(outfit.created_at).toLocaleDateString("vi-VN") : "Gần đây"}
                     </span>
 
                     <div className="flex items-center gap-1">
@@ -230,10 +221,10 @@ export default function Outfits() {
                         className="p-2 hover:bg-cream-dark/50 rounded-lg text-ink-muted hover:text-red-500 transition-colors"
                         title="Yêu thích"
                       >
-                        <Heart className={cn("size-4", outfit.favorite && "fill-red-500 text-red-500")} />
+                        <Heart className={cn("size-4", isFavorite && "fill-red-500 text-red-500")} />
                       </button>
                       <button 
-                        onClick={(e) => deleteOutfit(outfit.id, e)}
+                        onClick={(e) => handleDeleteOutfit(outfit.id, e)}
                         className="p-2 hover:bg-cream-dark/50 rounded-lg text-ink-muted hover:text-terracotta transition-colors"
                         title="Xóa"
                       >
@@ -287,4 +278,15 @@ export default function Outfits() {
   );
 }
 
-
+export default function Outfits() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="size-10 text-terracotta animate-spin" />
+        <p className="text-sm text-ink-muted font-mono">Đang tải danh sách phối đồ...</p>
+      </div>
+    }>
+      <OutfitsContent />
+    </Suspense>
+  );
+}
