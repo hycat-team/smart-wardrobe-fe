@@ -9,6 +9,7 @@ import {
   InitClosetFromCatalogReq,
   SearchWardrobeItemRes,
   UpdateWardrobeItemReq,
+  CategoryRes,
 } from '../types';
 
 export const wardrobeApi = {
@@ -43,7 +44,16 @@ export const wardrobeApi = {
   },
 
   updateWardrobeItem: async (id: string, data: UpdateWardrobeItemReq): Promise<WardrobeItemRes> => {
-    const res = await api.put<APIResponse<WardrobeItemRes>>(`/wardrobe-items/${id}`, data);
+    const res = await api.put<APIResponse<WardrobeItemRes>>(`/wardrobe-items/${id}/manual-classify`, data);
+    return res.data.data!;
+  },
+
+  deleteWardrobeItem: async (id: string, axiosInstance: AxiosInstance = api): Promise<void> => {
+    await axiosInstance.delete<APIResponse<void>>(`/wardrobe-items/${id}`);
+  },
+
+  getCategories: async (axiosInstance: AxiosInstance = api): Promise<CategoryRes[]> => {
+    const res = await axiosInstance.get<APIResponse<CategoryRes[]>>('/categories');
     return res.data.data!;
   },
 

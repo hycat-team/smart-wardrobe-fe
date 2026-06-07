@@ -1,235 +1,130 @@
 "use client";
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { Search, Filter, Tag, LayoutGrid, List, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Heart, Search, SlidersHorizontal, Tag } from "lucide-react";
 
 const MARKETPLACE_ITEMS = [
   {
     id: "m1",
-    name: "Áo Blazer Zara Nâu Đất",
-    brand: "Zara",
-    price: 350000,
-    originalPrice: 1200000,
+    name: "Structured Wool Coat",
+    brand: "Studio Nicholson",
+    price: "$450",
     condition: "Like New",
-    size: "M",
-    sellerName: "lan_style",
-    sellerRating: 4.8,
-    img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&q=80&w=400",
+    size: "Size M • Organic Wool",
+    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA0FYW6smtxDjgvmjUwqMakLGNgnkh50pSVfvNwEXWOPs_9BQuLr9UURaHp38uo_0L-RaKfBmvalwNgQO5P6wrzHgVDjvYxehj1TRdj-ch_D7xttnNNUFsYUd_Z1XrX5yLW61KKXfaJBax9NdJJWuQbIxftTmfgegPobfSesssQQaK4KYngT1jvab2U6aFSVwID4NIvXiaoiY0WLKELAzF2UX2_aPY7JRuEkXnARGaH159mJ9yXiw9kP14fWaavkQOVDlwyG4yY7iQ",
+    badgeClass: "bg-tertiary-container text-on-tertiary"
   },
   {
     id: "m2",
-    name: "Quần Jeans Levi's 501",
-    brand: "Levi's",
-    price: 450000,
-    originalPrice: 1500000,
-    condition: "Good",
-    size: "30",
-    sellerName: "hieu_nguyen",
-    sellerRating: 4.5,
-    img: "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=400",
+    name: "Cashmere Blend Knit",
+    brand: "Lemaire",
+    price: "$280",
+    condition: "Gently Used",
+    size: "Size L • Recycled Blend",
+    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBQivzdnCeL4RzgHKNCYuZpbO1KWTERYbwElC40Ws_KqbZCCihBQ4dJu4NxayAt12AFunuKYEleNR3mjDQCTPFMufVAGKL5xk7qCKp3bOe9d6_6dTg3J4JG9K4LURPg0yMpFqchuQmum6bM71Jiuh8k2rzFnrJfo8qkfO5hBcdsQysk8QiBKXU_TN4CnfiLDLOSi66UMzNicuQAq4mWPy1rVyObzc1xZtYqgEPTWe7UUUv8YVMxbM82PGPjF3fiJNax5dM4M6CU9eg",
+    badgeClass: "bg-secondary-container text-on-secondary-container"
   },
   {
     id: "m3",
-    name: "Áo Len Cổ Lọ Tăm",
-    brand: "Uniqlo",
-    price: 150000,
-    originalPrice: 400000,
-    condition: "Fair",
-    size: "S",
-    sellerName: "mai_vintage",
-    sellerRating: 4.9,
-    img: "https://images.unsplash.com/photo-1538329972958-465d6d2144ed?auto=format&fit=crop&q=80&w=400",
+    name: "Ecru Twill Trousers",
+    brand: "Jil Sander",
+    price: "$320",
+    condition: "Excellent",
+    size: "Size S • Organic Cotton",
+    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA_mWmD2DkZj84pyivprF2beHKkkRyQw6gsSdLYLZ7i2nDJwhq_WVF1uHyDJCtgi9RB3QZZwmEG6FCcV6xM8MEsU44PJSOVGi1Aj8-nw3hZ7fpiUqKVSNDezADA3ywxAHLT5GWNYzQOqFCmx-eJneKR8pEvfktk0C1QyZNITRtRokbkY-QuAFhrnKPH05VBYm3Mpx2j2RHUKQGNckVO_2VsBfS4K8vsRtPB5oQqwDdMWja_H_o62DNjc10xksXACaqecyovVQY3Ztk",
+    badgeClass: "bg-tertiary-container text-on-tertiary"
   },
   {
     id: "m4",
-    name: "Váy Lụa Dáng Dài Họa Tiết",
-    brand: "Mango",
-    price: 550000,
-    originalPrice: 1800000,
-    condition: "Like New",
-    size: "S",
-    sellerName: "ha_fashion",
-    sellerRating: 5.0,
-    img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: "m5",
-    name: "Túi Tote Canvas Basic",
-    brand: "Muji",
-    price: 120000,
-    originalPrice: 300000,
-    condition: "Mới nguyên tag",
-    size: "F",
-    sellerName: "eco_life",
-    sellerRating: 4.7,
-    img: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=400",
+    name: "Classic Crossbody",
+    brand: "The Row",
+    price: "$850",
+    condition: "Vintage",
+    size: "One Size • Veg-Tanned",
+    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDEzNLPNDj1L-kD3cioSTGjfyTeh8K93-T4-u_rnTuGVa4mkQsZ2PPr0zJ_KyntYtCJuqAif35x6JUL69gMMAleI1E375gw2ZYMgUui7lnUrsbAQj07q-A5v46XP3buHyki3fMg-VDaU-xAUxZaOPvgtg3fXY5VhHPFlHnjcNpHWUapy2IummPMi9JRzpzXVYeDnmGSmeMdWOjfecau-xwATWYFyne_f9QUa5pTgMDkSs1DBzLxKvDvIwVWdhavdluCbYIc76pO16s",
+    badgeClass: "bg-secondary-container text-on-secondary-container"
   },
 ];
 
-const CONDITIONS = ["Tất cả", "Mới nguyên tag", "Like New", "Good", "Fair"];
-
 export default function Marketplace() {
-  const router = useRouter();
-  const [activeCondition, setActiveCondition] = useState("Tất cả");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-
-  const filteredItems = activeCondition === "Tất cả" 
-    ? MARKETPLACE_ITEMS 
-    : MARKETPLACE_ITEMS.filter(x => x.condition === activeCondition);
-
   return (
-    <div className="flex flex-col h-full gap-8 animate-in fade-in duration-500 font-sans pb-16 pt-4">
-      
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div className="flex-1 w-full max-w-container-max mx-auto px-gutter md:px-margin-desktop pt-8 pb-16 animate-in fade-in duration-500">
+      {/* Marketplace Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div>
-          <h1 className="text-3xl font-heading font-bold tracking-wide text-ink">Chợ Đồ Cũ</h1>
-          <p className="text-sm text-ink-muted mt-2">Mua bán, trao đổi trang phục và cùng nhau hướng tới thời trang bền vững.</p>
+          <h2 className="font-display-lg text-[36px] md:text-[48px] text-primary mb-2 tracking-tight">Curated Exchange</h2>
+          <p className="font-body-lg text-[16px] text-on-surface-variant max-w-2xl">
+            Discover pre-owned luxury and sustainable pieces from the Ethos community. Extend the lifecycle of exceptional garments.
+          </p>
         </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline"
-            onClick={() => router.push("/marketplace/my-listings")}
-            className="rounded-xl h-11 border-ink-subtle text-ink font-mono text-xs tracking-wider"
-          >
-            QUẢN LÝ TIN ĐĂNG
-          </Button>
-          <Button 
-            onClick={() => router.push("/wardrobe")}
-            className="rounded-xl h-11 bg-terracotta text-cream hover:bg-terracotta/90 font-mono text-xs tracking-wider border border-transparent shadow-sm"
-          >
-            ĐĂNG BÁN TỪ TỦ ĐỒ
-          </Button>
-        </div>
+        <button className="self-start md:self-auto bg-primary text-on-primary font-body-lg text-[14px] px-6 py-3 rounded-full flex items-center gap-2 hover:bg-inverse-surface hover:shadow-lg transition-all duration-300 min-h-[48px]">
+          <span className="material-symbols-outlined text-[18px]">sell</span>
+          Sell an Item
+        </button>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sticky top-[64px] bg-background/90 backdrop-blur-md z-20 py-2 border-b border-cream-dark">
-        {/* Search */}
-        <div className="relative w-full md:w-64 shrink-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-ink-muted" />
-          <input 
-            type="text" 
-            placeholder="Tìm theo tên, hãng..." 
-            className="h-10 w-full pl-9 pr-4 rounded-xl bg-cream-dark/50 border-transparent focus:ring-1 focus:ring-terracotta focus:border-terracotta text-sm transition-all"
-          />
+      {/* Minimal Filter Bar */}
+      <div className="flex items-center justify-between border-b border-outline-variant/30 pb-4 mb-8">
+        <div className="flex gap-6 overflow-x-auto no-scrollbar">
+          <button className="font-label-caps text-[12px] uppercase tracking-widest text-primary border-b-2 border-primary pb-4 -mb-[18px] whitespace-nowrap font-bold">
+            All Items
+          </button>
+          <button className="font-label-caps text-[12px] uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors pb-4 -mb-[18px] whitespace-nowrap font-bold">
+            Outerwear
+          </button>
+          <button className="font-label-caps text-[12px] uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors pb-4 -mb-[18px] whitespace-nowrap font-bold">
+            Knitwear
+          </button>
+          <button className="font-label-caps text-[12px] uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors pb-4 -mb-[18px] whitespace-nowrap font-bold">
+            Accessories
+          </button>
         </div>
-
-        {/* Filters & View Mode */}
-        <div className="flex items-center justify-between w-full md:w-auto gap-4 overflow-x-auto no-scrollbar">
-          <div className="flex gap-2">
-            {CONDITIONS.map(cond => (
-              <button
-                key={cond}
-                onClick={() => setActiveCondition(cond)}
-                className={cn(
-                  "px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border",
-                  activeCondition === cond 
-                    ? "bg-ink border-ink text-cream" 
-                    : "bg-cream border-cream-dark text-ink-muted hover:border-ink/30"
-                )}
-              >
-                {cond}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center bg-cream-dark/50 rounded-lg p-1 shrink-0 ml-auto border border-cream-dark">
-            <button 
-              onClick={() => setViewMode("grid")}
-              className={cn("p-1.5 rounded-md transition-colors", viewMode === "grid" ? "bg-cream text-ink shadow-sm" : "text-ink-muted")}
-            >
-              <LayoutGrid className="size-4" />
-            </button>
-            <button 
-              onClick={() => setViewMode("list")}
-              className={cn("p-1.5 rounded-md transition-colors", viewMode === "list" ? "bg-cream text-ink shadow-sm" : "text-ink-muted")}
-            >
-              <List className="size-4" />
-            </button>
-          </div>
-        </div>
+        <button className="flex items-center gap-2 font-body-sm text-[14px] text-on-surface-variant hover:text-primary transition-colors pl-4">
+          <SlidersHorizontal className="size-4" />
+          <span className="hidden sm:inline">Filters</span>
+        </button>
       </div>
 
-      {/* Items Grid/List */}
-      <div className={cn(
-        "gap-6",
-        viewMode === "grid" 
-          ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4" 
-          : "flex flex-col"
-      )}>
-        {filteredItems.map(item => (
-          <div 
-            key={item.id} 
-            className={cn(
-              "group bg-card rounded-2xl overflow-hidden border border-border transition-all duration-300 hover:border-terracotta/50 shadow-sm",
-              viewMode === "list" && "flex h-40"
-            )}
-          >
-            <div className={cn(
-              "relative overflow-hidden bg-cream-dark/30",
-              viewMode === "grid" ? "aspect-[4/5]" : "w-32 md:w-40 h-full shrink-0"
-            )}>
+      {/* Product Grid (Spacious, Editorial) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
+        {MARKETPLACE_ITEMS.map((item) => (
+          <a key={item.id} className="group block relative cursor-pointer" href="#">
+            <div className="aspect-[3/4] rounded-xl bg-surface-container-low overflow-hidden mb-4 relative transition-shadow duration-300 group-hover:shadow-[0px_10px_30px_rgba(45,45,45,0.08)]">
               <img 
-                src={item.img} 
                 alt={item.name} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                src={item.img} 
               />
-              <div className="absolute top-2 left-2 bg-cream/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-mono font-bold text-ink flex items-center gap-1 shadow-sm">
-                <Tag className="size-3" /> {item.condition}
+              
+              {/* Condition Badge */}
+              <div className={`absolute top-3 left-3 ${item.badgeClass} font-label-caps text-[10px] px-2 py-1 rounded-sm tracking-wider uppercase backdrop-blur-sm bg-opacity-90 font-bold`}>
+                {item.condition}
               </div>
+              
+              <button className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-surface-container-lowest/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-primary hover:scale-110 transition-all opacity-0 group-hover:opacity-100">
+                <Heart className="size-5" />
+              </button>
             </div>
             
-            <div className={cn("p-4 flex flex-col justify-between flex-1", viewMode === "list" && "py-4 px-5")}>
+            <div className="flex justify-between items-start gap-2">
               <div>
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-heading font-bold text-base leading-tight text-ink line-clamp-2">
-                    {item.name}
-                  </h3>
-                </div>
-                <p className="text-[11px] font-mono text-ink-muted mt-1 uppercase">{item.brand} • Size {item.size}</p>
-                
-                {viewMode === "list" && (
-                  <div className="mt-3 flex items-center gap-2">
-                    <div className="size-5 rounded-full bg-cream-dark flex items-center justify-center text-[10px] font-bold text-ink">
-                      {item.sellerName.charAt(0).toUpperCase()}
-                    </div>
-                    <span className="text-xs text-ink-muted">@{item.sellerName} (★ {item.sellerRating})</span>
-                  </div>
-                )}
+                <p className="font-body-sm text-[14px] font-medium text-on-surface-variant mb-1">{item.brand}</p>
+                <h3 className="font-title-lg text-[20px] font-semibold text-primary line-clamp-1 leading-tight mb-2 tracking-tight">
+                  {item.name}
+                </h3>
+                <p className="font-label-caps text-[12px] uppercase text-on-surface-variant/70 tracking-wider">
+                  {item.size}
+                </p>
               </div>
-
-              <div className={cn("mt-4 flex", viewMode === "grid" ? "flex-col gap-2" : "items-center justify-between")}>
-                <div className="space-y-0.5">
-                  <div className="text-lg font-mono font-bold text-terracotta">
-                    {item.price.toLocaleString("vi-VN")}đ
-                  </div>
-                  <div className="text-[10px] font-mono text-ink-subtle line-through">
-                    Giá gốc: {item.originalPrice.toLocaleString("vi-VN")}đ
-                  </div>
-                </div>
-
-                {viewMode === "list" ? (
-                  <Button className="bg-ink text-cream hover:bg-ink/90 rounded-xl h-10 px-6 font-mono text-xs">
-                    Xem Chi Tiết
-                  </Button>
-                ) : (
-                  <div className="flex items-center justify-between border-t border-border pt-3 mt-1">
-                    <span className="text-[10px] text-ink-muted truncate max-w-[100px]">@{item.sellerName}</span>
-                    <span className="text-[10px] font-bold text-ink bg-cream-dark px-1.5 py-0.5 rounded">★ {item.sellerRating}</span>
-                  </div>
-                )}
-              </div>
+              <p className="font-body-lg text-[16px] font-medium text-primary whitespace-nowrap">{item.price}</p>
             </div>
-          </div>
+          </a>
         ))}
       </div>
 
+      <div className="mt-16 flex justify-center">
+        <button className="border border-outline text-primary font-body-sm text-[14px] px-8 py-3 rounded-full hover:bg-surface-variant transition-colors duration-300 min-h-[48px]">
+          Load More Pieces
+        </button>
+      </div>
     </div>
   );
 }
-
-

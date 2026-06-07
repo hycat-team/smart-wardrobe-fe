@@ -27,47 +27,42 @@ export default function PricingPage() {
 
   if (isLoadingPlans) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <Loader2 className="animate-spin text-purple-500" size={48} />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary" size={48} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white pb-20">
+    <div className="min-h-screen bg-background text-primary pb-24">
       {/* Hero Section */}
-      <div className="relative pt-20 pb-16 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-64 bg-purple-600/20 blur-[100px] rounded-full pointer-events-none" />
-        
-        <div className="container relative z-10 px-4 mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
-            Nâng tầm phong cách <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
-              không giới hạn
-            </span>
+      <div className="relative pt-24 pb-16 overflow-hidden">
+        <div className="container relative z-10 px-4 mx-auto text-center max-w-3xl">
+          <h1 className="font-display-lg text-5xl md:text-7xl font-bold tracking-tight mb-6 text-primary leading-tight">
+            Elevate Your Style
           </h1>
-          <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-            Trải nghiệm tủ đồ thông minh với các gói hội viên cao cấp. Tạo nhiều phối đồ hơn, quét quần áo không giới hạn và nhận gợi ý chuẩn xác từ AI.
+          <p className="font-body-lg text-muted-foreground text-lg md:text-xl">
+            Khám phá tiềm năng tủ đồ của bạn với các gói hội viên cao cấp. Trải nghiệm không giới hạn quyền năng của AI Stylist.
           </p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 space-y-16">
+      <div className="container mx-auto px-4 md:px-8 space-y-24 max-w-[1200px]">
         {/* Current Subscription Section */}
         {mySubscription && dailyQuota && (
-          <section className="max-w-4xl mx-auto">
+          <section className="mx-auto">
             <CurrentPlanCard subscription={mySubscription} quota={dailyQuota} />
           </section>
         )}
 
         {/* Pricing Plans Section */}
-        <section className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Chọn gói phù hợp với bạn</h2>
-            <p className="text-zinc-400">Thanh toán an toàn - Hủy bất kỳ lúc nào</p>
+        <section className="mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-display-lg text-3xl md:text-4xl font-bold mb-4">Membership Plans</h2>
+            <p className="font-body-sm text-muted-foreground tracking-wide uppercase">Thanh toán an toàn - Hủy bất kỳ lúc nào</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+          <div className={`grid grid-cols-1 md:grid-cols-2 ${plans.length === 2 ? 'max-w-4xl mx-auto' : 'lg:grid-cols-3'} gap-6 lg:gap-8 items-stretch`}>
             {plans.length > 0 ? (
               plans.map((plan, index) => (
                 <PricingCard 
@@ -77,7 +72,7 @@ export default function PricingPage() {
                 />
               ))
             ) : (
-              <div className="col-span-full text-center text-zinc-500 py-10">
+              <div className="col-span-full text-center text-muted-foreground py-20 font-body-sm border border-dashed border-border rounded-2xl">
                 Hiện chưa có gói hội viên nào.
               </div>
             )}

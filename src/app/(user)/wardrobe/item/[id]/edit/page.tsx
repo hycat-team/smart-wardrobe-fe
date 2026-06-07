@@ -5,21 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { 
   useWardrobeItemDetail, 
-  useUpdateWardrobeItem 
+  useUpdateWardrobeItem,
+  useCategories
 } from "@/features/wardrobe/queries/wardrobe.queries";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UpdateWardrobeItemReq } from "@/features/wardrobe/types";
-
-// Static mock categories just for UI purpose until Category API is integrated
-const MOCK_CATEGORIES = [
-  { id: "cat_1", name: "Áo" },
-  { id: "cat_2", name: "Quần" },
-  { id: "cat_3", name: "Váy" },
-  { id: "cat_4", name: "Giày" },
-  { id: "cat_5", name: "Phụ kiện" },
-];
 
 export default function WardrobeItemEdit() {
   const router = useRouter();
@@ -28,6 +20,7 @@ export default function WardrobeItemEdit() {
 
   const { data: item, isLoading, error } = useWardrobeItemDetail(itemId);
   const { mutate: updateItem, isPending } = useUpdateWardrobeItem();
+  const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
 
   const { control, handleSubmit, reset, register } = useForm<UpdateWardrobeItemReq>({
     defaultValues: {
@@ -141,7 +134,7 @@ export default function WardrobeItemEdit() {
                 className="w-full h-12 px-4 rounded-xl border border-cream-dark bg-transparent focus:ring-1 focus:ring-terracotta focus:border-terracotta outline-none transition-all font-sans text-ink appearance-none"
               >
                 <option value="">-- Chọn danh mục --</option>
-                {MOCK_CATEGORIES.map(cat => (
+                {categories.map(cat => (
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>

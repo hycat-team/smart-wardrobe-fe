@@ -1,14 +1,12 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Sparkles, Save, RefreshCw, Send, Image as ImageIcon } from "lucide-react";
+import { Sparkles, Save, RefreshCw, Send, Image as ImageIcon, ZoomIn, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const OCCASIONS = ["🎓 Đi học", "💼 Đi làm", "🌙 Hẹn hò", "🎉 Tiệc", "🏃 Thể thao", "🏠 Ở nhà"];
 const STYLES = ["Minimalist", "Casual", "Formal", "Trendy", "Vintage", "Streetwear"];
 
 export default function AIStylist() {
-  const [activeTab, setActiveTab] = useState<"suggest" | "chat">("suggest");
   const [selectedOccasion, setSelectedOccasion] = useState(OCCASIONS[0]);
   const [selectedStyle, setSelectedStyle] = useState(STYLES[0]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -23,183 +21,243 @@ export default function AIStylist() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-150px)] max-w-5xl mx-auto animate-in fade-in duration-500">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-heading font-bold text-ink flex items-center gap-2">
-          <Sparkles className="text-primary size-6" /> AI Stylist
-        </h1>
-        <div className="text-sm font-medium bg-secondary px-3 py-1 rounded-full text-ink border border-border">
-          Lượt còn lại: <span className="text-primary">2/3</span> (Free)
+    <div className="flex-1 relative pb-32 md:pb-12 min-h-[calc(100vh-100px)] flex flex-col">
+      <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop w-full flex-1 flex flex-col pt-8">
+        {/* Page Header */}
+        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h2 className="font-display-lg-mobile md:font-display-lg text-primary mb-2">Today's Curated Look</h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+              Optimized for your schedule and local conditions, drawing from your conscious wardrobe.
+            </p>
+          </div>
+          {/* Context Chips */}
+          <div className="flex flex-wrap gap-3">
+            <div className="bg-surface-container text-on-surface font-label-caps text-label-caps px-4 py-2 rounded-full flex items-center gap-2 border border-outline-variant/20">
+              <span className="material-symbols-outlined text-[16px] text-secondary">sunny</span>
+              <span>Sunny, 24°C</span>
+            </div>
+            <div className="bg-surface-container text-on-surface font-label-caps text-label-caps px-4 py-2 rounded-full flex items-center gap-2 border border-outline-variant/20">
+              <span className="material-symbols-outlined text-[16px] text-secondary">business_center</span>
+              <span>Office Days</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Custom Tabs */}
-      <div className="flex border-b border-border mb-6">
-        <button 
-          onClick={() => setActiveTab("suggest")}
-          className={cn(
-            "px-6 py-3 font-medium text-sm transition-all border-b-2",
-            activeTab === "suggest" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-ink"
-          )}
-        >
-          Gợi Ý Outfit
-        </button>
-        <button 
-          onClick={() => setActiveTab("chat")}
-          className={cn(
-            "px-6 py-3 font-medium text-sm transition-all border-b-2",
-            activeTab === "chat" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-ink"
-          )}
-        >
-          Chat với Stylist
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-hidden">
-        {activeTab === "suggest" ? (
-          <div className="h-full overflow-y-auto no-scrollbar space-y-8 pb-10">
-            {/* Form */}
-            <div className="bg-card p-6 rounded-2xl border border-border shadow-sm">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-sm font-medium text-ink mb-3">Dịp nào?</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {OCCASIONS.map(occ => (
-                      <button 
-                        key={occ} 
-                        onClick={() => setSelectedOccasion(occ)}
-                        className={cn("px-4 py-2 rounded-full text-sm border transition-colors", selectedOccasion === occ ? "bg-ink text-cream border-ink" : "bg-background text-ink-muted border-border hover:bg-secondary")}
-                      >
-                        {occ}
-                      </button>
-                    ))}
-                  </div>
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter flex-1">
+          {/* Left Column: Visual Outfit (Span 8) */}
+          <div className="lg:col-span-8 flex flex-col gap-gutter">
+            {/* Main Flat-lay Hero */}
+            <div className="relative bg-surface-container-low rounded-xl overflow-hidden aspect-[4/3] md:aspect-[16/9] shadow-sm group border border-outline-variant/20">
+              {hasResult ? (
+                <img 
+                  alt="Outfit Flat-lay" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgb-9GhUsL5ThxlKE9i7E6cwgP9eU-d_MF3p_m8Gv3YMHzDG1IpqRLO0ODAfUTYhruPUK5FCS4ZVxawYkeZgRDBdSepejgdXq2SQV_SurHt3o7PNWQCoLYMI6uWfx-FFL1_eBD1i45c8MJglx1mZlR1oPZMxJzZgpJMnQjDdNsW_OOPB41FyMIsGM4hGp3Ush0nMIgpQ0aTPI9tD888KFttjMjBxzlVKM7uXeLcHvdGnqzg4c1TFbR4Lx-D6OlH4_W-WvyCIwdVgk"
+                />
+              ) : isGenerating ? (
+                <div className="w-full h-full flex items-center justify-center bg-surface-container-low animate-pulse">
+                  <Sparkles className="size-10 text-primary opacity-50 animate-bounce" />
                 </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-ink mb-3">Phong cách mong muốn?</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {STYLES.map(style => (
-                      <button 
-                        key={style} 
-                        onClick={() => setSelectedStyle(style)}
-                        className={cn("px-4 py-2 rounded-full text-sm border transition-colors", selectedStyle === style ? "bg-ink text-cream border-ink" : "bg-background text-ink-muted border-border hover:bg-secondary")}
-                      >
-                        {style}
-                      </button>
-                    ))}
-                  </div>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-surface-container-low p-6 text-center">
+                  <Sparkles className="size-12 text-primary/30 mb-4" />
+                  <p className="text-primary font-title-lg text-lg mb-2">Chưa có outfit</p>
+                  <p className="text-on-surface-variant text-sm max-w-sm">Hãy dùng trợ lý AI bên phải để phân tích tủ đồ và gợi ý trang phục cho hôm nay nhé.</p>
                 </div>
-
-                <div className="flex items-center justify-between p-4 bg-secondary/50 rounded-xl">
-                  <span className="text-sm text-ink-muted">Thời tiết hôm nay: <span className="font-medium text-ink">☀️ 32°C (Hồ Chí Minh)</span></span>
-                  <Button onClick={handleGenerate} disabled={isGenerating} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 rounded-full px-6">
-                    {isGenerating ? "✦ Đang phân tích..." : "✦ Gợi Ý Outfit"}
-                  </Button>
-                </div>
-              </div>
+              )}
+              
+              {/* Overlay gradient for luxury feel */}
+              {hasResult && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <button className="absolute bottom-6 right-6 bg-surface-container-lowest/90 backdrop-blur-md text-primary p-3 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center">
+                    <ZoomIn className="size-5" />
+                  </button>
+                </>
+              )}
             </div>
 
-            {/* Results */}
-            {isGenerating && (
-              <div className="space-y-4 animate-pulse">
-                <div className="h-40 bg-secondary rounded-2xl" />
-                <div className="h-40 bg-secondary rounded-2xl" />
-              </div>
-            )}
-
-            {hasResult && !isGenerating && (
-              <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-                <h2 className="font-heading text-2xl font-bold text-ink">Outfit Đề Xuất</h2>
-                
-                {/* Outfit Card 1 */}
-                <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col md:flex-row">
-                  <div className="w-full md:w-2/5 p-6 bg-secondary/30 flex items-center justify-center gap-2">
-                     <div className="w-24 aspect-[3/4] bg-muted rounded-lg shadow-sm overflow-hidden relative">
-                       <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" />
-                       <span className="absolute bottom-1 left-1 text-[9px] bg-background/80 px-1 rounded">Áo</span>
-                     </div>
-                     <span className="text-muted-foreground">+</span>
-                     <div className="w-24 aspect-[3/4] bg-muted rounded-lg shadow-sm overflow-hidden relative">
-                       <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" />
-                       <span className="absolute bottom-1 left-1 text-[9px] bg-background/80 px-1 rounded">Quần</span>
-                     </div>
-                     <span className="text-muted-foreground">+</span>
-                     <div className="w-20 aspect-square bg-muted rounded-lg shadow-sm overflow-hidden relative self-end mb-4">
-                       <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" />
-                       <span className="absolute bottom-1 left-1 text-[9px] bg-background/80 px-1 rounded">Giày</span>
-                     </div>
+            {/* Individual Items Breakdown */}
+            {hasResult && (
+              <div className="animate-in slide-in-from-bottom-4 duration-500">
+                <h3 className="font-title-lg text-title-lg text-primary mb-4">Comprised Of</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {/* Item 1 */}
+                  <div className="bg-surface-container-lowest p-3 rounded-lg shadow-sm border border-surface-container hover:border-outline-variant/50 transition-colors cursor-pointer">
+                    <div className="aspect-square rounded-md bg-surface-container-low mb-3 overflow-hidden">
+                      <img alt="Linen Blazer" className="w-full h-full object-cover mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQ0lti_lykgDsfbjNHTEiYPcstAhYAJGENTn_8cRgL5s65k89uXCuSOht8MxCeBvg816ioLzYlDUKpI5zZoGI_uu5kskg7Ptp7vUUdyN91ajxpQyiuQTxDF52GacdhzX6uoMAljTE8ZqZJekoQxDuYLT6A0saFuVZLhNs-FsWfRYQixPh-tTKu1g7U9NL1mbI4JGzZY9shDp6PqxVcCbLceY0IyA2lib7vw7_8W6w_YmN41PApeUAElkPAe7U8uY2nN05CrEyYSfA"/>
+                    </div>
+                    <p className="font-label-caps text-[10px] text-secondary mb-1">Organic Linen</p>
+                    <p className="font-body-sm text-body-sm text-primary font-medium truncate">Structured Blazer</p>
                   </div>
-                  <div className="flex-1 p-6 flex flex-col">
-                    <h3 className="font-heading font-bold text-xl mb-3">#1 Trẻ trung đến lớp</h3>
-                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-6">
-                      <p className="text-sm text-ink-muted leading-relaxed">
-                        <span className="font-bold text-primary">💬 AI giải thích:</span> Sự kết hợp trắng-xanh navy tạo độ tương phản rõ ràng theo nguyên tắc màu bổ túc. Chất liệu cotton và denim phù hợp với thời tiết 32°C. Giày trắng giúp outfit sáng và nhẹ nhàng hơn.
-                      </p>
+                  {/* Item 2 */}
+                  <div className="bg-surface-container-lowest p-3 rounded-lg shadow-sm border border-surface-container hover:border-outline-variant/50 transition-colors cursor-pointer">
+                    <div className="aspect-square rounded-md bg-surface-container-low mb-3 overflow-hidden">
+                      <img alt="Silk Camisole" className="w-full h-full object-cover mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFkr_4GoVG1aMoaXyg9-4dOYb4gQBDbSQ4Vskkg8zpuyRoHA5AizMwRYzaNJpOu-HTZIUPRDaC3w0cA3A_ZppccbUKKha-3xappmXhiVZgqm32TAUN2pvkAa2xuYr-Bzv26PAGzEYvOuWheV7d3SlhPJrAYWv5-hL8yRM7JMStKswWHKRAw0-CfZrRds5EnFOIoyqfNJvUMOlB7gj60JqiV_hN07oCHcDTIPbm4aJq_oFyFgeFPSXjr69EiW2rixnXvHRZJG6mJEM"/>
                     </div>
-                    <div className="mt-auto flex gap-3">
-                      <Button className="rounded-full bg-ink text-cream hover:bg-ink/90 flex-1"><Save className="size-4 mr-2" /> Lưu Outfit</Button>
-                      <Button variant="outline" className="rounded-full"><RefreshCw className="size-4 mr-2" /> Thay đổi</Button>
+                    <p className="font-label-caps text-[10px] text-secondary mb-1">Upcycled Silk</p>
+                    <p className="font-body-sm text-body-sm text-primary font-medium truncate">Draped Camisole</p>
+                  </div>
+                  {/* Item 3 */}
+                  <div className="bg-surface-container-lowest p-3 rounded-lg shadow-sm border border-surface-container hover:border-outline-variant/50 transition-colors cursor-pointer">
+                    <div className="aspect-square rounded-md bg-surface-container-low mb-3 overflow-hidden">
+                      <img alt="Wide Leg Trousers" className="w-full h-full object-cover mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAjCO5c6YXH_kg2Z05YUKNXSOZ1So5Z7mzX0A_QK1k2x7q11z21-YcfNIrWuhsFO6vFURv9qKGRYabPpQ2d_fb7Wc5UIbyBDyMmj_voc9mzsjeatP2nPxwk_CGawbiZs9EycpBYKAv7tcGLmHlBBNHslAU_aKqkeaX4nXRhHoeqwA-fPhNn5G5iIUuAkg7WolMTSYEF5jdRpUPqj3YEsmWSk3i1g5bvrFD4otuVI0d2uGDKnDPGp0KNv9dzepczMQRe0aCfPNa01U"/>
                     </div>
+                    <p className="font-label-caps text-[10px] text-secondary mb-1">Tencel Blend</p>
+                    <p className="font-body-sm text-body-sm text-primary font-medium truncate">Flow Trousers</p>
+                  </div>
+                  {/* Item 4 */}
+                  <div className="bg-surface-container-lowest p-3 rounded-lg shadow-sm border border-surface-container hover:border-outline-variant/50 transition-colors cursor-pointer">
+                    <div className="aspect-square rounded-md bg-surface-container-low mb-3 overflow-hidden flex items-center justify-center">
+                      <img alt="Leather Loafers" className="w-full h-full object-cover mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXXqUlhyepBsniCXWPaJC8EsBHofr0KjGrdT2juBazb13fYbjGNUl_yANyRQeafkYAt_2QjMFCvlRAXuDEatVRoY9CiSmWxusbfXi9D7lQCJHO9kwzOX2afDpEv4c-Zu63Rz19HNgY2ONVQwsGYRFUJjNJ8SmyxRiYVPC9T_aZLi9feWf6bN5K312c4hH_uUmUjUtePJWXFt6oD4JUUVW5nUWPCFtRh8u6bLRyfJ_GPLZLLd9MQHCokOl7TVVZCVq1OLoBdLZS1S4"/>
+                    </div>
+                    <p className="font-label-caps text-[10px] text-secondary mb-1">Vegan Leather</p>
+                    <p className="font-body-sm text-body-sm text-primary font-medium truncate">Classic Loafer</p>
                   </div>
                 </div>
               </div>
             )}
           </div>
-        ) : (
-          <div className="flex flex-col h-full bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-             {/* Chat History */}
-             <div className="flex-1 p-6 overflow-y-auto space-y-6">
-                <div className="flex gap-4">
-                   <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                     <Sparkles className="size-4 text-primary" />
-                   </div>
-                   <div className="bg-secondary p-4 rounded-2xl rounded-tl-none max-w-[80%] text-sm text-ink leading-relaxed">
-                     Xin chào! Tôi là stylist AI của bạn. Hôm nay bạn muốn mặc gì? 😊
-                   </div>
-                </div>
-                
-                <div className="flex gap-4 flex-row-reverse">
-                   <div className="bg-primary p-4 rounded-2xl rounded-tr-none max-w-[80%] text-sm text-primary-foreground leading-relaxed shadow-sm">
-                     Tôi cần outfit đi phỏng vấn tuần tới, muốn trông professional nhưng không quá cứng nhắc.
-                   </div>
-                </div>
 
-                <div className="flex gap-4">
-                   <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                     <Sparkles className="size-4 text-primary" />
-                   </div>
-                   <div className="bg-secondary p-4 rounded-2xl rounded-tl-none max-w-[80%] text-sm text-ink leading-relaxed">
-                     Tuyệt! Trong tủ đồ của bạn, tôi thấy có áo sơ mi trắng lụa và quần tây ống rộng xám. <br/><br/>
-                     Gợi ý: Kết hợp sơ mi trắng (sơ vin) với quần xám, đi kèm giày loafer đen. Style "Smart Casual" rất phù hợp cho phỏng vấn hiện đại. Bạn có muốn xem hình ảnh outfit này không?
-                   </div>
+          {/* Right Column: AI Chat Interface (Span 4) */}
+          <div className="lg:col-span-4 h-[600px] lg:h-auto rounded-xl shadow-md border border-outline-variant/20 bg-surface-container-lowest/80 backdrop-blur-[20px] flex flex-col overflow-hidden relative">
+            {/* Chat Header */}
+            <div className="p-6 border-b border-outline-variant/20 flex items-center justify-between bg-surface-container-lowest/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
+                  <Sparkles className="size-5" />
                 </div>
-             </div>
-             
-             {/* Chat Input */}
-             <div className="p-4 bg-background border-t border-border">
-                <div className="relative flex items-center">
-                  <button className="absolute left-3 text-muted-foreground hover:text-primary transition-colors">
-                    <ImageIcon className="size-5" />
-                  </button>
-                  <input 
-                    type="text" 
-                    placeholder="Nhập tin nhắn..." 
-                    className="w-full bg-secondary h-12 rounded-full pl-11 pr-12 focus:outline-none focus:ring-1 focus:ring-primary text-sm"
-                  />
-                  <button className="absolute right-1 size-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center hover:bg-primary/90 transition-transform hover:scale-105">
-                    <Send className="size-4 ml-0.5" />
-                  </button>
+                <div>
+                  <h3 className="font-title-lg text-[18px] text-primary">Ethos AI</h3>
+                  <p className="font-body-sm text-[12px] text-on-surface-variant">Your Personal Stylist</p>
                 </div>
-                <div className="text-center mt-2">
-                  <span className="text-[10px] text-muted-foreground">AI có thể mắc lỗi. Vui lòng kiểm tra lại.</span>
+              </div>
+              <button className="text-on-surface-variant hover:text-primary transition-colors">
+                <MoreHorizontal className="size-5" />
+              </button>
+            </div>
+
+            {/* Chat Messages Area */}
+            <div className="flex-1 p-6 overflow-y-auto no-scrollbar space-y-6 flex flex-col bg-surface/30">
+              
+              {/* Form Config inside Chat context if no result yet */}
+              {!hasResult && !isGenerating && (
+                 <div className="bg-surface-container-low text-on-surface p-4 rounded-2xl font-body-sm text-[14px] leading-relaxed shadow-sm border border-outline-variant/20 mb-4 animate-in fade-in">
+                    <p className="mb-3 font-medium text-primary">Hãy thiết lập yêu cầu hôm nay:</p>
+                    
+                    <div className="mb-4">
+                      <p className="text-xs text-on-surface-variant mb-2 font-label-caps">DỊP SỬ DỤNG</p>
+                      <div className="flex flex-wrap gap-2">
+                        {OCCASIONS.map(occ => (
+                          <button 
+                            key={occ} 
+                            onClick={() => setSelectedOccasion(occ)}
+                            className={cn(
+                              "px-3 py-1.5 rounded-full text-xs transition-colors border", 
+                              selectedOccasion === occ ? "bg-primary text-on-primary border-primary" : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:bg-surface-variant"
+                            )}
+                          >
+                            {occ}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <p className="text-xs text-on-surface-variant mb-2 font-label-caps">PHONG CÁCH</p>
+                      <div className="flex flex-wrap gap-2">
+                        {STYLES.map(style => (
+                          <button 
+                            key={style} 
+                            onClick={() => setSelectedStyle(style)}
+                            className={cn(
+                              "px-3 py-1.5 rounded-full text-xs transition-colors border", 
+                              selectedStyle === style ? "bg-primary text-on-primary border-primary" : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:bg-surface-variant"
+                            )}
+                          >
+                            {style}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={handleGenerate}
+                      className="w-full bg-primary text-on-primary font-body-lg text-[14px] font-medium py-2.5 rounded-lg hover:bg-primary/90 transition-colors mt-2 flex justify-center items-center gap-2"
+                    >
+                      <Sparkles className="size-4" /> Bắt đầu phân tích
+                    </button>
+                 </div>
+              )}
+
+              {/* AI Message */}
+              {hasResult && (
+                <div className="flex flex-col gap-1 max-w-[85%] animate-in slide-in-from-left-2">
+                  <div className="bg-surface-container-low text-on-surface p-4 rounded-2xl rounded-tl-none font-body-sm text-[15px] leading-relaxed shadow-sm">
+                      Good morning. Based on today's forecast of 24°C and your schedule showing office hours followed by a light dinner, I've curated a breathable, structured look. The linen blend will keep you comfortable, while the tailoring maintains a professional silhouette.
+                  </div>
+                  <span className="text-[11px] text-on-surface-variant/60 ml-2">Just now</span>
                 </div>
-             </div>
+              )}
+
+              {/* User Message */}
+              {hasResult && (
+                <div className="flex flex-col gap-1 max-w-[85%] self-end items-end animate-in slide-in-from-right-2">
+                  <div className="bg-primary text-on-primary p-4 rounded-2xl rounded-tr-none font-body-sm text-[15px] leading-relaxed shadow-sm">
+                      I love the silhouette. Could we swap the heels for something flatter? I'll be walking quite a bit.
+                  </div>
+                  <span className="text-[11px] text-on-surface-variant/60 mr-2">1 min ago</span>
+                </div>
+              )}
+
+              {/* AI Message (Typing Indicator) */}
+              {isGenerating && (
+                <div className="flex flex-col gap-1 max-w-[85%] animate-in fade-in">
+                  <div className="bg-surface-container-low text-on-surface p-4 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-sm w-16 h-12">
+                    <div className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                    <div className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                    <div className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Chat Input */}
+            <div className="p-4 bg-surface-container-lowest/80 border-t border-outline-variant/20">
+              <div className="relative flex items-center group">
+                <input 
+                  className="w-full bg-transparent border-0 border-b border-outline-variant/50 focus:border-transparent focus:ring-0 px-0 py-3 font-body-sm text-primary placeholder:text-on-surface-variant/50 transition-all peer focus:bg-surface-container-low focus:px-4 focus:rounded-lg" 
+                  placeholder="Ask to adjust color, formality, or items..." 
+                  type="text"
+                />
+                <button className="absolute right-2 text-primary opacity-50 hover:opacity-100 transition-opacity peer-focus:right-4">
+                  <Send className="size-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Actions */}
+        {hasResult && (
+          <div className="mt-8 flex justify-end gap-4 border-t border-outline-variant/20 pt-6 animate-in fade-in">
+            <button 
+              onClick={() => { setHasResult(false); setIsGenerating(false); }}
+              className="px-8 py-3 rounded-none border border-secondary text-secondary font-body-lg text-[15px] font-medium hover:bg-secondary/5 transition-colors min-h-[48px] flex items-center gap-2"
+            >
+              <RefreshCw className="size-4" /> Regenerate
+            </button>
+            <button className="px-8 py-3 rounded-none bg-primary text-on-primary font-body-lg text-[15px] font-medium hover:bg-primary/90 transition-colors shadow-sm min-h-[48px] flex items-center gap-2">
+              <Save className="size-4" /> Save Look to Wardrobe
+            </button>
           </div>
         )}
       </div>
     </div>
   );
 }
+
 
 

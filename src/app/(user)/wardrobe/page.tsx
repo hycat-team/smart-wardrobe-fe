@@ -1,13 +1,14 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
-import { 
-  Plus, Edit2, Tag, Search, Filter, 
-  X, Eye, Lock, Loader2 
+import {
+  Plus, Edit2, Tag, Search, Filter,
+  X, Eye, Lock, Loader2, Sparkles
 } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import {
   Sheet,
   SheetContent,
@@ -16,7 +17,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useMyWardrobe, useSearchWardrobeItems } from "@/features/wardrobe/queries/wardrobe.queries";
+import { useMyWardrobe } from "@/features/wardrobe/queries/wardrobe.queries";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
 import { toast } from "sonner";
 
@@ -67,15 +68,10 @@ const getColorValue = (color: string) => {
 
 function WardrobeContent() {
   const router = useRouter();
+  const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const isPremium = user?.isPremium;
   const searchParams = useSearchParams();
-  
-  const setSearchParams = (p: any) => { 
-    const q = new URLSearchParams(searchParams.toString()); 
-    for(const k in p) q.set(k, p[k]); 
-    router.push('?' + q.toString()); 
-  };
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -87,20 +83,33 @@ function WardrobeContent() {
   const searchParam = searchParams.get("q") || "";
 
   const [searchInput, setSearchInput] = useState(searchParam);
+  const lastPushedQ = useRef(searchParam);
 
   // Load real wardrobe items
   const { data: realItems = [], isLoading: isLoadingItems } = useMyWardrobe();
-  // Load ES search results if search is active
-  const { data: searchResults = [], isLoading: isSearching } = useSearchWardrobeItems(searchParam);
 
-  // Update local search input state when searchParam changes in URL
+  // Sync Search state with query params ONLY if changed externally
   useEffect(() => {
-    setSearchInput(searchParam);
+    if (searchParam !== lastPushedQ.current) {
+      setSearchInput(searchParam);
+      lastPushedQ.current = searchParam;
+    }
   }, [searchParam]);
+
+  // Debounced Search effect
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchInput !== searchParam && searchInput !== lastPushedQ.current) {
+        lastPushedQ.current = searchInput;
+        updateParams({ q: searchInput });
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchInput, searchParam]);
 
   // Update query parameters helper
   const updateParams = (newParams: Record<string, string | null>) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([key, value]) => {
       if (value === null || value === "") {
         params.delete(key);
@@ -108,7 +117,7 @@ function WardrobeContent() {
         params.set(key, value);
       }
     });
-    setSearchParams(params);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const handleCategoryChange = (cat: string) => {
@@ -133,32 +142,37 @@ function WardrobeContent() {
   };
 
   const handleResetFilters = () => {
-    setSearchParams(new URLSearchParams());
+    router.push(pathname, { scroll: false });
     setSearchInput("");
   };
 
   // Active filters counting
-  const activeFiltersCount = 
-    (colorParam ? 1 : 0) + 
-    (tagParam ? 1 : 0) + 
+  const activeFiltersCount =
+    (colorParam ? 1 : 0) +
+    (tagParam ? 1 : 0) +
     (searchParam ? 1 : 0);
 
-  // Choose source database (Search results vs normal lists)
-  const activeSourceItems = searchParam ? searchResults : realItems;
-
   // Filter & Sort Logic
-  const filteredItems = activeSourceItems.filter(item => {
+  const filteredItems = realItems.filter(item => {
     const itemCatName = item.category?.name || "";
     const matchesCategory = categoryParam === "Tất cả" || itemCatName === categoryParam;
-    
+
     const matchesColor = !colorParam || getColorValue(item.color || "") === colorParam;
-    
+
     // Tag filter (for mock tags backward compatibility, or matching backend style/material)
     const mockTags = (item as any).tags || [];
     const backendTags = [item.style, item.material, item.pattern, item.seasonality].filter(Boolean);
     const matchesTag = !tagParam || mockTags.includes(tagParam) || backendTags.includes(tagParam);
-    
-    return matchesCategory && matchesColor && matchesTag;
+
+    const searchLower = searchParam.toLowerCase();
+    const matchesSearch = !searchParam ||
+      itemCatName.toLowerCase().includes(searchLower) ||
+      ((item as any).name && (item as any).name.toLowerCase().includes(searchLower)) ||
+      (item.color && item.color.toLowerCase().includes(searchLower)) ||
+      (item.material && item.material.toLowerCase().includes(searchLower)) ||
+      (item.style && item.style.toLowerCase().includes(searchLower));
+
+    return matchesCategory && matchesColor && matchesTag && matchesSearch;
   });
 
   const sortedItems = [...filteredItems].sort((a, b) => {
@@ -178,256 +192,108 @@ function WardrobeContent() {
   });
 
   return (
-    <div className="flex flex-col h-full gap-8 animate-in fade-in duration-500">
-      
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="animate-in fade-in duration-500 w-full max-w-[1200px] mx-auto pt-6">
+      {/* Page Header & Actions */}
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
         <div>
-          <h1 className={cn("text-3xl font-heading font-medium tracking-wide text-ink")}>Tủ đồ cá nhân</h1>
-          {isPremium ? (
-            <div className="mt-4 max-w-lg border-l-2 border-primary pl-4 py-1">
-              <p className="text-sm font-heading italic text-muted-foreground leading-relaxed">
-                "Bạn có {realItems.length} item — hôm nay bạn nên thử phong cách Capsule Wardrobe với 2 item đã lâu không mặc. <a href="#" className="text-primary not-italic font-sans text-xs uppercase tracking-widest font-bold hover:underline ml-2">✦ Xem gợi ý</a>"
-              </p>
-            </div>
-          ) : (
-            <div className="mt-2 flex items-center gap-4 text-xs font-mono text-ink-muted">
-              <span>Sức chứa: {realItems.length} / 50 món</span>
-              <div className="w-32 h-1 bg-cream-dark rounded-full overflow-hidden">
-                <div className="h-full bg-terracotta transition-all" style={{ width: `${(realItems.length / 50) * 100}%` }} />
-              </div>
-              <span>{Math.round((realItems.length / 50) * 100)}%</span>
-            </div>
-          )}
+          <h1 className="font-display-lg text-4xl md:text-5xl text-primary tracking-tight mb-2 font-bold">My Wardrobe</h1>
+          <p className="font-body-lg text-base text-muted-foreground">{realItems.length} items curated for you.</p>
         </div>
-        <Button 
-          onClick={() => router.push("/wardrobe/upload")}
-          className={cn(
-            "rounded-xl font-medium px-5 h-11 transition-all active:scale-[0.98] shadow-sm",
-            isPremium ? "bg-transparent border border-primary text-primary hover:bg-primary/10 hover:text-primary" : "bg-ink text-cream hover:bg-ink/90"
-          )}
-        >
-          <Plus className="mr-2 size-4" /> Thêm đồ mới
-        </Button>
+        <div className="flex items-center gap-3">
+          {/* Search Input */}
+          <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-[240px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full bg-secondary/50 border border-border focus:border-primary focus:bg-background pl-9 pr-4 py-2.5 rounded-lg outline-none transition-all font-body-sm text-sm text-primary placeholder:text-muted-foreground"
+              placeholder="Search items..."
+            />
+          </form>
+
+          {/* Filter Button */}
+          <button className={cn(
+            "flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm transition-all whitespace-nowrap",
+            activeFiltersCount > 0
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border text-primary hover:bg-secondary/50"
+          )}>
+            <Filter className="w-4 h-4" />
+            <span className="font-medium">Filters</span>
+          </button>
+        </div>
       </div>
 
-      {/* Primary Category Selector & Quick Bar */}
-      <div className="flex flex-col gap-4 border-b border-cream-dark pb-4 sticky top-[64px] bg-[#FAF7F2]/90 backdrop-blur-md z-20">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
-          {/* Categories Horizontal Tabs */}
-          <div className="flex overflow-x-auto gap-1.5 no-scrollbar py-1">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                onClick={() => handleCategoryChange(cat)}
-                className={cn(
-                  "px-4 py-2 rounded-full text-xs font-medium tracking-wider whitespace-nowrap transition-all",
-                  categoryParam === cat 
-                    ? "bg-ink text-cream font-semibold shadow-sm" 
-                    : "bg-cream-dark/50 text-ink-muted hover:text-ink hover:bg-cream-dark"
-                )}
-              >
-                {cat}
+      {/* Selected Filter Chips */}
+      {activeFiltersCount > 0 && (
+        <div className="flex flex-wrap items-center gap-2 mb-6 animate-in fade-in slide-in-from-top-1 duration-200">
+          <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Active:</span>
+          {colorParam && (
+            <span className="inline-flex items-center gap-1 bg-secondary border border-border text-primary px-2.5 py-1 rounded-full text-xs font-medium">
+              Màu: {COLORS.find(c => c.value === colorParam)?.name}
+              <button onClick={() => updateParams({ color: null })} className="hover:text-muted-foreground">
+                <X className="size-3" />
               </button>
-            ))}
-          </div>
-
-          {/* Quick Search & Filter Drawer Trigger */}
-          <div className="flex items-center gap-2 shrink-0">
-            <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-48">
-              {isSearching ? (
-                <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-ink-muted animate-spin" />
-              ) : (
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-ink-muted" />
-              )}
-              <input 
-                type="text" 
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Tìm trang phục thông minh..." 
-                className="h-9 pl-9 pr-4 rounded-xl bg-cream-dark/50 border-transparent focus:ring-1 focus:ring-terracotta focus:border-terracotta text-xs w-full transition-all"
-              />
-            </form>
-
-            {/* Filter Sheet */}
-            <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-              <SheetTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className={cn(
-                    "rounded-xl h-9 border-cream-dark hover:bg-cream-dark/50 text-xs font-mono tracking-wider relative",
-                    activeFiltersCount > 0 && "border-terracotta text-terracotta bg-terracotta-light/10 hover:bg-terracotta-light/20"
-                  )}
-                >
-                  <Filter className="mr-1.5 size-3.5" /> 
-                  BỘ LỌC
-                  {activeFiltersCount > 0 && (
-                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-terracotta text-cream text-[9px] font-bold">
-                      {activeFiltersCount}
-                    </span>
-                  )}
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="w-[340px] sm:w-[400px] border-l border-cream-dark bg-cream p-6 flex flex-col justify-between font-sans">
-                <div className="space-y-6">
-                  <SheetHeader className="border-b border-cream-dark pb-4">
-                    <SheetTitle className="font-heading text-xl text-ink font-semibold tracking-wide flex items-center justify-between">
-                      Bộ lọc tủ đồ
-                      {activeFiltersCount > 0 && (
-                        <button 
-                          onClick={handleResetFilters} 
-                          className="text-xs font-mono font-medium text-terracotta hover:underline"
-                        >
-                          Xóa tất cả
-                        </button>
-                      )}
-                    </SheetTitle>
-                    <SheetDescription className="text-xs text-ink-muted">
-                      Tinh chỉnh tủ đồ theo các bộ lọc thuộc tính.
-                    </SheetDescription>
-                  </SheetHeader>
-
-                  {/* Color Selector */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-ink font-semibold">Màu Sắc</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {COLORS.map(color => {
-                        const isSelected = colorParam === color.value;
-                        return (
-                          <button
-                            key={color.value}
-                            onClick={() => handleColorChange(color.value)}
-                            className={cn(
-                              "flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all",
-                              isSelected 
-                                ? "border-ink bg-ink text-cream" 
-                                : "border-cream-dark hover:border-ink/30 bg-transparent text-ink-muted"
-                            )}
-                          >
-                            <span 
-                              className="size-3.5 rounded-full border border-black/10 inline-block"
-                              style={{ backgroundColor: color.hex }}
-                            />
-                            {color.name}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Style Tags Selector */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-ink font-semibold">Phong cách / Tag</h4>
-                    <div className="flex flex-wrap gap-1.5">
-                      {TAGS.map(tag => {
-                        const isSelected = tagParam === tag;
-                        return (
-                          <button
-                            key={tag}
-                            onClick={() => handleTagChange(tag)}
-                            className={cn(
-                              "px-3 py-1.5 rounded-full text-xs transition-all border",
-                              isSelected 
-                                ? "bg-terracotta border-terracotta text-cream font-medium" 
-                                : "bg-cream-dark/30 border-transparent text-ink-muted hover:bg-cream-dark/50"
-                            )}
-                          >
-                            #{tag}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Sort Order Selector */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-ink font-semibold">Sắp xếp</h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { label: "Mới nhất", value: "newest" },
-                        { label: "Cũ nhất", value: "oldest" },
-                        { label: "Tên A-Z", value: "name" },
-                      ].map(opt => {
-                        const isSelected = sortParam === opt.value;
-                        return (
-                          <button
-                            key={opt.value}
-                            onClick={() => handleSortChange(opt.value)}
-                            className={cn(
-                              "px-3 py-2 rounded-xl text-xs text-left border transition-all",
-                              isSelected 
-                                ? "border-ink bg-ink text-cream font-medium" 
-                                : "border-cream-dark text-ink-muted hover:bg-cream-dark/20"
-                            )}
-                          >
-                            {opt.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-t border-cream-dark pt-4 flex gap-3">
-                  <Button 
-                    className="flex-1 bg-ink text-cream hover:bg-ink/90 rounded-xl"
-                    onClick={() => setIsFilterOpen(false)}
-                  >
-                    Xem {sortedItems.length} kết quả
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+            </span>
+          )}
+          {tagParam && (
+            <span className="inline-flex items-center gap-1 bg-secondary border border-border text-primary px-2.5 py-1 rounded-full text-xs font-medium">
+              #{tagParam}
+              <button onClick={() => updateParams({ tag: null })} className="hover:text-muted-foreground">
+                <X className="size-3" />
+              </button>
+            </span>
+          )}
+          {searchParam && (
+            <span className="inline-flex items-center gap-1 bg-secondary border border-border text-primary px-2.5 py-1 rounded-full text-xs font-medium">
+              "{searchParam}"
+              <button onClick={() => updateParams({ q: null })} className="hover:text-muted-foreground">
+                <X className="size-3" />
+              </button>
+            </span>
+          )}
         </div>
+      )}
 
-        {/* Selected Filter Chips Display */}
-        {activeFiltersCount > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
-            <span className="text-[10px] font-mono text-ink-muted uppercase tracking-wider">Đang lọc:</span>
-            {colorParam && (
-              <span className="inline-flex items-center gap-1 bg-cream-dark text-ink px-2.5 py-1 rounded-full text-xs font-medium">
-                Màu: {COLORS.find(c => c.value === colorParam)?.name}
-                <button onClick={() => updateParams({ color: null })} className="hover:text-terracotta">
-                  <X className="size-3" />
-                </button>
-              </span>
-            )}
-            {tagParam && (
-              <span className="inline-flex items-center gap-1 bg-cream-dark text-ink px-2.5 py-1 rounded-full text-xs font-medium">
-                #{tagParam}
-                <button onClick={() => updateParams({ tag: null })} className="hover:text-terracotta">
-                  <X className="size-3" />
-                </button>
-              </span>
-            )}
-            {searchParam && (
-              <span className="inline-flex items-center gap-1 bg-cream-dark text-ink px-2.5 py-1 rounded-full text-xs font-medium">
-                "{searchParam}"
-                <button onClick={() => updateParams({ q: null })} className="hover:text-terracotta">
-                  <X className="size-3" />
-                </button>
-              </span>
-            )}
-            <button 
-              onClick={handleResetFilters}
-              className="text-[11px] font-medium text-terracotta hover:underline ml-1"
+      {/* Categories / Tabs */}
+      <div className="flex overflow-x-auto no-scrollbar gap-8 mb-8 pb-[1px] border-b border-border/50">
+        {CATEGORIES.map((cat, idx) => {
+          // Adjust labels to match English design if standard
+          const label = cat === "Tất cả" ? "All Items" :
+            cat === "Áo" ? "Tops" :
+              cat === "Quần" ? "Bottoms" :
+                cat === "Váy" ? "Dresses" :
+                  cat === "Áo khoác" ? "Outerwear" :
+                    cat === "Phụ kiện" ? "Shoes & Accessories" : cat;
+          return (
+            <button
+              key={cat}
+              onClick={() => handleCategoryChange(cat)}
+              className={cn(
+                "font-body-sm text-[14px] pb-3 whitespace-nowrap transition-all tracking-wide relative",
+                categoryParam === cat
+                  ? "font-bold text-primary"
+                  : "text-muted-foreground font-medium hover:text-primary"
+              )}
             >
-              Thiết lập lại
+              {label}
+              {categoryParam === cat && (
+                <span className="absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded-t-full" />
+              )}
             </button>
-          </div>
-        )}
+          );
+        })}
       </div>
 
       {/* Grid Content */}
       {isLoadingItems ? (
         <div className="flex flex-col items-center justify-center p-12 space-y-4">
-          <Loader2 className="size-10 text-terracotta animate-spin" />
-          <p className="text-sm text-ink-muted font-mono">Đang tải tủ đồ...</p>
+          <Loader2 className="size-10 text-primary animate-spin" />
+          <p className="text-sm text-muted-foreground font-mono">Loading wardrobe...</p>
         </div>
       ) : sortedItems.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {sortedItems.map((item: any) => {
             const isProcessing = item.status === WardrobeItemStatus.Processing;
             const isFailed = item.status === WardrobeItemStatus.Failed;
@@ -446,161 +312,85 @@ function WardrobeContent() {
             };
 
             return (
-              <div 
-                key={item.id} 
+              <div
+                key={item.id}
+                onClick={handleCardClick}
                 className={cn(
-                  "group relative rounded-2xl overflow-hidden border transition-all duration-300",
-                  isPremium 
-                    ? "bg-card hover:border-primary/50 border-border" 
-                    : "bg-cream-dark/20 hover:bg-cream-dark/30 border-cream-dark/50 hover:border-ink-subtle",
+                  "group bg-background rounded-[16px] overflow-hidden transition-all duration-300 cursor-pointer relative flex flex-col p-3 border border-transparent hover:border-border hover:shadow-sm",
                   isLocked && "opacity-75"
                 )}
               >
-                {/* Lock overlay */}
-                {isLocked && (
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center text-white gap-2 p-4 text-center">
-                    <Lock className="size-6 text-yellow-500" />
-                    <span className="text-xs font-bold font-mono tracking-wider">ĐÃ KHÓA</span>
-                    <span className="text-[10px] opacity-80">Gói Free hết hạn ngạch</span>
-                  </div>
-                )}
-
-                {/* Processing overlay */}
-                {isProcessing && (
-                  <div className="absolute inset-0 bg-cream/70 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center text-ink gap-2">
-                    <Loader2 className="size-6 text-terracotta animate-spin" />
-                    <span className="text-[10px] font-mono font-bold text-ink-muted">AI ĐANG PHÂN TÍCH...</span>
-                  </div>
-                )}
-
-                {isFailed && (
-                  <div className="absolute top-3 left-3 z-10 bg-red-500 text-white px-2 py-0.5 rounded text-[9px] font-mono font-bold">
-                    AI LỖI
-                  </div>
-                )}
-                
-                <div 
-                  onClick={handleCardClick}
-                  className={cn(
-                    "aspect-[4/5] relative overflow-hidden cursor-pointer",
-                    isPremium ? "bg-muted" : "bg-cream-dark/40"
-                  )}
-                >
-                  <img 
-                    src={item.imageUrl} 
-                    alt={getWardrobeItemName(item)} 
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" 
+                <div className="relative aspect-[3/4] bg-secondary rounded-[12px] overflow-hidden mb-4">
+                  <img
+                    alt={getWardrobeItemName(item)}
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 mix-blend-multiply"
+                    src={item.imageUrl || undefined}
                   />
-                  
-                  {/* Elegant Hover overlay (hide when locked or processing) */}
+                  {item.material && (
+                    <div className="absolute top-2 left-2 flex gap-2 z-10">
+                      <span className="bg-[#D9C5B2]/80 text-primary font-label-caps text-[10px] px-2 py-1 rounded-[4px] backdrop-blur-sm uppercase tracking-wider font-bold">
+                        {item.material}
+                      </span>
+                    </div>
+                  )}
+
                   {!isLocked && !isProcessing && (
-                    <div className="absolute inset-0 bg-ink/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-                      <button 
+                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           router.push(`/wardrobe/item/${item.id}`);
                         }}
-                        className={cn(
-                          "size-10 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-md",
-                          isPremium ? "bg-primary text-primary-foreground" : "bg-cream text-ink hover:bg-ink hover:text-cream"
-                        )}
-                        title="Chi tiết"
+                        className="size-9 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm bg-background text-primary hover:bg-primary hover:text-primary-foreground"
                       >
                         <Eye className="size-4" />
-                      </button>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/wardrobe/item/${item.id}/edit`);
-                        }}
-                        className={cn(
-                          "size-10 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-md",
-                          isPremium ? "bg-primary text-primary-foreground" : "bg-cream text-ink hover:bg-ink hover:text-cream"
-                        )}
-                        title="Chỉnh sửa"
-                      >
-                        <Edit2 className="size-4" />
                       </button>
                     </div>
                   )}
                 </div>
-                
-                {/* Product Info */}
-                <div className="p-4 space-y-2">
-                  <div className="flex items-start justify-between gap-1.5">
-                    <h3 
-                      onClick={handleCardClick}
-                      className={cn(
-                        "font-semibold text-sm md:text-base leading-tight hover:underline cursor-pointer truncate text-ink",
-                        isPremium ? "font-sans font-light" : "font-heading"
-                      )}
-                    >
-                      {getWardrobeItemName(item)}
-                    </h3>
-                    <span 
-                      className="size-3 rounded-full border border-black/10 shrink-0 inline-block mt-1" 
-                      style={{ backgroundColor: getColorHex(item.color || "") }}
-                    />
-                  </div>
 
-                  <div className="flex items-center justify-between text-[11px] font-mono text-ink-muted">
-                    <span className="font-medium">{item.style || "Hàng ngày"}</span>
-                    <span>{item.material || "Chưa rõ"}</span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1 pt-1 opacity-70">
-                    {item.fit && (
-                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                        #{item.fit}
-                      </span>
-                    )}
-                    {item.seasonality && (
-                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                        #{item.seasonality}
-                      </span>
-                    )}
-                  </div>
+                <div className="flex flex-col px-1">
+                  <h3 className="font-title-lg text-[15px] text-primary truncate font-semibold mb-1">{getWardrobeItemName(item)}</h3>
+                  <p className="font-body-sm text-[13px] text-muted-foreground flex items-center justify-between">
+                    <span className="truncate">{item.brand || "Acne Studios"} • Size {item.size || "S"}</span>
+                  </p>
                 </div>
               </div>
             );
           })}
 
-          {/* Inline Add Item CTA Card */}
-          <div 
+          {/* Add New Item Card */}
+          <div
             onClick={() => router.push("/wardrobe/upload")}
-            className="group border border-dashed border-ink-subtle hover:border-terracotta rounded-2xl flex flex-col items-center justify-center aspect-[4/5] gap-3 text-ink-muted hover:text-terracotta transition-all duration-300 cursor-pointer bg-cream-dark/10 hover:bg-terracotta-light/5"
+            className="group rounded-[16px] border-2 border-dashed border-border hover:border-primary/50 bg-transparent transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-h-[300px] text-muted-foreground hover:text-primary hover:bg-secondary/20"
           >
-            <div className="size-11 rounded-full bg-cream-dark/50 flex items-center justify-center group-hover:bg-terracotta/10 group-hover:scale-110 transition-all">
-              <Plus className="size-5 transition-transform group-hover:rotate-90" />
+            <div className="size-12 rounded-full border-2 border-current flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-500">
+              <Plus className="size-6 transition-transform duration-500 group-hover:rotate-[360deg]" />
             </div>
-            <div className="text-center">
-              <p className="font-semibold text-xs tracking-wider uppercase">Thêm đồ mới</p>
-              <p className="text-[10px] text-ink-subtle mt-0.5 font-mono">Quét QR hoặc tải ảnh</p>
-            </div>
+            <span className="font-body-sm text-[14px] font-medium">Thêm món mới</span>
           </div>
         </div>
       ) : (
-        /* Empty State */
-        <div className="border border-dashed border-cream-dark p-12 text-center rounded-2xl bg-cream-dark/10 max-w-md mx-auto my-12 space-y-4">
-          <div className="size-12 bg-cream-dark rounded-full flex items-center justify-center mx-auto text-ink-muted">
-            <Search className="size-6" />
-          </div>
-          <div className="space-y-2">
-            <h3 className="font-heading text-lg font-bold text-ink">Không tìm thấy quần áo</h3>
-            <p className="text-sm text-ink-muted">
-              Không có món đồ nào trong tủ khớp với bộ lọc hiện tại của bạn.
-            </p>
-          </div>
-          <div className="flex justify-center gap-3">
-            <Button variant="outline" onClick={handleResetFilters} className="rounded-xl h-10 text-xs font-mono">
-              XÓA BỘ LỌC
-            </Button>
-            <Button onClick={() => router.push("/wardrobe/upload")} className="bg-ink text-cream hover:bg-ink/90 rounded-xl h-10 text-xs font-mono">
-              THÊM ĐỒ MỚI
-            </Button>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div
+            onClick={() => router.push("/wardrobe/upload")}
+            className="group rounded-[16px] border-2 border-dashed border-border hover:border-primary/50 bg-transparent transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-h-[300px] text-muted-foreground hover:text-primary hover:bg-secondary/20"
+          >
+            <div className="size-12 rounded-full border-2 border-current flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-500">
+              <Plus className="size-6 transition-transform duration-500 group-hover:rotate-[360deg]" />
+            </div>
+            <span className="font-body-sm text-[14px] font-medium">Thêm món mới</span>
           </div>
         </div>
       )}
+
+      {/* {sortedItems.length > 0 && (
+        <div className="mt-16 flex justify-center">
+          <button className="px-8 py-2.5 border border-primary text-primary font-body-sm text-[14px] font-medium rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm">
+            Load More Items
+          </button>
+        </div>
+      )} */}
     </div>
   );
 }

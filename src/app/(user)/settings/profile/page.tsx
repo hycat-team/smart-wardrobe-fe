@@ -1,22 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Camera, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { X, Plus, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUpdateProfile, useChangePassword } from "@/features/profile/queries/profile.queries";
 import { Gender } from "@/common/enum";
+import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 export default function ProfileSettings() {
   const user = useAuthStore((state) => state.user);
-  
+
   const [profileData, setProfileData] = useState({
     firstName: "",
     lastName: "",
-    dateOfBirth: "",
+    email: "",
     address: "",
+    dateOfBirth: "",
     gender: Gender.Unknown,
   });
 
@@ -24,40 +26,53 @@ export default function ProfileSettings() {
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
-    logoutAllDevices: false,
+    logoutAllDevices: true,
   });
+
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
   const { mutate: changePassword, isPending: isChangingPassword } = useChangePassword();
 
   useEffect(() => {
     if (user) {
-      setProfileData({
+      setProfileData(prev => ({
+        ...prev,
         firstName: user.firstName || "",
         lastName: user.lastName || "",
-        dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : "",
+        email: user.email || "",
         address: user.address || "",
+        dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : "",
         gender: user.gender ?? Gender.Unknown,
-      });
+      }));
     }
   }, [user]);
 
-  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setProfileData(prev => ({ ...prev, [name]: name === 'gender' ? Number(value) : value }));
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setPasswordData(prev => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? checked : value 
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile(profileData);
+
+    updateProfile({
+      firstName: profileData.firstName,
+      lastName: profileData.lastName,
+      address: profileData.address,
+      gender: profileData.gender,
+      dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toISOString() : undefined,
+    });
   };
 
   const handleSavePassword = (e: React.FormEvent) => {
@@ -78,120 +93,271 @@ export default function ProfileSettings() {
     });
   };
 
-  return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-16">
-      {/* Profile Section */}
-      <section className="space-y-8">
-        <div>
-          <h2 className="text-xl font-heading font-bold text-foreground">Hồ sơ công khai</h2>
-          <p className="text-sm text-muted-foreground mt-1">Thông tin này sẽ hiển thị trên trang cá nhân của bạn.</p>
-        </div>
+  const inputClassName = "w-full bg-cream-dark/30 border border-cream-dark/50 focus:border-ink focus:ring-1 focus:ring-ink focus:bg-transparent rounded-xl px-4 py-3 outline-none transition-all font-body-sm text-ink placeholder:text-ink-muted/50";
+  const labelClassName = "block text-[11px] font-label-caps text-ink-muted uppercase tracking-wider mb-2 font-bold";
 
-        <div className="flex items-center gap-6">
-          <div className="relative group cursor-not-allowed">
-            <div className="size-24 rounded-full overflow-hidden bg-secondary border-2 border-border relative">
-              <img 
-                src={user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"} 
-                alt="Avatar" 
-                className="w-full h-full object-cover opacity-80"
+  return (
+    <div className="animate-in fade-in duration-700 max-w-2xl mx-auto w-full pb-20">
+
+      {/* Profile Header */}
+      <div className="text-center mb-10 space-y-3">
+        <h1 className="font-heading text-4xl md:text-5xl text-ink font-bold tracking-tight">Profile Information</h1>
+        <p className="font-body-sm text-ink-muted">Update your personal details and preferences.</p>
+      </div>
+
+      {/* Avatar Section */}
+      <div className="flex justify-center mb-12 relative">
+        <div className="size-24 rounded-full overflow-hidden border border-cream-dark/50 bg-cream-dark/30 relative group cursor-not-allowed">
+          <img
+            src={user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"}
+            alt="Avatar"
+            className="w-full h-full object-cover opacity-90 transition-opacity group-hover:opacity-75"
+          />
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 backdrop-blur-[2px]">
+            <span className="text-[10px] font-label-caps uppercase tracking-wider text-ink bg-white/80 px-2 py-1 rounded">Edit</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Form */}
+      <form onSubmit={handleSaveProfile} className="space-y-8">
+        <div className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className={labelClassName}>First Name</label>
+              <input
+                name="firstName"
+                value={profileData.firstName}
+                onChange={handleProfileChange}
+                className={inputClassName}
+                placeholder="e.g. Alexander"
+                required
+              />
+            </div>
+            <div>
+              <label className={labelClassName}>Last Name</label>
+              <input
+                name="lastName"
+                value={profileData.lastName}
+                onChange={handleProfileChange}
+                className={inputClassName}
+                placeholder="e.g. Chen"
               />
             </div>
           </div>
-          <div className="space-y-1">
-            <Button variant="outline" className="h-9" disabled>Đổi ảnh đại diện</Button>
-            <p className="text-xs text-muted-foreground">Chức năng đang được phát triển.</p>
-          </div>
-        </div>
 
-        <form onSubmit={handleSaveProfile} className="space-y-6 max-w-2xl border-t border-border pt-8">
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-foreground">Họ</Label>
-              <Input id="firstName" name="firstName" value={profileData.firstName} onChange={handleProfileChange} className="bg-card text-foreground" required />
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className={labelClassName}>Date of Birth</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button type="button" style={{ width: '150%' }} className={cn("w-full text-left flex justify-between items-center", inputClassName, !profileData.dateOfBirth && "text-ink-muted/50")}>
+                    {profileData.dateOfBirth ? profileData.dateOfBirth.split('-').reverse().join('/') : "dd/mm/yyyy"}
+                    <svg className="w-4 h-4 opacity-50 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-background border-cream-dark/50 rounded-xl shadow-xl">
+                  <Calendar
+                    mode="single"
+                    selected={profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        const y = date.getFullYear();
+                        const m = String(date.getMonth() + 1).padStart(2, '0');
+                        const d = String(date.getDate()).padStart(2, '0');
+                        setProfileData(prev => ({ ...prev, dateOfBirth: `${y}-${m}-${d}` }));
+                      } else {
+                        setProfileData(prev => ({ ...prev, dateOfBirth: "" }));
+                      }
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-foreground">Tên</Label>
-              <Input id="lastName" name="lastName" value={profileData.lastName} onChange={handleProfileChange} className="bg-card text-foreground" />
-            </div>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="dateOfBirth" className="text-foreground">Ngày sinh</Label>
-              <Input id="dateOfBirth" type="date" name="dateOfBirth" value={profileData.dateOfBirth} onChange={handleProfileChange} className="bg-card text-foreground" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="gender" className="text-foreground">Giới tính</Label>
-              <select 
-                id="gender" name="gender" value={profileData.gender} onChange={handleProfileChange}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            <div>
+              <label className={labelClassName}>Gender</label>
+              <Select
+                value={profileData.gender.toString()}
+                onValueChange={(value) => setProfileData(prev => ({ ...prev, gender: Number(value) }))}
               >
-                <option value={Gender.Unknown}>Không xác định</option>
-                <option value={Gender.Male}>Nam</option>
-                <option value={Gender.Female}>Nữ</option>
-                <option value={Gender.Other}>Khác</option>
-              </select>
+                <SelectTrigger style={{ width: '100%', height: '68%' }} className={cn("w-full flex justify-between items-center", inputClassName)}>
+                  <SelectValue placeholder="Chọn giới tính">
+                    {profileData.gender === Gender.Male ? "Nam" :
+                      profileData.gender === Gender.Female ? "Nữ" :
+                        profileData.gender === Gender.Other ? "Khác" : "Không xác định"}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent alignItemWithTrigger={false} className="bg-background border-cream-dark/50 shadow-xl rounded-xl z-50">
+                  <SelectItem value={Gender.Unknown.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Không xác định</SelectItem>
+                  <SelectItem value={Gender.Male.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Nam</SelectItem>
+                  <SelectItem value={Gender.Female.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Nữ</SelectItem>
+                  <SelectItem value={Gender.Other.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Khác</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="address" className="text-foreground">Địa chỉ</Label>
-            <Input id="address" name="address" value={profileData.address} onChange={handleProfileChange} className="bg-card text-foreground" />
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className={labelClassName}>Email Address</label>
+              <input
+                name="email"
+                value={profileData.email}
+                readOnly
+                className={cn(inputClassName, "opacity-70 cursor-not-allowed bg-cream-dark/10")}
+              />
+            </div>
+            <div>
+              <label className={labelClassName}>Address</label>
+              <input
+                name="address"
+                value={profileData.address}
+                onChange={handleProfileChange}
+                className={inputClassName}
+                placeholder="e.g. New York, NY"
+              />
+            </div>
           </div>
-
-          <div className="pt-4 flex items-center gap-4">
-            <Button type="submit" disabled={isUpdating} className="bg-primary text-primary-foreground hover:bg-primary/90 px-8">
-              {isUpdating ? "Đang lưu..." : "Lưu thay đổi"}
-            </Button>
-          </div>
-        </form>
-      </section>
-
-      {/* Security Section */}
-      <section className="space-y-8 border-t border-border pt-12">
-        <div>
-          <h2 className="text-xl font-heading font-bold text-foreground">Bảo mật & Mật khẩu</h2>
-          <p className="text-sm text-muted-foreground mt-1">Cập nhật mật khẩu để bảo vệ tài khoản của bạn.</p>
         </div>
 
-        <form onSubmit={handleSavePassword} className="space-y-6 max-w-2xl">
-          <div className="space-y-2">
-            <Label htmlFor="oldPassword" className="text-foreground">Mật khẩu hiện tại</Label>
-            <Input id="oldPassword" name="oldPassword" type="password" value={passwordData.oldPassword} onChange={handlePasswordChange} className="bg-card text-foreground" required />
+        {/* Profile Form Actions */}
+        <div className="pt-8 border-t border-cream-dark/50 flex items-center justify-end gap-6">
+          <button
+            type="button"
+            className="text-sm font-medium text-ink-muted hover:text-ink transition-colors"
+            onClick={() => {
+              // Reset
+              setProfileData(prev => ({
+                ...prev,
+                firstName: user?.firstName || "",
+                lastName: user?.lastName || "",
+                address: user?.address || "",
+                dateOfBirth: user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : "",
+                gender: user?.gender ?? Gender.Unknown,
+              }))
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isUpdating}
+            className="bg-[#1A1A1A] text-[#F9F9F7] px-8 py-3 rounded-xl text-sm font-medium hover:bg-black transition-colors shadow-lg shadow-black/10 disabled:opacity-70 flex items-center gap-2"
+          >
+            {isUpdating ? <><Loader2 className="size-4 animate-spin" /> Saving...</> : "Save Changes"}
+          </button>
+        </div>
+      </form>
+
+      {/* Password Section */}
+      <div className="mt-16 pt-16 border-t border-cream-dark/50 space-y-8">
+        <div className="text-center mb-8 space-y-2">
+          <h2 className="font-heading text-3xl text-ink font-bold tracking-tight">Security</h2>
+          <p className="font-body-sm text-ink-muted">Update your password to keep your account secure.</p>
+        </div>
+
+        <form onSubmit={handleSavePassword} className="space-y-6">
+          <div>
+            <label className={labelClassName}>Current Password</label>
+            <div className="relative">
+              <input
+                name="oldPassword"
+                type={showOldPassword ? "text" : "password"}
+                value={passwordData.oldPassword}
+                onChange={handlePasswordChange}
+                className={cn(inputClassName, "pr-10")}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowOldPassword(!showOldPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink transition-colors focus:outline-none"
+              >
+                {showOldPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="newPassword" className="text-foreground">Mật khẩu mới</Label>
-              <Input id="newPassword" name="newPassword" type="password" value={passwordData.newPassword} onChange={handlePasswordChange} className="bg-card text-foreground" required minLength={6} />
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className={labelClassName}>New Password</label>
+              <div className="relative">
+                <input
+                  name="newPassword"
+                  type={showNewPassword ? "text" : "password"}
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  className={cn(inputClassName, "pr-10")}
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink transition-colors focus:outline-none"
+                >
+                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-foreground">Xác nhận mật khẩu mới</Label>
-              <Input id="confirmPassword" name="confirmPassword" type="password" value={passwordData.confirmPassword} onChange={handlePasswordChange} className="bg-card text-foreground" required minLength={6} />
+            <div>
+              <label className={labelClassName}>Confirm New Password</label>
+              <div className="relative">
+                <input
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  className={cn(inputClassName, "pr-10")}
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink transition-colors focus:outline-none"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              id="logoutAllDevices" 
-              name="logoutAllDevices" 
-              checked={passwordData.logoutAllDevices} 
+          <div className="flex items-center space-x-3 pt-2">
+            <input
+              type="checkbox"
+              id="logoutAllDevices"
+              name="logoutAllDevices"
+              checked={passwordData.logoutAllDevices}
               onChange={handlePasswordChange}
-              className="size-4 rounded border-input bg-card text-primary"
+              className="size-5 rounded-md border-cream-dark/50 bg-cream-dark/30 text-ink focus:ring-ink"
             />
-            <Label htmlFor="logoutAllDevices" className="text-sm font-medium leading-none">
-              Đăng xuất khỏi tất cả thiết bị khác
-            </Label>
+            <label htmlFor="logoutAllDevices" className="text-[13px] font-medium text-ink-muted select-none cursor-pointer">
+              Sign out from all other devices
+            </label>
           </div>
 
-          <div className="pt-4">
-            <Button type="submit" disabled={isChangingPassword} className="bg-ink text-cream hover:bg-ink/90 px-8">
-              {isChangingPassword ? "Đang cập nhật..." : "Đổi mật khẩu"}
-            </Button>
+          <div className="pt-8 border-t border-cream-dark/50 flex items-center justify-end gap-6">
+            <button
+              type="button"
+              className="text-sm font-medium text-ink-muted hover:text-ink transition-colors"
+              onClick={() => setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "", logoutAllDevices: false })}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isChangingPassword}
+              className="bg-[#1A1A1A] text-[#F9F9F7] px-8 py-3 rounded-xl text-sm font-medium hover:bg-black transition-colors shadow-lg shadow-black/10 disabled:opacity-70 flex items-center gap-2"
+            >
+              {isChangingPassword ? <><Loader2 className="size-4 animate-spin" /> Updating...</> : "Update Password"}
+            </button>
           </div>
         </form>
-      </section>
+      </div>
     </div>
   );
 }

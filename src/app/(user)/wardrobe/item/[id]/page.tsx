@@ -1,10 +1,21 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useWardrobeItemDetail } from "@/features/wardrobe/queries/wardrobe.queries";
+import { useWardrobeItemDetail, useDeleteWardrobeItem } from "@/features/wardrobe/queries/wardrobe.queries";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit2, Loader2, Tag, Info, AlertCircle } from "lucide-react";
+import { ArrowLeft, Edit2, Loader2, Tag, Info, AlertCircle, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
 
@@ -33,6 +44,15 @@ export default function WardrobeItemDetail() {
   const isPremium = user?.isPremium;
 
   const { data: item, isLoading, error } = useWardrobeItemDetail(itemId);
+  const { mutate: deleteItem, isPending: isDeleting } = useDeleteWardrobeItem();
+
+  const handleDelete = () => {
+    deleteItem(itemId, {
+      onSuccess: () => {
+        router.push("/wardrobe");
+      }
+    });
+  };
 
   if (isLoading) {
     return (
@@ -74,12 +94,43 @@ export default function WardrobeItemDetail() {
           <ArrowLeft className="size-4 group-hover:-translate-x-1 transition-transform" /> 
           QUAY LẠI
         </button>
-        <Button 
-          onClick={() => router.push(`/wardrobe/item/${itemId}/edit`)}
-          className="rounded-xl h-9 px-4 text-xs font-mono font-medium bg-ink text-cream hover:bg-ink/90 shadow-sm"
-        >
-          <Edit2 className="size-3.5 mr-2" /> CHỈNH SỬA
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            onClick={() => router.push(`/wardrobe/item/${itemId}/edit`)}
+            className="rounded-xl h-9 px-4 text-xs font-mono font-medium bg-ink text-cream hover:bg-ink/90 shadow-sm"
+          >
+            <Edit2 className="size-3.5 mr-2" /> CHỈNH SỬA
+          </Button>
+          
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="outline"
+                className="rounded-xl h-9 px-3 text-xs font-mono font-medium border-red-200 text-red-500 hover:bg-red-50 hover:text-red-600 hover:border-red-300 shadow-sm transition-colors"
+                disabled={isDeleting}
+              >
+                {isDeleting ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="rounded-3xl border-cream-dark">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-heading text-xl text-ink">Xóa trang phục này?</AlertDialogTitle>
+                <AlertDialogDescription className="font-sans text-ink-muted">
+                  Bạn có chắc chắn muốn xóa trang phục này khỏi tủ đồ không? Nếu trang phục này đang được sử dụng trong các bộ phối đồ (Outfit), nó có thể bị mất hiển thị. Hành động này không thể hoàn tác.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="mt-4">
+                <AlertDialogCancel className="rounded-xl font-mono text-sm border-cream-dark">HỦY BỎ</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleDelete}
+                  className="rounded-xl font-mono text-sm bg-red-500 text-white hover:bg-red-600 shadow-sm"
+                >
+                  ĐỒNG Ý XÓA
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {/* Main Split Layout */}

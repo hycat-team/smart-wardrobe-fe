@@ -23,6 +23,11 @@ export function GuestHeader() {
   const { mutate: logout } = useLogout();
   const isLoggedIn = !!user;
 
+  // Chỉ hiển thị ở trang chủ (landing page)
+  if (pathname !== '/') {
+    return null;
+  }
+
   return (
     <header className="h-16 px-4 md:px-8 lg:px-12 flex items-center justify-between absolute top-0 w-full z-50 bg-transparent">
       <Link href="/" className="text-2xl font-heading font-bold text-ink">

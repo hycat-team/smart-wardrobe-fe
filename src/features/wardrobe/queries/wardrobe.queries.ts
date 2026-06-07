@@ -8,6 +8,7 @@ export const WARDROBE_QUERY_KEYS = {
   lists: () => [...WARDROBE_QUERY_KEYS.all, 'list'] as const,
   detail: (id: string) => [...WARDROBE_QUERY_KEYS.all, 'detail', id] as const,
   search: (query: string) => [...WARDROBE_QUERY_KEYS.all, 'search', query] as const,
+  categories: () => [...WARDROBE_QUERY_KEYS.all, 'categories'] as const,
 };
 
 export const useMyWardrobe = () => {
@@ -24,6 +25,13 @@ export const useMyWardrobe = () => {
       }
       return false;
     },
+  });
+};
+
+export const useCategories = () => {
+  return useQuery({
+    queryKey: WARDROBE_QUERY_KEYS.categories(),
+    queryFn: () => wardrobeApi.getCategories(),
   });
 };
 
@@ -80,8 +88,21 @@ export const useUpdateWardrobeItem = () => {
       toast.success('Cập nhật trang phục thành công!');
     },
     onError: (error) => {
-      // Backend maybe doesn't have it yet, we just mock success
-      toast.error('API Cập nhật chưa sẵn sàng trên Backend, vui lòng đợi bản cập nhật sau.');
+      toast.error('Có lỗi xảy ra khi cập nhật trang phục.');
+    }
+  });
+};
+
+export const useDeleteWardrobeItem = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: wardrobeApi.deleteWardrobeItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+      toast.success('Xóa trang phục thành công!');
+    },
+    onError: (error) => {
+      toast.error('API Xóa trang phục hiện chưa khả dụng trên Backend.');
     }
   });
 };

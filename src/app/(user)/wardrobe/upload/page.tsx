@@ -1,31 +1,30 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { UploadCloud, X, Sparkles, Check, ChevronRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useBatchUploadWardrobeItems } from "@/features/wardrobe/queries/wardrobe.queries";
+import { useBatchUploadWardrobeItems, useCategories } from "@/features/wardrobe/queries/wardrobe.queries";
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-// Seeded Categories from DB migrations
-const SEEDED_CATEGORIES = [
-  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a01", name: "Áo", slug: "ao" },
-  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a02", name: "Quần", slug: "quan" },
-  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a06", name: "Váy", slug: "vay" },
-  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a04", name: "Giày", slug: "giay" },
-  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a03", name: "Mũ", slug: "mu" },
-  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a07", name: "Áo khoác", slug: "ao-khoac" },
-  { id: "8b7eb3de-2661-46ab-ae7d-b57bfd2d2a05", name: "Phụ kiện", slug: "phu-kien" },
-];
+// Seeded categories removed, using API instead
 
 export default function Upload() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>(SEEDED_CATEGORIES[0].id);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
+
+  const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
+  
+  useEffect(() => {
+    if (categories.length > 0 && !selectedCategory) {
+      setSelectedCategory(categories[0].id);
+    }
+  }, [categories, selectedCategory]);
 
   const batchUploadMutation = useBatchUploadWardrobeItems();
 
@@ -134,7 +133,11 @@ export default function Upload() {
               Chọn danh mục trước khi tải lên
             </label>
             <div className="grid grid-cols-3 gap-2">
-              {SEEDED_CATEGORIES.map((cat) => (
+              {isLoadingCategories ? (
+                <div className="col-span-3 flex justify-center py-4">
+                  <Loader2 className="animate-spin size-6 text-muted-foreground" />
+                </div>
+              ) : categories.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
@@ -202,7 +205,7 @@ export default function Upload() {
           <div className="space-y-8 flex flex-col justify-center">
             <div className="space-y-6 text-center md:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cream-dark text-ink text-xs font-mono border border-cream-dark/50">
-                Danh mục: {SEEDED_CATEGORIES.find(x => x.id === selectedCategory)?.name}
+                Danh mục: {categories.find(x => x.id === selectedCategory)?.name || "Đang tải..."}
               </div>
               <h2 className="text-3xl font-heading font-bold text-ink">Bắt đầu phân tích AI</h2>
               <p className="text-ink-muted leading-relaxed">

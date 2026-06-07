@@ -7,11 +7,8 @@ export function ThemeController({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
-    if (user?.isPremium) {
-      document.documentElement.classList.add("dark-atelier");
-    } else {
-      document.documentElement.classList.remove("dark-atelier");
-    }
+    // Premium theme is disabled for now to be developed later.
+    document.documentElement.classList.remove("dark-atelier");
   }, [user]);
 
   return <>{children}</>;
