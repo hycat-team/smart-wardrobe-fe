@@ -3,13 +3,16 @@ import { profileApi } from '../api/profile.api';
 import { toast } from 'sonner';
 
 
+import { UserRes } from '../types';
+
 export const PROFILE_QUERY_KEY = ['me'];
 
-export const useProfile = () => {
+export const useProfile = (initialData?: UserRes) => {
   return useQuery({
     queryKey: PROFILE_QUERY_KEY,
     queryFn: profileApi.getProfile,
     retry: 0, // Do not retry if unauthorized
+    initialData,
   });
 };
 

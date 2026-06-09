@@ -8,18 +8,20 @@ export const OUTFIT_QUERY_KEYS = {
   detail: (id: string) => [...OUTFIT_QUERY_KEYS.all, 'detail', id] as const,
 };
 
-export const useMyOutfits = () => {
+export const useMyOutfits = (initialData?: any[]) => {
   return useQuery({
     queryKey: OUTFIT_QUERY_KEYS.lists(),
     queryFn: () => outfitsApi.getMyOutfits(),
+    initialData,
   });
 };
 
-export const useOutfitDetail = (id: string) => {
+export const useOutfitDetail = (id: string, initialData?: any) => {
   return useQuery({
     queryKey: OUTFIT_QUERY_KEYS.detail(id),
     queryFn: () => outfitsApi.getOutfitDetail(id),
     enabled: !!id,
+    initialData,
   });
 };
 
