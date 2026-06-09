@@ -12,9 +12,11 @@ export const outfitsApi = {
     return res.data.data!;
   },
 
-  createOutfit: async (data: SaveOutfitReq): Promise<OutfitRes> => {
+  createOutfit: async (data: SaveOutfitReq): Promise<OutfitRes & { message?: string }> => {
     const res = await api.post<APIResponse<OutfitRes>>('/outfits', data);
-    return res.data.data!;
+    const result = res.data.data as any;
+    if (result) result.message = res.data.message;
+    return result;
   },
 
   getOutfitDetail: async (id: string, axiosInstance: AxiosInstance = api): Promise<OutfitRes> => {
@@ -22,12 +24,15 @@ export const outfitsApi = {
     return res.data.data!;
   },
 
-  updateOutfit: async (id: string, data: SaveOutfitReq): Promise<OutfitRes> => {
+  updateOutfit: async (id: string, data: SaveOutfitReq): Promise<OutfitRes & { message?: string }> => {
     const res = await api.put<APIResponse<OutfitRes>>(`/outfits/${id}`, data);
-    return res.data.data!;
+    const result = res.data.data as any;
+    if (result) result.message = res.data.message;
+    return result;
   },
 
-  deleteOutfit: async (id: string): Promise<void> => {
-    await api.delete<APIResponse<void>>(`/outfits/${id}`);
+  deleteOutfit: async (id: string): Promise<{ message?: string }> => {
+    const res = await api.delete<APIResponse<void>>(`/outfits/${id}`);
+    return { message: res.data.message };
   },
 };

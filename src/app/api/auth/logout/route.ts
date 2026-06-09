@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Logout Proxy Error:', error);
     // Still clear cookies on error
-    const res = NextResponse.json({ detail: 'Lỗi máy chủ nội bộ' }, { status: 500 });
+    const res = NextResponse.json({ message: 'Lỗi máy chủ nội bộ' }, { status: 500 });
     res.cookies.delete('accessToken');
     res.cookies.delete('refreshToken');
     return res;

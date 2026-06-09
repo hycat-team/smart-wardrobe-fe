@@ -29,13 +29,10 @@ export const useToggleAutoRenew = () => {
       const currentStatus = sub?.isAutoRenewEnabled || sub?.IsAutoRenewEnabled || false;
       return subscriptionApi.toggleAutoRenew(!currentStatus);
     },
-    onSuccess: (data) => {
-      toast.success(data ? 'Đã bật tự động gia hạn' : 'Đã tắt tự động gia hạn');
+    onSuccess: (res) => {
+      toast.success(res?.message || (res?.data ? 'Đã bật tự động gia hạn' : 'Đã tắt tự động gia hạn'));
       // Invalidate the subscription query to refresh data
       queryClient.invalidateQueries({ queryKey: ['subscription', 'me'] });
-    },
-    onError: () => {
-      toast.error('Có lỗi xảy ra khi thay đổi cài đặt tự động gia hạn');
     },
   });
 };

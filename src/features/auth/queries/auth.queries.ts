@@ -9,7 +9,7 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: () => {
+    onSuccess: (res) => {
       // Invalidate auth status so it refetches immediately
       queryClient.invalidateQueries({ queryKey: ['authStatus'] });
       
@@ -18,7 +18,7 @@ export const useLogin = () => {
       queryClient.fetchQuery({ queryKey: PROFILE_QUERY_KEY, queryFn: profileApi.getProfile }).catch(console.error);
       
       queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
-      toast.success('Đăng nhập thành công');
+      toast.success(res?.message || 'Đăng nhập thành công');
     },
   });
 };
@@ -26,8 +26,8 @@ export const useLogin = () => {
 export const useRegister = () => {
   return useMutation({
     mutationFn: authApi.register,
-    onSuccess: () => {
-      toast.success('Đăng ký thành công. Vui lòng kiểm tra email để nhận mã OTP.');
+    onSuccess: (res) => {
+      toast.success(res?.message || 'Đăng ký thành công. Vui lòng kiểm tra email để nhận mã OTP.');
     },
   });
 };
@@ -35,8 +35,8 @@ export const useRegister = () => {
 export const useConfirmRegisterOtp = () => {
   return useMutation({
     mutationFn: authApi.confirmRegisterOtp,
-    onSuccess: () => {
-      toast.success('Xác thực tài khoản thành công. Bạn có thể đăng nhập ngay.');
+    onSuccess: (res) => {
+      toast.success(res?.message || 'Xác thực tài khoản thành công. Bạn có thể đăng nhập ngay.');
     },
   });
 };
@@ -45,10 +45,10 @@ export const useLogout = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: authApi.logout,
-    onSuccess: () => {
+    onSuccess: (res) => {
       // queryClient.invalidateQueries({ queryKey: ['authStatus'] });
       queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
-      toast.success('Đăng xuất thành công');
+      toast.success(res?.message || 'Đăng xuất thành công');
       window.location.href = '/auth/login';
     },
     onError: () => {
@@ -60,8 +60,8 @@ export const useLogout = () => {
 export const useForgotPassword = () => {
   return useMutation({
     mutationFn: authApi.forgotPassword,
-    onSuccess: () => {
-      toast.success('Đã gửi mã OTP khôi phục đến email của bạn.');
+    onSuccess: (res) => {
+      toast.success(res?.message || 'Đã gửi mã OTP khôi phục đến email của bạn.');
     },
   });
 };
@@ -69,8 +69,8 @@ export const useForgotPassword = () => {
 export const useConfirmForgotPasswordOtp = () => {
   return useMutation({
     mutationFn: authApi.confirmForgotPasswordOtp,
-    onSuccess: () => {
-      toast.success('Xác thực OTP thành công. Vui lòng đặt mật khẩu mới.');
+    onSuccess: (res) => {
+      toast.success(res?.message || 'Xác thực OTP thành công. Vui lòng đặt mật khẩu mới.');
     },
   });
 };
@@ -78,8 +78,8 @@ export const useConfirmForgotPasswordOtp = () => {
 export const useResetPassword = () => {
   return useMutation({
     mutationFn: authApi.resetPassword,
-    onSuccess: () => {
-      toast.success('Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.');
+    onSuccess: (res) => {
+      toast.success(res?.message || 'Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.');
     },
   });
 };

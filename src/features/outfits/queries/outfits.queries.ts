@@ -27,9 +27,9 @@ export const useCreateOutfit = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: outfitsApi.createOutfit,
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.lists() });
-      toast.success('Lưu bộ phối đồ thành công!');
+      toast.success(res?.message || 'Lưu bộ phối đồ thành công!');
     },
   });
 };
@@ -38,10 +38,10 @@ export const useUpdateOutfit = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => outfitsApi.updateOutfit(id, data),
-    onSuccess: (_, variables) => {
+    onSuccess: (res, variables) => {
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.lists() });
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.detail(variables.id) });
-      toast.success('Cập nhật bộ phối đồ thành công!');
+      toast.success(res?.message || 'Cập nhật bộ phối đồ thành công!');
     },
   });
 };
@@ -50,9 +50,9 @@ export const useDeleteOutfit = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: outfitsApi.deleteOutfit,
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.lists() });
-      toast.success('Đã xóa bộ phối đồ!');
+      toast.success(res?.message || 'Đã xóa bộ phối đồ!');
     },
   });
 };

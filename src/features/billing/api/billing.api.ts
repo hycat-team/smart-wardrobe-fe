@@ -25,8 +25,8 @@ export const billingApi = {
   },
 
 
-  purchasePlanWithWallet: async (data: DirectPurchaseReq): Promise<boolean> => {
+  purchasePlanWithWallet: async (data: DirectPurchaseReq): Promise<{ data: boolean; message?: string }> => {
     const res = await api.post<APIResponse<boolean>>('/subscriptions/me/purchase-with-wallet', data);
-    return res.data.data!;
+    return { data: res.data.data!, message: res.data.message };
   },
 };

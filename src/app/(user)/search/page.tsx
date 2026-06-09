@@ -5,7 +5,8 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Search, Eye, Heart, MessageCircle, UserPlus, Sparkles, Grid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MOCK_ITEMS } from "../wardrobe/page";
+// MOCK_ITEMS has been removed from wardrobe, using empty array for now
+const MOCK_ITEMS: any[] = [];
 
 // Mock posts database
 const MOCK_POSTS = [
@@ -82,24 +83,24 @@ export default function SearchPage() {
 
   // Searching logic
   const filteredItems = query 
-    ? MOCK_ITEMS.filter(item => 
+    ? MOCK_ITEMS.filter((item: any) => 
         item.name.toLowerCase().includes(query.toLowerCase()) || 
         item.brand.toLowerCase().includes(query.toLowerCase()) ||
         item.category.toLowerCase().includes(query.toLowerCase()) ||
-        item.tags.some(t => t.toLowerCase().includes(query.toLowerCase()))
+        item.tags.some((t: any) => t.toLowerCase().includes(query.toLowerCase()))
       )
     : [];
 
   const filteredPosts = query
-    ? MOCK_POSTS.filter(post => 
+    ? MOCK_POSTS.filter((post: any) => 
         post.content.toLowerCase().includes(query.toLowerCase()) || 
         post.author.toLowerCase().includes(query.toLowerCase()) ||
-        post.tags?.some(t => t.toLowerCase().includes(query.toLowerCase()))
+        post.tags?.some((t: any) => t.toLowerCase().includes(query.toLowerCase()))
       )
     : [];
 
   const filteredUsers = query
-    ? MOCK_USERS.filter(user => 
+    ? MOCK_USERS.filter((user: any) => 
         user.username.toLowerCase().includes(query.toLowerCase()) || 
         user.name.toLowerCase().includes(query.toLowerCase()) ||
         user.bio.toLowerCase().includes(query.toLowerCase())
@@ -189,7 +190,7 @@ export default function SearchPage() {
                     <Grid className="size-4 text-terracotta" /> Tủ đồ cá nhân ({filteredItems.length})
                   </h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {filteredItems.map(item => (
+                    {filteredItems.map((item: any) => (
                       <div 
                         key={item.id} 
                         onClick={() => router.push(`/wardrobe/item/${item.id}`)}

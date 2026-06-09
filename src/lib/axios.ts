@@ -45,8 +45,10 @@ api.interceptors.response.use(
       const isAuthError = 
         error.response.status === 401 || 
         (error.response.status === 500 && 
-          ((error.response.data as any)?.detail === "Vui lòng đăng nhập" || 
+          ((error.response.data as any)?.message === "Vui lòng đăng nhập" || 
+           (error.response.data as any)?.detail === "Vui lòng đăng nhập" || 
            (error.response.data as any)?.Detail === "Vui lòng đăng nhập" ||
+           (error.response.data as any)?.message === "Đã xảy ra lỗi hệ thống" ||
            (error.response.data as any)?.detail === "Đã xảy ra lỗi hệ thống" // Fallback if WrapError swallowed it completely
           )
         );
@@ -102,8 +104,10 @@ api.interceptors.response.use(
         }
 
         const errorData = error.response.data;
-        if (errorData && errorData.detail) {
-          toast.error(errorData.detail);
+        const errorMessage = errorData?.message || errorData?.detail;
+        
+        if (errorMessage) {
+          toast.error(errorMessage);
         } else if (error.response.status >= 500) {
           toast.error('Lỗi máy chủ! Vui lòng thử lại sau.');
         } else {

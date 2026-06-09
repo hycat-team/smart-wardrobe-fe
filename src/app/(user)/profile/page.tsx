@@ -58,7 +58,7 @@ export default function UserProfile() {
 
         <div className="relative z-10 flex md:flex-col gap-3 w-full md:w-auto">
           <button className="flex-1 md:flex-none h-10 px-6 bg-ink text-cream hover:bg-ink/90 rounded-xl text-xs font-mono font-medium transition-all">
-            <Link href="/settings/profile"> Chỉnh sửa</Link>
+            <Link href="/profile/update"> Chỉnh sửa</Link>
           </button>
           <button className="flex-1 md:flex-none h-10 px-6 bg-secondary text-foreground hover:bg-secondary/80 rounded-xl text-xs font-mono font-medium border border-border transition-all flex items-center justify-center gap-2">
             <Settings className="size-4" /> Cài đặt

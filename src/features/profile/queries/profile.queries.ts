@@ -17,10 +17,10 @@ export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: profileApi.updateProfile,
-    onSuccess: (data) => {
+    onSuccess: (res) => {
       // Cập nhật cache ngay lập tức
-      queryClient.setQueryData(PROFILE_QUERY_KEY, data);
-      toast.success('Cập nhật thông tin cá nhân thành công');
+      queryClient.setQueryData(PROFILE_QUERY_KEY, res);
+      toast.success(res?.message || 'Cập nhật thông tin cá nhân thành công');
     },
   });
 };
@@ -28,8 +28,8 @@ export const useUpdateProfile = () => {
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: profileApi.changePassword,
-    onSuccess: () => {
-      toast.success('Đổi mật khẩu thành công');
+    onSuccess: (res) => {
+      toast.success(res?.message || 'Đổi mật khẩu thành công');
     },
   });
 };

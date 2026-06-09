@@ -157,14 +157,12 @@ export default function ProfileSettings() {
                   onChange={handleProfileChange}
                   className="w-full h-full bg-transparent border-none outline-none text-ink font-body-sm px-4 py-3 [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
                 />
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button type="button" className="outline-none opacity-50 hover:opacity-100 transition-opacity shrink-0">
+                  <Popover>
+                    <PopoverTrigger className="outline-none opacity-50 hover:opacity-100 transition-opacity shrink-0">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                    </button>
-                  </PopoverTrigger>
+                    </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 bg-background border-cream-dark/50 rounded-xl shadow-xl">
                     <Calendar
                       mode="single"
@@ -182,7 +180,6 @@ export default function ProfileSettings() {
                           setProfileData(prev => ({ ...prev, dateOfBirth: "" }));
                         }
                       }}
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>
@@ -246,7 +243,7 @@ export default function ProfileSettings() {
                 lastName: user?.lastName || "",
                 address: user?.address || "",
                 dateOfBirth: user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : "",
-                gender: user?.gender ?? Gender.Unknown,
+                gender: user?.gender as Gender ?? (undefined as unknown as Gender),
               }))
             }}
           >

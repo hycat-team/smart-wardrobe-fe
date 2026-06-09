@@ -275,12 +275,10 @@ export default function Register() {
                     className="w-full bg-transparent border-none outline-none text-ethos-primary font-inter text-[16px] [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
                   />
                   <Popover>
-                    <PopoverTrigger asChild>
-                      <button type="button" className="p-1 outline-none text-ethos-on-surface-variant group-focus-within:text-ethos-primary transition-colors shrink-0">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </button>
+                    <PopoverTrigger className="p-1 outline-none text-ethos-on-surface-variant group-focus-within:text-ethos-primary transition-colors shrink-0">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 bg-ethos-surface border-ethos-primary/20 shadow-xl shadow-black/10" align="start">
                       <Calendar
@@ -299,7 +297,6 @@ export default function Register() {
                             setFormData({...formData, dateOfBirth: ""});
                           }
                         }}
-                        initialFocus
                         className="bg-ethos-surface text-ethos-on-surface"
                       />
                     </PopoverContent>

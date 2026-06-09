@@ -77,6 +77,6 @@ export async function POST(request: NextRequest) {
     return res;
   } catch (error) {
     console.error('Login Proxy Error:', error);
-    return NextResponse.json({ detail: 'Lỗi máy chủ nội bộ' }, { status: 500 });
+    return NextResponse.json({ message: 'Lỗi máy chủ nội bộ' }, { status: 500 });
   }
 }

@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const refreshToken = request.cookies.get('refreshToken')?.value;
 
     if (!refreshToken) {
-      return NextResponse.json({ detail: 'Không có refresh token' }, { status: 401 });
+      return NextResponse.json({ message: 'Không có refresh token' }, { status: 401 });
     }
 
     const response = await fetch(`${API_URL}/auth/refresh-token`, {
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     return res;
   } catch (error) {
     console.error('Refresh Token Proxy Error:', error);
-    const res = NextResponse.json({ detail: 'Lỗi máy chủ nội bộ' }, { status: 500 });
+    const res = NextResponse.json({ message: 'Lỗi máy chủ nội bộ' }, { status: 500 });
     res.cookies.delete('accessToken');
     res.cookies.delete('refreshToken');
     return res;

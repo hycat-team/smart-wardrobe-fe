@@ -34,9 +34,6 @@ export function TopUpModal({ open, onOpenChange }: Props) {
           if (data.paymentUrl) {
             window.location.href = data.paymentUrl;
           }
-        },
-        onError: () => {
-          toast.error('Có lỗi xảy ra khi tạo yêu cầu nạp tiền');
         }
       }
     );

@@ -47,9 +47,9 @@ export const useBatchUploadWardrobeItems = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: wardrobeApi.batchUploadWardrobeItems,
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
-      toast.success('Bắt đầu phân tách và số hóa trang phục!');
+      toast.success(res?.message || 'Bắt đầu phân tách và số hóa trang phục!');
     },
   });
 };
@@ -58,9 +58,9 @@ export const useInitClosetFromCatalog = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: wardrobeApi.initClosetFromCatalog,
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
-      toast.success('Khởi tạo nhanh tủ đồ cá nhân thành công!');
+      toast.success(res?.message || 'Khởi tạo nhanh tủ đồ cá nhân thành công!');
     },
   });
 };
@@ -70,9 +70,9 @@ export const useCloneWardrobeItem = () => {
   return useMutation({
     mutationFn: ({ id, quantity }: { id: string; quantity: number }) =>
       wardrobeApi.cloneWardrobeItem(id, { quantity }),
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
-      toast.success('Nhân bản trang phục thành công!');
+      toast.success(res?.message || 'Nhân bản trang phục thành công!');
     },
   });
 };
@@ -82,28 +82,22 @@ export const useUpdateWardrobeItem = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Parameters<typeof wardrobeApi.updateWardrobeItem>[1] }) =>
       wardrobeApi.updateWardrobeItem(id, data),
-    onSuccess: (_, variables) => {
+    onSuccess: (res, variables) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.detail(variables.id) });
-      toast.success('Cập nhật trang phục thành công!');
+      toast.success(res?.message || 'Cập nhật trang phục thành công!');
     },
-    onError: (error) => {
-      toast.error('Có lỗi xảy ra khi cập nhật trang phục.');
-    }
   });
 };
 
 export const useDeleteWardrobeItem = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: wardrobeApi.deleteWardrobeItem,
-    onSuccess: () => {
+    mutationFn: (id: string) => wardrobeApi.deleteWardrobeItem(id),
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
-      toast.success('Xóa trang phục thành công!');
+      toast.success(res?.message || 'Xóa trang phục thành công!');
     },
-    onError: (error) => {
-      toast.error('API Xóa trang phục hiện chưa khả dụng trên Backend.');
-    }
   });
 };
 

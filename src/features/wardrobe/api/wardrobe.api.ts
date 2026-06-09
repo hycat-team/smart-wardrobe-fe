@@ -23,14 +23,18 @@ export const wardrobeApi = {
     return res.data.data!;
   },
 
-  batchUploadWardrobeItems: async (data: BatchCropWardrobeItemsReq): Promise<WardrobeItemRes[]> => {
+  batchUploadWardrobeItems: async (data: BatchCropWardrobeItemsReq): Promise<WardrobeItemRes[] & { message?: string }> => {
     const res = await api.post<APIResponse<WardrobeItemRes[]>>('/wardrobe-items/batch-upload', data);
-    return res.data.data!;
+    const result = res.data.data as any;
+    if (result) result.message = res.data.message;
+    return result;
   },
 
-  initClosetFromCatalog: async (data: InitClosetFromCatalogReq): Promise<WardrobeItemRes[]> => {
+  initClosetFromCatalog: async (data: InitClosetFromCatalogReq): Promise<WardrobeItemRes[] & { message?: string }> => {
     const res = await api.post<APIResponse<WardrobeItemRes[]>>('/wardrobe-items/catalog-init', data);
-    return res.data.data!;
+    const result = res.data.data as any;
+    if (result) result.message = res.data.message;
+    return result;
   },
 
   getWardrobeItemDetail: async (id: string, axiosInstance: AxiosInstance = api): Promise<WardrobeItemRes> => {
@@ -38,18 +42,23 @@ export const wardrobeApi = {
     return res.data.data!;
   },
 
-  cloneWardrobeItem: async (id: string, data: CloneWardrobeItemReq): Promise<WardrobeItemRes[]> => {
+  cloneWardrobeItem: async (id: string, data: CloneWardrobeItemReq): Promise<WardrobeItemRes[] & { message?: string }> => {
     const res = await api.post<APIResponse<WardrobeItemRes[]>>(`/wardrobe-items/${id}/clone`, data);
-    return res.data.data!;
+    const result = res.data.data as any;
+    if (result) result.message = res.data.message;
+    return result;
   },
 
-  updateWardrobeItem: async (id: string, data: UpdateWardrobeItemReq): Promise<WardrobeItemRes> => {
+  updateWardrobeItem: async (id: string, data: UpdateWardrobeItemReq): Promise<WardrobeItemRes & { message?: string }> => {
     const res = await api.put<APIResponse<WardrobeItemRes>>(`/wardrobe-items/${id}/manual-classify`, data);
-    return res.data.data!;
+    const result = res.data.data as any;
+    if (result) result.message = res.data.message;
+    return result;
   },
 
-  deleteWardrobeItem: async (id: string, axiosInstance: AxiosInstance = api): Promise<void> => {
-    await axiosInstance.delete<APIResponse<void>>(`/wardrobe-items/${id}`);
+  deleteWardrobeItem: async (id: string, axiosInstance: AxiosInstance = api): Promise<{ message?: string }> => {
+    const res = await axiosInstance.delete<APIResponse<void>>(`/wardrobe-items/${id}`);
+    return { message: res.data.message };
   },
 
   getCategories: async (axiosInstance: AxiosInstance = api): Promise<CategoryRes[]> => {
