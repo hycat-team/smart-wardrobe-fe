@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
 
 /**
  * Hàm fetch tùy chỉnh dành riêng cho Server Components.
@@ -15,7 +15,7 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
   if (!headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
-  
+
   // Tự động gắn Token nếu có
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
@@ -30,7 +30,7 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
     if (!res.ok) {
       console.error(`[ServerFetch Error] ${endpoint}: ${res.status} ${res.statusText}`);
       // Có thể throw error tùy vào logic xử lý lỗi bạn muốn
-      return null; 
+      return null;
     }
 
     const data = await res.json();

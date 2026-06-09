@@ -22,8 +22,12 @@ export function LoginClient() {
     }
 
     login({ loginName: email, password }, {
-      onSuccess: () => {
-        router.push("/wardrobe");
+      onSuccess: (res: any) => {
+        if (res?.isAdmin) {
+          router.push("/admin/dashboard");
+        } else {
+          router.push("/wardrobe");
+        }
       }
     });
   };

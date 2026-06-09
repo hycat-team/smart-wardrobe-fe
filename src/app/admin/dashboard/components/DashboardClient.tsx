@@ -11,6 +11,8 @@ import {
 import { Users, Sparkles, TrendingUp, ShieldAlert, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { useAdminUsers, useAdminPosts, useAdminCatalog } from "@/features/admin/queries/admin.queries";
+
 const data = [
   { name: "Mon", users: 4000, aiCalls: 2400 },
   { name: "Tue", users: 3000, aiCalls: 1398 },
@@ -22,6 +24,14 @@ const data = [
 ];
 
 export function DashboardClient() {
+  const { data: usersData, isLoading: usersLoading } = useAdminUsers({ limit: 1 });
+  const { data: postsData, isLoading: postsLoading } = useAdminPosts({ limit: 1 });
+  const { data: catalogData, isLoading: catalogLoading } = useAdminCatalog();
+
+  const totalUsers = usersData?.metadata?.totalItems || 0;
+  const totalPosts = postsData?.metadata?.totalItems || 0;
+  const totalCatalog = catalogData?.length || 0;
+
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500 font-sans pb-16">
       
@@ -34,10 +44,10 @@ export function DashboardClient() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Tổng số Users", value: "12,450", change: "+12%", icon: Users },
-          { label: "Lượt gọi AI (Tháng)", value: "845,021", change: "+24%", icon: Sparkles },
-          { label: "Doanh thu Premium", value: "245M đ", change: "+8%", icon: TrendingUp },
-          { label: "Report chờ duyệt", value: "14", change: "-2", icon: ShieldAlert, alert: true },
+          { label: "Người dùng hệ thống", value: usersLoading ? "..." : totalUsers.toLocaleString('vi-VN'), change: "Thực tế", icon: Users },
+          { label: "Bài viết cộng đồng", value: postsLoading ? "..." : totalPosts.toLocaleString('vi-VN'), change: "Thực tế", icon: Sparkles },
+          { label: "Trang phục mẫu", value: catalogLoading ? "..." : totalCatalog.toLocaleString('vi-VN'), change: "Thực tế", icon: TrendingUp },
+          { label: "Report chờ duyệt (Mock)", value: "14", change: "-2", icon: ShieldAlert, alert: true },
         ].map((stat, i) => (
           <div key={i} className="bg-card border border-border p-6 rounded-2xl flex flex-col gap-4 shadow-sm relative overflow-hidden">
             <div className="flex justify-between items-start">
@@ -70,8 +80,8 @@ export function DashboardClient() {
             <p className="text-xs text-muted-foreground">So sánh lượng người dùng truy cập và số lượt sử dụng AI Stylist.</p>
           </div>
           
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[300px] w-full relative">
+            <ResponsiveContainer width="100%" height="100%" minHeight={300} minWidth={100}>
               <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
                 <XAxis dataKey="name" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />

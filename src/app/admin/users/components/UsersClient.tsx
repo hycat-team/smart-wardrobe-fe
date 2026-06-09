@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Search, MoreHorizontal, ShieldBan, Crown, Eye } from "lucide-react";
+import { Search, MoreHorizontal, ShieldBan, Eye, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -18,31 +18,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-
-const MOCK_USERS = [
-  { id: "u1", name: "Lê Cẩm Lan", email: "lan.le@example.com", isPremium: false, joinDate: "2026-01-01", status: "active" },
-  { id: "u2", name: "VIP Style", email: "vip@smartwardrobe.com", isPremium: true, joinDate: "2026-02-15", status: "active" },
-  { id: "u3", name: "Nguyễn Văn A", email: "nguyenvana@gmail.com", isPremium: false, joinDate: "2026-05-10", status: "banned" },
-  { id: "u4", name: "Trần Thị B", email: "tranb_fashion@yahoo.com", isPremium: true, joinDate: "2025-11-20", status: "active" },
-  { id: "u5", name: "Eco Life", email: "eco.life@green.vn", isPremium: false, joinDate: "2026-04-05", status: "active" },
-];
+import { useAdminUsers, useUpdateUserStatus } from "@/features/admin/queries/admin.queries";
 
 export function UsersClient() {
-  const [users, setUsers] = useState(MOCK_USERS);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  
+  // Custom hook fetching real data
+  const { data, isLoading, isError } = useAdminUsers({ page, limit: 10, q: searchTerm });
+  const { mutate: updateStatus, isPending: isUpdating } = useUpdateUserStatus();
 
-  const filteredUsers = users.filter(u => 
-    u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    u.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const toggleBan = (id: string) => {
-    setUsers(users.map(u => u.id === id ? { ...u, status: u.status === "active" ? "banned" : "active" } : u));
+  const toggleBan = (id: string, currentStatus: string) => {
+    // Assuming backend enums are ACTIVE and BANNED
+    const newStatus = currentStatus === "ACTIVE" ? "BANNED" : "ACTIVE";
+    updateStatus({ id, data: { status: newStatus } });
   };
 
-  const togglePremium = (id: string) => {
-    setUsers(users.map(u => u.id === id ? { ...u, isPremium: !u.isPremium } : u));
-  };
+  const users = data?.items || [];
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-500 font-sans pb-16">
@@ -57,9 +49,12 @@ export function UsersClient() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <input 
             type="text" 
-            placeholder="Tìm theo tên hoặc email..." 
+            placeholder="Tìm theo tên, email, username..." 
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1); // Reset page on search
+            }}
             className="h-10 w-full pl-9 pr-4 rounded-xl bg-secondary border-transparent focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-all outline-none text-foreground"
           />
         </div>
@@ -71,82 +66,120 @@ export function UsersClient() {
           <TableHeader>
             <TableRow className="bg-secondary/50 hover:bg-secondary/50">
               <TableHead className="w-[250px]">Người dùng</TableHead>
-              <TableHead>Loại tài khoản</TableHead>
+              <TableHead>Tên đăng nhập</TableHead>
               <TableHead>Ngày tham gia</TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead className="text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.length === 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  <div className="flex items-center justify-center text-muted-foreground">
+                    <Loader2 className="size-5 animate-spin mr-2" />
+                    Đang tải dữ liệu...
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center text-red-500">
+                  Lỗi khi tải dữ liệu người dùng.
+                </TableCell>
+              </TableRow>
+            ) : users.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                   Không tìm thấy người dùng nào.
                 </TableCell>
               </TableRow>
-            ) : filteredUsers.map((user) => (
-              <TableRow key={user.id} className={cn(user.status === "banned" && "opacity-60 bg-muted/30")}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="size-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-foreground">
-                      {user.name.charAt(0)}
+            ) : users.map((user: any) => {
+              const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Người dùng';
+              const isActive = user.status === "ACTIVE";
+
+              return (
+                <TableRow key={user.id} className={cn(!isActive && "opacity-60 bg-muted/30")}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="size-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-foreground overflow-hidden">
+                        {user.avatarUrl ? (
+                          <img src={user.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                        ) : (
+                          displayName.charAt(0).toUpperCase()
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-foreground">{displayName}</span>
+                        <span className="text-xs text-muted-foreground">{user.email}</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-foreground">{user.name}</span>
-                      <span className="text-xs text-muted-foreground">{user.email}</span>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {user.isPremium ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium border border-primary/20">
-                      <Crown className="size-3" /> Premium
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-sm">
+                    {user.username}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground font-mono text-xs">
+                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <span className={cn(
+                      "inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                      isActive ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
+                    )}>
+                      {isActive ? "Hoạt động" : "Đã khóa"}
                     </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-secondary text-muted-foreground text-xs font-medium border border-border">
-                      Free Plan
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className="text-muted-foreground font-mono text-xs">{user.joinDate}</TableCell>
-                <TableCell>
-                  <span className={cn(
-                    "inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
-                    user.status === "active" ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
-                  )}>
-                    {user.status === "active" ? "Hoạt động" : "Đã khóa"}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                        <MoreHorizontal className="size-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 font-sans">
-                      <DropdownMenuItem className="text-xs cursor-pointer"><Eye className="mr-2 size-3.5" /> Xem chi tiết</DropdownMenuItem>
-                      <DropdownMenuItem 
-                        className="text-xs cursor-pointer"
-                        onClick={() => togglePremium(user.id)}
-                      >
-                        <Crown className="mr-2 size-3.5 text-primary" /> {user.isPremium ? "Hạ cấp về Free" : "Nâng cấp Premium"}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem 
-                        className={cn("text-xs cursor-pointer font-medium", user.status === "active" ? "text-red-500" : "text-green-500")}
-                        onClick={() => toggleBan(user.id)}
-                      >
-                        <ShieldBan className="mr-2 size-3.5" /> {user.status === "active" ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                          <MoreHorizontal className="size-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48 font-sans">
+                        <DropdownMenuItem className="text-xs cursor-pointer"><Eye className="mr-2 size-3.5" /> Xem chi tiết</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          className={cn("text-xs cursor-pointer font-medium", isActive ? "text-red-500" : "text-green-500")}
+                          onClick={() => toggleBan(user.id, user.status)}
+                          disabled={isUpdating}
+                        >
+                          <ShieldBan className="mr-2 size-3.5" /> {isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination Controls */}
+      {data?.metadata && data.metadata.totalPages > 1 && (
+        <div className="flex justify-end gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            disabled={page <= 1}
+            onClick={() => setPage(p => p - 1)}
+          >
+            Trang trước
+          </Button>
+          <div className="flex items-center text-sm px-2 text-muted-foreground">
+            {page} / {data.metadata.totalPages}
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            disabled={page >= data.metadata.totalPages}
+            onClick={() => setPage(p => p + 1)}
+          >
+            Trang sau
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

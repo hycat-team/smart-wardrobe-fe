@@ -21,7 +21,7 @@ export const subscriptionApi = {
   },
 
   toggleAutoRenew: async (autoRenew: boolean): Promise<{ data: boolean; message?: string }> => {
-    const res = await api.patch<APIResponse<boolean>>('/subscriptions/me/toggle-auto-renew', { enabled: autoRenew });
+    const res = await api.put<APIResponse<boolean>>('/subscriptions/me/auto-renew', { enabled: autoRenew });
     return { data: res.data.data!, message: res.data.message };
   },
 };

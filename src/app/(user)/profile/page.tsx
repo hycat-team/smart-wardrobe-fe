@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 
 export default async function UserProfilePage() {
   const initialProfile = await serverFetch<UserRes>('/me');
-  
   if (!initialProfile) {
     redirect('/auth/login');
   }
