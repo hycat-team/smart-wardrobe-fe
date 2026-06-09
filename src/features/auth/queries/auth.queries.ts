@@ -1,7 +1,6 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../api/auth.api';
 import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
 import { PROFILE_QUERY_KEY } from '@/features/profile/queries/profile.queries';
 import { profileApi } from '@/features/profile/api/profile.api';
 
@@ -9,16 +8,25 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: (res) => {
-      // Invalidate auth status so it refetches immediately
+    onSuccess: async (res) => {
       queryClient.invalidateQueries({ queryKey: ['authStatus'] });
       
-      // Fetch the profile imperatively to populate the cache,
-      // which will trigger auth-provider to update the user state.
-      queryClient.fetchQuery({ queryKey: PROFILE_QUERY_KEY, queryFn: profileApi.getProfile }).catch(console.error);
+      let isAdmin = false;
+      try {
+        const profile = await queryClient.fetchQuery({ queryKey: PROFILE_QUERY_KEY, queryFn: profileApi.getProfile });
+        if (profile?.roleSlug === 'admin' || profile?.role === 'ADMIN' || profile?.roleSlug === 'ADMIN') {
+          isAdmin = true;
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile during login', error);
+      }
       
       queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
       toast.success(res?.message || 'Đăng nhập thành công');
+      
+      if (res) {
+        (res as any).isAdmin = isAdmin;
+      }
     },
   });
 };

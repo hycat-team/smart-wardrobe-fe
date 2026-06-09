@@ -164,7 +164,7 @@ Tất cả các phản hồi từ hệ thống đều tuân thủ cấu trúc AP
 
 ### 2.5. Bật/Tắt tự động gia hạn gói cước (Toggle Auto-Renewal)
 * **HTTP Method**: `PATCH`
-* **URL Path**: `/api/v1/subscriptions/me/toggle-auto-renew`
+* **URL Path**: `/api/v1/subscriptions/me/auto-renew`
 * **Authentication**: Yêu cầu xác thực tự động (Cookie: `accessToken`)
 * **Response Body (JSON Mock)**:
 ```json

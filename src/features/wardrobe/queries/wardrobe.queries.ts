@@ -11,10 +11,11 @@ export const WARDROBE_QUERY_KEYS = {
   categories: () => [...WARDROBE_QUERY_KEYS.all, 'categories'] as const,
 };
 
-export const useMyWardrobe = () => {
+export const useMyWardrobe = (initialData?: any[]) => {
   return useQuery({
     queryKey: WARDROBE_QUERY_KEYS.lists(),
     queryFn: () => wardrobeApi.getMyWardrobeItems(),
+    initialData,
     refetchInterval: (query) => {
       const items = query.state.data;
       if (Array.isArray(items)) {
@@ -35,11 +36,12 @@ export const useCategories = () => {
   });
 };
 
-export const useWardrobeItemDetail = (id: string) => {
+export const useWardrobeItemDetail = (id: string, initialData?: any) => {
   return useQuery({
     queryKey: WARDROBE_QUERY_KEYS.detail(id),
     queryFn: () => wardrobeApi.getWardrobeItemDetail(id),
     enabled: !!id,
+    initialData,
   });
 };
 

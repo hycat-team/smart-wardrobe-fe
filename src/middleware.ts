@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// --- CẤU HÌNH CÁC ĐƯỜNG DẪN ---
-// THAM KHẢO: Cấu hình gốc cho khi kết nối Backend thật
-// const authRoutes = ['/login', '/register']; 
-// const protectedRoutes = ['/wardrobe', '/profile'];
-// const adminRoutes = ['/dashboard'];
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
 
 // Hàm giải mã JWT Token (Base64) ở môi trường Edge Runtime
 function parseJwt(token: string) {
@@ -27,49 +23,136 @@ function parseJwt(token: string) {
   }
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+// Kiểm tra xem token còn hạn không (trước 10 giây để an toàn)
+function isTokenExpired(token: string) {
+  const payload = parseJwt(token);
+  if (!payload || !payload.exp) return true;
+  
+  const currentTime = Math.floor(Date.now() / 1000);
+  return payload.exp <= currentTime + 10; 
+}
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  let accessToken = request.cookies.get('accessToken')?.value;
+  const refreshToken = request.cookies.get('refreshToken')?.value;
 
-  // Intercept API calls intended for the backend
+  let headersToForward = new Headers(request.headers);
+  let backendSetCookies: string[] = [];
+  let isRefreshFailed = false;
+
+  // 1. CHẶN VÀ KIỂM TRA HẠN TOKEN
+  if (accessToken && isTokenExpired(accessToken) && refreshToken) {
+    try {
+      // Gọi API refresh token tới Backend
+      const refreshRes = await fetch(`${BACKEND_URL}/auth/refresh-token`, {
+        method: 'POST',
+        headers: {
+          'Cookie': `refreshToken=${refreshToken}`
+        }
+      });
+
+      if (refreshRes.ok) {
+        backendSetCookies = refreshRes.headers.getSetCookie();
+        
+        let newAccessToken = '';
+        let newRefreshToken = '';
+
+        // Phân tích Cookie trả về từ Backend
+        for (const cookieStr of backendSetCookies) {
+          const [nameValue] = cookieStr.split(';');
+          const [name, ...valueParts] = nameValue.split('=');
+          const value = valueParts.join('=');
+          if (name.trim() === 'accessToken') newAccessToken = value.trim();
+          if (name.trim() === 'refreshToken') newRefreshToken = value.trim();
+        }
+
+        if (newAccessToken) {
+          accessToken = newAccessToken; // Cập nhật token hiện tại
+          
+          // Ghi đè header Cookie để Server Components (page.tsx) đằng sau nhận token mới
+          const updatedCookies = request.cookies.getAll().map(c => {
+             if (c.name === 'accessToken') return `accessToken=${newAccessToken}`;
+             if (c.name === 'refreshToken' && newRefreshToken) return `refreshToken=${newRefreshToken}`;
+             return `${c.name}=${c.value}`;
+          }).join('; ');
+          
+          headersToForward.set('cookie', updatedCookies);
+        }
+      } else {
+        // Backend trả về 4011 -> Refresh token cũng đã chết
+        isRefreshFailed = true;
+      }
+    } catch (error) {
+      console.error("Middleware refresh token error:", error);
+      isRefreshFailed = true;
+    }
+  }
+
+  // 2. XỬ LÝ NẾU REFRESH THẤT BẠI
+  if (isRefreshFailed) {
+    // Nếu là API Proxy Request (Client đang gọi)
+    if (pathname.startsWith('/api/v1/')) {
+      const errorRes = new NextResponse(JSON.stringify({ message: 'Session expired', detail: '4011' }), { 
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      errorRes.cookies.delete('accessToken');
+      errorRes.cookies.delete('refreshToken');
+      return errorRes;
+    } 
+    // Nếu là Page Request
+    else {
+      // Không tự động redirect ở middleware để tránh ảnh hưởng các trang public (landing page).
+      // Việc bảo vệ route (auth guard) sẽ do các Server/Client Component tự lo.
+      const response = NextResponse.next({
+        request: { headers: headersToForward }
+      });
+      response.cookies.delete('accessToken');
+      response.cookies.delete('refreshToken');
+      return response;
+    }
+  }
+
+  // 3. ĐIỀU HƯỚNG REQUEST (PROXY HOẶC NEXT)
+  let finalResponse: NextResponse;
+
   if (pathname.startsWith('/api/v1/')) {
-    const token = request.cookies.get('accessToken')?.value;
-    
-    // Create a new URL pointing to the backend
-    // Remove the /api/v1 prefix from the frontend request since BACKEND_URL already includes it
-    // Wait, if BACKEND_URL is http://localhost:8080/api/v1, and request is /api/v1/me
-    // We should append the remaining path.
+    // Luồng cho Axios gọi tới Next.js API Routes (BFF)
     const remainingPath = pathname.replace('/api/v1', '');
     const backendUrl = new URL(`${BACKEND_URL}${remainingPath}${request.nextUrl.search}`);
 
-    // Clone request headers to modify them
-    const requestHeaders = new Headers(request.headers);
-    if (token) {
-      requestHeaders.set('Authorization', `Bearer ${token}`);
+    if (accessToken) {
+      headersToForward.set('Authorization', `Bearer ${accessToken}`);
     }
 
-    // Forward the request to the backend with the modified headers
-    return NextResponse.rewrite(backendUrl, {
+    finalResponse = NextResponse.rewrite(backendUrl, {
       request: {
-        headers: requestHeaders,
+        headers: headersToForward,
       },
+    });
+  } else {
+    // Luồng cho Server Component render trang
+    finalResponse = NextResponse.next({
+      request: {
+        headers: headersToForward,
+      }
     });
   }
 
-  // =====================================================================
-  // CHẾ ĐỘ MOCK: Cho phép tất cả các route đi qua mà không kiểm tra JWT.
-  // Khi kết nối Backend thật (có API login trả JWT cookie), hãy bỏ comment
-  // đoạn logic bên dưới và xóa dòng return NextResponse.next() này.
-  // =====================================================================
-  return NextResponse.next();
+  // 4. GẮN COOKIE MỚI VÀO RESPONSE (NẾU CÓ REFRESH)
+  if (backendSetCookies.length > 0) {
+    for (const cookieStr of backendSetCookies) {
+      finalResponse.headers.append('Set-Cookie', cookieStr);
+    }
+  }
+
+  return finalResponse;
 }
 
 export const config = {
   matcher: [
-    // Bắt thêm cả API routes
     '/api/v1/:path*',
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
-

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,15 +44,41 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const res = NextResponse.json(data);
-
-    // Forward Set-Cookie headers from backend if they exist
+    // Check setCookies to find token if not in body
     const setCookies = response.headers.getSetCookie ? response.headers.getSetCookie() : [];
     if (setCookies && setCookies.length > 0) {
-      setCookies.forEach((cookie) => {
-        res.headers.append('Set-Cookie', cookie);
-      });
+      for (const cookieStr of setCookies) {
+        if (!token && cookieStr.includes('accessToken=')) {
+          const match = cookieStr.match(/accessToken=([^;]+)/);
+          if (match && match[1]) token = match[1];
+        }
+        if (!refreshToken && cookieStr.includes('refreshToken=')) {
+          const match = cookieStr.match(/refreshToken=([^;]+)/);
+          if (match && match[1]) refreshToken = match[1];
+        }
+      }
     }
+
+    let isAdmin = false;
+    if (token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = Buffer.from(base64, 'base64').toString('utf8');
+        const payload = JSON.parse(jsonPayload);
+        const role = payload?.role || payload?.roles?.[0] || '';
+        isAdmin = role.includes('ADMIN');
+      } catch (e) {
+        console.error('Failed to parse JWT in login proxy', e);
+      }
+    }
+
+    const responseData = typeof data === 'object' ? { ...data, isAdmin } : { data, isAdmin };
+    if (token && !responseData.accessToken) {
+      responseData.accessToken = token;
+    }
+
+    const res = NextResponse.json(responseData);
 
     if (token) {
       res.cookies.set('accessToken', token, {

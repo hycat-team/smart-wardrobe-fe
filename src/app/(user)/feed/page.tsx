@@ -1,4 +1,3 @@
-"use client";
 import { Heart, MessageCircle, Share2, MoreHorizontal, Bookmark, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +44,11 @@ const FEED_POSTS = [
     articleDesc: "How structural design is reshaping zero-waste fashion patterns and redefining modern city wear."
   }
 ];
+
+export const metadata = {
+  title: 'Feed | Smart Wardrobe',
+  description: 'Inspiration from conscious creators.',
+};
 
 export default function Feed() {
   return (

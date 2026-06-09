@@ -1,4 +1,3 @@
-"use client";
 import { Heart, Search, SlidersHorizontal, Tag } from "lucide-react";
 
 const MARKETPLACE_ITEMS = [
@@ -43,6 +42,11 @@ const MARKETPLACE_ITEMS = [
     badgeClass: "bg-secondary-container text-on-secondary-container"
   },
 ];
+
+export const metadata = {
+  title: 'Marketplace | Smart Wardrobe',
+  description: 'Curated exchange for pre-owned luxury and sustainable pieces.',
+};
 
 export default function Marketplace() {
   return (
