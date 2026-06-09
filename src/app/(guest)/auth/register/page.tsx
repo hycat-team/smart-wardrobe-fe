@@ -23,14 +23,14 @@ export default function Register() {
     confirmPassword: "",
     dateOfBirth: "",
     address: "",
-    gender: Gender.Unknown,
+    gender: undefined as unknown as Gender,
   });
   
   const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
-  
+  const [isGenderOpen, setIsGenderOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(59);
   const [canResend, setCanResend] = useState(false);
 
@@ -263,58 +263,71 @@ export default function Register() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2 relative group">
                 <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="dateOfBirth">Ngày sinh</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button 
-                      type="button"
-                      className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none px-1 text-left flex justify-between items-center data-[state=open]:bg-ethos-surface-low data-[state=open]:border-b-2 data-[state=open]:border-ethos-primary data-[state=open]:px-4`}
-                    >
-                      {formData.dateOfBirth ? (
-                        <span>{formData.dateOfBirth.split('-').reverse().join('/')}</span>
-                      ) : (
-                        <span className="text-ethos-on-surface-variant/50">dd/mm/yyyy</span>
-                      )}
-                      <svg className="w-5 h-5 shrink-0 text-ethos-on-surface-variant group-focus-within:text-ethos-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-ethos-surface border-ethos-primary/20 shadow-xl shadow-black/10" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined}
-                      onSelect={(date) => {
-                        if (date) {
-                          const y = date.getFullYear();
-                          const m = String(date.getMonth() + 1).padStart(2, '0');
-                          const d = String(date.getDate()).padStart(2, '0');
-                          setFormData({...formData, dateOfBirth: `${y}-${m}-${d}`});
-                        } else {
-                          setFormData({...formData, dateOfBirth: ""});
-                        }
-                      }}
-                      initialFocus
-                      className="bg-ethos-surface text-ethos-on-surface"
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 flex items-center transition-all duration-300 focus-within:bg-ethos-surface-low focus-within:border-b-2 focus-within:border-ethos-primary focus-within:px-4 px-1 group`}>
+                  <input
+                    type="date"
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedInput('dateOfBirth')}
+                    onBlur={() => setFocusedInput(null)}
+                    className="w-full bg-transparent border-none outline-none text-ethos-primary font-inter text-[16px] [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
+                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button type="button" className="p-1 outline-none text-ethos-on-surface-variant group-focus-within:text-ethos-primary transition-colors shrink-0">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-ethos-surface border-ethos-primary/20 shadow-xl shadow-black/10" align="start">
+                      <Calendar
+                        mode="single"
+                        captionLayout="dropdown"
+                        startMonth={new Date(1900, 0)}
+                        endMonth={new Date(new Date().getFullYear() + 10, 11)}
+                        selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined}
+                        onSelect={(date) => {
+                          if (date) {
+                            const y = date.getFullYear();
+                            const m = String(date.getMonth() + 1).padStart(2, '0');
+                            const d = String(date.getDate()).padStart(2, '0');
+                            setFormData({...formData, dateOfBirth: `${y}-${m}-${d}`});
+                          } else {
+                            setFormData({...formData, dateOfBirth: ""});
+                          }
+                        }}
+                        initialFocus
+                        className="bg-ethos-surface text-ethos-on-surface"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
               <div className="flex flex-col gap-2 relative group">
                 <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="gender">Giới tính</label>
                 <Select 
-                  value={formData.gender} 
-                  onValueChange={(value) => setFormData({...formData, gender: value as Gender})}
+                  value={formData.gender ? formData.gender.toString() : ""} 
+                  onValueChange={(value) => setFormData({...formData, gender: Number(value) as Gender})}
+                  onOpenChange={setIsGenderOpen}
                 >
-                  <SelectTrigger 
-                    className="w-full h-[48px] data-[size=default]:h-[48px] bg-transparent border-0 border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:ring-0 focus:outline-none hover:bg-ethos-surface-low px-1 rounded-none data-[state=open]:bg-ethos-surface-low data-[state=open]:border-b-2 data-[state=open]:border-ethos-primary data-[state=open]:px-4 shadow-none [&>span]:line-clamp-1 data-placeholder:text-ethos-on-surface-variant/50"
+                  <SelectTrigger
+                    onFocus={() => setFocusedInput('gender')}
+                    onBlur={() => setFocusedInput(null)}
+                    className={`w-full h-[48px] data-[size=default]:h-[48px] bg-transparent border-0 border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:ring-0 focus:outline-none hover:bg-ethos-surface-low rounded-none shadow-none [&>span]:line-clamp-1 data-placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'gender' || isGenderOpen ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4' : 'px-1'}`}
                   >
-                    <SelectValue placeholder="Chọn giới tính" />
+                    <SelectValue placeholder="Chọn giới tính">
+                      {formData.gender === Gender.Male && "Nam"}
+                      {formData.gender === Gender.Female && "Nữ"}
+                      {formData.gender === Gender.Other && "Khác"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent alignItemWithTrigger={false} className="bg-ethos-surface border-ethos-primary/20 text-ethos-on-surface shadow-xl shadow-black/10 z-50">
-                    <SelectItem value={Gender.Unknown} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Không xác định</SelectItem>
-                    <SelectItem value={Gender.Male} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Nam</SelectItem>
-                    <SelectItem value={Gender.Female} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Nữ</SelectItem>
-                    <SelectItem value={Gender.Other} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Khác</SelectItem>
+                    <SelectItem value={Gender.Male.toString()} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Nam</SelectItem>
+                    <SelectItem value={Gender.Female.toString()} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Nữ</SelectItem>
+                    <SelectItem value={Gender.Other.toString()} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Khác</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

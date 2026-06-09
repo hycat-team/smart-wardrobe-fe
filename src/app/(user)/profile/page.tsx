@@ -2,8 +2,10 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import Link from "next/link";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { Settings, Crown, TrendingUp, Leaf, Award, Sparkles } from "lucide-react";
+import { Settings, Crown, TrendingUp, Leaf, Award, Sparkles, Edit, Wallet, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WalletPageContent } from "@/features/wallet/components/WalletPageContent";
 
 export default function UserProfile() {
   const user = useAuthStore((state) => state.user);
@@ -56,7 +58,7 @@ export default function UserProfile() {
 
         <div className="relative z-10 flex md:flex-col gap-3 w-full md:w-auto">
           <button className="flex-1 md:flex-none h-10 px-6 bg-ink text-cream hover:bg-ink/90 rounded-xl text-xs font-mono font-medium transition-all">
-            Chỉnh sửa
+            <Link href="/settings/profile"> Chỉnh sửa</Link>
           </button>
           <button className="flex-1 md:flex-none h-10 px-6 bg-secondary text-foreground hover:bg-secondary/80 rounded-xl text-xs font-mono font-medium border border-border transition-all flex items-center justify-center gap-2">
             <Settings className="size-4" /> Cài đặt
@@ -64,9 +66,20 @@ export default function UserProfile() {
         </div>
       </div>
 
-      {/* Premium Only: Style DNA & Insights */}
-      {isPremium ? (
-        <div className="grid md:grid-cols-2 gap-6">
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-8 bg-cream-dark/15 border border-cream-dark/60 rounded-xl p-1 h-12 mx-auto md:mx-0">
+          <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-ink data-[state=active]:text-cream text-ink-muted">
+            <LayoutDashboard className="size-4 mr-2" /> Tổng quan
+          </TabsTrigger>
+          <TabsTrigger value="wallet" className="rounded-lg data-[state=active]:bg-ink data-[state=active]:text-cream text-ink-muted">
+            <Wallet className="size-4 mr-2" /> Ví thanh toán
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="animate-in fade-in duration-500">
+          {/* Premium Only: Style DNA & Insights */}
+          {isPremium ? (
+            <div className="grid md:grid-cols-2 gap-6">
           
           {/* Radar Chart: Style DNA */}
           <div className="bg-card border border-border rounded-3xl p-6 relative overflow-hidden flex flex-col items-center">
@@ -177,6 +190,12 @@ export default function UserProfile() {
            </div>
         </div>
       )}
+        </TabsContent>
+
+        <TabsContent value="wallet" className="animate-in fade-in duration-500 mt-2">
+          <WalletPageContent />
+        </TabsContent>
+      </Tabs>
 
     </div>
   );

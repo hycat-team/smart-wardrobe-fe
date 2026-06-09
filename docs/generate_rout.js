@@ -1,7 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const fs = require('fs');
 
-const swaggerPath = 'c:/FPT/Project/smart-wardrobe/smart-wardrobe-be/docs/swagger.json';
-const outputPath = 'c:/FPT/Project/smart-wardrobe/smart-wardrobe-fe/docs/ROUT.md';
+const swaggerPath = 'd:/Project/smart-wardrobe/smart-wardrobe-be/docs/swagger.json';
+const outputPath = 'd:/Project/smart-wardrobe/smart-wardrobe-fe/docs/ROUT.md';
 
 try {
   const data = JSON.parse(fs.readFileSync(swaggerPath, 'utf8'));

@@ -19,7 +19,7 @@ export default function ProfileSettings() {
     email: "",
     address: "",
     dateOfBirth: "",
-    gender: Gender.Unknown,
+    gender: undefined as unknown as Gender,
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -45,7 +45,7 @@ export default function ProfileSettings() {
         email: user.email || "",
         address: user.address || "",
         dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : "",
-        gender: user.gender ?? Gender.Unknown,
+        gender: user.gender as Gender,
       }));
     }
   }, [user]);
@@ -149,49 +149,59 @@ export default function ProfileSettings() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className={labelClassName}>Date of Birth</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button type="button" style={{ width: '150%' }} className={cn("w-full text-left flex justify-between items-center", inputClassName, !profileData.dateOfBirth && "text-ink-muted/50")}>
-                    {profileData.dateOfBirth ? profileData.dateOfBirth.split('-').reverse().join('/') : "dd/mm/yyyy"}
-                    <svg className="w-4 h-4 opacity-50 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-background border-cream-dark/50 rounded-xl shadow-xl">
-                  <Calendar
-                    mode="single"
-                    selected={profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : undefined}
-                    onSelect={(date) => {
-                      if (date) {
-                        const y = date.getFullYear();
-                        const m = String(date.getMonth() + 1).padStart(2, '0');
-                        const d = String(date.getDate()).padStart(2, '0');
-                        setProfileData(prev => ({ ...prev, dateOfBirth: `${y}-${m}-${d}` }));
-                      } else {
-                        setProfileData(prev => ({ ...prev, dateOfBirth: "" }));
-                      }
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <div className={cn("flex items-center w-full", inputClassName, "p-0 overflow-hidden pr-3 transition-all", !profileData.dateOfBirth && "text-ink-muted/50")}>
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  value={profileData.dateOfBirth}
+                  onChange={handleProfileChange}
+                  className="w-full h-full bg-transparent border-none outline-none text-ink font-body-sm px-4 py-3 [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
+                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="outline-none opacity-50 hover:opacity-100 transition-opacity shrink-0">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background border-cream-dark/50 rounded-xl shadow-xl">
+                    <Calendar
+                      mode="single"
+                      captionLayout="dropdown"
+                      startMonth={new Date(1900, 0)}
+                      endMonth={new Date(new Date().getFullYear() + 10, 11)}
+                      selected={profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          const y = date.getFullYear();
+                          const m = String(date.getMonth() + 1).padStart(2, '0');
+                          const d = String(date.getDate()).padStart(2, '0');
+                          setProfileData(prev => ({ ...prev, dateOfBirth: `${y}-${m}-${d}` }));
+                        } else {
+                          setProfileData(prev => ({ ...prev, dateOfBirth: "" }));
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
             <div>
               <label className={labelClassName}>Gender</label>
               <Select
-                value={profileData.gender.toString()}
+                value={profileData.gender ? profileData.gender.toString() : ""}
                 onValueChange={(value) => setProfileData(prev => ({ ...prev, gender: Number(value) }))}
               >
                 <SelectTrigger style={{ width: '100%', height: '68%' }} className={cn("w-full flex justify-between items-center", inputClassName)}>
                   <SelectValue placeholder="Chọn giới tính">
-                    {profileData.gender === Gender.Male ? "Nam" :
-                      profileData.gender === Gender.Female ? "Nữ" :
-                        profileData.gender === Gender.Other ? "Khác" : "Không xác định"}
+                    {profileData.gender === Gender.Male && "Nam"}
+                    {profileData.gender === Gender.Female && "Nữ"}
+                    {profileData.gender === Gender.Other && "Khác"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent alignItemWithTrigger={false} className="bg-background border-cream-dark/50 shadow-xl rounded-xl z-50">
-                  <SelectItem value={Gender.Unknown.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Không xác định</SelectItem>
                   <SelectItem value={Gender.Male.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Nam</SelectItem>
                   <SelectItem value={Gender.Female.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Nữ</SelectItem>
                   <SelectItem value={Gender.Other.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Khác</SelectItem>
