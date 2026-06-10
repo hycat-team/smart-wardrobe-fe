@@ -105,10 +105,10 @@ export function LandingClient() {
 
   return (
     <div ref={containerRef} className="w-full bg-[#F4F1EE] text-[#1A1A1A] font-sans overflow-x-hidden selection:bg-[#D9C5B2] selection:text-white">
-      
+
       {/* 1. SCROLLYTELLING CONTAINER */}
       <section className="scrolly-container relative w-full h-[100vh] flex items-center justify-center overflow-hidden">
-        
+
         {/* Background Gradients */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#FFFFFF] to-[#F4F1EE] z-0" />
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 z-0 mix-blend-multiply pointer-events-none" />
@@ -128,39 +128,39 @@ export function LandingClient() {
         </div>
 
         {/* CENTRAL WARDROBE (Scene 0 -> Scene 1) */}
-        <div className="wardrobe-container absolute z-20 scale-[1.5] translate-y-[40vh] flex justify-center items-center h-[500px] w-[400px]">
+        <div className="wardrobe-container absolute z-20 scale-[1.5] translate-y-[40vh] flex justify-center items-center h-[600px] w-[600px]">
           <div className="relative w-full h-full">
             {/* Frame 1 */}
-            <Image 
-              src="/landing-page/wardrobe-closed-2.png" 
-              alt="Wardrobe Frame 1" 
-              fill 
+            <Image
+              src="/landing-page/wardrobe-closed-1.png"
+              alt="Wardrobe Frame 1"
+              fill
               className="wardrobe-frame-1 object-contain z-10"
               priority
             />
             {/* Frame 2 */}
-            <Image 
-              src="/landing-page/wardrobe-door-2.png" 
-              alt="Wardrobe Frame 2" 
-              fill 
+            <Image
+              src="/landing-page/wardrobe-door-2.png"
+              alt="Wardrobe Frame 2"
+              fill
               className="wardrobe-frame-2 object-contain opacity-0 z-20"
             />
             {/* Frame 3 */}
-            <Image 
-              src="/landing-page/wardrobe-door-3.png" 
-              alt="Wardrobe Frame 3" 
-              fill 
+            <Image
+              src="/landing-page/wardrobe-door-3.png"
+              alt="Wardrobe Frame 3"
+              fill
               className="wardrobe-frame-3 object-contain opacity-0 z-30"
             />
             {/* Scan Line Effect */}
-            <div className="scan-line absolute left-0 w-full h-1 bg-[#D9C5B2] shadow-[0_0_20px_5px_rgba(217,197,178,0.5)] z-20 opacity-0 rounded-full" />
+            <div className="scan-line absolute left-25 w-[400px] h-1 bg-[#f5b158] shadow-[0_0_20px_5px_rgba(217,197,178,0.5)] z-20 opacity-0 rounded-full" />
           </div>
         </div>
 
         {/* CLOTHING CARDS (Scattered -> Outfit) */}
         <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center">
           <div className="outfit-group relative w-full h-full flex items-center justify-center">
-            
+
             {/* Magic Glow for Scene 2 */}
             <div className="magic-glow absolute opacity-0 w-[400px] h-[400px] bg-[#D9C5B2] rounded-full blur-[100px] mix-blend-multiply -z-10 translate-x-[15vw]" />
             <div className="time-decay-tag absolute opacity-0 bg-white/80 backdrop-blur-md border border-black/10 text-black/50 text-[10px] px-3 py-1 rounded-full uppercase tracking-widest z-50 -translate-y-24">Last worn: 3 months ago</div>
@@ -193,7 +193,7 @@ export function LandingClient() {
               <p className="text-xs text-[#D9C5B2] uppercase tracking-widest font-bold">Stylist Cá Nhân</p>
             </div>
           </div>
-          
+
           <div className="space-y-4">
             <div className="chat-bubble-1 opacity-0 bg-[#F4F1EE] text-[#1A1A1A] text-sm p-4 rounded-2xl rounded-tl-sm w-[90%] border border-[#1A1A1A]/5">
               Thứ 7 này đi dạo phố mặc gì?
@@ -209,7 +209,7 @@ export function LandingClient() {
           <FeedCard src="/landing-page/feed-1.png" className="feed-card-1" likes="1.2k" user="@fashionista" />
           <FeedCard src="/landing-page/feed-2.png" className="feed-card-2" likes="856" user="@minimalist" />
           <FeedCard src="/landing-page/feed-3.png" className="feed-card-3" likes="2.4k" user="@genz.style" />
-          
+
           {/* Floating Likes */}
           <Heart className="like-bubble absolute top-[50vh] left-[40vw] text-red-500 fill-red-500 opacity-0 size-8" />
           <Heart className="like-bubble absolute top-[40vh] left-[60vw] text-red-400 fill-red-400 opacity-0 size-6" />
@@ -263,7 +263,7 @@ export function LandingClient() {
       {/* 2. PRICING & CTA SECTION (Scroll 6) */}
       <section className="w-full py-32 px-6 bg-[#EBE7E2] relative z-10 border-t border-[#1A1A1A]/5">
         <div className="max-w-5xl mx-auto flex flex-col items-center">
-          
+
           <div className="text-center mb-20 relative">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#D9C5B2] rounded-full blur-[150px] opacity-20 pointer-events-none" />
             <h2 className="font-heading text-5xl md:text-7xl font-medium text-[#1A1A1A] mb-6 relative z-10">Mở khóa Tủ đồ của bạn.</h2>
@@ -277,7 +277,7 @@ export function LandingClient() {
             <div className="bg-white rounded-[2rem] p-10 border border-[#1A1A1A]/5 flex flex-col hover:border-[#1A1A1A]/10 transition-colors shadow-sm">
               <h3 className="text-2xl font-bold mb-2">Closy Basic</h3>
               <div className="text-5xl font-heading font-medium mb-8">Miễn phí</div>
-              
+
               <ul className="space-y-5 mb-10 flex-1">
                 <PricingFeature text="Số hóa tối đa 30 items" />
                 <PricingFeature text="3 lượt AI phối đồ mỗi ngày" />
@@ -293,7 +293,7 @@ export function LandingClient() {
               <div className="absolute top-0 right-0 bg-[#D9C5B2] text-white text-xs font-bold px-6 py-2 rounded-bl-2xl uppercase tracking-widest">Premium</div>
               <h3 className="text-2xl font-bold mb-2 text-[#1A1A1A]">Closy Pro</h3>
               <div className="text-5xl font-heading font-medium mb-8 text-[#1A1A1A]">99k<span className="text-xl font-sans text-[#707070]"> / tháng</span></div>
-              
+
               <ul className="space-y-5 mb-10 flex-1">
                 <PricingFeature text="Không giới hạn items tủ đồ" highlighted />
                 <PricingFeature text="Không giới hạn AI phối đồ & Chat" highlighted />

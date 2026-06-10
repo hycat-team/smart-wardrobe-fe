@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { wardrobeApi } from '../api/wardrobe.api';
 import { WardrobeItemStatus } from '../types';
 import { toast } from 'sonner';
@@ -32,6 +32,7 @@ export const useMyWardrobe = (categorySlug?: string) => {
       }
       return false;
     },
+    placeholderData: keepPreviousData,
   });
 };
 

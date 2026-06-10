@@ -118,7 +118,7 @@ export function UploadClient() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto h-[calc(100dvh-150px)] flex flex-col items-center justify-center animate-in fade-in duration-500 py-8">
+    <div className="max-w-4xl mx-auto w-full flex flex-col animate-in fade-in duration-500 pt-4 pb-12">
       {!preview ? (
         // Step 1: Upload Area
         <div className="w-full text-center space-y-8">

@@ -23,6 +23,17 @@ import { toast } from "sonner";
 
 const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
 
+const CATEGORY_SLUG_MAP: Record<string, string> = {
+  "Áo": "ao",
+  "Quần": "quan",
+  "Váy": "vay",
+  "Giày": "giay",
+  "Phụ kiện": "phu-kien",
+  "Áo khoác": "ao-khoac",
+  "Mũ": "mu",
+  "Khác": "other"
+};
+
 const COLORS = [
   { name: "Trắng", value: "white", hex: "#FFFFFF" },
   { name: "Đen", value: "black", hex: "#1A1A1A" },
@@ -72,14 +83,18 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   const [searchInput, setSearchInput] = useState(searchParam);
   const lastPushedQ = useRef(searchParam);
 
+  // Map category param to backend slug
+  const slugToFetch = categoryParam === "Tất cả" ? undefined : CATEGORY_SLUG_MAP[categoryParam] || categoryParam;
+
   // Load real wardrobe items
-  const { 
-    data, 
+  const {
+    data,
     isLoading: isLoadingItems,
+    isFetching,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
-  } = useMyWardrobe(categoryParam === "Tất cả" ? undefined : categoryParam);
+  } = useMyWardrobe(slugToFetch);
 
   const rawInitialItems = Array.isArray(initialData) ? initialData : ((initialData as any)?.items || []);
   const realItems = data ? data.pages.flatMap(page => page.items) : rawInitialItems;
@@ -97,7 +112,8 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     const handler = setTimeout(() => {
       if (searchInput !== searchParam && searchInput !== lastPushedQ.current) {
         lastPushedQ.current = searchInput;
-        updateParams({ q: searchInput });
+        // If the user starts typing a new search, clear the category to search all items
+        updateParams({ q: searchInput, category: null });
       }
     }, 500);
     return () => clearTimeout(handler);
@@ -134,7 +150,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateParams({ q: searchInput });
+    updateParams({ q: searchInput, category: null });
   };
 
   const handleResetFilters = () => {
@@ -160,13 +176,22 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     const backendTags = [item.style, item.material, item.pattern, item.seasonality].filter(Boolean);
     const matchesTag = !tagParam || mockTags.includes(tagParam) || backendTags.includes(tagParam);
 
-    const searchLower = searchParam.toLowerCase();
-    const matchesSearch = !searchParam ||
-      itemCatName.toLowerCase().includes(searchLower) ||
-      ((item as any).name && (item as any).name.toLowerCase().includes(searchLower)) ||
-      (item.color && item.color.toLowerCase().includes(searchLower)) ||
-      (item.material && item.material.toLowerCase().includes(searchLower)) ||
-      (item.style && item.style.toLowerCase().includes(searchLower));
+    const searchTokens = searchParam.toLowerCase().split(/\s+/).filter(Boolean);
+    const itemName = getWardrobeItemName(item).toLowerCase();
+
+    // Combine all searchable text into one string
+    const itemText = [
+      itemName,
+      itemCatName.toLowerCase(),
+      ((item as any).name || "").toLowerCase(),
+      (item.color || "").toLowerCase(),
+      (item.material || "").toLowerCase(),
+      (item.style || "").toLowerCase(),
+      (item.brand || "").toLowerCase()
+    ].join(" ");
+
+    // Ensure EVERY word in the search query exists SOMEWHERE in the item's combined text (AND logic)
+    const matchesSearch = !searchParam || searchTokens.every(token => itemText.includes(token));
 
     return matchesCategory && matchesColor && matchesTag && matchesSearch;
   });
@@ -289,7 +314,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
           <p className="text-sm text-muted-foreground font-mono">Loading wardrobe...</p>
         </div>
       ) : sortedItems.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition-all duration-300", (isFetching && !isFetchingNextPage) && "opacity-60 blur-[1px]")}>
           {sortedItems.map((item: any) => {
             const isProcessing = item.status === WardrobeItemStatus.Processing;
             const isFailed = item.status === WardrobeItemStatus.Failed;
@@ -331,7 +356,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
                   )}
                   {item.colorHex && (
                     <div className="absolute top-2 right-2 flex gap-2 z-10">
-                      <div 
+                      <div
                         className="w-4 h-4 rounded-full border border-white/40 shadow-sm"
                         style={{ backgroundColor: item.colorHex }}
                         title={item.color || "Màu sắc"}
@@ -376,7 +401,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition-all duration-300", (isFetching && !isFetchingNextPage) && "opacity-60 blur-[1px]")}>
           <div
             onClick={() => router.push("/wardrobe/upload")}
             className="group rounded-[16px] border-2 border-dashed border-border hover:border-primary/50 bg-transparent transition-all duration-300 cursor-pointer flex flex-col items-center justify-center min-h-[300px] text-muted-foreground hover:text-primary hover:bg-secondary/20"
@@ -391,7 +416,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
       {hasNextPage && (
         <div className="mt-16 flex justify-center">
-          <button 
+          <button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
             className="px-8 py-2.5 border border-primary text-primary font-body-sm text-[14px] font-medium rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm disabled:opacity-50"

@@ -34,7 +34,7 @@ export function GuestHeader() {
       <Link href="/" className="text-2xl font-heading font-bold text-ink">
         SW
       </Link>
-      
+
       <nav className="flex items-center gap-4">
         {isLoggedIn ? (
           <DropdownMenu>
@@ -58,13 +58,13 @@ export function GuestHeader() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard" className="cursor-pointer">
+                <Link href="/Tủ đồ" className="cursor-pointer">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
-                  <span>Dashboard</span>
+                  <span>Tủ đồ</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/settings" className="cursor-pointer">
+                <Link href="/profile/update" className="cursor-pointer">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Cài đặt</span>
                 </Link>
