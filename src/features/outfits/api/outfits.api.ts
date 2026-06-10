@@ -1,14 +1,14 @@
 import api from '@/lib/axios';
 import { AxiosInstance } from 'axios';
-import { APIResponse } from '@/types/api';
+import { APIResponse, PaginationResult } from '@/types/api';
 import {
   OutfitRes,
   SaveOutfitReq,
 } from '../types';
 
 export const outfitsApi = {
-  getMyOutfits: async (axiosInstance: AxiosInstance = api): Promise<OutfitRes[]> => {
-    const res = await axiosInstance.get<APIResponse<OutfitRes[]>>('/me/outfits');
+  getMyOutfits: async (params?: { page?: number; limit?: number }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<OutfitRes>> => {
+    const res = await axiosInstance.get<APIResponse<PaginationResult<OutfitRes>>>('/me/outfits', { params });
     return res.data.data!;
   },
 

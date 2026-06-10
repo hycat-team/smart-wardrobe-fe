@@ -12,6 +12,7 @@ export interface SaveOutfitReq {
   name: string;
   description?: string;
   cover_image_url?: string;
+  cover_public_id?: string;
   items: SaveOutfitItemReq[];
 }
 
@@ -30,6 +31,7 @@ export interface OutfitRes {
   name: string;
   description?: string;
   cover_image_url?: string;
+  cover_public_id?: string;
   status: number;
   items?: OutfitItemRes[];
   created_at: string;

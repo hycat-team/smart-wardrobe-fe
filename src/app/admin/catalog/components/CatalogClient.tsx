@@ -32,7 +32,7 @@ export function CatalogClient() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<any | null>(null);
 
-  const items = data || [];
+  const items = data?.items || [];
 
   const handleDelete = () => {
     if (deletingId) {

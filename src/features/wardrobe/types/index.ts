@@ -17,6 +17,10 @@ export interface WardrobeItemRes {
   userId: string;
   category?: CategoryRes;
   color?: string;
+  colorHex?: string;
+  colorHue?: number;
+  colorLightness?: number;
+  colorSaturation?: number;
   fit?: string;
   imagePublicId?: string;
   imageUrl: string;
@@ -26,6 +30,7 @@ export interface WardrobeItemRes {
   seasonality?: string;
   status: WardrobeItemStatus;
   style?: string;
+  price?: number;
   createdAt: string;
 }
 
@@ -33,6 +38,10 @@ export interface SearchWardrobeItemRes {
   id: string;
   category?: CategoryRes;
   color?: string;
+  colorHex?: string;
+  colorHue?: number;
+  colorLightness?: number;
+  colorSaturation?: number;
   fit?: string;
   imagePublicId?: string;
   imageUrl: string;
@@ -41,6 +50,7 @@ export interface SearchWardrobeItemRes {
   pattern?: string;
   seasonality?: string;
   style?: string;
+  price?: number;
 }
 
 export interface UploadSignatureResult {
@@ -70,13 +80,12 @@ export interface InitClosetFromCatalogReq {
 }
 
 export interface UpdateWardrobeItemReq {
-  name?: string;
-  categoryId?: string;
-  color?: string;
-  fit?: string;
-  material?: string;
-  pattern?: string;
-  seasonality?: string;
-  style?: string;
-  tags?: string[];
+  categoryId: string;
+  color: string;
+  fit: string;
+  material: string;
+  pattern: string;
+  seasonality: string;
+  style: string;
+  price?: number;
 }

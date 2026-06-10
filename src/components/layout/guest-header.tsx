@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/useAuthStore";
 import { UserCircle, LayoutDashboard, User as UserIcon, Settings, LogOut } from "lucide-react";
 import {
@@ -39,8 +40,11 @@ export function GuestHeader() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
-                {user?.avatar ? (
-                  <img src={user.avatar} alt="Avatar" className="size-8 rounded-full border border-border" />
+                {user?.avatarUrl ? (
+                  <Avatar className="size-8">
+                    <AvatarImage src={user.avatarUrl} alt={user.username || "User"} />
+                    <AvatarFallback>{user.firstName?.charAt(0) || user.username?.charAt(0) || 'U'}</AvatarFallback>
+                  </Avatar>
                 ) : (
                   <UserCircle className="size-8 text-ink" />
                 )}

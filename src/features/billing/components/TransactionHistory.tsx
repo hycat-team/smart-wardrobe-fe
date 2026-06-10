@@ -2,13 +2,16 @@
 
 import React from 'react';
 import { Statement } from '../types';
-import { ArrowDownRight, ArrowUpRight, Clock } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface TransactionHistoryProps {
   statements: Statement[];
+  page?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
 }
 
-export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ statements }) => {
+export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ statements, page = 1, totalPages = 1, onPageChange }) => {
   return (
     <div className="bg-zinc-900/50 backdrop-blur-xl border border-white/5 rounded-3xl p-6 md:p-8 shadow-2xl">
       <div className="flex items-center gap-3 mb-8">
@@ -56,6 +59,28 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ statemen
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
+          <button 
+            onClick={() => onPageChange?.(page - 1)}
+            disabled={page <= 1}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-400 hover:text-white disabled:opacity-50 transition-colors"
+          >
+            <ChevronLeft size={16} /> Trang trước
+          </button>
+          <span className="text-sm font-medium text-zinc-500">
+            Trang {page} / {totalPages}
+          </span>
+          <button 
+            onClick={() => onPageChange?.(page + 1)}
+            disabled={page >= totalPages}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-400 hover:text-white disabled:opacity-50 transition-colors"
+          >
+            Tiếp theo <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

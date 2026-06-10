@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import { APIResponse } from '@/types/api';
+import { APIResponse, PaginationResult } from '@/types/api';
 import { AdminUserListRes, UpdateUserStatusReq, AdminPostListRes, AdminPostItemListRes } from '../types';
 
 export const adminApi = {
@@ -56,9 +56,9 @@ export const adminApi = {
   },
 
   // Catalog
-  getSystemWardrobeItems: async (params?: Record<string, any>): Promise<any[]> => {
-    const res = await api.get<APIResponse<any[]>>('/admin/wardrobe-items', { params });
-    return res.data.data || [];
+  getSystemWardrobeItems: async (params?: Record<string, any>): Promise<PaginationResult<any>> => {
+    const res = await api.get<APIResponse<PaginationResult<any>>>('/admin/wardrobe-items', { params });
+    return res.data.data!;
   },
   updateSystemWardrobeItem: async ({ id, data }: { id: string; data: any }): Promise<any> => {
     const res = await api.put<APIResponse>(`/admin/wardrobe-items/${id}`, data);

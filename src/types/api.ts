@@ -23,3 +23,14 @@ export interface ErrorResponse {
   detail?: string;  // Tương thích ngược với các API cũ dùng detail
   errors?: ValidationErrorItem[]; // Mảng lỗi chi tiết nếu là validation error
 }
+
+export interface PaginationMetadata {
+  page: number;
+  limit: number;
+  totalPages: number;
+  totalItems: number;
+}
+
+export interface PaginationResult<T> extends PaginationMetadata {
+  items: T[];
+}

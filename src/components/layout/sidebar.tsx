@@ -36,7 +36,7 @@ export function Sidebar() {
       {/* User Profile Header */}
       <div className="flex items-center gap-3 mb-6 px-2">
         <img 
-          src={user?.avatar || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100"} 
+          src={user?.avatarUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100"} 
           alt="Avatar" 
           className="size-10 rounded-full object-cover shadow-sm border border-border" 
         />

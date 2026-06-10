@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { wardrobeApi } from '../api/wardrobe.api';
 import { WardrobeItemStatus } from '../types';
 import { toast } from 'sonner';
@@ -11,15 +11,21 @@ export const WARDROBE_QUERY_KEYS = {
   categories: () => [...WARDROBE_QUERY_KEYS.all, 'categories'] as const,
 };
 
-export const useMyWardrobe = (initialData?: any[]) => {
-  return useQuery({
-    queryKey: WARDROBE_QUERY_KEYS.lists(),
-    queryFn: () => wardrobeApi.getMyWardrobeItems(),
-    initialData,
+export const useMyWardrobe = (categorySlug?: string) => {
+  return useInfiniteQuery({
+    queryKey: [...WARDROBE_QUERY_KEYS.lists(), categorySlug],
+    queryFn: ({ pageParam = 1 }) => wardrobeApi.getMyWardrobeItems({ page: pageParam as number, limit: 20, category_slug: categorySlug }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
+      return undefined;
+    },
     refetchInterval: (query) => {
-      const items = query.state.data;
-      if (Array.isArray(items)) {
-        const hasProcessing = items.some((item) => item.status === WardrobeItemStatus.Processing);
+      const pages = query.state.data?.pages;
+      if (pages) {
+        const hasProcessing = pages.some(page => 
+          page.items.some((item) => item.status === WardrobeItemStatus.Processing)
+        );
         if (hasProcessing) {
           return 5000; // Poll every 5s if there is any item processing
         }
@@ -103,10 +109,15 @@ export const useDeleteWardrobeItem = () => {
   });
 };
 
-export const useSearchWardrobeItems = (query: string) => {
-  return useQuery({
-    queryKey: WARDROBE_QUERY_KEYS.search(query),
-    queryFn: () => wardrobeApi.searchWardrobeItems(query),
+export const useSearchWardrobeItems = (query: string, categorySlug?: string) => {
+  return useInfiniteQuery({
+    queryKey: [...WARDROBE_QUERY_KEYS.search(query), categorySlug],
+    queryFn: ({ pageParam = 1 }) => wardrobeApi.searchWardrobeItems({ q: query, page: pageParam as number, limit: 20, category_slug: categorySlug }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
+      return undefined;
+    },
     enabled: query.trim().length > 0,
   });
 };

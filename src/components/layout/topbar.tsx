@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Sparkles, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export function Topbar() {
@@ -23,11 +24,10 @@ export function Topbar() {
             </div>
           )}
           <Link href="/settings">
-            {user?.avatar ? (
-              <img src={user.avatar} alt="Avatar" className="size-7 rounded-full border border-border" />
-            ) : (
-              <UserCircle className="size-7 text-muted-foreground" />
-            )}
+            <Avatar className="size-8 cursor-pointer">
+              <AvatarImage src={user?.avatarUrl} alt={user?.username} />
+              <AvatarFallback>{user?.firstName?.charAt(0) || user?.username?.charAt(0) || 'U'}</AvatarFallback>
+            </Avatar>
           </Link>
         </div>
       </header>

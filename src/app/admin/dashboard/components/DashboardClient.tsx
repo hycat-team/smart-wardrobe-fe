@@ -30,7 +30,7 @@ export function DashboardClient() {
 
   const totalUsers = usersData?.metadata?.totalItems || 0;
   const totalPosts = postsData?.metadata?.totalItems || 0;
-  const totalCatalog = catalogData?.length || 0;
+  const totalCatalog = catalogData?.totalItems || 0;
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-500 font-sans pb-16">

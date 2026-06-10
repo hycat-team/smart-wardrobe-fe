@@ -47,7 +47,8 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
   const [activeCategory, setActiveCategory] = useState("Tất cả");
 
   // Load real wardrobe items and outfit detail
-  const { data: realItems = [], isLoading: isLoadingWardrobe } = useMyWardrobe();
+  const { data, isLoading: isLoadingWardrobe } = useMyWardrobe();
+  const realItems = data ? data.pages.flatMap(p => p.items) : [];
   const { data: outfit, isLoading: isLoadingOutfit } = useOutfitDetail(outfitId, initialOutfit);
   const updateOutfitMutation = useUpdateOutfit();
 

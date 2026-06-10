@@ -17,7 +17,9 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const searchParams = useSearchParams();
   const filterParam = searchParams.get("filter") || "all";
   
-  const { data: outfits = [], isLoading } = useMyOutfits(initialOutfits);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useMyOutfits();
+  const rawInitialOutfits = Array.isArray(initialOutfits) ? initialOutfits : ((initialOutfits as any)?.items || []);
+  const outfits = data ? data.pages.flatMap(p => p.items) : rawInitialOutfits;
   const deleteOutfitMutation = useDeleteOutfit();
 
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
@@ -50,7 +52,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   };
 
   // Filter outfits logic
-  const filteredOutfits = outfits.filter(o => {
+  const filteredOutfits = outfits.filter((o: Outfit) => {
     const isFavorite = favorites[o.id] || false;
     
     if (filterParam === "all") return true;
@@ -127,7 +129,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
         </div>
       ) : filteredOutfits.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredOutfits.map(outfit => {
+          {filteredOutfits.map((outfit: Outfit) => {
             const itemsInOutfit = outfit.items || [];
             const isFavorite = favorites[outfit.id] || false;
 
@@ -275,6 +277,19 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
               TẠO OUTFIT
             </Button>
           </div>
+        </div>
+      )}
+      
+      {hasNextPage && (
+        <div className="mt-12 flex justify-center">
+          <Button 
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            variant="outline"
+            className="rounded-xl border-cream-dark hover:bg-cream-dark/50 text-xs font-mono tracking-wider h-11 text-ink disabled:opacity-50"
+          >
+            {isFetchingNextPage ? 'ĐANG TẢI...' : 'TẢI THÊM PHỐI ĐỒ'}
+          </Button>
         </div>
       )}
       

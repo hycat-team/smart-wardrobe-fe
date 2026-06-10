@@ -73,7 +73,16 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   const lastPushedQ = useRef(searchParam);
 
   // Load real wardrobe items
-  const { data: realItems = initialData, isLoading: isLoadingItems } = useMyWardrobe(initialData);
+  const { 
+    data, 
+    isLoading: isLoadingItems,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useMyWardrobe(categoryParam === "Tất cả" ? undefined : categoryParam);
+
+  const rawInitialItems = Array.isArray(initialData) ? initialData : ((initialData as any)?.items || []);
+  const realItems = data ? data.pages.flatMap(page => page.items) : rawInitialItems;
 
   // Sync Search state with query params ONLY if changed externally
   useEffect(() => {
@@ -140,7 +149,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     (searchParam ? 1 : 0);
 
   // Filter & Sort Logic
-  const filteredItems = realItems.filter(item => {
+  const filteredItems = realItems.filter((item: any) => {
     const itemCatName = item.category?.name || "";
     const matchesCategory = categoryParam === "Tất cả" || itemCatName === categoryParam;
 
@@ -320,6 +329,15 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
                       </span>
                     </div>
                   )}
+                  {item.colorHex && (
+                    <div className="absolute top-2 right-2 flex gap-2 z-10">
+                      <div 
+                        className="w-4 h-4 rounded-full border border-white/40 shadow-sm"
+                        style={{ backgroundColor: item.colorHex }}
+                        title={item.color || "Màu sắc"}
+                      />
+                    </div>
+                  )}
 
                   {!isLocked && !isProcessing && (
                     <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
@@ -371,13 +389,17 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
         </div>
       )}
 
-      {/* {sortedItems.length > 0 && (
+      {hasNextPage && (
         <div className="mt-16 flex justify-center">
-          <button className="px-8 py-2.5 border border-primary text-primary font-body-sm text-[14px] font-medium rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm">
-            Load More Items
+          <button 
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="px-8 py-2.5 border border-primary text-primary font-body-sm text-[14px] font-medium rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm disabled:opacity-50"
+          >
+            {isFetchingNextPage ? 'Đang tải...' : 'Tải thêm trang phục'}
           </button>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

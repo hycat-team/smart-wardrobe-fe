@@ -28,9 +28,8 @@ export function UsersClient() {
   const { data, isLoading, isError } = useAdminUsers({ page, limit: 10, q: searchTerm });
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateUserStatus();
 
-  const toggleBan = (id: string, currentStatus: string) => {
-    // Assuming backend enums are ACTIVE and BANNED
-    const newStatus = currentStatus === "ACTIVE" ? "BANNED" : "ACTIVE";
+  const toggleBan = (id: string, currentStatus: number) => {
+    const newStatus = currentStatus === 1 ? 0 : 1;
     updateStatus({ id, data: { status: newStatus } });
   };
 
@@ -96,7 +95,7 @@ export function UsersClient() {
               </TableRow>
             ) : users.map((user: any) => {
               const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Người dùng';
-              const isActive = user.status === "ACTIVE";
+              const isActive = user.status === 1 || user.status === "ACTIVE";
 
               return (
                 <TableRow key={user.id} className={cn(!isActive && "opacity-60 bg-muted/30")}>

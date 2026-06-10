@@ -5,12 +5,25 @@ export interface PaginationMetadata {
   totalPages: number;
 }
 
+export interface UserBodyMeasurementsRes {
+  chestCm?: number;
+  waistCm?: number;
+  hipCm?: number;
+}
+
+export interface UserInferredBodyRes {
+  bodyShape: string;
+  confidenceScore?: number;
+}
+
 export interface UserBodyProfileRes {
-  height?: number;
-  weight?: number;
-  bust?: number;
-  waist?: number;
-  hips?: number;
+  heightCm: number;
+  weightKg: number;
+  bodyShape: string;
+  measurements?: UserBodyMeasurementsRes;
+  inferredByAi?: UserInferredBodyRes;
+  verifiedByUser: boolean;
+  lastUpdatedAt?: string;
 }
 
 export interface UserSubscriptionRes {
@@ -103,8 +116,11 @@ export interface AdminPostItemListRes {
 }
 
 export interface PostMediaRes {
+  id: string;
+  mediaType: string;
   mediaUrl: string;
-  mediaPublicId: string;
+  publicId?: string;
+  sortOrder: number;
 }
 
 export interface PostRes {

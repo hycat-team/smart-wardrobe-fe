@@ -8,15 +8,17 @@ import { TransactionHistory } from '@/features/billing/components/TransactionHis
 import { AlertCircle, Loader2 } from 'lucide-react';
 
 export default function WalletPage() {
+  const [page, setPage] = React.useState(1);
+
   const { data: balanceData, isLoading: isLoadingBalance, error: balanceError } = useQuery({
     queryKey: ['wallet', 'balance'],
     queryFn: () => billingApi.getWalletBalance(),
     retry: 0,
   });
 
-  const { data: statementsData = [], isLoading: isLoadingStatements } = useQuery({
-    queryKey: ['wallet', 'statements'],
-    queryFn: () => billingApi.getWalletStatements(),
+  const { data: statementsResult, isLoading: isLoadingStatements } = useQuery({
+    queryKey: ['wallet', 'statements', page],
+    queryFn: () => billingApi.getWalletStatements({ page, limit: 10 }),
     retry: 0,
   });
 
@@ -57,7 +59,12 @@ export default function WalletPage() {
 
             {/* Cột phải: Lịch sử giao dịch */}
             <div className="lg:col-span-2">
-              <TransactionHistory statements={statementsData} />
+              <TransactionHistory 
+                statements={statementsResult?.items || []} 
+                page={page}
+                totalPages={statementsResult?.totalPages || 1}
+                onPageChange={setPage}
+              />
             </div>
           </div>
         )}

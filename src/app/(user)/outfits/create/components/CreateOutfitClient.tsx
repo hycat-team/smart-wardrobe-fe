@@ -39,7 +39,8 @@ function CreateOutfitContent() {
   const [activeCategory, setActiveCategory] = useState("Tất cả");
 
   // Load real wardrobe items
-  const { data: realItems = [], isLoading: isLoadingWardrobe } = useMyWardrobe();
+  const { data, isLoading: isLoadingWardrobe } = useMyWardrobe();
+  const realItems = data ? data.pages.flatMap(p => p.items) : [];
   const createOutfitMutation = useCreateOutfit();
 
   // Selection handler

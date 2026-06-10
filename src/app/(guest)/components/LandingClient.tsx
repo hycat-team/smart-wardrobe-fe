@@ -132,7 +132,7 @@ export function LandingClient() {
           <div className="relative w-full h-full">
             {/* Frame 1 */}
             <Image 
-              src="/landing-page/wardrobe-closed-1.png" 
+              src="/landing-page/wardrobe-closed-2.png" 
               alt="Wardrobe Frame 1" 
               fill 
               className="wardrobe-frame-1 object-contain z-10"

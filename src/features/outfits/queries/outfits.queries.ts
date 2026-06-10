@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { outfitsApi } from '../api/outfits.api';
 import { toast } from 'sonner';
 
@@ -8,11 +8,15 @@ export const OUTFIT_QUERY_KEYS = {
   detail: (id: string) => [...OUTFIT_QUERY_KEYS.all, 'detail', id] as const,
 };
 
-export const useMyOutfits = (initialData?: any[]) => {
-  return useQuery({
+export const useMyOutfits = () => {
+  return useInfiniteQuery({
     queryKey: OUTFIT_QUERY_KEYS.lists(),
-    queryFn: () => outfitsApi.getMyOutfits(),
-    initialData,
+    queryFn: ({ pageParam = 1 }) => outfitsApi.getMyOutfits({ page: pageParam as number, limit: 20 }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
+      return undefined;
+    },
   });
 };
 

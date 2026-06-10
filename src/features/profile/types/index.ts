@@ -1,14 +1,24 @@
 import { Gender } from '@/common/enum';
 
+export interface UserBodyMeasurementsRes {
+  chestCm?: number;
+  waistCm?: number;
+  hipCm?: number;
+}
+
+export interface UserInferredBodyRes {
+  bodyShape: string;
+  confidenceScore?: number;
+}
+
 export interface UserBodyProfileRes {
-  bodyType?: string;
-  estimatedBodyShape?: string;
-  fitPreference?: string;
-  height?: number;
-  weight?: number;
-  recommendedSize?: string;
-  skinTone?: string;
-  stylingNotes?: string;
+  heightCm: number;
+  weightKg: number;
+  bodyShape: string;
+  measurements?: UserBodyMeasurementsRes;
+  inferredByAi?: UserInferredBodyRes;
+  verifiedByUser: boolean;
+  lastUpdatedAt?: string;
 }
 
 export interface UserSubscriptionRes {
@@ -38,7 +48,8 @@ export interface UserRes {
   
   // UI backwards compatibility fields
   name?: string;
-  avatar?: string;
+  avatarUrl?: string;
+  avatarPublicId?: string;
   isPremium?: boolean;
 }
 

@@ -14,7 +14,7 @@ export const useLogin = () => {
       let isAdmin = false;
       try {
         const profile = await queryClient.fetchQuery({ queryKey: PROFILE_QUERY_KEY, queryFn: profileApi.getProfile });
-        if (profile?.roleSlug === 'admin' || profile?.role === 'ADMIN' || profile?.roleSlug === 'ADMIN') {
+        if (profile?.roleSlug === 'admin' || profile?.roleSlug === 'ADMIN') {
           isAdmin = true;
         }
       } catch (error) {

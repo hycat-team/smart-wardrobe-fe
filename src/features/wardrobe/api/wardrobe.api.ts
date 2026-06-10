@@ -1,6 +1,6 @@
 import api from '@/lib/axios';
 import { AxiosInstance } from 'axios';
-import { APIResponse } from '@/types/api';
+import { APIResponse, PaginationResult } from '@/types/api';
 import {
   WardrobeItemRes,
   UploadSignatureResult,
@@ -13,8 +13,8 @@ import {
 } from '../types';
 
 export const wardrobeApi = {
-  getMyWardrobeItems: async (axiosInstance: AxiosInstance = api): Promise<WardrobeItemRes[]> => {
-    const res = await axiosInstance.get<APIResponse<WardrobeItemRes[]>>('/me/wardrobe-items');
+  getMyWardrobeItems: async (params?: { page?: number; limit?: number; category_slug?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<WardrobeItemRes>> => {
+    const res = await axiosInstance.get<APIResponse<PaginationResult<WardrobeItemRes>>>('/me/wardrobe-items', { params });
     return res.data.data!;
   },
 
@@ -66,9 +66,9 @@ export const wardrobeApi = {
     return res.data.data!;
   },
 
-  searchWardrobeItems: async (query: string, axiosInstance: AxiosInstance = api): Promise<SearchWardrobeItemRes[]> => {
-    const res = await axiosInstance.get<APIResponse<SearchWardrobeItemRes[]>>('/wardrobe-items/search', {
-      params: { q: query },
+  searchWardrobeItems: async (params?: { q?: string; page?: number; limit?: number; category_slug?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<SearchWardrobeItemRes>> => {
+    const res = await axiosInstance.get<APIResponse<PaginationResult<SearchWardrobeItemRes>>>('/wardrobe-items/search', {
+      params,
     });
     return res.data.data!;
   },

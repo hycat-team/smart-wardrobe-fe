@@ -1,6 +1,6 @@
 import api from '@/lib/axios';
 import { AxiosInstance } from 'axios';
-import { APIResponse } from '@/types/api';
+import { APIResponse, PaginationResult } from '@/types/api';
 import { DirectPurchaseReq, PaymentLinkRes, Statement, TopUpReq, WalletBalance } from '../types';
 
 export const billingApi = {
@@ -9,8 +9,8 @@ export const billingApi = {
     return res.data.data!;
   },
 
-  getWalletStatements: async (axiosInstance: AxiosInstance = api): Promise<Statement[]> => {
-    const res = await axiosInstance.get<APIResponse<Statement[]>>('/subscriptions/me/wallet/statements');
+  getWalletStatements: async (params?: { page?: number; limit?: number }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<Statement>> => {
+    const res = await axiosInstance.get<APIResponse<PaginationResult<Statement>>>('/subscriptions/me/wallet/statements', { params });
     return res.data.data!;
   },
 

@@ -26,7 +26,6 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
 
   const { handleSubmit, reset, register } = useForm<UpdateWardrobeItemReq>({
     defaultValues: {
-      name: "",
       categoryId: "",
       color: "",
       fit: "",
@@ -34,6 +33,7 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
       pattern: "",
       seasonality: "",
       style: "",
+      price: undefined,
     }
   });
 
@@ -41,7 +41,6 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
   useEffect(() => {
     if (item) {
       reset({
-        name: item.category?.name || "Trang phục",
         categoryId: item.category?.id || "",
         color: item.color || "",
         fit: item.fit || "",
@@ -49,6 +48,7 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
         pattern: item.pattern || "",
         seasonality: item.seasonality || "",
         style: item.style || "",
+        price: item.price || undefined,
       });
     }
   }, [item, reset]);
@@ -117,13 +117,14 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
         {/* Right Column: Form Fields */}
         <div className="md:col-span-7 flex flex-col gap-6">
           
-          {/* Tên trang phục */}
+          {/* Giá tiền */}
           <div className="space-y-2">
-            <label className="text-xs font-mono font-bold text-ink uppercase tracking-wider">Tên trang phục</label>
+            <label className="text-xs font-mono font-bold text-ink uppercase tracking-wider">Giá tiền</label>
             <input 
-              {...register("name")}
+              type="number"
+              {...register("price", { valueAsNumber: true })}
               className="w-full h-12 px-4 rounded-xl border border-cream-dark bg-transparent focus:ring-1 focus:ring-terracotta focus:border-terracotta outline-none transition-all font-sans text-ink"
-              placeholder="VD: Áo Thun Trắng Nam"
+              placeholder="VD: 500000"
             />
           </div>
 
