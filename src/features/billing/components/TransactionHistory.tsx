@@ -11,7 +11,7 @@ interface TransactionHistoryProps {
   onPageChange?: (page: number) => void;
 }
 
-export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ statements, page = 1, totalPages = 1, onPageChange }) => {
+export const TransactionHistory = ({ statements, page = 1, totalPages = 1, onPageChange }: TransactionHistoryProps) => {
   return (
     <div className="bg-zinc-900/50 backdrop-blur-xl border border-white/5 rounded-3xl p-6 md:p-8 shadow-2xl">
       <div className="flex items-center gap-3 mb-8">

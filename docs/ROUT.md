@@ -25,7 +25,7 @@
 | **GET** | `/api/v1/ai/chat/sessions` | Lấy danh sách cuộc trò chuyện AI |  | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.ChatSessionRes[]` |
 | **POST** | `/api/v1/ai/chat/sessions` | Tạo cuộc trò chuyện AI mới | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.CreateChatSessionReq` | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.ChatSessionRes` |
 | **PATCH** | `/api/v1/ai/chat/sessions/{contextID}/archive` | Lưu trữ cuộc trò chuyện AI | Params: contextID (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
-| **GET** | `/api/v1/ai/chat/sessions/{contextID}/messages` | Lấy lịch sử tin nhắn AI | Params: contextID (path, required) | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.ChatMessageRes[]` |
+| **GET** | `/api/v1/ai/chat/sessions/{contextID}/messages` | Lấy lịch sử tin nhắn AI | Params: contextID (path, required), page (query), limit (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_ChatMessageRes` |
 | **POST** | `/api/v1/ai/chat/sessions/{contextID}/messages/stream` | Nhắn tin với stylist AI (Stream SSE) | Params: contextID (path, required)<br>Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.SendChatMessageReq` | N/A |
 | **POST** | `/api/v1/ai/outfit-recommendations` | Gợi ý phối đồ từ tủ đồ | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.RecommendOutfitReq` | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.RecommendedOutfitRes` |
 
@@ -695,11 +695,13 @@
 
 | Property | Type | Description |
 | --- | --- | --- |
-| **details** | string |  |
-| **occasion** | string |  |
-| **season** | string |  |
-| **styleTarget** | string |  |
-| **weather** | string |  |
+| **colorTone** | string | Tông màu phối đồ (Gợi ý: light, dark, pastel, earthy, neon... hoặc nhập tông màu tùy ý) |
+| **details** | string | Ghi chú thêm bằng tay (free text) |
+| **occasion** | string | Dịp phối đồ (Gợi ý: casual, work, date, party, sport, hoặc nhập dịp tùy ý) |
+| **season** | string | Mùa phối đồ
+@enums spring,summer,autumn,winter,all |
+| **styleTarget** | string | Phong cách hướng tới (Gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant, hoặc nhập phong cách tùy ý) |
+| **weather** | string | Thời tiết hiện tại (Gợi ý: hot, cold, warm, cool, rainy, hoặc nhập thời tiết cụ thể) |
 
 ### `RecommendedItemGroup`
 
@@ -714,7 +716,9 @@
 | Property | Type | Description |
 | --- | --- | --- |
 | **explanation** | string |  |
+| **isFallback** | boolean |  |
 | **items** | array of `smart-wardrobe-be_internal_modules_wardrobe_application_dto.RecommendedItemGroup` |  |
+| **remainingQuota** | integer |  |
 | **title** | string |  |
 
 ### `SaveOutfitItemReq`
@@ -823,6 +827,13 @@
 | Property | Type | Description |
 | --- | --- | --- |
 | **items** | array of `smart-wardrobe-be_internal_modules_subscription_application_dto.WalletStatementDTO` |  |
+| **metadata** | ref: `smart-wardrobe-be_internal_shared_application_dto.PaginationMetadata` |  |
+
+### `PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_ChatMessageRes`
+
+| Property | Type | Description |
+| --- | --- | --- |
+| **items** | array of `smart-wardrobe-be_internal_modules_wardrobe_application_dto.ChatMessageRes` |  |
 | **metadata** | ref: `smart-wardrobe-be_internal_shared_application_dto.PaginationMetadata` |  |
 
 ### `PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_OutfitRes`

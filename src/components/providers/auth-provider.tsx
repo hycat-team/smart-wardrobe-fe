@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useProfile } from "@/features/profile/queries/profile.queries";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -8,11 +8,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: profileData, isError, isLoading } = useProfile();
   const setUser = useAuthStore((state) => state.setUser);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (profileData) {
@@ -23,7 +18,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: profileData.firstName + (profileData.lastName ? ` ${profileData.lastName}` : ""),
         avatar: `https://api.dicebear.com/7.x/notionists/svg?seed=${profileData.username}`,
         isPremium: (!!profileData.subscription?.planSlug && profileData.subscription.planSlug !== "free") || 
-                   (!!(profileData as any).planSlug && (profileData as any).planSlug !== "free")
+                   (!!profileData.planSlug && profileData.planSlug !== "free")
       };
       setUser(userToStore);
     }
@@ -38,7 +33,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Optionally, you can return null while loading if you want to block rendering
   // but it's usually better to render children and let them handle loading states
   // or just show a global loader if needed.
-  if (!mounted) return null;
 
   return <>{children}</>;
 }

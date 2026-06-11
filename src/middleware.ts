@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Hàm giải mã JWT Token (Base64) ở môi trường Edge Runtime
 function parseJwt(token: string) {
@@ -9,7 +9,10 @@ function parseJwt(token: string) {
     const base64Url = token.split('.')[1];
     if (!base64Url) return null;
     
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) {
+      base64 += '=';
+    }
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
@@ -19,6 +22,7 @@ function parseJwt(token: string) {
 
     return JSON.parse(jsonPayload);
   } catch (e) {
+    console.log(e);
     return null;
   }
 }
@@ -37,7 +41,7 @@ export async function middleware(request: NextRequest) {
   let accessToken = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;
 
-  let headersToForward = new Headers(request.headers);
+  const headersToForward = new Headers(request.headers);
   let backendSetCookies: string[] = [];
   let isRefreshFailed = false;
 

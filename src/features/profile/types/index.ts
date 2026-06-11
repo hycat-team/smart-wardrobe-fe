@@ -51,6 +51,7 @@ export interface UserRes {
   avatarUrl?: string;
   avatarPublicId?: string;
   isPremium?: boolean;
+  planSlug?: string;
 }
 
 export interface UpdateProfileReq {

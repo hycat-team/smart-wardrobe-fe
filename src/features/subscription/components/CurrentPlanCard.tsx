@@ -11,7 +11,7 @@ interface CurrentPlanCardProps {
   quota: DailyQuota;
 }
 
-export const CurrentPlanCard: React.FC<CurrentPlanCardProps> = ({ subscription, quota }) => {
+export const CurrentPlanCard = ({ subscription, quota }: CurrentPlanCardProps) => {
   const toggleMutation = useToggleAutoRenewMutation();
   const [autoRenew, setAutoRenew] = React.useState(subscription.isAutoRenewEnabled || subscription.IsAutoRenewEnabled || false);
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import { SubscriptionPlan } from '../types';
 import { Button } from '@/components/ui/button';
-import { Check, Zap, Sparkles } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
 import { usePurchaseDirectMutation, usePurchaseWithWalletMutation } from '@/features/billing/queries/billing.queries';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
@@ -12,7 +12,7 @@ interface PricingCardProps {
   isPopular?: boolean;
 }
 
-export const PricingCard: React.FC<PricingCardProps> = ({ plan, isPopular }) => {
+export const PricingCard = ({ plan, isPopular }: PricingCardProps) => {
   const purchaseDirect = usePurchaseDirectMutation();
   const purchaseWallet = usePurchaseWithWalletMutation();
 

@@ -11,7 +11,7 @@ interface WalletBalanceWidgetProps {
   balanceData: WalletBalance;
 }
 
-export const WalletBalanceWidget: React.FC<WalletBalanceWidgetProps> = ({ balanceData }) => {
+export const WalletBalanceWidget = ({ balanceData }: WalletBalanceWidgetProps) => {
   return (
     <div className="relative overflow-hidden rounded-3xl p-8 bg-gradient-to-br from-zinc-900 to-black border border-white/10 shadow-2xl group">
       {/* 3D Glass effects */}

@@ -21,6 +21,7 @@ export interface ErrorResponse {
   title?: string;   // Tên nhóm lỗi ngắn gọn (ví dụ: "Bad Request", "Conflict")
   message?: string; // Nội dung lỗi từ backend trả về
   detail?: string;  // Tương thích ngược với các API cũ dùng detail
+  Detail?: string;  // Tương thích với các lỗi trả về có chữ hoa
   errors?: ValidationErrorItem[]; // Mảng lỗi chi tiết nếu là validation error
 }
 

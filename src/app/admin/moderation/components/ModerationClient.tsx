@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Search, Loader2, ExternalLink, Trash2, ShieldAlert, CheckCircle2, RefreshCcw, EyeOff } from "lucide-react";
+import { Search, Loader2, ExternalLink, Trash2, ShieldAlert, CheckCircle2, RefreshCcw, EyeOff, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Plus } from "lucide-react";
+import { CreatePostModal } from "@/features/community/components/CreatePostModal";
 
 export function ModerationClient() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,15 +40,19 @@ export function ModerationClient() {
           <p className="text-sm text-muted-foreground">Kiểm duyệt bài viết Feed, bình luận và các sản phẩm đăng bán Marketplace.</p>
         </div>
         
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <input 
-            type="text" 
-            placeholder="Tìm kiếm nội dung..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-10 w-full pl-9 pr-4 rounded-xl bg-secondary border-transparent focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-all outline-none text-foreground"
-          />
+        <div className="flex flex-col sm:flex-row gap-3 items-center w-full sm:w-auto">
+          <CreatePostModal />
+          
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <input 
+              type="text" 
+              placeholder="Tìm kiếm nội dung..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-10 w-full pl-9 pr-4 rounded-xl bg-secondary border-transparent focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-all outline-none text-foreground"
+            />
+          </div>
         </div>
       </div>
 
@@ -107,6 +112,16 @@ function PostsModerationList({ searchTerm }: { searchTerm: string }) {
                 <div className="space-y-2 flex-1 flex flex-col justify-center">
                   <p className="text-sm">Trạng thái: <span className={cn("font-bold", isDeleted ? "text-red-500" : "text-green-500")}>{isDeleted ? 'Đã Xóa' : 'Hoạt động'}</span></p>
                   {post.createdAt && <p className="text-xs text-muted-foreground">Tạo lúc: {new Date(post.createdAt).toLocaleString('vi-VN')}</p>}
+                  <div className="flex items-center gap-4 mt-2">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Heart className="size-4" />
+                      <span className="text-xs font-medium">{post.likeCount || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <MessageSquare className="size-4" />
+                      <span className="text-xs font-medium">{post.commentCount || 0}</span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex flex-row justify-end gap-2 shrink-0 items-center border-t md:border-t-0 pt-4 md:pt-0 border-border">

@@ -24,11 +24,11 @@ api.interceptors.response.use(
       const isAuthError = 
         error.response.status === 401 || 
         (error.response.status === 500 && 
-          ((error.response.data as any)?.message === "Vui lòng đăng nhập" || 
-           (error.response.data as any)?.detail === "Vui lòng đăng nhập" || 
-           (error.response.data as any)?.Detail === "Vui lòng đăng nhập" ||
-           (error.response.data as any)?.message === "Đã xảy ra lỗi hệ thống" ||
-           (error.response.data as any)?.detail === "Đã xảy ra lỗi hệ thống" // Fallback if WrapError swallowed it completely
+          (error.response.data?.message === "Vui lòng đăng nhập" || 
+           error.response.data?.detail === "Vui lòng đăng nhập" || 
+           error.response.data?.Detail === "Vui lòng đăng nhập" ||
+           error.response.data?.message === "Đã xảy ra lỗi hệ thống" ||
+           error.response.data?.detail === "Đã xảy ra lỗi hệ thống" // Fallback if WrapError swallowed it completely
           )
         );
 
@@ -42,15 +42,16 @@ api.interceptors.response.use(
         // nghĩa là phiên đăng nhập đã thực sự hết hạn (Refresh Token cũng chết).
         
         const isLoginPage = typeof window !== 'undefined' && window.location.pathname.includes('/auth/login');
+        const isMeEndpoint = error.config?.url?.endsWith('/me');
 
         // Không báo lỗi với /me để tránh spam lúc mới load trang chưa đăng nhập
         // Và không bao giờ hiện toast lỗi hết hạn nếu user đang ở chính trang login
-        if (!isLoginPage && !error.config?.url?.endsWith('/me')) {
+        if (!isLoginPage && !isMeEndpoint) {
           toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
         }
 
         // Chuyển hướng người dùng về trang đăng nhập
-        if (!isLoginPage) {
+        if (!isLoginPage && !isMeEndpoint) {
           setTimeout(() => {
             window.location.href = '/auth/login';
           }, 1000);

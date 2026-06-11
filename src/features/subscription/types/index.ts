@@ -1,6 +1,7 @@
 export interface SubscriptionPlan {
   id?: string; ID?: string;
   slug?: string; Slug?: string;
+  planSlug?: string; PlanSlug?: string;
   name?: string; Name?: string;
   description?: string; Description?: string;
   price?: number; Price?: number;

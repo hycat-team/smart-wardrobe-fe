@@ -9,7 +9,7 @@ import { Zap } from 'lucide-react';
 
 const SUGGESTED_AMOUNTS = [50000, 100000, 200000, 500000];
 
-export const TopupModal: React.FC = () => {
+export const TopupModal = () => {
   const [amount, setAmount] = useState<number | ''>('');
   const topupMutation = useTopupMutation();
 
