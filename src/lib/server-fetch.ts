@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
 
 /**
  * Hàm fetch tùy chỉnh dành riêng cho Server Components.

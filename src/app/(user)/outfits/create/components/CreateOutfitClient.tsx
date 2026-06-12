@@ -1,8 +1,8 @@
 "use client";
-import { useState, Suspense } from "react";
+import { useState, useRef, Suspense } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Sparkles, Save, X, Grid, AlertCircle, ZoomIn, ZoomOut, CloudRain, Sun, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Sparkles, Save, X, Grid, AlertCircle, ZoomIn, ZoomOut, CloudRain, Sun, Loader2, Layers, MoveUp, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,9 @@ import { useMyWardrobe } from "@/features/wardrobe/queries/wardrobe.queries";
 import { useCreateOutfit } from "@/features/outfits/queries/outfits.queries";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
+import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
+import { motion } from "framer-motion";
+import * as htmlToImage from "html-to-image";
 
 const OCCASIONS = ["Casual", "Workwear", "Summer", "Party", "Formal", "Sporty"];
 
@@ -35,36 +38,71 @@ function CreateOutfitContent() {
   const [customOccasion, setCustomOccasion] = useState("");
   const [selectedMoodboard, setSelectedMoodboard] = useState("");
   const [useWeather, setUseWeather] = useState(false);
-  const [selectedItems, setSelectedItems] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Canvas State
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
 
   // Load real wardrobe items
   const { data, isLoading: isLoadingWardrobe } = useMyWardrobe();
   const realItems = data ? data.pages.flatMap(p => p.items) : [];
   const createOutfitMutation = useCreateOutfit();
 
+  // Bring to Front (Layering)
+  const bringToFront = (id: string) => {
+    setSelectedItems(prev => {
+      const maxZ = Math.max(...prev.map(i => i.zIndex || 0), 0);
+      return prev.map(item => item.id === id ? { ...item, zIndex: maxZ + 1 } : item);
+    });
+  };
+
   // Selection handler
   const handleItemToggle = (item: any) => {
     if (selectedItems.some(x => x.id === item.id)) {
       setSelectedItems(prev => prev.filter(x => x.id !== item.id));
     } else {
-      setSelectedItems(prev => [...prev, { ...item, scale: 100 }]);
+      const maxZ = Math.max(...selectedItems.map(i => i.zIndex || 0), 0);
+      setSelectedItems(prev => [
+        ...prev, 
+        { 
+          ...item, 
+          scale: 100, 
+          x: 0, 
+          y: 0, 
+          zIndex: maxZ + 1 
+        }
+      ]);
       toast.success(`Đã thêm ${getWardrobeItemName(item)} vào bàn phối!`);
     }
   };
 
   // Canvas manipulations
   const updateScale = (id: string, newScale: number) => {
-    setSelectedItems(prev => prev.map(x => x.id === id ? { ...x, scale: Math.max(50, Math.min(150, newScale)) } : x));
+    setSelectedItems(prev => prev.map(x => x.id === id ? { ...x, scale: Math.max(30, Math.min(250, newScale)) } : x));
   };
 
   const removeItem = (id: string) => {
     setSelectedItems(prev => prev.filter(x => x.id !== id));
   };
 
+  // Update item coordinates after drag
+  const handleDragEnd = (id: string, info: any) => {
+    setSelectedItems(prev => prev.map(x => {
+      if (x.id === id) {
+        return {
+          ...x,
+          x: x.x + info.offset.x,
+          y: x.y + info.offset.y
+        };
+      }
+      return x;
+    }));
+  };
+
   // AI Auto-matching magic button
   const handleAIMatch = () => {
-    // Pick 1 Top, 1 Bottom, and 1 Shoes from the real items
     const tops = realItems.filter(x => x.category?.name === "Áo" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe);
     const bottoms = realItems.filter(x => x.category?.name === "Quần" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe);
     const shoes = realItems.filter(x => x.category?.name === "Giày" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe);
@@ -78,13 +116,14 @@ function CreateOutfitContent() {
     const randomBottom = bottoms[Math.floor(Math.random() * bottoms.length)];
     const randomShoes = shoes.length > 0 ? shoes[Math.floor(Math.random() * shoes.length)] : null;
 
+    let z = 1;
     const matched = [
-      { ...randomTop, scale: 100 },
-      { ...randomBottom, scale: 100 }
+      { ...randomTop, scale: 100, x: 0, y: -80, zIndex: z++ },
+      { ...randomBottom, scale: 100, x: 0, y: 100, zIndex: z++ }
     ];
 
     if (randomShoes) {
-      matched.push({ ...randomShoes, scale: 95 });
+      matched.push({ ...randomShoes, scale: 70, x: 0, y: 240, zIndex: z++ });
     }
 
     setSelectedItems(matched);
@@ -92,7 +131,36 @@ function CreateOutfitContent() {
     toast.success("AI Stylist đã gợi ý bộ phối hợp hoàn chỉnh!");
   };
 
-  // Submit
+  // Upload canvas image to Cloudinary
+  const uploadCanvasImage = async (blob: Blob): Promise<string> => {
+    try {
+      const signatureResult = await wardrobeApi.getUploadSignature();
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
+      const formData = new FormData();
+      formData.append("file", blob, "outfit_cover.png");
+      formData.append("api_key", signatureResult.apiKey);
+      formData.append("timestamp", signatureResult.timestamp.toString());
+      formData.append("signature", signatureResult.signature);
+      formData.append("folder", signatureResult.folder);
+      
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Cloudinary upload failed");
+      }
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error("Lỗi upload Cloudinary:", error);
+      throw error;
+    }
+  };
+
+  // Submit Outfit
   const handleSaveOutfit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedItems.length < 2) {
@@ -104,24 +172,59 @@ function CreateOutfitContent() {
       return;
     }
 
+    if (!canvasRef.current) return;
+
     try {
+      setIsSaving(true);
+      toast.loading("Đang chụp ảnh Canvas và lưu phối đồ...", { id: "saving_outfit" });
+
+      // 1. Chụp ảnh Canvas bằng html-to-image (ẩn controls)
+      const controls = document.querySelectorAll(".canvas-item-controls");
+      controls.forEach((el) => ((el as HTMLElement).style.opacity = "0"));
+
+      // Đợi DOM cập nhật CSS
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const blob = await htmlToImage.toBlob(canvasRef.current, {
+        quality: 1,
+        pixelRatio: 3, // Tăng độ phân giải lên 3x một cách tự nhiên (an toàn nhất)
+        backgroundColor: "transparent",
+        cacheBust: true,
+      });
+
+      controls.forEach((el) => ((el as HTMLElement).style.opacity = "1"));
+
+      if (!blob) {
+        throw new Error("Không thể tạo ảnh từ Canvas");
+      }
+
+      // 2. Upload ảnh lên Cloudinary
+      const coverImageUrl = await uploadCanvasImage(blob);
+
+      // 3. Chuẩn bị payload và gửi API tạo Outfit
+      // Tính toán position % tương đối để dễ lưu (mặc dù ảnh cover đã có đầy đủ rồi)
       const payload = {
         name: outfitName,
         description: customOccasion || occasion,
-        cover_image_url: selectedItems[0]?.imageUrl || "", // use first item image as cover
-        items: selectedItems.map((item, index) => ({
-          wardrobe_item_id: item.id,
-          position_x: (index + 1) / (selectedItems.length + 1), // distributed on X axis
-          position_y: 0.5,
-          scale: (item.scale || 100) / 100, // scale standard 0.1 to 10
-          layer_order: index + 1,
+        coverImageUrl: coverImageUrl,
+        items: selectedItems.map((item) => ({
+          wardrobeItemId: item.id,
+          positionX: Math.max(1, Math.abs(item.x || 0)),
+          positionY: Math.max(1, Math.abs(item.y || 0)),
+          scale: (item.scale || 100) / 100,
+          layerOrder: item.zIndex || 1,
         })),
       };
 
       await createOutfitMutation.mutateAsync(payload);
+      toast.success("Lưu bộ phối đồ thành công!", { id: "saving_outfit" });
       router.push("/outfits");
-    } catch (err) {
+      
+    } catch (err: any) {
       console.error(err);
+      toast.error(err.message || "Đã xảy ra lỗi khi lưu.", { id: "saving_outfit" });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -137,18 +240,18 @@ function CreateOutfitContent() {
     : activeClosetItems.filter(x => x.category?.name === activeCategory);
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col gap-6 animate-in fade-in duration-500 pb-16 font-sans">
+    <div className="max-w-7xl mx-auto flex flex-col gap-6 animate-in fade-in duration-500 pb-16 font-sans px-4 sm:px-6">
       
       {/* Top Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-cream-dark pb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-cream-dark pb-4 pt-4">
         <div className="space-y-1">
           <Link 
             href="/outfits" 
-            className="inline-flex items-center gap-1.5 text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="size-3.5" /> QUAY LẠI OUTFITS
           </Link>
-          <h1 className={cn("text-2xl font-heading font-medium tracking-wide text-ink")}>Mix & Match Canvas</h1>
+          <h1 className={cn("text-3xl font-heading font-medium tracking-wide text-ink")}>Mix & Match Canvas</h1>
         </div>
 
         {/* Action triggers */}
@@ -164,36 +267,39 @@ function CreateOutfitContent() {
           <Button
             type="button"
             onClick={handleSaveOutfit}
-            className="flex-1 sm:flex-none h-11 rounded-xl bg-ink text-cream hover:bg-ink/90 px-6 text-xs font-mono tracking-wider flex items-center justify-center gap-1.5"
+            disabled={isSaving}
+            className="flex-1 sm:flex-none h-11 rounded-xl bg-ink text-cream hover:bg-ink/90 px-6 text-xs font-mono tracking-wider flex items-center justify-center gap-1.5 shadow-md disabled:opacity-70"
           >
-            <Save className="size-4" /> LƯU PHỐI ĐỒ
+            {isSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+            {isSaving ? "ĐANG LƯU..." : "LƯU PHỐI ĐỒ"}
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* LEFT COLUMN: THE CLOSET (LG: 5/12) */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className={cn("border rounded-2xl p-4 md:p-6 space-y-4", isPremium ? "bg-card border-border shadow-sm" : "bg-cream-dark/15 border-cream-dark/60")}>
-            
-            <div className="space-y-1">
-              <h3 className={cn("font-heading font-bold text-lg text-ink")}>Tủ đồ cá nhân</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">Chọn các món đồ để mang lên bàn phối đồ.</p>
+        {/* LEFT COLUMN: THE CLOSET & SETTINGS (LG: 4/12) */}
+        <div className="lg:col-span-4 space-y-6 flex flex-col-reverse lg:flex-col">
+          
+          {/* THE CLOSET */}
+          <div className="border border-cream-dark/60 rounded-3xl p-5 bg-cream-dark/10 shadow-sm flex flex-col max-h-[500px]">
+            <div className="space-y-1 mb-4">
+              <h3 className="font-heading font-bold text-xl text-ink">Tủ đồ cá nhân</h3>
+              <p className="text-[11px] text-ink-muted font-mono uppercase tracking-wider">Chọn đồ kéo vào bàn phối</p>
             </div>
 
-            {/* Categories horizontal tabs */}
-            <div className="flex overflow-x-auto gap-1 no-scrollbar pb-1 border-b border-cream-dark/40">
+            {/* Categories */}
+            <div className="flex overflow-x-auto gap-2 no-scrollbar pb-3 border-b border-cream-dark/40 shrink-0">
               {categories.map(cat => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setActiveCategory(cat)}
                   className={cn(
-                    "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all",
+                    "px-4 py-1.5 rounded-full text-xs font-mono tracking-widest whitespace-nowrap transition-all border",
                     activeCategory === cat 
-                      ? "bg-ink text-cream" 
-                      : "text-ink-muted hover:text-ink hover:bg-cream-dark/50"
+                      ? "bg-ink border-ink text-cream" 
+                      : "bg-transparent border-cream-dark text-ink-muted hover:border-ink hover:text-ink"
                   )}
                 >
                   {cat}
@@ -201,69 +307,67 @@ function CreateOutfitContent() {
               ))}
             </div>
 
-            {/* Closet Items Grid */}
-            {isLoadingWardrobe ? (
-              <div className="flex flex-col items-center justify-center py-12 gap-2">
-                <Loader2 className="size-6 text-terracotta animate-spin" />
-                <span className="text-xs text-ink-muted font-mono">Đang tải tủ đồ...</span>
-              </div>
-            ) : filteredCloset.length > 0 ? (
-              <div className="grid grid-cols-3 gap-3 max-h-[380px] overflow-y-auto pr-1 no-scrollbar">
-                {filteredCloset.map(item => {
-                  const isSelected = selectedItems.some(x => x.id === item.id);
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => handleItemToggle(item)}
-                      className={cn(
-                        "relative rounded-xl overflow-hidden aspect-square border cursor-pointer bg-cream-dark/20 transition-all select-none",
-                        isSelected 
-                          ? "border-terracotta ring-1 ring-terracotta" 
-                          : "border-cream-dark/80 hover:border-ink/20"
-                      )}
-                    >
-                      <img src={item.imageUrl} alt={getWardrobeItemName(item)} className="w-full h-full object-cover" />
-                      <div className="absolute inset-x-0 bottom-0 bg-black/40 text-[9px] text-white p-1 text-center font-mono truncate">
-                        {item.style || "Hàng ngày"}
+            {/* Items Grid */}
+            <div className="flex-1 overflow-y-auto pr-2 mt-4 custom-scrollbar">
+              {isLoadingWardrobe ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                  <Loader2 className="size-6 text-terracotta animate-spin" />
+                  <span className="text-[10px] text-ink-muted font-mono uppercase tracking-widest">Đang tải tủ đồ...</span>
+                </div>
+              ) : filteredCloset.length > 0 ? (
+                <div className="grid grid-cols-3 gap-3">
+                  {filteredCloset.map(item => {
+                    const isSelected = selectedItems.some(x => x.id === item.id);
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => handleItemToggle(item)}
+                        className={cn(
+                          "relative rounded-2xl overflow-hidden aspect-square border cursor-pointer bg-cream transition-all select-none group",
+                          isSelected 
+                            ? "border-terracotta ring-2 ring-terracotta/50 shadow-md" 
+                            : "border-cream-dark/60 hover:border-ink/30 hover:shadow-sm"
+                        )}
+                      >
+                        <img src={item.imageUrl} alt={getWardrobeItemName(item)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-terracotta/10 flex items-center justify-center backdrop-blur-[1px]">
+                            <span className="bg-terracotta text-cream size-6 rounded-full flex items-center justify-center font-bold text-sm shadow-md">✓</span>
+                          </div>
+                        )}
                       </div>
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-terracotta/25 flex items-center justify-center">
-                          <span className="bg-cream text-terracotta size-5 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">✓</span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-12 text-xs text-ink-muted font-mono">
-                Không có trang phục khả dụng.
-              </div>
-            )}
-
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-xs text-ink-muted font-mono uppercase tracking-widest border border-dashed border-cream-dark/50 rounded-2xl">
+                  Trống
+                </div>
+              )}
+            </div>
           </div>
 
           {/* OUTFIT FORM SETTINGS */}
-          <div className={cn("border rounded-2xl p-4 md:p-6 space-y-4", isPremium ? "bg-card border-border shadow-sm" : "bg-cream-dark/15 border-cream-dark/60")}>
-            <h3 className={cn("font-heading font-bold text-lg text-ink")}>Thiết lập bộ trang phục</h3>
+          <div className="border border-cream-dark/60 rounded-3xl p-5 bg-cream-dark/10 shadow-sm shrink-0">
+            <h3 className="font-heading font-bold text-lg text-ink mb-4">Thông tin bộ phối</h3>
             
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="outfit-name" className="text-xs font-mono uppercase tracking-wider text-ink font-semibold">Tên bộ phối</Label>
+                <Label htmlFor="outfit-name" className="text-[10px] font-mono uppercase tracking-widest text-ink font-bold">Tên bộ phối <span className="text-terracotta">*</span></Label>
                 <Input
                   id="outfit-name"
                   type="text"
                   required
                   value={outfitName}
                   onChange={(e) => setOutfitName(e.target.value)}
-                  placeholder="Ví dụ: Phối đồ Đi cafe Cuối tuần"
-                  className="h-11 bg-cream border-cream-dark focus-visible:ring-1 focus-visible:ring-terracotta focus-visible:border-terracotta rounded-xl text-sm"
+                  placeholder="VD: Look đi cafe cuối tuần..."
+                  className="h-12 bg-cream border-cream-dark focus-visible:ring-1 focus-visible:ring-ink focus-visible:border-ink rounded-xl text-sm"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-xs font-mono uppercase tracking-wider text-muted-foreground font-semibold">Dịp sử dụng</Label>
-                <div className="flex flex-wrap gap-1.5">
+              <div className="space-y-3">
+                <Label className="text-[10px] font-mono uppercase tracking-widest text-ink font-bold">Dịp sử dụng</Label>
+                <div className="flex flex-wrap gap-2">
                   {OCCASIONS.map(occ => (
                     <button
                       key={occ}
@@ -273,180 +377,148 @@ function CreateOutfitContent() {
                         setCustomOccasion("");
                       }}
                       className={cn(
-                        "px-3 py-1.5 rounded-full text-xs transition-all border",
+                        "px-4 py-1.5 rounded-full text-xs font-mono tracking-widest transition-all border",
                         occasion === occ && !customOccasion
-                          ? "bg-primary border-primary text-primary-foreground font-medium" 
-                          : "bg-transparent border-border text-muted-foreground hover:bg-secondary/50"
+                          ? "bg-ink border-ink text-cream" 
+                          : "bg-cream border-cream-dark text-ink-muted hover:border-ink/50"
                       )}
                     >
                       {occ}
                     </button>
                   ))}
                 </div>
-                {isPremium && (
-                  <Input
-                    type="text"
-                    value={customOccasion}
-                    onChange={(e) => setCustomOccasion(e.target.value)}
-                    placeholder="Mô tả dịp cụ thể (VD: Hẹn hò mùa đông)..."
-                    className="h-10 mt-2 bg-transparent border-border focus-visible:ring-1 focus-visible:ring-primary rounded-xl text-sm"
-                  />
-                )}
               </div>
-
-              {isPremium && (
-                <>
-                  <div className="space-y-2 pt-2">
-                    <Label className="text-xs font-mono uppercase tracking-wider text-muted-foreground font-semibold flex justify-between items-center">
-                      Mood Board
-                      <span className="text-[9px] text-primary normal-case italic font-sans tracking-normal">✦ Premium AI</span>
-                    </Label>
-                    <div className="grid grid-cols-3 gap-2 mt-1">
-                      {MOODBOARDS.map((mood) => (
-                        <div 
-                          key={mood.id} 
-                          onClick={() => setSelectedMoodboard(mood.id)}
-                          className={cn(
-                            "relative aspect-video rounded-lg overflow-hidden cursor-pointer group border-2 transition-all",
-                            selectedMoodboard === mood.id ? "border-primary shadow-sm" : "border-transparent"
-                          )}
-                        >
-                          <img src={mood.img} alt={mood.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <span className="text-[9px] font-mono font-bold text-white tracking-widest text-center px-1">{mood.name}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="pt-2">
-                    <Button 
-                      type="button"
-                      variant="outline"
-                      onClick={() => setUseWeather(!useWeather)}
-                      className={cn(
-                        "w-full h-10 rounded-xl text-xs font-mono tracking-wider flex items-center gap-2 transition-all",
-                        useWeather 
-                          ? "border-primary text-primary bg-primary/10" 
-                          : "border-border text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      {useWeather ? <Sun className="size-4" /> : <CloudRain className="size-4" />}
-                      {useWeather ? "ĐÃ BẬT TÍNH NĂNG THỜI TIẾT" : "TÍNH ĐẾN THỜI TIẾT (24°C, MƯA NHẸ)"}
-                    </Button>
-                  </div>
-                </>
-              )}
             </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: STYLING CANVAS (LG: 7/12) */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className={cn(
-            "border rounded-2xl p-6 h-[460px] md:h-[600px] relative flex flex-col justify-between overflow-hidden shadow-inner",
-            isPremium ? "bg-card/50 border-border" : "bg-[#EFEBE3]/30 border-cream-dark/80"
-          )}>
-            
-            {/* Grid layout decoration */}
-            <div className={cn(
-              "absolute inset-0 pointer-events-none opacity-20",
-              isPremium ? "bg-[radial-gradient(#B8975A_0.5px,transparent_0.5px)] [background-size:24px_24px]" : "bg-[radial-gradient(#1A1A1A_0.4px,transparent_0.4px)] [background-size:20px_20px]"
-            )} />
+        {/* RIGHT COLUMN: STYLING CANVAS (LG: 8/12) */}
+        <div className="lg:col-span-8 h-full flex flex-col relative min-h-[600px]">
+          
+          <div className="flex items-center justify-between z-20 mb-3 px-1">
+            <span className="text-xs font-mono text-ink-muted uppercase tracking-widest font-bold flex items-center gap-2">
+              <Layers className="size-4" /> Canvas Studio 
+              <span className="bg-ink text-cream px-2 py-0.5 rounded-full text-[10px]">{selectedItems.length} MÓN</span>
+            </span>
 
-            {/* Canvas Header Toolbar */}
-            <div className="flex items-center justify-between z-10">
-              <span className="text-[10px] font-mono text-ink-muted uppercase tracking-wider bg-cream/80 backdrop-blur-sm px-2.5 py-1 rounded-md border border-cream-dark/40 shadow-sm">
-                Bàn Phối Đồ ({selectedItems.length} sản phẩm)
-              </span>
+            {selectedItems.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedItems([]);
+                  setOutfitName("");
+                }}
+                className="text-[10px] font-mono text-terracotta hover:bg-terracotta/10 px-3 py-1.5 rounded-full uppercase tracking-widest flex items-center gap-1 transition-colors font-bold"
+              >
+                <Trash2 className="size-3" /> Làm mới
+              </button>
+            )}
+          </div>
 
-              {selectedItems.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedItems([]);
-                    setOutfitName("");
-                  }}
-                  className="text-xs font-mono text-terracotta hover:underline flex items-center gap-1 bg-cream/80 backdrop-blur-sm px-2 py-1 rounded-md border border-cream-dark/40 shadow-sm"
-                >
-                  <X className="size-3" /> Làm mới canvas
-                </button>
-              )}
-            </div>
+          {/* THE DRAG & DROP CANVAS */}
+          <div 
+            className="flex-1 bg-cream border-2 border-cream-dark/50 rounded-[2.5rem] relative overflow-hidden shadow-inner flex items-center justify-center"
+          >
+            {/* Background texture */}
+            <div className="absolute inset-0 bg-[radial-gradient(#1A1A1A_0.6px,transparent_0.6px)] [background-size:24px_24px] opacity-[0.07] pointer-events-none" />
 
-            {/* Canvas viewport space */}
-            <div className="flex-1 relative flex items-center justify-center p-8 select-none">
+            {/* CANVAS REF TARGET FOR HTML-TO-IMAGE */}
+            <div 
+              ref={canvasRef} 
+              className="absolute inset-0 w-full h-full bg-cream/0 flex items-center justify-center"
+            >
               {selectedItems.length > 0 ? (
-                <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 max-w-full animate-in zoom-in-95 duration-300">
-                  {selectedItems.map(item => (
-                    <div 
-                      key={item.id} 
-                      className="relative bg-cream border border-cream-dark/80 p-3 rounded-2xl shadow-md transition-all flex flex-col items-center max-w-[120px] md:max-w-[140px]"
-                      style={{ 
-                        transform: `scale(${item.scale / 100})`,
-                      }}
-                    >
-                      {/* Delete button */}
-                      <button
-                        type="button"
-                        onClick={() => removeItem(item.id)}
-                        className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-terracotta text-cream flex items-center justify-center hover:bg-terracotta/90 transition-colors shadow-sm"
-                      >
-                        <X className="size-3" />
-                      </button>
-
-                      {/* Image */}
-                      <div className="w-20 md:w-24 aspect-[4/5] rounded-xl overflow-hidden bg-cream-dark/20">
-                        <img src={item.imageUrl} alt={getWardrobeItemName(item)} className="w-full h-full object-cover" />
-                      </div>
-
-                      {/* Info & Adjuster */}
-                      <p className="text-[10px] font-medium text-ink truncate w-full text-center mt-2">{getWardrobeItemName(item)}</p>
-                      
-                      <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-cream-dark/40 w-full justify-between">
+                selectedItems.map(item => (
+                  <motion.div 
+                    key={item.id}
+                    drag
+                    dragConstraints={canvasRef}
+                    dragMomentum={false}
+                    initial={{ x: item.x, y: item.y }}
+                    onDragEnd={(e, info) => handleDragEnd(item.id, info)}
+                    className="absolute cursor-grab active:cursor-grabbing group"
+                    style={{ 
+                      zIndex: item.zIndex,
+                    }}
+                    whileTap={{ scale: 1.02 }}
+                  >
+                    <div className="relative">
+                      {/* Controls (Hidden during capture) */}
+                      <div className="canvas-item-controls opacity-0 group-hover:opacity-100 transition-opacity absolute -top-12 left-1/2 -translate-x-1/2 bg-ink text-cream flex items-center gap-2 px-3 py-1.5 rounded-full shadow-lg z-50 whitespace-nowrap border border-ink-muted/30">
                         <button 
                           type="button" 
-                          onClick={() => updateScale(item.id, item.scale - 10)}
-                          className="size-4 hover:bg-cream-dark rounded flex items-center justify-center text-ink-muted"
+                          onClick={(e) => { e.stopPropagation(); updateScale(item.id, item.scale - 10); }}
+                          className="hover:text-terracotta transition-colors"
                           title="Thu nhỏ"
                         >
-                          <ZoomOut className="size-2.5" />
+                          <ZoomOut className="size-3.5" />
                         </button>
-                        <span className="text-[9px] font-mono text-ink-muted">{item.scale}%</span>
+                        <span className="text-[10px] font-mono w-8 text-center">{item.scale}%</span>
                         <button 
                           type="button" 
-                          onClick={() => updateScale(item.id, item.scale + 10)}
-                          className="size-4 hover:bg-cream-dark rounded flex items-center justify-center text-ink-muted"
+                          onClick={(e) => { e.stopPropagation(); updateScale(item.id, item.scale + 10); }}
+                          className="hover:text-terracotta transition-colors"
                           title="Phóng to"
                         >
-                          <ZoomIn className="size-2.5" />
+                          <ZoomIn className="size-3.5" />
+                        </button>
+                        <div className="w-px h-3 bg-cream/30 mx-1" />
+                        <button 
+                          type="button" 
+                          onClick={(e) => { e.stopPropagation(); bringToFront(item.id); }}
+                          className="hover:text-terracotta transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest font-mono"
+                          title="Đưa lên trên"
+                        >
+                          <MoveUp className="size-3" /> Lên trên
+                        </button>
+                        <div className="w-px h-3 bg-cream/30 mx-1" />
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
+                          className="hover:text-red-400 transition-colors"
+                        >
+                          <X className="size-4" />
                         </button>
                       </div>
+
+                      {/* Image */}
+                      <div 
+                        className="pointer-events-none drop-shadow-xl"
+                        style={{ 
+                          width: `${item.scale * 1.5}px`, // base size 150px when scale is 100
+                          height: "auto",
+                        }}
+                      >
+                        <img 
+                          src={item.imageUrl} 
+                          alt="Outfit Item" 
+                          className="w-full h-full object-contain filter drop-shadow-md" 
+                          draggable={false}
+                        />
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  </motion.div>
+                ))
               ) : (
-                <div className="text-center space-y-3 p-8 border border-dashed border-cream-dark/80 rounded-2xl max-w-sm bg-cream/40 backdrop-blur-[2px]">
-                  <div className="size-11 bg-cream rounded-full flex items-center justify-center mx-auto text-ink-muted shadow-sm">
-                    <Grid className="size-5" />
+                <div className="text-center space-y-4 p-10 max-w-sm">
+                  <div className="size-16 border-2 border-dashed border-ink/20 rounded-full flex items-center justify-center mx-auto text-ink/30">
+                    <Grid className="size-8" />
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold text-ink">Bàn phối trống</p>
-                    <p className="text-xs text-ink-muted leading-relaxed">
-                      Chọn các trang phục bên trái hoặc nhấp <span className="text-terracotta font-semibold hover:underline cursor-pointer" onClick={handleAIMatch}>AI Tự Phối</span> để bắt đầu phối đồ.
+                  <div className="space-y-2">
+                    <p className="text-lg font-heading font-bold text-ink">Canvas trống</p>
+                    <p className="text-xs font-mono text-ink-muted leading-relaxed">
+                      Kéo các trang phục từ tủ đồ vào đây để bắt đầu ghép phối. Bạn có thể tự do phóng to, thu nhỏ và kéo thả.
                     </p>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Quick tips footer */}
-            <div className="flex items-center gap-2 text-[10px] font-mono text-ink-muted bg-cream/70 backdrop-blur-sm p-2 rounded-xl border border-cream-dark/40 mt-auto z-10 justify-center">
+            {/* Quick tips footer inside canvas */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] font-mono text-ink-muted bg-cream/80 backdrop-blur-md px-4 py-2 rounded-full border border-cream-dark/50 z-20 pointer-events-none shadow-sm whitespace-nowrap">
               <AlertCircle className="size-3.5 text-terracotta" />
-              <span>Gợi ý: Phối ít nhất 1 món Áo + 1 món Quần/Váy để có Outfit hợp lệ.</span>
+              <span>Gợi ý: Kéo thả để di chuyển. Hover vào item để đổi kích thước & lớp.</span>
             </div>
-
           </div>
         </div>
 
@@ -459,9 +531,9 @@ function CreateOutfitContent() {
 export function CreateOutfitClient() {
   return (
     <Suspense fallback={
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="size-10 text-terracotta animate-spin" />
-        <p className="text-sm text-ink-muted font-mono">Đang khởi tạo canvas...</p>
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-6">
+        <div className="size-16 border-2 border-terracotta border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-ink-muted font-mono uppercase tracking-widest">Đang khởi tạo studio...</p>
       </div>
     }>
       <CreateOutfitContent />

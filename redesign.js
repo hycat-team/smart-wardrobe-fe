@@ -1,4 +1,150 @@
-"use client";
+const fs = require('fs');
+
+const cardCode = `"use client";
+
+import { useRef } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Sparkles, Heart, Trash2, ArrowRight, Shirt } from "lucide-react";
+import { cn } from "@/lib/utils";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { OutfitRes as Outfit } from "@/features/outfits/types";
+
+gsap.registerPlugin(useGSAP);
+
+interface OutfitCardProps {
+  outfit: Outfit;
+  isFavorite: boolean;
+  onToggleFavorite: (id: string, e: React.MouseEvent) => void;
+  onDelete: (id: string, e: React.MouseEvent) => void;
+  index: number;
+}
+
+export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, index }: OutfitCardProps) {
+  const router = useRouter();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const infoRef = useRef<HTMLDivElement>(null);
+
+  const { contextSafe } = useGSAP({ scope: cardRef });
+
+  const itemsInOutfit = outfit.items || [];
+  const coverImage = outfit.coverImageUrl || itemsInOutfit[0]?.wardrobeItem?.imageUrl;
+
+  const onMouseEnter = contextSafe(() => {
+    gsap.to(imageRef.current, {
+      scale: 1.05,
+      duration: 1.2,
+      ease: "expo.out"
+    });
+    gsap.to(infoRef.current, {
+      y: -4,
+      duration: 0.6,
+      ease: "power2.out"
+    });
+  });
+
+  const onMouseLeave = contextSafe(() => {
+    gsap.to(imageRef.current, {
+      scale: 1,
+      duration: 1,
+      ease: "expo.out"
+    });
+    gsap.to(infoRef.current, {
+      y: 0,
+      duration: 0.6,
+      ease: "power2.out"
+    });
+  });
+
+  // Decide if this card should be a feature card (spans larger)
+  const isFeature = index % 7 === 0;
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onClick={() => router.push(\`/outfits/\${outfit.id}\`)}
+      className={cn(
+        "group cursor-pointer flex flex-col gap-5",
+        isFeature ? "md:col-span-2 md:row-span-2" : "col-span-1"
+      )}
+    >
+      {/* Editorial Image Container */}
+      <div className={cn(
+        "relative w-full overflow-hidden bg-[#e0dcd5]",
+        isFeature ? "aspect-[3/4] md:aspect-[4/3]" : "aspect-[3/4]"
+      )}>
+        {coverImage ? (
+          <Image
+            ref={imageRef as any}
+            src={coverImage}
+            alt={outfit.name || "Outfit"}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover mix-blend-multiply opacity-90 transition-opacity duration-700 group-hover:opacity-100"
+            priority={index < 4}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Shirt className="size-12 stroke-1 text-ink/20" />
+          </div>
+        )}
+
+        {/* Minimal Badges */}
+        <div className="absolute top-4 left-4 z-10">
+          {outfit.status === 1 && (
+            <span className="text-[10px] font-mono px-3 py-1 bg-ink text-cream uppercase tracking-widest flex items-center gap-1.5">
+              <Sparkles className="size-3" /> AI
+            </span>
+          )}
+        </div>
+
+        {/* Action overlay (subtle) */}
+        <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button 
+            onClick={(e) => onToggleFavorite(outfit.id, e)}
+            className="p-2.5 bg-cream/80 backdrop-blur hover:bg-cream text-ink hover:text-red-500 rounded-full transition-colors"
+          >
+            <Heart className={cn("size-4", isFavorite && "fill-red-500 text-red-500")} />
+          </button>
+          <button 
+            onClick={(e) => onDelete(outfit.id, e)}
+            className="p-2.5 bg-cream/80 backdrop-blur hover:bg-cream text-ink hover:text-red-500 rounded-full transition-colors"
+          >
+            <Trash2 className="size-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Info Area - Magazine Caption Style */}
+      <div ref={infoRef} className="flex justify-between items-start gap-4 px-1">
+        <div className="space-y-1.5">
+          <h3 className={cn(
+            "font-heading font-medium text-ink leading-tight",
+            isFeature ? "text-3xl md:text-4xl" : "text-xl md:text-2xl"
+          )}>
+            {outfit.name}
+          </h3>
+          <p className="text-[10px] font-mono text-ink-muted uppercase tracking-[0.2em]">
+            {outfit.description || "Everyday Look"}
+          </p>
+        </div>
+        <div className="text-right flex flex-col items-end gap-2 shrink-0">
+          <span className="text-[10px] font-mono text-ink/60 uppercase tracking-widest">
+            {outfit.createdAt ? new Date(outfit.createdAt).toLocaleDateString("en-GB").replace(/\\//g, '.') : "00.00.00"}
+          </span>
+          <ArrowRight className="size-4 text-ink opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 ease-out" />
+        </div>
+      </div>
+    </div>
+  );
+}
+`;
+
+const clientCode = `"use client";
 import { useState, useRef, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Sparkles, Shirt } from "lucide-react";
@@ -10,16 +156,6 @@ import { OutfitRes as Outfit } from "@/features/outfits/types";
 import { OutfitCard } from "./OutfitCard";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 gsap.registerPlugin(useGSAP);
 
@@ -41,7 +177,6 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
 
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [sortParam, setSortParam] = useState<SortOption>("newest");
-  const [outfitToDelete, setOutfitToDelete] = useState<string | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -52,44 +187,35 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
     toast.success("Saved to your curations.");
   };
 
-  const handleDeleteOutfit = (id: string, e: React.MouseEvent) => {
+  const handleDeleteOutfit = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setOutfitToDelete(id);
-  };
-
-  const confirmDelete = async () => {
-    if (!outfitToDelete) return;
-    try {
-      await deleteOutfitMutation.mutateAsync(outfitToDelete);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setOutfitToDelete(null);
+    if (confirm("Permanently delete this look?")) {
+      try {
+        await deleteOutfitMutation.mutateAsync(id);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
   const handleFilterChange = (filter: string) => {
-    const changeRoute = () => {
-      const params = new URLSearchParams(searchParams);
-      if (filter === "all") {
-        params.delete("filter");
-      } else {
-        params.set("filter", filter);
-      }
-      router.push("?" + params.toString(), { scroll: false });
-    };
-
-    if (gridRef.current && gridRef.current.children.length > 0) {
+    if (gridRef.current) {
       gsap.to(gridRef.current.children, {
         opacity: 0,
         y: 20,
         stagger: 0.02,
         duration: 0.4,
         ease: "power2.inOut",
-        onComplete: changeRoute
+        onComplete: () => {
+          const params = new URLSearchParams(searchParams);
+          if (filter === "all") {
+            params.delete("filter");
+          } else {
+            params.set("filter", filter);
+          }
+          router.push("?" + params.toString(), { scroll: false });
+        }
       });
-    } else {
-      changeRoute();
     }
   };
 
@@ -128,18 +254,18 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   }, { dependencies: [filteredAndSortedOutfits], scope: containerRef });
 
   return (
-    <div ref={containerRef} className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans selection:bg-ink selection:text-cream">
+    <div ref={containerRef} className="max-w-[1400px] mx-auto space-y-16 pb-32 px-4 sm:px-8 lg:px-12 font-sans selection:bg-ink selection:text-cream">
       
       {/* High-end Editorial Header */}
-      <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-ink/10 pb-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-4 max-w-2xl">
-            <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
+      <div className="flex flex-col gap-12 pt-16 md:pt-24 border-b border-ink/10 pb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="space-y-6 max-w-2xl">
+            <h1 className="text-6xl md:text-8xl lg:text-[140px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
               Curations
             </h1>
-            <p className="text-sm text-ink-muted font-mono uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-ink/20 pl-4">
+            <p className="text-sm md:text-base text-ink-muted font-mono uppercase tracking-[0.2em] max-w-md leading-relaxed border-l border-ink/20 pl-4">
               An archive of your personal style. 
-              {outfits.length > 0 ? ` Documenting ${outfits.length} looks.` : " Start composing your wardrobe."}
+              {outfits.length > 0 ? \` Documenting \${outfits.length} looks.\` : " Start composing your wardrobe."}
             </p>
           </div>
           
@@ -259,28 +385,12 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
           </Button>
         </div>
       )}
-
-      {/* Delete Confirmation Popup */}
-      <AlertDialog open={!!outfitToDelete} onOpenChange={(open) => !open && setOutfitToDelete(null)}>
-        <AlertDialogContent className="bg-cream border border-cream-dark/60 rounded-3xl p-8 max-w-md gap-6">
-          <AlertDialogHeader className="space-y-3">
-            <AlertDialogTitle className="font-heading text-3xl text-ink font-medium uppercase tracking-tight">Void Look</AlertDialogTitle>
-            <AlertDialogDescription className="text-xs font-mono tracking-widest text-ink-muted leading-relaxed uppercase">
-              Are you sure you want to permanently delete this look from your archive? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="gap-3 sm:gap-4 mt-4">
-            <AlertDialogCancel className="rounded-none border-ink text-ink hover:bg-ink/5 text-xs font-mono tracking-[0.2em] uppercase h-12 px-6">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDelete} 
-              className="rounded-none bg-red-600 text-cream hover:bg-red-700 text-xs font-mono tracking-[0.2em] uppercase h-12 px-6 shadow-none"
-            >
-              Confirm
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
     </div>
   );
 }
+`;
+
+fs.writeFileSync('d:\\\\Project\\\\smart-wardrobe\\\\smart-wardrobe-fe\\\\src\\\\app\\\\(user)\\\\outfits\\\\components\\\\OutfitCard.tsx', cardCode, 'utf8');
+fs.writeFileSync('d:\\\\Project\\\\smart-wardrobe\\\\smart-wardrobe-fe\\\\src\\\\app\\\\(user)\\\\outfits\\\\components\\\\OutfitsClient.tsx', clientCode, 'utf8');
+
+console.log('Design updated');

@@ -33,6 +33,6 @@ export const outfitsApi = {
 
   deleteOutfit: async (id: string): Promise<{ message?: string }> => {
     const res = await api.delete<APIResponse<void>>(`/outfits/${id}`);
-    return { message: res.data.message };
+    return { message: res.data?.message };
   },
 };

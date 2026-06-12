@@ -76,7 +76,9 @@
 | --- | --- | --- | --- | --- |
 | **GET** | `/api/v1/me/wardrobe-items` | Lấy danh sách trang phục | Params: page (query), limit (query), category_slug (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_WardrobeItemRes` |
 | **POST** | `/api/v1/wardrobe-items/batch-upload` | Số hóa trang phục hàng loạt | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.BatchUploadWardrobeItemsReq` | N/A |
+| **DELETE** | `/api/v1/wardrobe-items/bulk` | Xóa hàng loạt trang phục | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.BulkDeleteItemsReq` | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **POST** | `/api/v1/wardrobe-items/catalog-init` | Khởi tạo nhanh tủ đồ cá nhân | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.InitClosetFromCatalogReq` | N/A |
+| **DELETE** | `/api/v1/wardrobe-items/locked` | Xóa toàn bộ trang phục bị khóa |  | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **GET** | `/api/v1/wardrobe-items/search` | Tìm kiếm trang phục có sẵn của hệ thống (Elasticsearch CQRS) | Params: page (query), limit (query), q (query), category_slug (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_SearchWardrobeItemRes` |
 | **GET** | `/api/v1/wardrobe-items/upload-signature` | Lấy chữ ký tải ảnh trang phục |  | `smart-wardrobe-be_internal_shared_application_dto.UploadSignatureResult` |
 | **GET** | `/api/v1/wardrobe-items/{id}` | Xem chi tiết trang phục | Params: id (path, required) | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.WardrobeItemRes` |
@@ -605,6 +607,12 @@
 | Property | Type | Description |
 | --- | --- | --- |
 | **items** | array of `smart-wardrobe-be_internal_modules_wardrobe_application_dto.WardrobeBatchUploadItemReq` |  |
+
+### `BulkDeleteItemsReq`
+
+| Property | Type | Description |
+| --- | --- | --- |
+| **ids** | array of string |  |
 
 ### `CategoryRes`
 

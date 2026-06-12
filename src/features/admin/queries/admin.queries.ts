@@ -105,6 +105,20 @@ export const useAdminCatalog = (params?: Record<string, any>) => {
   });
 };
 
+export const useBatchUploadSystemWardrobeItems = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.batchUploadSystemWardrobeItems,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_CATALOG_KEY });
+      toast.success('Upload trang phục hệ thống thành công');
+    },
+    onError: () => {
+      toast.error('Upload thất bại');
+    }
+  });
+};
+
 export const useUpdateSystemWardrobeItem = () => {
   const queryClient = useQueryClient();
   return useMutation({

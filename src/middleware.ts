@@ -122,18 +122,12 @@ export async function middleware(request: NextRequest) {
   let finalResponse: NextResponse;
 
   if (pathname.startsWith('/api/v1/')) {
-    // Luồng cho Axios gọi tới Next.js API Routes (BFF)
-    const remainingPath = pathname.replace('/api/v1', '');
-    const backendUrl = new URL(`${BACKEND_URL}${remainingPath}${request.nextUrl.search}`);
-
-    if (accessToken) {
-      headersToForward.set('Authorization', `Bearer ${accessToken}`);
-    }
-
-    finalResponse = NextResponse.rewrite(backendUrl, {
+    // Luồng cho Axios gọi tới Next.js API Routes (BFF) - hiện tại đã được cấu hình rewrite trong next.config.ts
+    // Middleware chỉ pass qua
+    finalResponse = NextResponse.next({
       request: {
         headers: headersToForward,
-      },
+      }
     });
   } else {
     // Luồng cho Server Component render trang

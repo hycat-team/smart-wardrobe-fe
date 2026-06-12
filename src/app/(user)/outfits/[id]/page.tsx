@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     title: `${outfit.name} | Chi tiết phối đồ`,
     description: `Chi tiết bộ phối đồ: ${outfit.name}.`,
     openGraph: {
-      images: [outfit.cover_image_url || "/og-image.jpg"],
+      images: [outfit.coverImageUrl || "/og-image.jpg"],
     }
   };
 }

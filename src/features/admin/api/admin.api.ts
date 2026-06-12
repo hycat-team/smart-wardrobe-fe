@@ -56,9 +56,17 @@ export const adminApi = {
   },
 
   // Catalog
+  getUploadSignature: async (): Promise<any> => {
+    const res = await api.get<APIResponse<any>>('/admin/wardrobe-items/upload-signature');
+    return res.data.data;
+  },
   getSystemWardrobeItems: async (params?: Record<string, any>): Promise<PaginationResult<any>> => {
     const res = await api.get<APIResponse<PaginationResult<any>>>('/admin/wardrobe-items', { params });
     return res.data.data!;
+  },
+  batchUploadSystemWardrobeItems: async (data: { items: { categoryId: string; imagePublicId: string; imageUrl: string }[] }): Promise<any> => {
+    const res = await api.post<APIResponse>('/admin/wardrobe-items/batch-upload', data);
+    return res.data;
   },
   updateSystemWardrobeItem: async ({ id, data }: { id: string; data: any }): Promise<any> => {
     const res = await api.put<APIResponse>(`/admin/wardrobe-items/${id}`, data);
