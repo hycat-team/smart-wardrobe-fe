@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function OutfitsPage() {
-  const outfits = await serverFetch<Outfit[]>("/outfits") || [];
+  const outfits = await serverFetch<Outfit[]>("/me/outfits") || [];
   
   return (
     <Suspense fallback={

@@ -20,7 +20,7 @@ export const outfitsApi = {
   },
 
   getOutfitDetail: async (id: string, axiosInstance: AxiosInstance = api): Promise<OutfitRes> => {
-    const res = await axiosInstance.get<APIResponse<OutfitRes>>(`/outfits/${id}`);
+    const res = await axiosInstance.get<APIResponse<OutfitRes>>(`outfits/${id}`);
     return res.data.data!;
   },
 

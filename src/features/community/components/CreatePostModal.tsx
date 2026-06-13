@@ -7,6 +7,7 @@ import { Plus, Image as ImageIcon, X, Loader2 } from 'lucide-react';
 import { useCreatePost } from '../queries/community.queries';
 import { communityApi } from '../api/community.api';
 import { toast } from 'sonner';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 
 export const CreatePostModal = () => {
   const [open, setOpen] = useState(false);
@@ -43,27 +44,18 @@ export const CreatePostModal = () => {
       for (let i = 0; i < images.length; i++) {
         const file = images[i];
         const signatureRes = await communityApi.getPostUploadSignature();
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("api_key", signatureRes.apiKey);
-        formData.append("timestamp", String(signatureRes.timestamp));
-        formData.append("signature", signatureRes.signature);
-        formData.append("folder", signatureRes.folder);
-        if (signatureRes.publicId) {
-          formData.append("public_id", signatureRes.publicId);
-        }
-
-        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
-        const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-          method: "POST",
-          body: formData,
+        
+        const cloudinaryData = await uploadToCloudinary({
+          file,
+          signatureParams: {
+            apiKey: signatureRes.apiKey,
+            timestamp: signatureRes.timestamp,
+            signature: signatureRes.signature,
+            folder: signatureRes.folder,
+            publicId: signatureRes.publicId,
+          },
         });
 
-        if (!uploadRes.ok) {
-          throw new Error("Tải ảnh thất bại");
-        }
-
-        const cloudinaryData = await uploadRes.json();
         mediaList.push({
           mediaType: "IMAGE",
           mediaUrl: cloudinaryData.secure_url,

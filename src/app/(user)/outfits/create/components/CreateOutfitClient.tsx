@@ -16,17 +16,10 @@ import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
 import { motion } from "framer-motion";
 import * as htmlToImage from "html-to-image";
+import { useOutfitCanvas } from "@/features/outfits/hooks/useOutfitCanvas";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 const OCCASIONS = ["Casual", "Workwear", "Summer", "Party", "Formal", "Sporty"];
-
-const MOODBOARDS = [
-  { id: "clean-girl", name: "Clean Girl", img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=200" },
-  { id: "dark-academia", name: "Dark Academia", img: "https://images.unsplash.com/photo-1550614000-4b95d466f2c8?auto=format&fit=crop&q=80&w=200" },
-  { id: "street-luxe", name: "Street Luxe", img: "https://images.unsplash.com/photo-1511511450040-677116ff389e?auto=format&fit=crop&q=80&w=200" },
-  { id: "coastal", name: "Coastal", img: "https://images.unsplash.com/photo-1499939667766-4afceb292d05?auto=format&fit=crop&q=80&w=200" },
-  { id: "business", name: "Business Core", img: "https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?auto=format&fit=crop&q=80&w=200" },
-  { id: "y2k", name: "Y2K Revival", img: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&q=80&w=200" },
-];
 
 function CreateOutfitContent() {
   const router = useRouter();
@@ -36,129 +29,29 @@ function CreateOutfitContent() {
   const [outfitName, setOutfitName] = useState("");
   const [occasion, setOccasion] = useState("Casual");
   const [customOccasion, setCustomOccasion] = useState("");
-  const [selectedMoodboard, setSelectedMoodboard] = useState("");
-  const [useWeather, setUseWeather] = useState(false);
   const [activeCategory, setActiveCategory] = useState("Tất cả");
   const [isSaving, setIsSaving] = useState(false);
 
   // Canvas State
   const canvasRef = useRef<HTMLDivElement>(null);
-  const [selectedItems, setSelectedItems] = useState<any[]>([]);
 
   // Load real wardrobe items
   const { data, isLoading: isLoadingWardrobe } = useMyWardrobe();
   const realItems = data ? data.pages.flatMap(p => p.items) : [];
   const createOutfitMutation = useCreateOutfit();
+  const {
+    selectedItems,
+    setSelectedItems,
+    bringToFront,
+    handleItemToggle,
+    updateScale,
+    removeItem,
+    handleDragEnd,
+    handleAIMatch: handleAIMatchHook,
+  } = useOutfitCanvas();
 
-  // Bring to Front (Layering)
-  const bringToFront = (id: string) => {
-    setSelectedItems(prev => {
-      const maxZ = Math.max(...prev.map(i => i.zIndex || 0), 0);
-      return prev.map(item => item.id === id ? { ...item, zIndex: maxZ + 1 } : item);
-    });
-  };
+  const handleAIMatch = () => handleAIMatchHook(realItems, setOutfitName);
 
-  // Selection handler
-  const handleItemToggle = (item: any) => {
-    if (selectedItems.some(x => x.id === item.id)) {
-      setSelectedItems(prev => prev.filter(x => x.id !== item.id));
-    } else {
-      const maxZ = Math.max(...selectedItems.map(i => i.zIndex || 0), 0);
-      setSelectedItems(prev => [
-        ...prev, 
-        { 
-          ...item, 
-          scale: 100, 
-          x: 0, 
-          y: 0, 
-          zIndex: maxZ + 1 
-        }
-      ]);
-      toast.success(`Đã thêm ${getWardrobeItemName(item)} vào bàn phối!`);
-    }
-  };
-
-  // Canvas manipulations
-  const updateScale = (id: string, newScale: number) => {
-    setSelectedItems(prev => prev.map(x => x.id === id ? { ...x, scale: Math.max(30, Math.min(250, newScale)) } : x));
-  };
-
-  const removeItem = (id: string) => {
-    setSelectedItems(prev => prev.filter(x => x.id !== id));
-  };
-
-  // Update item coordinates after drag
-  const handleDragEnd = (id: string, info: any) => {
-    setSelectedItems(prev => prev.map(x => {
-      if (x.id === id) {
-        return {
-          ...x,
-          x: x.x + info.offset.x,
-          y: x.y + info.offset.y
-        };
-      }
-      return x;
-    }));
-  };
-
-  // AI Auto-matching magic button
-  const handleAIMatch = () => {
-    const tops = realItems.filter(x => x.category?.name === "Áo" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe);
-    const bottoms = realItems.filter(x => x.category?.name === "Quần" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe);
-    const shoes = realItems.filter(x => x.category?.name === "Giày" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe);
-
-    if (tops.length === 0 || bottoms.length === 0) {
-      toast.error("Không đủ quần áo trong tủ đồ để thực hiện AI match! Cần có ít nhất 1 Áo và 1 Quần.");
-      return;
-    }
-
-    const randomTop = tops[Math.floor(Math.random() * tops.length)];
-    const randomBottom = bottoms[Math.floor(Math.random() * bottoms.length)];
-    const randomShoes = shoes.length > 0 ? shoes[Math.floor(Math.random() * shoes.length)] : null;
-
-    let z = 1;
-    const matched = [
-      { ...randomTop, scale: 100, x: 0, y: -80, zIndex: z++ },
-      { ...randomBottom, scale: 100, x: 0, y: 100, zIndex: z++ }
-    ];
-
-    if (randomShoes) {
-      matched.push({ ...randomShoes, scale: 70, x: 0, y: 240, zIndex: z++ });
-    }
-
-    setSelectedItems(matched);
-    setOutfitName("AI Styled Outfit " + Math.floor(Math.random() * 100));
-    toast.success("AI Stylist đã gợi ý bộ phối hợp hoàn chỉnh!");
-  };
-
-  // Upload canvas image to Cloudinary
-  const uploadCanvasImage = async (blob: Blob): Promise<string> => {
-    try {
-      const signatureResult = await wardrobeApi.getUploadSignature();
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
-      const formData = new FormData();
-      formData.append("file", blob, "outfit_cover.png");
-      formData.append("api_key", signatureResult.apiKey);
-      formData.append("timestamp", signatureResult.timestamp.toString());
-      formData.append("signature", signatureResult.signature);
-      formData.append("folder", signatureResult.folder);
-      
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Cloudinary upload failed");
-      }
-
-      const data = await response.json();
-      return data.secure_url;
-    } catch (error) {
-      console.error("Lỗi upload Cloudinary:", error);
-      throw error;
-    }
-  };
 
   // Submit Outfit
   const handleSaveOutfit = async (e: React.FormEvent) => {
@@ -199,7 +92,17 @@ function CreateOutfitContent() {
       }
 
       // 2. Upload ảnh lên Cloudinary
-      const coverImageUrl = await uploadCanvasImage(blob);
+      const signatureResult = await wardrobeApi.getUploadSignature();
+      const uploadResData = await uploadToCloudinary({
+        file: blob,
+        signatureParams: {
+          apiKey: signatureResult.apiKey,
+          timestamp: signatureResult.timestamp,
+          signature: signatureResult.signature,
+          folder: signatureResult.folder,
+        },
+      });
+      const coverImageUrl = uploadResData.secure_url;
 
       // 3. Chuẩn bị payload và gửi API tạo Outfit
       // Tính toán position % tương đối để dễ lưu (mặc dù ảnh cover đã có đầy đủ rồi)

@@ -7,6 +7,7 @@ import { useBatchUploadWardrobeItems, useCategories } from "@/features/wardrobe/
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { uploadToCloudinary, applyCloudinaryBackgroundRemoval } from "@/lib/cloudinary";
 
 // Seeded categories removed, using API instead
 
@@ -36,18 +37,7 @@ export function UploadClient() {
     }
   };
 
-  // Helper to transform URL with Cloudinary AI background removal + compression
-  function getOptimizedBackgroundRemovedUrl(url: string): string {
-    if (!url || !url.includes("cloudinary.com")) return url;
-    let newUrl = url;
-    // Đổi đuôi file thành .png để giữ nền trong suốt
-    newUrl = newUrl.replace(/\.[^/.]+$/, ".png");
-    if (newUrl.includes("/upload/")) {
-      // Bắt buộc dùng f_png thay vì f_auto để đảm bảo Cloudinary trả về định dạng hỗ trợ trong suốt
-      return newUrl.replace("/upload/", "/upload/e_background_removal,f_png,q_auto/");
-    }
-    return newUrl;
-  }
+
 
   const handleUploadAndAnalyze = async () => {
     if (!file) {
@@ -61,34 +51,22 @@ export function UploadClient() {
       const signatureResult = await wardrobeApi.getUploadSignature();
 
       // 2. Upload direct to Cloudinary
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", signatureResult.apiKey);
-      formData.append("timestamp", signatureResult.timestamp.toString());
-      formData.append("signature", signatureResult.signature);
-      formData.append("folder", signatureResult.folder);
-      if (signatureResult.publicId) {
-        formData.append("public_id", signatureResult.publicId);
-      }
-
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: "POST",
-        body: formData,
+      const uploadResData = await uploadToCloudinary({
+        file,
+        signatureParams: {
+          apiKey: signatureResult.apiKey,
+          timestamp: signatureResult.timestamp,
+          signature: signatureResult.signature,
+          folder: signatureResult.folder,
+          publicId: signatureResult.publicId,
+        },
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Cloudinary upload error details:", errorText);
-        throw new Error("Không thể upload ảnh lên Cloudinary");
-      }
-
-      const uploadResData = await response.json();
       const originalUrl = uploadResData.secure_url;
       const publicId = uploadResData.public_id;
 
       // 3. Apply background removal & format/quality optimization transformations
-      const optimizedUrl = getOptimizedBackgroundRemovedUrl(originalUrl);
+      const optimizedUrl = applyCloudinaryBackgroundRemoval(originalUrl);
 
       // 4. Send crop & analysis request to backend
       await batchUploadMutation.mutateAsync({

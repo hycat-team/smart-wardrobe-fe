@@ -7,6 +7,7 @@ import { useCategories } from "@/features/wardrobe/queries/wardrobe.queries";
 import { useBatchUploadSystemWardrobeItems } from "@/features/admin/queries/admin.queries";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { uploadToCloudinary, applyCloudinaryBackgroundRemoval } from "@/lib/cloudinary";
 
 interface BatchUploadModalProps {
   isOpen: boolean;
@@ -53,34 +54,21 @@ export function BatchUploadModal({ isOpen, onClose }: BatchUploadModalProps) {
       const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
 
       const uploadPromises = files.map(async (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("api_key", signatureResult.apiKey);
-        formData.append("timestamp", signatureResult.timestamp.toString());
-        formData.append("signature", signatureResult.signature);
-        formData.append("folder", signatureResult.folder);
-        // Do not use publicId for batch since it needs to be unique per file. We let Cloudinary generate it.
-
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-          method: "POST",
-          body: formData,
+        const uploadResData = await uploadToCloudinary({
+          file,
+          signatureParams: {
+            apiKey: signatureResult.apiKey,
+            timestamp: signatureResult.timestamp,
+            signature: signatureResult.signature,
+            folder: signatureResult.folder,
+            // Do not use publicId for batch since it needs to be unique per file.
+          },
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Cloudinary upload error details:", errorText);
-          throw new Error("Không thể upload ảnh lên Cloudinary");
-        }
-
-        const uploadResData = await response.json();
         const originalUrl = uploadResData.secure_url;
         const publicId = uploadResData.public_id;
 
-        // Apply background removal & format/quality optimization transformations
-        let optimizedUrl = originalUrl.replace(/\.[^/.]+$/, ".png");
-        if (optimizedUrl.includes("/upload/")) {
-          optimizedUrl = optimizedUrl.replace("/upload/", "/upload/e_background_removal,f_png,q_auto/");
-        }
+        const optimizedUrl = applyCloudinaryBackgroundRemoval(originalUrl);
 
         return {
           categoryId: selectedCategory,
