@@ -7,9 +7,9 @@ const MARKETPLACE_ITEMS = [
     brand: "Studio Nicholson",
     price: "$450",
     condition: "Like New",
-    size: "Size M • Organic Wool",
+    size: "Size M",
     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA0FYW6smtxDjgvmjUwqMakLGNgnkh50pSVfvNwEXWOPs_9BQuLr9UURaHp38uo_0L-RaKfBmvalwNgQO5P6wrzHgVDjvYxehj1TRdj-ch_D7xttnNNUFsYUd_Z1XrX5yLW61KKXfaJBax9NdJJWuQbIxftTmfgegPobfSesssQQaK4KYngT1jvab2U6aFSVwID4NIvXiaoiY0WLKELAzF2UX2_aPY7JRuEkXnARGaH159mJ9yXiw9kP14fWaavkQOVDlwyG4yY7iQ",
-    badgeClass: "bg-tertiary-container text-on-tertiary"
+    badgeClass: "bg-[#111] text-white"
   },
   {
     id: "m2",
@@ -17,9 +17,9 @@ const MARKETPLACE_ITEMS = [
     brand: "Lemaire",
     price: "$280",
     condition: "Gently Used",
-    size: "Size L • Recycled Blend",
+    size: "Size L",
     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBQivzdnCeL4RzgHKNCYuZpbO1KWTERYbwElC40Ws_KqbZCCihBQ4dJu4NxayAt12AFunuKYEleNR3mjDQCTPFMufVAGKL5xk7qCKp3bOe9d6_6dTg3J4JG9K4LURPg0yMpFqchuQmum6bM71Jiuh8k2rzFnrJfo8qkfO5hBcdsQysk8QiBKXU_TN4CnfiLDLOSi66UMzNicuQAq4mWPy1rVyObzc1xZtYqgEPTWe7UUUv8YVMxbM82PGPjF3fiJNax5dM4M6CU9eg",
-    badgeClass: "bg-secondary-container text-on-secondary-container"
+    badgeClass: "bg-white border border-[#111] text-[#111]"
   },
   {
     id: "m3",
@@ -27,9 +27,9 @@ const MARKETPLACE_ITEMS = [
     brand: "Jil Sander",
     price: "$320",
     condition: "Excellent",
-    size: "Size S • Organic Cotton",
+    size: "Size S",
     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA_mWmD2DkZj84pyivprF2beHKkkRyQw6gsSdLYLZ7i2nDJwhq_WVF1uHyDJCtgi9RB3QZZwmEG6FCcV6xM8MEsU44PJSOVGi1Aj8-nw3hZ7fpiUqKVSNDezADA3ywxAHLT5GWNYzQOqFCmx-eJneKR8pEvfktk0C1QyZNITRtRokbkY-QuAFhrnKPH05VBYm3Mpx2j2RHUKQGNckVO_2VsBfS4K8vsRtPB5oQqwDdMWja_H_o62DNjc10xksXACaqecyovVQY3Ztk",
-    badgeClass: "bg-tertiary-container text-on-tertiary"
+    badgeClass: "bg-[#111] text-white"
   },
   {
     id: "m4",
@@ -37,9 +37,9 @@ const MARKETPLACE_ITEMS = [
     brand: "The Row",
     price: "$850",
     condition: "Vintage",
-    size: "One Size • Veg-Tanned",
+    size: "One Size",
     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDEzNLPNDj1L-kD3cioSTGjfyTeh8K93-T4-u_rnTuGVa4mkQsZ2PPr0zJ_KyntYtCJuqAif35x6JUL69gMMAleI1E375gw2ZYMgUui7lnUrsbAQj07q-A5v46XP3buHyki3fMg-VDaU-xAUxZaOPvgtg3fXY5VhHPFlHnjcNpHWUapy2IummPMi9JRzpzXVYeDnmGSmeMdWOjfecau-xwATWYFyne_f9QUa5pTgMDkSs1DBzLxKvDvIwVWdhavdluCbYIc76pO16s",
-    badgeClass: "bg-secondary-container text-on-secondary-container"
+    badgeClass: "bg-[#111] text-white"
   },
 ];
 
@@ -50,82 +50,108 @@ export const metadata = {
 
 export default function Marketplace() {
   return (
-    <div className="flex-1 w-full max-w-container-max mx-auto px-gutter md:px-margin-desktop pt-8 pb-16 animate-in fade-in duration-500">
-      {/* Marketplace Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <div>
-          <h2 className="font-display-lg text-[36px] md:text-[48px] text-primary mb-2 tracking-tight">Curated Exchange</h2>
-          <p className="font-body-lg text-[16px] text-on-surface-variant max-w-2xl">
-            Discover pre-owned luxury and sustainable pieces from the Ethos community. Extend the lifecycle of exceptional garments.
-          </p>
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-[#111]">
+      
+      {/* High-end Editorial Header */}
+      <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-black/10 pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-4 max-w-2xl">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1] uppercase">
+              MARKETPLACE
+            </h1>
+            <p className="text-[12px] text-[#666] font-['IBM_Plex_Mono'] uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4">
+              Curated exchange for pre-owned luxury and sustainable pieces. Extend the lifecycle of exceptional garments.
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+            <button className="h-12 px-8 bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black/80 transition-colors">
+              <Tag className="size-4" />
+              Sell an Item
+            </button>
+          </div>
         </div>
-        <button className="self-start md:self-auto bg-primary text-on-primary font-body-lg text-[14px] px-6 py-3 rounded-full flex items-center gap-2 hover:bg-inverse-surface hover:shadow-lg transition-all duration-300 min-h-[48px]">
-          <span className="material-symbols-outlined text-[18px]">sell</span>
-          Sell an Item
-        </button>
+
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 pt-4">
+          <div className="flex flex-wrap gap-x-8 gap-y-4">
+            {["All Items", "Outerwear", "Knitwear", "Accessories"].map((tab, idx) => (
+              <button
+                key={tab}
+                className={`text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.12em] relative transition-colors group pb-1 ${
+                  idx === 0 
+                    ? "text-[#111] font-medium border-b border-[#111]" 
+                    : "text-[#666] hover:text-[#111] border-b border-transparent hover:border-[#111]"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4 border border-black/10 px-4 py-2 bg-[#F8F7F5] cursor-pointer hover:bg-[#111] hover:text-white transition-colors group">
+            <SlidersHorizontal className="size-3.5 text-[#888] group-hover:text-white" />
+            <span className="text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#111] font-medium group-hover:text-white">Filters</span>
+          </div>
+        </div>
       </div>
 
-      {/* Minimal Filter Bar */}
-      <div className="flex items-center justify-between border-b border-outline-variant/30 pb-4 mb-8">
-        <div className="flex gap-6 overflow-x-auto no-scrollbar">
-          <button className="font-label-caps text-[12px] uppercase tracking-widest text-primary border-b-2 border-primary pb-4 -mb-[18px] whitespace-nowrap font-bold">
-            All Items
-          </button>
-          <button className="font-label-caps text-[12px] uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors pb-4 -mb-[18px] whitespace-nowrap font-bold">
-            Outerwear
-          </button>
-          <button className="font-label-caps text-[12px] uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors pb-4 -mb-[18px] whitespace-nowrap font-bold">
-            Knitwear
-          </button>
-          <button className="font-label-caps text-[12px] uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors pb-4 -mb-[18px] whitespace-nowrap font-bold">
-            Accessories
-          </button>
-        </div>
-        <button className="flex items-center gap-2 font-body-sm text-[14px] text-on-surface-variant hover:text-primary transition-colors pl-4">
-          <SlidersHorizontal className="size-4" />
-          <span className="hidden sm:inline">Filters</span>
-        </button>
-      </div>
-
-      {/* Product Grid (Spacious, Editorial) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
+      {/* Product Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8">
         {MARKETPLACE_ITEMS.map((item) => (
-          <a key={item.id} className="group block relative cursor-pointer" href="#">
-            <div className="aspect-[3/4] rounded-xl bg-surface-container-low overflow-hidden mb-4 relative transition-shadow duration-300 group-hover:shadow-[0px_10px_30px_rgba(45,45,45,0.08)]">
+          <a key={item.id} className="group flex flex-col cursor-pointer relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out" href="#">
+            
+            {/* Image Area */}
+            <div className="relative w-full overflow-hidden bg-[#e0dcd5] aspect-[3/4] flex-shrink-0">
               <img 
                 alt={item.name} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                className="w-full h-full object-cover mix-blend-multiply opacity-90 transition-all duration-700 group-hover:opacity-100 group-hover:scale-[1.02]" 
                 src={item.img} 
               />
               
               {/* Condition Badge */}
-              <div className={`absolute top-3 left-3 ${item.badgeClass} font-label-caps text-[10px] px-2 py-1 rounded-sm tracking-wider uppercase backdrop-blur-sm bg-opacity-90 font-bold`}>
-                {item.condition}
+              <div className="absolute top-4 left-4 z-10">
+                <span className={`text-[9px] font-['IBM_Plex_Mono'] px-3 py-1.5 uppercase tracking-[0.12em] ${item.badgeClass}`}>
+                  {item.condition}
+                </span>
               </div>
               
-              <button className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-surface-container-lowest/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-primary hover:scale-110 transition-all opacity-0 group-hover:opacity-100">
-                <Heart className="size-5" />
-              </button>
+              {/* Action overlay */}
+              <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button className="text-black/40 hover:text-red-500 transition-colors">
+                  <Heart className="size-5" />
+                </button>
+              </div>
+
+              {/* Hover View Details */}
+              <div className="absolute inset-0 bg-white/92 opacity-0 group-hover:opacity-100 transition-opacity duration-250 flex flex-col items-center justify-end pb-8 pointer-events-none">
+                <div className="text-black font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] border-b border-black pb-0.5 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                  View Details
+                </div>
+              </div>
             </div>
             
-            <div className="flex justify-between items-start gap-2">
+            {/* Information Area */}
+            <div className="flex flex-col p-4 pt-5 flex-grow justify-between gap-3 bg-white border-t border-black/5">
               <div>
-                <p className="font-body-sm text-[14px] font-medium text-on-surface-variant mb-1">{item.brand}</p>
-                <h3 className="font-title-lg text-[20px] font-semibold text-primary line-clamp-1 leading-tight mb-2 tracking-tight">
+                <h3 className="font-['Playfair_Display'] text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
                   {item.name}
                 </h3>
-                <p className="font-label-caps text-[12px] uppercase text-on-surface-variant/70 tracking-wider">
-                  {item.size}
+                <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#666] mt-2 truncate">
+                  {item.brand}
                 </p>
               </div>
-              <p className="font-body-lg text-[16px] font-medium text-primary whitespace-nowrap">{item.price}</p>
+              <div className="flex justify-between items-center font-['IBM_Plex_Mono'] text-[11px] text-[#888]">
+                <span>{item.size}</span>
+                <span className="text-[13px] font-medium text-[#111]">{item.price}</span>
+              </div>
             </div>
           </a>
         ))}
       </div>
 
-      <div className="mt-16 flex justify-center">
-        <button className="border border-outline text-primary font-body-sm text-[14px] px-8 py-3 rounded-full hover:bg-surface-variant transition-colors duration-300 min-h-[48px]">
+      <div className="mt-16 flex justify-center border-t border-black/10 pt-12">
+        <button className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase text-[#666] hover:text-[#111] transition-colors border-b border-transparent hover:border-[#111] pb-1">
           Load More Pieces
         </button>
       </div>

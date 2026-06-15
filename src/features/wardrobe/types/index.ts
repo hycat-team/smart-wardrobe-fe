@@ -79,6 +79,10 @@ export interface InitClosetFromCatalogReq {
   catalogItemIds: string[];
 }
 
+export interface BulkDeleteItemsReq {
+  ids: string[];
+}
+
 export interface UpdateWardrobeItemReq {
   categoryId: string;
   color: string;

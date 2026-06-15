@@ -110,6 +110,17 @@ export const useDeleteWardrobeItem = () => {
   });
 };
 
+export const useBulkDeleteWardrobeItems = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { ids: string[] }) => wardrobeApi.bulkDeleteWardrobeItems(data),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+      toast.success(res?.message || 'Xóa trang phục hàng loạt thành công!');
+    },
+  });
+};
+
 export const useSearchWardrobeItems = (query: string, categorySlug?: string) => {
   return useInfiniteQuery({
     queryKey: [...WARDROBE_QUERY_KEYS.search(query), categorySlug],

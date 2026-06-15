@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans, Playfair_Display, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import QueryProvider from "@/components/providers/query-provider";
@@ -19,6 +19,18 @@ const dmSans = DM_Sans({
   weight: ["400", "500", "700"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["vietnamese", "latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex",
+  subsets: ["vietnamese", "latin"],
+  weight: ["400", "500", "600"],
+});
+
 export const metadata: Metadata = {
   title: "Smart Wardrobe",
   description: "Your digital fashion stylist",
@@ -32,7 +44,7 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${cormorant.variable} ${dmSans.variable} h-full antialiased`}
+      className={`${cormorant.variable} ${dmSans.variable} ${playfair.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>
@@ -41,7 +53,7 @@ export default function RootLayout({
               <Suspense fallback={null}>
                 {children}
               </Suspense>
-              <Toaster position="top-right" richColors />
+              <Toaster position="bottom-right" />
             </AuthProvider>
           </ThemeController>
         </QueryProvider>

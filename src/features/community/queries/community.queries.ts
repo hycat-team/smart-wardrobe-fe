@@ -130,3 +130,34 @@ export const useCreatePost = () => {
     }
   });
 };
+
+export const useDeletePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (postPublicID: string) => communityApi.deletePost(postPublicID),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.feed() });
+      queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
+      toast.success('Đã xoá bài viết.');
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi xoá bài viết.');
+    }
+  });
+};
+
+export const useDeleteComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ postPublicID, commentID }: { postPublicID: string, commentID: string }) => 
+      communityApi.deleteComment(postPublicID, commentID),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
+      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
+      toast.success('Đã xoá bình luận.');
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi xoá bình luận.');
+    }
+  });
+};

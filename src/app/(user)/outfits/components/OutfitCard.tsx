@@ -1,15 +1,10 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Sparkles, Heart, Trash2, ArrowRight, Shirt } from "lucide-react";
 import { cn } from "@/lib/utils";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { OutfitRes as Outfit } from "@/features/outfits/types";
-
-gsap.registerPlugin(useGSAP);
 
 interface OutfitCardProps {
   outfit: Outfit;
@@ -21,71 +16,36 @@ interface OutfitCardProps {
 
 export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, index }: OutfitCardProps) {
   const router = useRouter();
-  const cardRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const infoRef = useRef<HTMLDivElement>(null);
-
-  const { contextSafe } = useGSAP({ scope: cardRef });
 
   const itemsInOutfit = outfit.items || [];
   const coverImage = outfit.coverImageUrl || itemsInOutfit[0]?.wardrobeItem?.imageUrl;
 
-  const onMouseEnter = contextSafe(() => {
-    gsap.to(imageRef.current, {
-      scale: 1.05,
-      duration: 1.2,
-      ease: "expo.out"
-    });
-    gsap.to(infoRef.current, {
-      y: -4,
-      duration: 0.6,
-      ease: "power2.out"
-    });
-  });
-
-  const onMouseLeave = contextSafe(() => {
-    gsap.to(imageRef.current, {
-      scale: 1,
-      duration: 1,
-      ease: "expo.out"
-    });
-    gsap.to(infoRef.current, {
-      y: 0,
-      duration: 0.6,
-      ease: "power2.out"
-    });
-  });
-
   return (
     <div
-      ref={cardRef}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
       onClick={() => router.push(`/outfits/${outfit.id}`)}
-      className="group cursor-pointer flex flex-col gap-5 col-span-1"
+      className="group flex flex-col cursor-pointer relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out"
     >
-      {/* Editorial Image Container */}
-      <div className="relative w-full overflow-hidden bg-[#e0dcd5] aspect-[3/4]">
+      {/* Image Area - Keep old image styling but in new card design */}
+      <div className="relative w-full overflow-hidden bg-[#e0dcd5] aspect-[3/4] flex-shrink-0">
         {coverImage ? (
           <Image
-            ref={imageRef as any}
             src={coverImage}
             alt={outfit.name || "Outfit"}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover mix-blend-multiply opacity-90 transition-opacity duration-700 group-hover:opacity-100"
+            className="object-cover mix-blend-multiply opacity-90 transition-all duration-700 group-hover:opacity-100 group-hover:scale-[1.02]"
             priority={index < 4}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Shirt className="size-12 stroke-1 text-ink/20" />
+            <Shirt className="size-12 stroke-1 text-black/20" />
           </div>
         )}
 
         {/* Minimal Badges */}
         <div className="absolute top-4 left-4 z-10">
           {outfit.status === 1 && (
-            <span className="text-[10px] font-mono px-3 py-1 bg-ink text-cream uppercase tracking-widest flex items-center gap-1.5">
+            <span className="text-[9px] font-['IBM_Plex_Mono'] px-3 py-1.5 bg-[#111] text-white uppercase tracking-[0.12em] flex items-center gap-1.5">
               <Sparkles className="size-3" /> AI
             </span>
           )}
@@ -95,34 +55,47 @@ export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, ind
         <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button 
             onClick={(e) => onToggleFavorite(outfit.id, e)}
-            className="p-2.5 bg-cream/80 backdrop-blur hover:bg-cream text-ink hover:text-red-500 rounded-full transition-colors"
+            className="text-black/40 hover:text-black transition-colors"
           >
-            <Heart className={cn("size-4", isFavorite && "fill-red-500 text-red-500")} />
+            <Heart className={cn("size-5", isFavorite && "fill-red-500 text-red-500")} />
           </button>
           <button 
             onClick={(e) => onDelete(outfit.id, e)}
-            className="p-2.5 bg-cream/80 backdrop-blur hover:bg-cream text-ink hover:text-red-500 rounded-full transition-colors"
+            className="text-black/40 hover:text-red-500 transition-colors"
           >
-            <Trash2 className="size-4" />
+            <Trash2 className="size-5" />
           </button>
+        </div>
+        
+        {/* Hover View Details */}
+        <div className="absolute inset-0 bg-white/92 opacity-0 group-hover:opacity-100 transition-opacity duration-250 flex flex-col items-center justify-end pb-8 pointer-events-none">
+          <div className="flex flex-col items-center gap-2 mb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 delay-75">
+            <span className="font-['IBM_Plex_Mono'] text-[9px] uppercase tracking-widest text-[#666]">
+              {itemsInOutfit.length} Items
+            </span>
+            <span className="font-['IBM_Plex_Mono'] text-[9px] uppercase tracking-widest text-[#666]">
+              {outfit.description || "Everyday Look"}
+            </span>
+          </div>
+          <div className="text-black font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] border-b border-black pb-0.5">
+            View Details
+          </div>
         </div>
       </div>
 
-      {/* Info Area - Magazine Caption Style */}
-      <div ref={infoRef} className="flex justify-between items-start gap-4 px-1">
-        <div className="space-y-1.5">
-          <h3 className="font-heading font-medium text-ink leading-tight text-xl md:text-2xl">
+      {/* Information Area - 25% Visual Weight */}
+      <div className="flex flex-col p-4 pt-5 flex-grow justify-between gap-3 bg-white border-t border-black/5">
+        <div>
+          <h3 className="font-['Playfair_Display'] text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
             {outfit.name}
           </h3>
-          <p className="text-[10px] font-mono text-ink-muted uppercase tracking-[0.2em]">
-            {outfit.description || "Everyday Look"}
+          <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#666] mt-2 truncate">
+            {outfit.description || "Curated Outfit"}
           </p>
         </div>
-        <div className="text-right flex flex-col items-end gap-2 shrink-0">
-          <span className="text-[10px] font-mono text-ink/60 uppercase tracking-widest">
-            {outfit.createdAt ? new Date(outfit.createdAt).toLocaleDateString("en-GB").replace(/\//g, '.') : "00.00.00"}
-          </span>
-          <ArrowRight className="size-4 text-ink opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 ease-out" />
+        <div className="flex justify-between items-center font-['IBM_Plex_Mono'] text-[11px] text-[#888]">
+          <span>{itemsInOutfit.length} Pieces</span>
+          <span>{outfit.createdAt ? new Date(outfit.createdAt).toLocaleDateString("en-GB").replace(/\//g, '.') : "00.00.00"}</span>
         </div>
       </div>
     </div>

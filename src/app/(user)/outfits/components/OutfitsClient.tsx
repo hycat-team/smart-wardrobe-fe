@@ -118,8 +118,8 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
         {
           opacity: 1,
           y: 0,
-          stagger: 0.08,
-          duration: 1,
+          stagger: 0.04,
+          duration: 0.8,
           ease: "expo.out",
           clearProps: "all"
         }
@@ -128,40 +128,39 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   }, { dependencies: [filteredAndSortedOutfits], scope: containerRef });
 
   return (
-    <div ref={containerRef} className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans selection:bg-ink selection:text-cream">
+    <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-[#111]">
       
       {/* High-end Editorial Header */}
-      <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-ink/10 pb-6">
+      <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-black/10 pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4 max-w-2xl">
-            <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1]">
               Curations
             </h1>
-            <p className="text-sm text-ink-muted font-mono uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-ink/20 pl-4">
+            <p className="text-[12px] text-[#666] font-['IBM_Plex_Mono'] uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4">
               An archive of your personal style. 
               {outfits.length > 0 ? ` Documenting ${outfits.length} looks.` : " Start composing your wardrobe."}
             </p>
           </div>
           
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
-            <Button
+            <button
               onClick={() => router.push("/ai-stylist")}
-              variant="outline"
-              className="rounded-none border-ink text-ink hover:bg-ink hover:text-cream text-xs font-mono tracking-[0.15em] h-14 px-8 transition-colors uppercase"
+              className="h-12 px-6 border border-[#E5E5E5] text-[#111] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:border-[#111] transition-colors flex items-center justify-center gap-2"
             >
-              <Sparkles className="mr-2 size-4" /> AI Generate
-            </Button>
+              <Sparkles className="size-3.5" /> AI Generate
+            </button>
 
-            <Button 
+            <button 
               onClick={() => router.push("/outfits/create")}
-              className="rounded-none bg-ink text-cream hover:bg-ink/80 text-xs font-mono tracking-[0.15em] h-14 px-8 transition-colors uppercase"
+              className="h-12 px-8 bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
             >
-              <Plus className="mr-2 size-4" /> Compose Look
-            </Button>
+              <Plus className="size-4" /> Compose Look
+            </button>
           </div>
         </div>
 
-        {/* Filters & Sorting - Magazine Index Style */}
+        {/* Filters & Sorting */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 pt-4">
           <div className="flex flex-wrap gap-x-8 gap-y-4">
             {[
@@ -174,27 +173,23 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                 key={tab.value}
                 onClick={() => handleFilterChange(tab.value)}
                 className={cn(
-                  "text-xs font-mono uppercase tracking-[0.2em] relative transition-colors group",
+                  "text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.12em] relative transition-colors group pb-1",
                   filterParam === tab.value 
-                    ? "text-ink font-bold" 
-                    : "text-ink-muted hover:text-ink"
+                    ? "text-[#111] font-medium border-b border-[#111]" 
+                    : "text-[#666] hover:text-[#111] border-b border-transparent hover:border-[#111]"
                 )}
               >
                 {tab.label}
-                <span className={cn(
-                  "absolute -bottom-2 left-0 h-[1px] bg-ink transition-all duration-300",
-                  filterParam === tab.value ? "w-full" : "w-0 group-hover:w-full"
-                )} />
               </button>
             ))}
           </div>
 
-          <div className="flex items-center gap-4 border border-ink/20 px-4 py-2">
-            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-muted">Sort</span>
+          <div className="flex items-center gap-4 border border-black/10 px-4 py-2 bg-[#F8F7F5]">
+            <span className="text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#888]">Sort</span>
             <select 
               value={sortParam}
               onChange={(e) => setSortParam(e.target.value as SortOption)}
-              className="bg-transparent text-xs font-mono uppercase tracking-widest text-ink font-bold focus:outline-none focus:ring-0 cursor-pointer appearance-none"
+              className="bg-transparent text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#111] font-medium focus:outline-none focus:ring-0 cursor-pointer appearance-none"
             >
               <option value="newest">Latest</option>
               <option value="oldest">Earliest</option>
@@ -206,13 +201,13 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
       {/* Outfits Grid */}
       {isLoading && !outfits.length ? (
         <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-8">
-          <div className="size-24 border border-ink/20 border-t-ink rounded-full animate-spin" />
-          <p className="text-[10px] text-ink-muted font-mono tracking-[0.3em] uppercase">Curating Archive...</p>
+          <div className="size-10 border border-[#111] border-t-transparent rounded-full animate-spin" />
+          <p className="text-[11px] text-[#666] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase animate-pulse">Curating Archive...</p>
         </div>
       ) : filteredAndSortedOutfits.length > 0 ? (
         <div 
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-20 auto-rows-fr"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8"
         >
           {filteredAndSortedOutfits.map((outfit: Outfit, index: number) => (
             <OutfitCard 
@@ -228,54 +223,52 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
       ) : (
         /* Empty State */
         <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
-          <div className="size-24 bg-[#e0dcd5] flex items-center justify-center text-ink/40">
-            <Shirt className="size-10 stroke-1" />
+          <div className="size-20 bg-[#F7F6F4] border border-[#E5E5E5] flex items-center justify-center text-[#A3A3A3]">
+            <Shirt className="size-8 stroke-1" />
           </div>
           <div className="space-y-4">
-            <h3 className="font-heading text-4xl text-ink uppercase tracking-tight">Void</h3>
-            <p className="text-xs font-mono uppercase tracking-widest text-ink-muted leading-relaxed">
+            <h3 className="font-['Playfair_Display'] text-3xl text-[#111] uppercase tracking-tight">Void</h3>
+            <p className="text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#666] leading-relaxed">
               No looks match your current filter. Return to the index or compose a new look.
             </p>
           </div>
-          <Button 
-            variant="outline" 
+          <button 
             onClick={() => handleFilterChange("all")} 
-            className="rounded-none border-ink text-ink hover:bg-ink hover:text-cream text-xs font-mono tracking-[0.2em] uppercase h-14 px-8 mt-4"
+            className="h-12 px-8 border border-[#111] text-[#111] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:bg-black hover:text-white transition-colors mt-4"
           >
             Clear Filters
-          </Button>
+          </button>
         </div>
       )}
       
       {hasNextPage && (
-        <div className="mt-32 flex justify-center border-t border-ink/10 pt-16">
-          <Button 
+        <div className="mt-16 flex justify-center border-t border-black/10 pt-12">
+          <button 
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
-            variant="ghost"
-            className="text-xs font-mono tracking-[0.3em] uppercase text-ink hover:bg-transparent hover:text-terracotta disabled:opacity-50 transition-colors"
+            className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase text-[#666] hover:text-[#111] disabled:opacity-50 transition-colors border-b border-transparent hover:border-[#111] pb-1"
           >
             {isFetchingNextPage ? 'Loading...' : 'Load More'}
-          </Button>
+          </button>
         </div>
       )}
 
       {/* Delete Confirmation Popup */}
       <AlertDialog open={!!outfitToDelete} onOpenChange={(open) => !open && setOutfitToDelete(null)}>
-        <AlertDialogContent className="bg-cream border border-cream-dark/60 rounded-3xl p-8 max-w-md gap-6">
-          <AlertDialogHeader className="space-y-3">
-            <AlertDialogTitle className="font-heading text-3xl text-ink font-medium uppercase tracking-tight">Void Look</AlertDialogTitle>
-            <AlertDialogDescription className="text-xs font-mono tracking-widest text-ink-muted leading-relaxed uppercase">
+        <AlertDialogContent className="rounded-none border border-black/10 bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-['Playfair_Display'] text-2xl font-medium text-[#111]">Void Look</AlertDialogTitle>
+            <AlertDialogDescription className="font-['IBM_Plex_Mono'] text-[12px] text-[#666] leading-relaxed">
               Are you sure you want to permanently delete this look from your archive? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="gap-3 sm:gap-4 mt-4">
-            <AlertDialogCancel className="rounded-none border-ink text-ink hover:bg-ink/5 text-xs font-mono tracking-[0.2em] uppercase h-12 px-6">Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="mt-6 flex gap-4">
+            <AlertDialogCancel className="rounded-none border border-black/10 bg-white font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest flex-1 hover:bg-[#F8F7F5] transition-colors m-0">HỦY BỎ</AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmDelete} 
-              className="rounded-none bg-red-600 text-cream hover:bg-red-700 text-xs font-mono tracking-[0.2em] uppercase h-12 px-6 shadow-none"
+              className="rounded-none bg-red-600 text-white hover:bg-red-700 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest flex-1 transition-colors m-0"
             >
-              Confirm
+              ĐỒNG Ý XÓA
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

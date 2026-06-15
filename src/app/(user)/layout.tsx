@@ -8,7 +8,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
       <Sidebar />
       <main className="flex-1 flex flex-col min-w-0 pb-[72px] md:pb-0 relative">
         {/* Page Content */}
-        <div className="flex-1 px-4 md:px-8 py-6 md:py-8 max-w-[1600px] w-full mx-auto">
+        <div className="flex-1 px-4 md:px-8 py-4 md:py-0 max-w-[1600px] w-full mx-auto">
           {children}
         </div>
       </main>

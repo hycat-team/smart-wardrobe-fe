@@ -426,3 +426,26 @@ html.dark-atelier * {
     border-right-color: var(--border);
   }
 }
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2%, -3%); }
+  30% { transform: translate(3%, -1%); }
+  50% { transform: translate(-1%, 2%); }
+  70% { transform: translate(2%, 1%); }
+  90% { transform: translate(-3%, -2%); }
+}
+
+.grain-overlay {
+  animation: grain 0.8s steps(6) infinite;
+  pointer-events: none;
+  opacity: 0.06;
+  position: fixed;
+  top: -5%;
+  left: -5%;
+  width: 110%;
+  height: 110%;
+  z-index: 2;
+  background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+  mix-blend-multiply: true;
+}

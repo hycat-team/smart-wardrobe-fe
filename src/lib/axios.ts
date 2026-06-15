@@ -63,8 +63,13 @@ api.interceptors.response.use(
       // Xử lý các lỗi khác có format ErrorResponse từ server
       const errorData = error.response.data;
       const errorMessage = errorData?.message || errorData?.detail;
+      const errorTitle = errorData?.title;
       
-      if (errorMessage) {
+      if (errorTitle && errorMessage) {
+        toast.error(errorTitle, { description: errorMessage });
+      } else if (errorTitle) {
+        toast.error(errorTitle);
+      } else if (errorMessage) {
         toast.error(errorMessage);
       } else if (error.response.status >= 500) {
         toast.error('Lỗi máy chủ! Vui lòng thử lại sau.');

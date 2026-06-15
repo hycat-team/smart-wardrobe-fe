@@ -15,10 +15,14 @@ import { OutfitRes as Outfit } from "@/features/outfits/types";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
-import { motion } from "framer-motion";
 import * as htmlToImage from "html-to-image";
 import { useOutfitCanvas } from "@/features/outfits/hooks/useOutfitCanvas";
-import { uploadToCloudinary } from "@/lib/cloudinary";
+import { OutfitCanvasBoard } from "@/features/outfits/components/OutfitCanvasBoard";
+import { uploadToCloudinary, applyCloudinaryTrim } from "@/lib/cloudinary";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(useGSAP);
 
 const OCCASIONS = ["Casual", "Workwear", "Summer", "Party", "Formal", "Sporty"];
 
@@ -52,6 +56,8 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
   // Canvas State
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const {
     selectedItems,
     setSelectedItems,
@@ -64,6 +70,16 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
   } = useOutfitCanvas();
 
   const handleAIMatch = () => handleAIMatchHook(realItems, setOutfitName);
+
+  const { contextSafe } = useGSAP({ scope: containerRef });
+
+  useGSAP(() => {
+    gsap.fromTo(
+      ".outfit-panel",
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" }
+    );
+  }, { scope: containerRef });
 
   // Load real wardrobe items
   const { data, isLoading: isLoadingWardrobe } = useMyWardrobe();
@@ -187,292 +203,218 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
     : activeClosetItems.filter(x => x.category?.name === activeCategory);
 
   return (
-    <div className="max-w-7xl mx-auto flex flex-col gap-6 animate-in fade-in duration-500 pb-16 font-sans px-4 sm:px-6">
-      
-      {/* Top Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-cream-dark pb-4 pt-4">
-        <div className="space-y-1">
-          <Link 
-            href="/outfits" 
-            className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="size-3.5" /> QUAY LẠI OUTFITS
-          </Link>
-          <h1 className={cn("text-3xl font-heading font-medium tracking-wide text-ink")}>Mix & Match Canvas</h1>
-        </div>
-
-        {/* Action triggers */}
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button
-            type="button"
-            onClick={handleAIMatch}
-            className="flex-1 sm:flex-none h-11 rounded-xl bg-terracotta-light/10 text-terracotta border border-terracotta/20 hover:bg-terracotta-light/20 text-xs font-mono tracking-wider flex items-center justify-center gap-1.5"
-          >
-            <Sparkles className="size-4" /> AI TỰ PHỐI
-          </Button>
-
-          <Button
-            type="button"
-            onClick={handleSaveOutfit}
-            disabled={isSaving}
-            className="flex-1 sm:flex-none h-11 rounded-xl bg-ink text-cream hover:bg-ink/90 px-6 text-xs font-mono tracking-wider flex items-center justify-center gap-1.5 shadow-md disabled:opacity-70"
-          >
-            {isSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-            {isSaving ? "ĐANG LƯU..." : "CẬP NHẬT PHỐI ĐỒ"}
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div ref={containerRef} className="flex-1 min-h-screen bg-white text-[#1A1A1A] pb-24 md:pb-12 font-sans selection:bg-[#1A1A1A] selection:text-white">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col pt-8 lg:pt-12">
         
-        {/* LEFT COLUMN: THE CLOSET & SETTINGS (LG: 4/12) */}
-        <div className="lg:col-span-4 space-y-6 flex flex-col-reverse lg:flex-col">
+        {/* Page Header */}
+        <div className="mb-8 md:mb-10 border-b border-[#E5E5E5] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6 outfit-panel">
+          <div>
+            <Link 
+              href="/outfits" 
+              className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors mb-4"
+            >
+              <ArrowLeft className="size-3.5" /> QUAY LẠI OUTFITS
+            </Link>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-2 uppercase">
+              STUDIO CANVAS
+            </h2>
+            <p className="text-xs md:text-sm text-[#666666] tracking-wide uppercase font-medium">
+              MIX & MATCH TO CREATE YOUR BESPOKE LOOK
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <button
+              type="button"
+              onClick={handleAIMatch}
+              className="flex-1 sm:flex-none px-6 py-3 border border-[#E5E5E5] text-[#1A1A1A] font-bold text-[11px] uppercase tracking-widest hover:bg-black hover:text-white transition-colors flex items-center justify-center gap-2"
+            >
+              <Sparkles className="size-3.5" /> AI TỰ PHỐI
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSaveOutfit}
+              disabled={isSaving}
+              className="flex-1 sm:flex-none px-8 py-3 bg-[#1A1A1A] text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
+              {isSaving ? "ĐANG LƯU..." : "CẬP NHẬT PHỐI ĐỒ"}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
-          {/* THE CLOSET */}
-          <div className="border border-cream-dark/60 rounded-3xl p-5 bg-cream-dark/10 shadow-sm flex flex-col max-h-[500px]">
-            <div className="space-y-1 mb-4">
-              <h3 className="font-heading font-bold text-xl text-ink">Tủ đồ cá nhân</h3>
-              <p className="text-[11px] text-ink-muted font-mono uppercase tracking-wider">Chọn đồ kéo vào bàn phối</p>
+          {/* LEFT COLUMN: THE CLOSET & SETTINGS (LG: 4/12) */}
+          <div className="lg:col-span-4 space-y-8 flex flex-col-reverse lg:flex-col">
+            
+            {/* THE CLOSET */}
+            <div className="outfit-panel flex flex-col h-[500px] border border-[#E5E5E5] bg-white">
+              <div className="p-5 border-b border-[#E5E5E5] bg-[#F9F9F9]">
+                <h3 className="font-bold text-[13px] text-[#1A1A1A] uppercase tracking-widest">TỦ ĐỒ CÁ NHÂN</h3>
+                <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest mt-1">CHỌN ĐỒ KÉO VÀO BÀN PHỐI</p>
+              </div>
+
+              {/* Categories */}
+              <div className="flex flex-wrap gap-2 p-4 border-b border-[#E5E5E5] shrink-0 bg-white">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setActiveCategory(cat)}
+                    className={cn(
+                      "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border whitespace-nowrap",
+                      activeCategory === cat 
+                        ? "bg-black text-white border-black" 
+                        : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black"
+                    )}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Items Grid */}
+              <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-white">
+                {isLoadingWardrobe ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-4">
+                    <div className="w-8 h-8 border-2 border-[#1A1A1A] border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">ĐANG TẢI TỦ ĐỒ...</span>
+                  </div>
+                ) : filteredCloset.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    {filteredCloset.map(item => {
+                      const isSelected = selectedItems.some(x => x.id === item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => handleItemToggle(item)}
+                          className={cn(
+                            "relative aspect-square border cursor-pointer transition-all select-none group bg-[#F9F9F9] overflow-hidden",
+                            isSelected 
+                              ? "border-black shadow-sm" 
+                              : "border-[#E5E5E5] hover:border-[#1A1A1A]"
+                          )}
+                        >
+                          <img src={applyCloudinaryTrim(item.imageUrl)} alt={getWardrobeItemName(item)} className="w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" />
+                          {isSelected && (
+                            <div className="absolute inset-0 border-[3px] border-black flex flex-col items-end justify-start p-1 pointer-events-none">
+                              <div className="bg-black size-4 flex items-center justify-center">
+                                <span className="text-white text-[10px] font-bold leading-none">✓</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 border border-dashed border-[#E5E5E5]">
+                    <span className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">TRỐNG</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Categories */}
-            <div className="flex overflow-x-auto gap-2 no-scrollbar pb-3 border-b border-cream-dark/40 shrink-0">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setActiveCategory(cat)}
-                  className={cn(
-                    "px-4 py-1.5 rounded-full text-xs font-mono tracking-widest whitespace-nowrap transition-all border",
-                    activeCategory === cat 
-                      ? "bg-ink border-ink text-cream" 
-                      : "bg-transparent border-cream-dark text-ink-muted hover:border-ink hover:text-ink"
-                  )}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            {/* Items Grid */}
-            <div className="flex-1 overflow-y-auto pr-2 mt-4 custom-scrollbar">
-              {isLoadingWardrobe ? (
-                <div className="flex flex-col items-center justify-center py-12 gap-3">
-                  <Loader2 className="size-6 text-terracotta animate-spin" />
-                  <span className="text-[10px] text-ink-muted font-mono uppercase tracking-widest">Đang tải tủ đồ...</span>
+            {/* OUTFIT FORM SETTINGS */}
+            <div className="outfit-panel border border-[#E5E5E5] bg-white flex flex-col shadow-sm">
+              <div className="p-5 border-b border-[#E5E5E5] bg-[#F9F9F9]">
+                <h3 className="font-bold text-[13px] text-[#1A1A1A] uppercase tracking-widest">THÔNG TIN BỘ PHỐI</h3>
+              </div>
+              
+              <div className="p-6 flex flex-col gap-6">
+                <div className="flex flex-col gap-3">
+                  <label htmlFor="outfit-name" className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]">TÊN BỘ PHỐI *</label>
+                  <input
+                    id="outfit-name"
+                    type="text"
+                    required
+                    value={outfitName}
+                    onChange={(e) => setOutfitName(e.target.value)}
+                    placeholder="Tên bộ trang phục..."
+                    className="w-full bg-transparent border-b border-[#E5E5E5] focus:border-[#1A1A1A] outline-none pb-2 text-[13px] font-medium text-[#1A1A1A] placeholder:text-[#A3A3A3] transition-colors rounded-none"
+                  />
                 </div>
-              ) : filteredCloset.length > 0 ? (
-                <div className="grid grid-cols-3 gap-3">
-                  {filteredCloset.map(item => {
-                    const isSelected = selectedItems.some(x => x.id === item.id);
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => handleItemToggle(item)}
+
+                <div className="flex flex-col gap-3">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]">DỊP SỬ DỤNG</label>
+                  <div className="flex flex-wrap gap-2">
+                    {OCCASIONS.map(occ => (
+                      <button
+                        key={occ}
+                        type="button"
+                        onClick={() => {
+                          setOccasion(occ);
+                          setCustomOccasion("");
+                        }}
                         className={cn(
-                          "relative rounded-2xl overflow-hidden aspect-square border cursor-pointer bg-cream transition-all select-none group",
-                          isSelected 
-                            ? "border-terracotta ring-2 ring-terracotta/50 shadow-md" 
-                            : "border-cream-dark/60 hover:border-ink/30 hover:shadow-sm"
+                          "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border",
+                          occasion === occ && !customOccasion
+                            ? "bg-black text-white border-black" 
+                            : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black"
                         )}
                       >
-                        <img src={item.imageUrl} alt={getWardrobeItemName(item)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                        {isSelected && (
-                          <div className="absolute inset-0 bg-terracotta/10 flex items-center justify-center backdrop-blur-[1px]">
-                            <span className="bg-terracotta text-cream size-6 rounded-full flex items-center justify-center font-bold text-sm shadow-md">✓</span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                        {occ}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              ) : (
-                <div className="text-center py-12 text-xs text-ink-muted font-mono uppercase tracking-widest border border-dashed border-cream-dark/50 rounded-2xl">
-                  Trống
-                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: STYLING CANVAS (LG: 8/12) */}
+          <div className="lg:col-span-8 h-full flex flex-col relative min-h-[600px] outfit-panel">
+            
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A] bg-white border border-[#E5E5E5] px-3 py-1.5 flex items-center gap-2">
+                <Layers className="size-3.5" /> CANVAS STUDIO
+                <span className="bg-[#E5E5E5] text-[#1A1A1A] px-1.5 py-0.5 text-[9px]">{selectedItems.length} MÓN</span>
+              </span>
+
+              {selectedItems.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedItems([]);
+                    setOutfitName("");
+                  }}
+                  className="text-[10px] text-[#A3A3A3] hover:text-[#1A1A1A] px-3 py-1.5 uppercase tracking-widest flex items-center gap-1.5 transition-colors font-bold"
+                >
+                  <Trash2 className="size-3.5" /> LÀM MỚI
+                </button>
               )}
             </div>
-          </div>
 
-          {/* OUTFIT FORM SETTINGS */}
-          <div className="border border-cream-dark/60 rounded-3xl p-5 bg-cream-dark/10 shadow-sm shrink-0">
-            <h3 className="font-heading font-bold text-lg text-ink mb-4">Thông tin bộ phối</h3>
-            
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="outfit-name" className="text-[10px] font-mono uppercase tracking-widest text-ink font-bold">Tên bộ phối <span className="text-terracotta">*</span></Label>
-                <Input
-                  id="outfit-name"
-                  type="text"
-                  required
-                  value={outfitName}
-                  onChange={(e) => setOutfitName(e.target.value)}
-                  placeholder="VD: Look đi cafe cuối tuần..."
-                  className="h-12 bg-cream border-cream-dark focus-visible:ring-1 focus-visible:ring-ink focus-visible:border-ink rounded-xl text-sm"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Label className="text-[10px] font-mono uppercase tracking-widest text-ink font-bold">Dịp sử dụng</Label>
-                <div className="flex flex-wrap gap-2">
-                  {OCCASIONS.map(occ => (
-                    <button
-                      key={occ}
-                      type="button"
-                      onClick={() => {
-                        setOccasion(occ);
-                        setCustomOccasion("");
-                      }}
-                      className={cn(
-                        "px-4 py-1.5 rounded-full text-xs font-mono tracking-widest transition-all border",
-                        occasion === occ && !customOccasion
-                          ? "bg-ink border-ink text-cream" 
-                          : "bg-cream border-cream-dark text-ink-muted hover:border-ink/50"
-                      )}
-                    >
-                      {occ}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN: STYLING CANVAS (LG: 8/12) */}
-        <div className="lg:col-span-8 h-full flex flex-col relative min-h-[600px]">
-          
-          <div className="flex items-center justify-between z-20 mb-3 px-1">
-            <span className="text-xs font-mono text-ink-muted uppercase tracking-widest font-bold flex items-center gap-2">
-              <Layers className="size-4" /> Canvas Studio 
-              <span className="bg-ink text-cream px-2 py-0.5 rounded-full text-[10px]">{selectedItems.length} MÓN</span>
-            </span>
-
-            {selectedItems.length > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedItems([]);
-                  setOutfitName("");
-                }}
-                className="text-[10px] font-mono text-terracotta hover:bg-terracotta/10 px-3 py-1.5 rounded-full uppercase tracking-widest flex items-center gap-1 transition-colors font-bold"
-              >
-                <Trash2 className="size-3" /> Làm mới
-              </button>
-            )}
-          </div>
-
-          {/* THE DRAG & DROP CANVAS */}
-          <div 
-            className="flex-1 bg-cream border-2 border-cream-dark/50 rounded-[2.5rem] relative overflow-hidden shadow-inner flex items-center justify-center"
-          >
-            {/* Background texture */}
-            <div className="absolute inset-0 bg-[radial-gradient(#1A1A1A_0.6px,transparent_0.6px)] [background-size:24px_24px] opacity-[0.07] pointer-events-none" />
-
-            {/* CANVAS REF TARGET FOR HTML-TO-IMAGE */}
-            <div 
-              ref={canvasRef} 
-              className="absolute inset-0 w-full h-full bg-cream/0 flex items-center justify-center"
-            >
-              {selectedItems.length > 0 ? (
-                selectedItems.map(item => (
-                  <motion.div 
-                    key={item.id}
-                    drag
-                    dragConstraints={canvasRef}
-                    dragMomentum={false}
-                    initial={{ x: item.x, y: item.y }}
-                    onDragEnd={(e, info) => handleDragEnd(item.id, info)}
-                    className="absolute cursor-grab active:cursor-grabbing group"
-                    style={{ 
-                      zIndex: item.zIndex,
-                    }}
-                    whileTap={{ scale: 1.02 }}
-                  >
-                    <div className="relative">
-                      {/* Controls (Hidden during capture) */}
-                      <div className="canvas-item-controls opacity-0 group-hover:opacity-100 transition-opacity absolute -top-12 left-1/2 -translate-x-1/2 bg-ink text-cream flex items-center gap-2 px-3 py-1.5 rounded-full shadow-lg z-50 whitespace-nowrap border border-ink-muted/30">
-                        <button 
-                          type="button" 
-                          onClick={(e) => { e.stopPropagation(); updateScale(item.id, item.scale - 10); }}
-                          className="hover:text-terracotta transition-colors"
-                          title="Thu nhỏ"
-                        >
-                          <ZoomOut className="size-3.5" />
-                        </button>
-                        <span className="text-[10px] font-mono w-8 text-center">{item.scale}%</span>
-                        <button 
-                          type="button" 
-                          onClick={(e) => { e.stopPropagation(); updateScale(item.id, item.scale + 10); }}
-                          className="hover:text-terracotta transition-colors"
-                          title="Phóng to"
-                        >
-                          <ZoomIn className="size-3.5" />
-                        </button>
-                        <div className="w-px h-3 bg-cream/30 mx-1" />
-                        <button 
-                          type="button" 
-                          onClick={(e) => { e.stopPropagation(); bringToFront(item.id); }}
-                          className="hover:text-terracotta transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest font-mono"
-                          title="Đưa lên trên"
-                        >
-                          <MoveUp className="size-3" /> Lên trên
-                        </button>
-                        <div className="w-px h-3 bg-cream/30 mx-1" />
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
-                          className="hover:text-red-400 transition-colors"
-                        >
-                          <X className="size-4" />
-                        </button>
-                      </div>
-
-                      {/* Image */}
-                      <div 
-                        className="pointer-events-none drop-shadow-xl"
-                        style={{ 
-                          width: `${item.scale * 1.5}px`, // base size 150px when scale is 100
-                          height: "auto",
-                        }}
-                      >
-                        <img 
-                          src={item.imageUrl} 
-                          alt="Outfit Item" 
-                          className="w-full h-full object-contain filter drop-shadow-md" 
-                          draggable={false}
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="text-center space-y-4 p-10 max-w-sm">
-                  <div className="size-16 border-2 border-dashed border-ink/20 rounded-full flex items-center justify-center mx-auto text-ink/30">
-                    <Grid className="size-8" />
+            {/* THE DRAG & DROP CANVAS */}
+            <OutfitCanvasBoard 
+              canvasRef={canvasRef}
+              selectedItems={selectedItems}
+              updateScale={updateScale}
+              bringToFront={bringToFront}
+              removeItem={removeItem}
+              handleDragEnd={handleDragEnd}
+              emptyState={
+                <div className="text-center space-y-6 p-12">
+                  <div className="w-16 h-16 border border-[#E5E5E5] flex items-center justify-center mx-auto text-[#A3A3A3] bg-white">
+                    <Grid className="w-6 h-6" />
                   </div>
-                  <div className="space-y-2">
-                    <p className="text-lg font-heading font-bold text-ink">Canvas trống</p>
-                    <p className="text-xs font-mono text-ink-muted leading-relaxed">
+                  <div className="space-y-3">
+                    <p className="text-2xl font-bold text-[#1A1A1A] uppercase tracking-tight">CANVAS TRỐNG</p>
+                    <p className="text-[13px] text-[#666666] leading-relaxed max-w-sm mx-auto">
                       Kéo các trang phục từ tủ đồ vào đây để bắt đầu ghép phối. Bạn có thể tự do phóng to, thu nhỏ và kéo thả.
                     </p>
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* Quick tips footer inside canvas */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] font-mono text-ink-muted bg-cream/80 backdrop-blur-md px-4 py-2 rounded-full border border-cream-dark/50 z-20 pointer-events-none shadow-sm whitespace-nowrap">
-              <AlertCircle className="size-3.5 text-terracotta" />
-              <span>Gợi ý: Kéo thả để di chuyển. Hover vào item để đổi kích thước & lớp.</span>
-            </div>
+              }
+            />
           </div>
+
         </div>
 
       </div>
-
     </div>
   );
 }
-
 

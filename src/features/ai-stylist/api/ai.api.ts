@@ -6,7 +6,7 @@ export const aiApi = {
   getOutfitRecommendation: async (data: AIOutfitRecommendationReq): Promise<AIOutfitRecommendationRes> => {
     // AI processing can take a while, increase timeout to 60 seconds
     const res = await api.post<APIResponse<AIOutfitRecommendationRes>>('/ai/outfit-recommendations', data, {
-      timeout: 100000,
+      timeout: 200000,
     });
     return res.data.data!;
   },

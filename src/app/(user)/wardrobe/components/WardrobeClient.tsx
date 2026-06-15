@@ -4,7 +4,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 import {
   Plus, Edit2, Tag, Search, Filter,
-  X, Eye, Lock, Loader2, Sparkles
+  X, Eye, Lock, Loader2, Sparkles, Check, Trash2
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -17,8 +17,21 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useMyWardrobe } from "@/features/wardrobe/queries/wardrobe.queries";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useMyWardrobe, useBulkDeleteWardrobeItems } from "@/features/wardrobe/queries/wardrobe.queries";
+import { applyCloudinaryTrim } from "@/lib/cloudinary";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
+import { WardrobeCard } from "./WardrobeCard";
 import { toast } from "sonner";
 
 const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
@@ -79,6 +92,10 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   const tagParam = searchParams.get("tag") || "";
   const sortParam = searchParams.get("sort") || "newest";
   const searchParam = searchParams.get("q") || "";
+
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const { mutate: bulkDelete, isPending: isDeleting } = useBulkDeleteWardrobeItems();
 
   const [searchInput, setSearchInput] = useState(searchParam);
   const lastPushedQ = useRef(searchParam);
@@ -246,6 +263,59 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
             >
               <Plus className="mr-2 size-4" /> Add Item
             </Button>
+            <Button 
+              onClick={() => {
+                setIsSelectMode(!isSelectMode);
+                setSelectedIds([]);
+              }}
+              variant={isSelectMode ? "default" : "outline"}
+              className={cn("rounded-none text-xs font-mono tracking-[0.15em] h-[42px] px-4 transition-colors uppercase", isSelectMode ? "bg-ink text-cream hover:bg-ink/90" : "border-ink text-ink")}
+            >
+              {isSelectMode ? "Hủy chọn" : "Chọn nhiều"}
+            </Button>
+            {isSelectMode && selectedIds.length > 0 && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    disabled={isDeleting}
+                    className="rounded-none bg-[#D03027] hover:bg-[#A9221B] text-[#F3F0EA] text-xs font-mono tracking-[0.15em] h-[42px] px-4 transition-all uppercase shadow-[3px_3px_0px_0px_rgba(26,26,26,1)] active:translate-y-[3px] active:translate-x-[3px] active:shadow-none border border-[#1A1A1A]"
+                  >
+                    {isDeleting ? <Loader2 className="size-4 animate-spin mr-2" /> : <Trash2 className="size-4 mr-2" />}
+                    Xóa ({selectedIds.length})
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="rounded-none border-2 border-[#1A1A1A] bg-[#F3F0EA] p-8 shadow-[12px_12px_0px_0px_rgba(26,26,26,1)] sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
+                  <AlertDialogHeader className="space-y-4 text-left">
+                    <AlertDialogTitle className="font-heading text-4xl uppercase tracking-tighter text-[#1A1A1A] leading-none">
+                      Warning <br/><span className="text-[#D03027]">Data Erasure</span>
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="font-mono text-[11px] text-[#1A1A1A]/70 uppercase tracking-widest leading-relaxed border-l-2 border-[#D03027] pl-4 mt-6">
+                      Bạn đang chuẩn bị xóa vĩnh viễn {selectedIds.length} trang phục khỏi hệ thống.
+                      <br/><br/>
+                      Hành động này không thể hoàn tác. Các item này sẽ bị gỡ bỏ khỏi mọi outfit liên quan.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="mt-10 flex gap-4 sm:space-x-0 w-full sm:justify-between">
+                    <AlertDialogCancel className="flex-1 rounded-none border-2 border-[#1A1A1A] bg-transparent text-[#1A1A1A] font-mono text-xs tracking-widest uppercase hover:bg-[#1A1A1A] hover:text-[#F3F0EA] h-12 transition-all m-0 shadow-[4px_4px_0px_0px_rgba(26,26,26,1)] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none">
+                      Hủy bỏ
+                    </AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={() => {
+                        bulkDelete({ ids: selectedIds }, {
+                          onSuccess: () => {
+                            setIsSelectMode(false);
+                            setSelectedIds([]);
+                          }
+                        });
+                      }}
+                      className="flex-1 rounded-none border-2 border-[#1A1A1A] bg-[#D03027] text-[#F3F0EA] font-mono text-xs tracking-widest uppercase hover:bg-transparent hover:text-[#D03027] h-12 transition-all m-0 shadow-[4px_4px_0px_0px_rgba(26,26,26,1)] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none"
+                    >
+                      Xác nhận
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
         </div>
 
@@ -302,13 +372,21 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
           <p className="text-[10px] text-ink-muted font-mono tracking-[0.3em] uppercase">Loading Wardrobe...</p>
         </div>
       ) : sortedItems.length > 0 ? (
-        <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-16 auto-rows-fr transition-all duration-300", (isFetching && !isFetchingNextPage) && "opacity-60 blur-[1px]")}>
+        <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", (isFetching && !isFetchingNextPage) && "opacity-60 blur-[1px]")}>
           {sortedItems.map((item: any) => {
             const isProcessing = item.status === WardrobeItemStatus.Processing;
             const isFailed = item.status === WardrobeItemStatus.Failed;
             const isLocked = item.isLocked;
 
             const handleCardClick = () => {
+              if (isSelectMode) {
+                if (selectedIds.includes(item.id)) {
+                  setSelectedIds(selectedIds.filter(id => id !== item.id));
+                } else {
+                  setSelectedIds([...selectedIds, item.id]);
+                }
+                return;
+              }
               if (isLocked) {
                 toast.error("Trang phục bị khóa do vượt quá hạn ngạch. Vui lòng nâng cấp gói cước!");
                 return;
@@ -321,56 +399,16 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
             };
 
             return (
-              <div
+              <WardrobeCard
                 key={item.id}
+                item={item}
+                isLocked={isLocked}
+                isProcessing={isProcessing}
+                isSelectMode={isSelectMode}
+                isSelected={selectedIds.includes(item.id)}
                 onClick={handleCardClick}
-                className={cn(
-                  "group flex flex-col gap-5 cursor-pointer relative",
-                  isLocked && "opacity-75"
-                )}
-              >
-                {/* Image Container */}
-                <div className="relative aspect-[3/4] overflow-hidden bg-cream border border-cream-dark/60 rounded-none">
-                  <img
-                    alt={getWardrobeItemName(item)}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 mix-blend-multiply"
-                    src={item.imageUrl || undefined}
-                  />
-                  {item.material && (
-                    <div className="absolute top-4 left-4 z-10">
-                      <span className="bg-ink/90 text-cream px-3 py-1.5 text-[10px] font-mono tracking-widest uppercase">
-                        {item.material}
-                      </span>
-                    </div>
-                  )}
-                  {item.colorHex && (
-                    <div className="absolute top-4 right-4 z-10">
-                      <div
-                        className="w-4 h-4 border border-ink/10 shadow-sm"
-                        style={{ backgroundColor: item.colorHex }}
-                        title={item.color || "Màu sắc"}
-                      />
-                    </div>
-                  )}
-
-                  {!isLocked && !isProcessing && (
-                    <div className="absolute inset-0 bg-ink/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <div className="bg-cream text-ink px-6 py-3 font-mono text-xs uppercase tracking-widest translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                        View Details
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Meta */}
-                <div className="flex flex-col gap-1 border-t border-ink/10 pt-4">
-                  <h3 className="font-heading text-lg text-ink font-medium tracking-tight uppercase truncate">{getWardrobeItemName(item)}</h3>
-                  <p className="font-mono text-[10px] text-ink-muted uppercase tracking-widest flex items-center justify-between">
-                    <span className="truncate">{item.brand || "Acne Studios"}</span>
-                    <span>Size {item.size || "S"}</span>
-                  </p>
-                </div>
-              </div>
+                getWardrobeItemName={getWardrobeItemName}
+              />
             );
           })}
         </div>

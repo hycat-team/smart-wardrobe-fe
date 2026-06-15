@@ -56,6 +56,14 @@ export const communityApi = {
     return res.data.data!;
   },
 
+  deletePost: async (postPublicID: string): Promise<void> => {
+    await api.delete(`/posts/${postPublicID}`);
+  },
+
+  deleteComment: async (postPublicID: string, commentID: string): Promise<void> => {
+    await api.delete(`/posts/${postPublicID}/comments/${commentID}`);
+  },
+
   getPostUploadSignature: async (): Promise<UploadSignatureResult> => {
     const res = await api.get<APIResponse<UploadSignatureResult>>('/posts/upload-signature');
     return res.data.data!;

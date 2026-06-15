@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
   let isRefreshFailed = false;
 
   // 1. CHẶN VÀ KIỂM TRA HẠN TOKEN
-  if (accessToken && isTokenExpired(accessToken) && refreshToken) {
+  if ((!accessToken || isTokenExpired(accessToken)) && refreshToken) {
     try {
       // Gọi API refresh token tới Backend
       const refreshRes = await fetch(`${BACKEND_URL}/auth/refresh-token`, {

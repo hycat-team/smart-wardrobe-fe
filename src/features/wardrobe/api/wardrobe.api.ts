@@ -61,6 +61,11 @@ export const wardrobeApi = {
     return { message: res.data.message };
   },
 
+  bulkDeleteWardrobeItems: async (data: { ids: string[] }): Promise<{ message?: string }> => {
+    const res = await api.delete<APIResponse<void>>(`/wardrobe-items/bulk`, { data });
+    return { message: res.data.message };
+  },
+
   getCategories: async (axiosInstance: AxiosInstance = api): Promise<CategoryRes[]> => {
     const res = await axiosInstance.get<APIResponse<CategoryRes[]>>('/categories');
     return res.data.data!;

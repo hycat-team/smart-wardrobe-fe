@@ -20,7 +20,7 @@ export function WalletPageContent() {
       {isStatementsLoading ? (
         <Skeleton className="h-[400px] w-full rounded-xl" />
       ) : (
-        <TransactionHistory statements={statements || []} />
+        <TransactionHistory statements={Array.isArray(statements) ? statements : (statements as any)?.items || []} />
       )}
     </div>
   );

@@ -1,12 +1,20 @@
 "use client";
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import Image from "next/image";
-import { Sparkles, Save, RefreshCw, Send, MoreHorizontal } from "lucide-react";
+import { Sparkles, Save, RefreshCw, MoveRight, ZoomOut, ZoomIn, MoveUp, RefreshCcw, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { aiApi } from "@/features/ai-stylist/api/ai.api";
 import { AIOutfitRecommendationRes, ChatMessage } from "@/features/ai-stylist/types";
+import { useOutfitCanvas } from "@/features/outfits/hooks/useOutfitCanvas";
+import { OutfitCanvasBoard } from "@/features/outfits/components/OutfitCanvasBoard";
+import { motion } from "framer-motion";
+import * as htmlToImage from "html-to-image";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
+import { useCreateOutfit } from "@/features/outfits/queries/outfits.queries";
+import { toast } from "sonner";
 
 gsap.registerPlugin(useGSAP);
 
@@ -16,21 +24,37 @@ const STYLES = ["Minimalist", "Casual", "Formal", "Trendy", "Vintage", "Streetwe
 export function AIStylistClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   const [selectedOccasion, setSelectedOccasion] = useState(OCCASIONS[0]);
   const [selectedStyle, setSelectedStyle] = useState(STYLES[0]);
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isChatting, setIsChatting] = useState(false);
   const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [contextID, setContextID] = useState<string>("");
   const [chatInput, setChatInput] = useState("");
 
+  const [alternativeIndices, setAlternativeIndices] = useState<Record<string, number>>({});
+
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  const {
+    selectedItems,
+    setSelectedItems,
+    bringToFront,
+    updateScale,
+    handleDragEnd,
+  } = useOutfitCanvas();
+
+  const createOutfitMutation = useCreateOutfit();
+
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatMessages.length > 0 || isChatting) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }, [chatMessages, isChatting]);
 
   useEffect(() => {
@@ -43,11 +67,11 @@ export function AIStylistClient() {
 
   const { contextSafe } = useGSAP({ scope: containerRef });
 
-  const animateResults = contextSafe(() => {
+  const animateChatIntro = contextSafe(() => {
     gsap.fromTo(
-      ".outfit-item",
-      { y: 40, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, stagger: 0.15, duration: 1, ease: "power4.out" }
+      ".chat-intro",
+      { opacity: 0, x: 20 },
+      { opacity: 1, x: 0, duration: 0.8, delay: 0.3, ease: "power3.out" }
     );
   });
 
@@ -55,18 +79,42 @@ export function AIStylistClient() {
     try {
       setIsGenerating(true);
       
-      const occasionClean = selectedOccasion.replace(/^[\u{1F300}-\u{1F9FF}\s]+/gu, '');
+      const occasionMap: Record<string, string> = {
+        "🎓 Đi học": "casual",
+        "💼 Đi làm": "formal",
+        "🌙 Hẹn hò": "casual",
+        "🎉 Tiệc": "party",
+        "🏃 Thể thao": "sport",
+        "🏠 Ở nhà": "casual",
+      };
 
       const res = await aiApi.getOutfitRecommendation({
-        occasion: occasionClean,
-        styleTarget: selectedStyle,
-        season: 'all',
-        weather: 'warm',
-        colorTone: 'neutral',
-        details: 'đơn giản',
+        colorTone: "light",
+        details: "string",
+        occasion: occasionMap[selectedOccasion] || "casual",
+        season: "spring",
+        styleTarget: selectedStyle.toLowerCase(),
+        weather: "warm",
       });
 
       setOutfitData(res);
+      setAlternativeIndices({});
+      
+      // Setup canvas items
+      if (res.items && res.items.length > 0) {
+        const initialSelected = res.items.map((item, idx) => ({
+          ...item.primary,
+          scale: 100,
+          x: (idx % 2 === 0 ? -1 : 1) * 30, // slight offset to prevent full overlap
+          y: idx * 80 - 100,
+          zIndex: idx + 1,
+          _role: item.role
+        }));
+        setSelectedItems(initialSelected);
+      } else {
+        setSelectedItems([]);
+      }
+
       setChatMessages([
         {
           id: crypto.randomUUID(),
@@ -84,7 +132,7 @@ export function AIStylistClient() {
       }
 
       requestAnimationFrame(() => {
-        animateResults();
+        animateChatIntro();
       });
     } catch (error) {
       console.error("Lỗi lấy đề xuất:", error);
@@ -144,110 +192,221 @@ export function AIStylistClient() {
     }
   };
 
-  return (
-    <div ref={containerRef} className="flex-1 relative pb-32 md:pb-12 min-h-[calc(100vh-100px)] flex flex-col bg-surface/50">
-      {/* Texture overlay for editorial feel */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-multiply" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cubes.png")' }}></div>
+  const handleSwap = (role: string) => {
+    const outfitItem = outfitData?.items.find(i => i.role === role);
+    if (!outfitItem || !outfitItem.alternatives || outfitItem.alternatives.length === 0) return;
+    
+    const currentIndex = alternativeIndices[role] ?? -1;
+    const totalOptions = outfitItem.alternatives.length + 1;
+    const nextIndex = ((currentIndex + 2) % totalOptions) - 1;
+    
+    setAlternativeIndices(prev => ({...prev, [role]: nextIndex}));
+    
+    const newItem = nextIndex === -1 ? outfitItem.primary : outfitItem.alternatives[nextIndex];
+    
+    setSelectedItems(prev => prev.map(item => {
+      if (item._role === role) {
+        return {
+          ...newItem,
+          scale: item.scale,
+          x: item.x,
+          y: item.y,
+          zIndex: item.zIndex,
+          _role: role
+        };
+      }
+      return item;
+    }));
+  };
+
+  const handleSaveOutfit = async () => {
+    if (selectedItems.length < 2) {
+      toast.error("Vui lòng chọn tối thiểu 2 món đồ trên canvas.");
+      return;
+    }
+    if (!outfitData?.title) return;
+
+    if (!canvasRef.current) return;
+
+    try {
+      setIsSaving(true);
+      toast.loading("Đang lưu phối đồ...", { id: "saving_outfit" });
+
+      const controls = document.querySelectorAll(".canvas-item-controls");
+      controls.forEach((el) => ((el as HTMLElement).style.opacity = "0"));
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const blob = await htmlToImage.toBlob(canvasRef.current, {
+        quality: 1,
+        pixelRatio: 3,
+        backgroundColor: "transparent",
+        cacheBust: true,
+      });
+
+      controls.forEach((el) => ((el as HTMLElement).style.opacity = "1"));
+
+      if (!blob) throw new Error("Không thể tạo ảnh từ Canvas");
+
+      const signatureResult = await wardrobeApi.getUploadSignature();
+      const uploadResData = await uploadToCloudinary({
+        file: blob,
+        signatureParams: {
+          apiKey: signatureResult.apiKey,
+          timestamp: signatureResult.timestamp,
+          signature: signatureResult.signature,
+          folder: signatureResult.folder,
+        },
+      });
+      const coverImageUrl = uploadResData.secure_url;
+
+      const payload = {
+        name: outfitData.title,
+        description: `AI Stylist: ${selectedOccasion} - ${selectedStyle}`,
+        coverImageUrl: coverImageUrl,
+        items: selectedItems.map((item) => ({
+          wardrobeItemId: item.id,
+          positionX: Math.max(1, Math.abs(item.x || 0)),
+          positionY: Math.max(1, Math.abs(item.y || 0)),
+          scale: (item.scale || 100) / 100,
+          layerOrder: item.zIndex || 1,
+        })),
+      };
+
+      await createOutfitMutation.mutateAsync(payload);
+      toast.success("Lưu bộ phối đồ thành công!", { id: "saving_outfit" });
       
-      <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop w-full flex-1 flex flex-col pt-8 relative z-10">
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Đã xảy ra lỗi khi lưu.", { id: "saving_outfit" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div ref={containerRef} className="flex-1 min-h-screen bg-white text-[#1A1A1A] pb-24 md:pb-12 font-sans selection:bg-[#1A1A1A] selection:text-white">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col pt-8 lg:pt-12">
         
         {/* Page Header */}
-        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="mb-8 md:mb-10 border-b border-[#E5E5E5] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h2 className="font-display-lg-mobile md:font-display-lg text-primary mb-2 font-serif tracking-tight">
-              {outfitData?.title || "Your Daily Lookbook"}
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-2 uppercase">
+              {outfitData?.title || "ATELIER STYLIST"}
             </h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl italic">
-              A curated selection designed for your specific moments.
+            <p className="text-xs md:text-sm text-[#666666] tracking-wide uppercase font-medium">
+              {outfitData ? "A CURATED SELECTION DESIGNED FOR YOUR SPECIFIC MOMENTS" : "CONFIGURE YOUR PREFERENCES TO DISCOVER TODAY'S CURATION"}
             </p>
           </div>
         </div>
 
-        {/* Bento Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 flex-1">
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 flex-1 items-start">
           
-          {/* Left Column: Visual Outfit (Span 8) */}
-          <div className="lg:col-span-8 flex flex-col gap-8">
+          {/* Left Column: Canvas (Span 8) */}
+          <div className="lg:col-span-8 flex flex-col gap-8 relative min-h-[600px] h-[600px] lg:h-[800px] border border-[#E5E5E5] bg-[#F9F9F9]">
             {outfitData ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px]">
-                {outfitData.items.map((item, index) => {
-                  const isMain = index === 0;
-                  return (
-                    <div 
-                      key={item.primary.id || index} 
-                      className={cn(
-                        "outfit-item group relative rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/30 shadow-sm transition-all duration-500 hover:shadow-md",
-                        isMain ? "md:col-span-2 md:row-span-2" : "md:col-span-1 md:row-span-1"
-                      )}
-                    >
-                      <Image 
-                        src={item.primary.imageUrl} 
-                        alt={item.role} 
-                        fill 
-                        priority={isMain}
-                        sizes={isMain ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
-                        className="object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div className="absolute bottom-4 left-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                        <p className="font-label-caps text-[10px] text-white/80 uppercase tracking-widest mb-1">{item.primary.material || item.role}</p>
-                        <p className="font-title-sm text-white font-medium truncate">{item.primary.category?.name || "Premium Item"}</p>
-                      </div>
+              <>
+                <div className="absolute top-4 left-4 z-20">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A] bg-white border border-[#E5E5E5] px-3 py-1.5 flex items-center gap-2">
+                    <Layers className="size-3.5" /> CANVAS STUDIO
+                  </span>
+                </div>
+                
+                {/* THE DRAG & DROP CANVAS */}
+                <OutfitCanvasBoard 
+                  canvasRef={canvasRef}
+                  selectedItems={selectedItems}
+                  updateScale={updateScale}
+                  bringToFront={bringToFront}
+                  removeItem={(id) => setSelectedItems(prev => prev.filter(x => x.id !== id))}
+                  handleDragEnd={handleDragEnd}
+                  onSwap={handleSwap}
+                  hasAlternativesCheck={(role) => {
+                    const outfitItem = outfitData.items.find(i => i.role === role);
+                    return outfitItem && outfitItem.alternatives && outfitItem.alternatives.length > 0;
+                  }}
+                  emptyState={
+                    <div className="text-center p-12">
+                      <p className="text-[#666666] text-sm uppercase tracking-widest">NO ITEMS SELECTED.</p>
                     </div>
-                  );
-                })}
-              </div>
+                  }
+                />
+              </>
             ) : (
-              <div className="relative bg-surface-container-lowest rounded-xl overflow-hidden aspect-[4/3] md:aspect-[16/9] border border-outline-variant/30 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center p-8 overflow-hidden">
                 {isGenerating ? (
-                  <div className="flex flex-col items-center justify-center">
-                    <Sparkles className="size-10 text-primary opacity-50 animate-bounce mb-4" />
-                    <p className="text-primary font-serif italic text-lg tracking-wide">Curating your style...</p>
+                  <div className="flex flex-col items-center justify-center gap-6">
+                    <div className="w-12 h-12 border-2 border-[#1A1A1A] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[#1A1A1A] font-bold text-sm uppercase tracking-widest">CURATING YOUR STYLE...</p>
                   </div>
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center opacity-60">
-                    <Sparkles className="size-12 text-primary/30 mb-4" />
-                    <p className="text-primary font-serif text-2xl mb-2 tracking-wide">The Blank Canvas</p>
-                    <p className="text-on-surface-variant text-sm max-w-sm">Configure your occasion and style on the right to discover today&apos;s curation.</p>
+                  <div className="w-full h-full flex flex-col items-center justify-center text-center max-w-md">
+                    <Sparkles className="w-8 h-8 text-[#A3A3A3] mb-6" strokeWidth={1} />
+                    <h3 className="text-2xl font-bold text-[#1A1A1A] uppercase tracking-tight mb-4">THE BLANK CANVAS</h3>
+                    <p className="text-[#666666] text-[13px] leading-relaxed">
+                      Please configure your occasion and style preferences on the right panel to generate a bespoke outfit curation.
+                    </p>
                   </div>
                 )}
               </div>
             )}
+            
+            {/* Action Footer */}
+            {outfitData && (
+              <div className="absolute bottom-0 left-0 right-0 flex flex-col sm:flex-row justify-between items-center border-t border-[#E5E5E5] bg-white z-20">
+                <button 
+                  onClick={() => { setOutfitData(null); setSelectedItems([]); setChatMessages([]); setContextID(""); }}
+                  className="w-full sm:w-1/2 px-6 py-4 border-r border-[#E5E5E5] text-[#1A1A1A] font-bold text-[11px] uppercase tracking-widest hover:bg-[#F9F9F9] transition-colors flex items-center justify-center gap-2"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> RE-GENERATE
+                </button>
+                <button 
+                  onClick={handleSaveOutfit}
+                  disabled={isSaving}
+                  className="w-full sm:w-1/2 px-8 py-4 bg-[#1A1A1A] text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <Save className="w-3.5 h-3.5" /> {isSaving ? "SAVING..." : "SAVE TO WARDROBE"}
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Right Column: AI Chat Interface (Span 4) */}
-          <div className="lg:col-span-4 h-[600px] lg:h-auto rounded-xl shadow-lg border border-outline-variant/20 bg-surface-container-lowest/90 backdrop-blur-[24px] flex flex-col overflow-hidden relative">
+          {/* Right Column: AI Chat Interface & Form (Span 4) */}
+          <div className="lg:col-span-4 h-[600px] lg:h-[800px] border border-[#E5E5E5] bg-white flex flex-col relative shadow-sm">
             
             {/* Chat Header */}
-            <div className="p-5 border-b border-outline-variant/20 flex items-center justify-between bg-surface/50">
+            <div className="p-5 border-b border-[#E5E5E5] flex items-center justify-between bg-[#F9F9F9]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <Sparkles className="size-5" />
+                <div className="w-8 h-8 bg-black flex items-center justify-center text-white">
+                  <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-serif text-[18px] text-primary tracking-wide">Ethos Stylist</h3>
-                  <p className="font-body-sm text-[12px] text-on-surface-variant tracking-wider uppercase">AI Assistant</p>
+                  <h3 className="font-bold text-[13px] text-[#1A1A1A] uppercase tracking-widest">ETHOS AI</h3>
+                  <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">STYLIST ASSISTANT</p>
                 </div>
               </div>
             </div>
 
-            {/* Chat Messages Area */}
-            <div className="flex-1 p-6 overflow-y-auto space-y-6 flex flex-col bg-surface-container-lowest/30 scroll-smooth">
+            {/* Content Area */}
+            <div className="flex-1 p-5 md:p-6 overflow-y-auto space-y-6 flex flex-col bg-white">
               
               {!outfitData && !isGenerating && (
-                 <div className="bg-surface text-on-surface p-5 rounded-2xl font-body-sm text-[14px] leading-relaxed shadow-sm border border-outline-variant/20 mb-4">
-                    <p className="mb-4 font-serif text-lg text-primary">Set the stage</p>
+                 <div className="flex flex-col gap-8">
+                    <div className="border-b border-[#E5E5E5] pb-4">
+                      <p className="text-xl font-bold text-[#1A1A1A] tracking-tight uppercase">PARAMETERS</p>
+                    </div>
                     
-                    <div className="mb-5">
-                      <p className="text-xs text-on-surface-variant mb-2 font-label-caps uppercase tracking-wider">Occasion</p>
+                    <div className="flex flex-col gap-4">
+                      <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">OCCASION</p>
                       <div className="flex flex-wrap gap-2">
                         {OCCASIONS.map(occ => (
                           <button 
                             key={occ} 
                             onClick={() => setSelectedOccasion(occ)}
                             className={cn(
-                              "px-3 py-1.5 rounded-full text-xs transition-all border", 
-                              selectedOccasion === occ ? "bg-primary text-on-primary border-primary shadow-md" : "bg-transparent text-on-surface border-outline-variant/50 hover:border-primary/50"
+                              "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border", 
+                              selectedOccasion === occ ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black"
                             )}
                           >
                             {occ}
@@ -256,16 +415,16 @@ export function AIStylistClient() {
                       </div>
                     </div>
 
-                    <div className="mb-6">
-                      <p className="text-xs text-on-surface-variant mb-2 font-label-caps uppercase tracking-wider">Style Direction</p>
+                    <div className="flex flex-col gap-4">
+                      <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">STYLE DIRECTION</p>
                       <div className="flex flex-wrap gap-2">
                         {STYLES.map(style => (
                           <button 
                             key={style} 
                             onClick={() => setSelectedStyle(style)}
                             className={cn(
-                              "px-3 py-1.5 rounded-full text-xs transition-all border", 
-                              selectedStyle === style ? "bg-primary text-on-primary border-primary shadow-md" : "bg-transparent text-on-surface border-outline-variant/50 hover:border-primary/50"
+                              "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border", 
+                              selectedStyle === style ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black"
                             )}
                           >
                             {style}
@@ -277,18 +436,24 @@ export function AIStylistClient() {
                     <button 
                       onClick={handleGenerate}
                       disabled={isGenerating}
-                      className="w-full bg-primary text-on-primary font-body-lg text-[14px] font-medium py-3 rounded-lg hover:bg-primary/90 transition-all flex justify-center items-center gap-2 shadow-sm disabled:opacity-70"
+                      className="mt-6 w-full bg-[#1A1A1A] text-white text-[11px] font-bold py-4 hover:bg-black/80 transition-colors flex justify-center items-center gap-2 disabled:opacity-50 tracking-widest uppercase"
                     >
-                      <Sparkles className="size-4" /> Discover Look
+                      <Sparkles className="w-3.5 h-3.5" /> GENERATE LOOKBOOK
                     </button>
                  </div>
               )}
 
+              {/* Chat Messages */}
               {chatMessages.map((msg) => (
-                <div key={msg.id} className={cn("flex flex-col gap-1 max-w-[85%]", msg.role === 'user' ? "self-end items-end" : "self-start")}>
+                <div key={msg.id} className={cn("chat-intro flex flex-col gap-1.5 w-full", msg.role === 'user' ? "items-end" : "items-start")}>
+                  {msg.role === 'ai' && <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">ETHOS AI</span>}
+                  {msg.role === 'user' && <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">YOU</span>}
+                  
                   <div className={cn(
-                    "p-4 rounded-2xl font-body-sm text-[14px] leading-relaxed shadow-sm",
-                    msg.role === 'user' ? "bg-primary text-on-primary rounded-tr-none" : "bg-surface text-on-surface rounded-tl-none border border-outline-variant/20"
+                    "p-4 text-[13px] leading-relaxed",
+                    msg.role === 'user' 
+                      ? "bg-[#1A1A1A] text-white ml-6 md:ml-12" 
+                      : "bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] mr-6 md:mr-12"
                   )}>
                     {msg.content}
                   </div>
@@ -296,11 +461,12 @@ export function AIStylistClient() {
               ))}
 
               {isChatting && (
-                <div className="flex flex-col gap-1 max-w-[85%] self-start animate-pulse">
-                  <div className="bg-surface text-on-surface p-4 rounded-2xl rounded-tl-none border border-outline-variant/20 shadow-sm w-16 h-12 flex items-center justify-center gap-1">
-                    <div className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                    <div className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                    <div className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                <div className="flex flex-col gap-1.5 items-start w-full">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">ETHOS AI</span>
+                  <div className="bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] p-4 mr-12 flex items-center justify-center gap-1.5 min-w-[60px] h-[52px]">
+                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{animationDelay: '0ms'}}></div>
+                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{animationDelay: '150ms'}}></div>
+                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{animationDelay: '300ms'}}></div>
                   </div>
                 </div>
               )}
@@ -308,43 +474,29 @@ export function AIStylistClient() {
             </div>
 
             {/* Chat Input */}
-            <div className="p-4 bg-surface/80 border-t border-outline-variant/20 backdrop-blur-md">
-              <div className="relative flex items-center group">
+            <div className="p-4 bg-[#F9F9F9] border-t border-[#E5E5E5]">
+              <div className="relative flex items-center bg-white border border-[#E5E5E5] focus-within:border-[#1A1A1A] transition-colors">
                 <input 
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   disabled={!outfitData || isChatting}
-                  className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-full pl-5 pr-12 py-3 font-body-sm text-primary placeholder:text-on-surface-variant/50 transition-all focus:border-primary/50 focus:ring-1 focus:ring-primary/50 disabled:opacity-50" 
-                  placeholder={outfitData ? "Ask for adjustments..." : "Generate an outfit first..."} 
+                  className="w-full bg-transparent border-none outline-none pl-4 pr-12 py-3.5 text-[13px] text-[#1A1A1A] placeholder:text-[#A3A3A3] disabled:opacity-50 font-medium" 
+                  placeholder={outfitData ? "Type a message..." : "Generate an outfit first..."} 
                   type="text"
                 />
                 <button 
                   onClick={handleSendMessage}
                   disabled={!chatInput.trim() || isChatting || !outfitData}
-                  className="absolute right-2 text-primary p-2 rounded-full hover:bg-surface-variant transition-colors disabled:opacity-30"
+                  className="absolute right-2 text-[#A3A3A3] hover:text-[#1A1A1A] p-2 transition-colors disabled:opacity-30 outline-none"
                 >
-                  <Send className="size-4" />
+                  <MoveRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
+            
           </div>
         </div>
-
-        {/* Bottom Actions */}
-        {outfitData && (
-          <div className="mt-8 flex justify-end gap-4 border-t border-outline-variant/20 pt-6">
-            <button 
-              onClick={() => { setOutfitData(null); setChatMessages([]); setContextID(""); }}
-              className="px-8 py-3 rounded-none border border-secondary text-secondary font-body-lg text-[15px] font-medium hover:bg-secondary/5 transition-colors min-h-[48px] flex items-center gap-2 tracking-wide"
-            >
-              <RefreshCw className="size-4" /> RESET
-            </button>
-            <button className="px-8 py-3 rounded-none bg-primary text-on-primary font-body-lg text-[15px] font-medium hover:bg-primary/90 transition-all shadow-md hover:shadow-lg min-h-[48px] flex items-center gap-2 tracking-wide uppercase">
-              <Save className="size-4" /> Save to Wardrobe
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

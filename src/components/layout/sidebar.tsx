@@ -17,7 +17,11 @@ import {
   Settings,
   HelpCircle,
   LogOut,
-  ChevronRight
+  ChevronRight,
+  Code,
+  ScanBarcode,
+  ScanBarcodeIcon,
+  ScanQrCode
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -26,6 +30,7 @@ import { useLogout } from "@/features/auth/queries/auth.queries";
 export const NAV_ITEMS = [
   { icon: Shirt, label: "Wardrobe", path: "/wardrobe" },
   { icon: Sparkles, label: "AI Stylist", path: "/ai-stylist" },
+  {icon: ScanQrCode, label: "Outfit", path:"/outfits"},
   { icon: LayoutGrid, label: "Community", path: "/community" },
   { icon: Store, label: "Marketplace", path: "/marketplace" },
 ];
@@ -143,31 +148,28 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Premium Upgrade (VIP Card Style) */}
+      {/* Premium Upgrade (Minimal Style) */}
       {!user?.isPremium && (
-        <div className="mt-auto mb-6 relative overflow-hidden rounded-2xl bg-[#111] border border-[#333] p-5 shadow-2xl group cursor-pointer transition-transform hover:-translate-y-1">
-          {/* Subtle noise texture */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
-          
-          <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#D9C5B2]/20 rounded-full blur-2xl group-hover:bg-[#D9C5B2]/30 transition-colors duration-700" />
+        <div className="mt-auto mb-6 relative overflow-hidden rounded-2xl bg-muted/30 border border-border/50 p-5 group cursor-pointer transition-colors hover:bg-muted/50">
+          <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#D9C5B2]/20 rounded-full blur-2xl transition-colors duration-700 group-hover:bg-[#D9C5B2]/30" />
 
           <div className="relative z-10 flex flex-col gap-2">
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <Sparkles className="size-4 text-[#D9C5B2]" />
-                <span className="font-title-lg text-[11px] font-bold tracking-[0.2em] uppercase text-[#D9C5B2]">
+                <Sparkles className="size-4 text-foreground/80 group-hover:text-[#D9C5B2] transition-colors" />
+                <span className="font-title-lg text-[11px] font-bold tracking-[0.2em] uppercase text-foreground/90 group-hover:text-foreground transition-colors">
                   Premium
                 </span>
               </div>
             </div>
-            <p className="font-body-sm text-[13px] text-[#F4F1EE]/70 leading-relaxed pr-4">
+            <p className="font-body-sm text-[13px] text-muted-foreground/90 leading-relaxed pr-4">
               Elevate your style with unlimited AI curation.
             </p>
             <Link
               href="/pricing"
-              className="mt-3 inline-flex items-center gap-2 text-[#D9C5B2] font-semibold text-[13px] group/btn"
+              className="mt-3 inline-flex items-center gap-2 text-foreground/90 font-medium text-[13px] group/btn"
             >
-              <span className="border-b border-[#D9C5B2]/30 pb-0.5 group-hover/btn:border-[#D9C5B2] transition-colors">Upgrade Access</span>
+              <span className="border-b border-foreground/30 pb-0.5 group-hover/btn:border-foreground/70 transition-colors">Upgrade Access</span>
               <ChevronRight className="size-3 group-hover/btn:translate-x-1 transition-transform" />
             </Link>
           </div>

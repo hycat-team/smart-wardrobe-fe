@@ -63,8 +63,41 @@ export function applyCloudinaryBackgroundRemoval(url: string): string {
   
   if (newUrl.includes("/upload/")) {
     // Bắt buộc dùng f_png thay vì f_auto để đảm bảo Cloudinary trả về định dạng hỗ trợ trong suốt
-    return newUrl.replace("/upload/", "/upload/e_background_removal,f_png,q_auto/");
+    // Thêm e_trim:10 để tự động cắt bỏ khoảng trắng và shadow thừa
+    return newUrl.replace("/upload/", "/upload/e_background_removal,e_trim:10,f_png,q_auto/");
   }
   
   return newUrl;
+}
+
+/**
+ * Thêm e_trim:10 vào một URL Cloudinary đã có sẵn để cắt ảnh trên giao diện.
+ * Hỗ trợ cả URL bên ngoài bằng Cloudinary Fetch API.
+ */
+export function applyCloudinaryTrim(url: string | undefined): string {
+  if (!url) return "";
+  
+  // Nếu là URL nội bộ, giữ nguyên
+  if (url.startsWith("/")) return url;
+
+  if (url.includes("cloudinary.com")) {
+    // Nếu đã có e_trim rồi thì bỏ qua
+    if (url.includes("e_trim")) return url;
+
+    // Nếu là URL chuẩn của Cloudinary có chứa /upload/
+    if (url.includes("/upload/")) {
+      // Chèn e_trim:10 vào ngay sau /upload/
+      return url.replace("/upload/", "/upload/e_trim:10/");
+    }
+    return url;
+  }
+
+  // Nếu là URL bên ngoài (http/https), sử dụng Cloudinary Fetch API để tự động trim
+  if (url.startsWith("http")) {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
+    // Thêm f_png và e_trim:20 để xử lý triệt để các URL không có đuôi mở rộng và bóng mờ
+    return `https://res.cloudinary.com/${cloudName}/image/fetch/f_png,e_trim:20/${url}`;
+  }
+
+  return url;
 }
