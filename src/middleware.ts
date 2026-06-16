@@ -42,33 +42,59 @@ export async function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get('refreshToken')?.value;
 
   const headersToForward = new Headers(request.headers);
-  let backendSetCookies: string[] = [];
   let isRefreshFailed = false;
+  let newAccessToken = '';
+  let newRefreshToken = '';
 
   // 1. CHẶN VÀ KIỂM TRA HẠN TOKEN
-  if ((!accessToken || isTokenExpired(accessToken)) && refreshToken) {
+  // Bỏ qua route refresh-token để tránh việc middleware và route handler cùng gọi backend 2 lần
+  if ((!accessToken || isTokenExpired(accessToken)) && refreshToken && !pathname.includes('/auth/refresh-token')) {
     try {
       // Gọi API refresh token tới Backend
       const refreshRes = await fetch(`${BACKEND_URL}/auth/refresh-token`, {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'Cookie': `refreshToken=${refreshToken}`
         }
       });
 
       if (refreshRes.ok) {
-        backendSetCookies = refreshRes.headers.getSetCookie();
-        
-        let newAccessToken = '';
-        let newRefreshToken = '';
+        // Thử lấy token từ JSON body
+        try {
+          const data = await refreshRes.json();
+          if (data) {
+            if (typeof data === 'string') {
+              newAccessToken = data;
+            } else if (typeof data === 'object') {
+              newAccessToken = data.accessToken || data.token || data.access_token || data.jwt || data.jwtToken;
+              newRefreshToken = data.refreshToken || data.refresh_token;
 
-        // Phân tích Cookie trả về từ Backend
-        for (const cookieStr of backendSetCookies) {
-          const [nameValue] = cookieStr.split(';');
-          const [name, ...valueParts] = nameValue.split('=');
-          const value = valueParts.join('=');
-          if (name.trim() === 'accessToken') newAccessToken = value.trim();
-          if (name.trim() === 'refreshToken') newRefreshToken = value.trim();
+              if (!newAccessToken) {
+                for (const key in data) {
+                  if (data[key] && typeof data[key] === 'object') {
+                    newAccessToken = data[key].accessToken || data[key].token || data[key].access_token || data[key].jwt || data[key].jwtToken;
+                    newRefreshToken = newRefreshToken || data[key].refreshToken || data[key].refresh_token;
+                    if (newAccessToken) break;
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          // Bỏ qua nếu không phải JSON
+        }
+
+        // Parse từ Cookie trả về từ Backend (nếu Backend dùng Set-Cookie)
+        const rawCookies = refreshRes.headers.getSetCookie();
+        if (rawCookies && rawCookies.length > 0) {
+          for (const cookieStr of rawCookies) {
+            const [nameValue] = cookieStr.split(';');
+            const [name, ...valueParts] = nameValue.split('=');
+            const value = valueParts.join('=');
+            if (name.trim() === 'accessToken') newAccessToken = value.trim();
+            if (name.trim() === 'refreshToken') newRefreshToken = value.trim();
+          }
         }
 
         if (newAccessToken) {
@@ -79,12 +105,19 @@ export async function middleware(request: NextRequest) {
              if (c.name === 'accessToken') return `accessToken=${newAccessToken}`;
              if (c.name === 'refreshToken' && newRefreshToken) return `refreshToken=${newRefreshToken}`;
              return `${c.name}=${c.value}`;
-          }).join('; ');
-          
-          headersToForward.set('cookie', updatedCookies);
+          });
+
+          // Nếu chưa có trong header cũ thì push thêm vào
+          if (!request.cookies.has('accessToken')) updatedCookies.push(`accessToken=${newAccessToken}`);
+          if (newRefreshToken && !request.cookies.has('refreshToken')) updatedCookies.push(`refreshToken=${newRefreshToken}`);
+
+          headersToForward.set('cookie', updatedCookies.join('; '));
+        } else {
+          // Backend trả về OK nhưng không parse được token -> Fail
+          isRefreshFailed = true;
         }
       } else {
-        // Backend trả về 4011 -> Refresh token cũng đã chết
+        // Backend trả về lỗi (VD: 401) -> Refresh token cũng đã chết
         isRefreshFailed = true;
       }
     } catch (error) {
@@ -108,7 +141,6 @@ export async function middleware(request: NextRequest) {
     // Nếu là Page Request
     else {
       // Không tự động redirect ở middleware để tránh ảnh hưởng các trang public (landing page).
-      // Việc bảo vệ route (auth guard) sẽ do các Server/Client Component tự lo.
       const response = NextResponse.next({
         request: { headers: headersToForward }
       });
@@ -119,30 +151,29 @@ export async function middleware(request: NextRequest) {
   }
 
   // 3. ĐIỀU HƯỚNG REQUEST (PROXY HOẶC NEXT)
-  let finalResponse: NextResponse;
+  let finalResponse = NextResponse.next({
+    request: { headers: headersToForward }
+  });
 
-  if (pathname.startsWith('/api/v1/')) {
-    // Luồng cho Axios gọi tới Next.js API Routes (BFF) - hiện tại đã được cấu hình rewrite trong next.config.ts
-    // Middleware chỉ pass qua
-    finalResponse = NextResponse.next({
-      request: {
-        headers: headersToForward,
-      }
-    });
-  } else {
-    // Luồng cho Server Component render trang
-    finalResponse = NextResponse.next({
-      request: {
-        headers: headersToForward,
-      }
+  // 4. GẮN COOKIE MỚI VÀO RESPONSE ĐỂ BROWSER LƯU LẠI
+  if (newAccessToken) {
+    finalResponse.cookies.set('accessToken', newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24, // 1 day
     });
   }
-
-  // 4. GẮN COOKIE MỚI VÀO RESPONSE (NẾU CÓ REFRESH)
-  if (backendSetCookies.length > 0) {
-    for (const cookieStr of backendSetCookies) {
-      finalResponse.headers.append('Set-Cookie', cookieStr);
-    }
+  
+  if (newRefreshToken) {
+    finalResponse.cookies.set('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
   }
 
   return finalResponse;

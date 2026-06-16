@@ -25,124 +25,143 @@ export const PricingCard = ({ plan, isPopular, currentPlanSlug }: PricingCardPro
     purchaseWallet.mutate({ planSlug: plan.slug || (plan as any).planSlug });
   };
 
-  const isFreePlan = (plan.price || plan.Price) === 0;
+  const priceValue = (plan.price || plan.Price) || 0;
+  const isFree = priceValue === 0;
+  
   const planSlug = plan.slug || plan.planSlug || plan.PlanSlug || (plan as any).slug;
   const isCurrentPlan = currentPlanSlug && planSlug === currentPlanSlug;
-  const shouldHideButton = isFreePlan || isCurrentPlan;
+  const shouldHideButton = isFree || isCurrentPlan;
 
   return (
     <div
-      className={`relative flex flex-col p-8 lg:p-10 rounded-none transition-all duration-500 hover:-translate-y-2 ${
+      className={`group relative flex flex-col h-full min-h-[500px] w-full transition-colors duration-700 ${
         isPopular
-          ? 'bg-[#1A1A1A] text-white border border-[#1A1A1A] shadow-xl'
-          : 'bg-[#F4F1EE] text-[#1A1A1A] border border-[#1A1A1A]/20 hover:border-[#1A1A1A]'
+          ? 'bg-[#1A1A1A] text-[#F4F1EE] shadow-2xl'
+          : 'bg-[#F4F1EE] text-[#1A1A1A] hover:bg-[#EAE5DF]'
       }`}
     >
+      {/* Background Noise Texture */}
+      <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-difference" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
+
       {isPopular && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#D9C5B2] text-[10px] font-['IBM_Plex_Mono'] font-semibold tracking-widest text-white uppercase shadow-sm flex items-center gap-1.5">
-          <Sparkles className="size-3" />
-          KHUYÊN DÙNG
+        <div className="absolute -right-6 -top-6 w-28 h-28 flex items-center justify-center z-30 pointer-events-none drop-shadow-xl">
+          <div className="absolute inset-0 bg-[#D9C5B2] animate-[spin_12s_linear_infinite]" style={{ clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' }}></div>
+          <span className="font-['IBM_Plex_Mono'] text-[9px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A] relative z-10 text-center leading-[1.2]">
+            PRO<br/>CHOICE
+          </span>
         </div>
       )}
 
-      <div className="mb-6 border-b border-current/10 pb-6">
-        <h3 className="font-['Playfair_Display'] text-2xl md:text-3xl font-medium mb-3 tracking-tight">{plan.name || plan.Name}</h3>
-        <p className={`font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-wider leading-relaxed min-h-[40px] ${isPopular ? 'text-white/70' : 'text-[#1A1A1A]/70'}`}>
-          {plan.description || plan.Description || 'Quản lý tủ đồ thông minh mỗi ngày.'}
-        </p>
-      </div>
-
-      <div className="mb-8 flex items-baseline gap-2">
-        <span className="font-['Playfair_Display'] text-4xl md:text-5xl font-semibold tracking-tight">
-          {(plan.price || plan.Price) === 0 ? 'Miễn phí' : (plan.price || plan.Price || 0).toLocaleString('vi-VN')}
+      {/* Decorative vertical text */}
+      <div className="absolute left-4 top-12 bottom-12 w-4 border-l border-current/10 hidden md:flex items-center justify-center opacity-30">
+        <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-[0.4em] rotate-180 whitespace-nowrap" style={{ writingMode: 'vertical-rl' }}>
+          {isPopular ? 'PREMIUM ACCESS TIER' : 'STANDARD MEMBERSHIP'}
         </span>
-        {(plan.price || plan.Price) !== 0 && (
-          <span className={`font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-wider ${isPopular ? 'text-[#D9C5B2]' : 'text-[#1A1A1A]/50'}`}>
-            VNĐ / {plan.durationDays || plan.DurationDays || 30} NGÀY
-          </span>
-        )}
       </div>
 
-      <div className="flex-1">
-        <ul className="space-y-4 mb-10">
-          <li className="flex items-start gap-3">
-            <Check size={16} strokeWidth={1.5} className={`mt-0.5 shrink-0 ${isPopular ? 'text-[#D9C5B2]' : 'text-[#1A1A1A]'}`} />
-            <span className={`font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-wider ${isPopular ? 'text-white/90' : 'text-[#1A1A1A]'}`}>
-              TỐI ĐA <strong>{plan.maxOutfits || plan.MaxOutfits}</strong> BỘ PHỐI ĐỒ
-            </span>
+      <div className="flex-1 p-8 md:pl-16 md:pr-10 pt-14 flex flex-col relative z-10">
+        <div className="mb-12">
+          <h3 className="font-['Playfair_Display'] text-4xl md:text-5xl italic font-medium mb-5 tracking-tighter">
+            {plan.name || plan.Name}
+          </h3>
+          <div className="w-12 h-[1px] bg-current/30 mb-6 transition-all duration-700 ease-out group-hover:w-full"></div>
+          <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.15em] leading-loose opacity-60 min-h-[48px]">
+            {plan.description || plan.Description || 'Quản lý tủ đồ thông minh mỗi ngày.'}
+          </p>
+        </div>
+
+        <div className="mb-14 relative flex items-start gap-3">
+          <span className="font-['Playfair_Display'] text-6xl md:text-7xl font-bold tracking-tighter leading-none group-hover:scale-105 origin-left transition-transform duration-500 ease-out">
+            {isFree ? 'Free' : priceValue.toLocaleString('vi-VN')}
+          </span>
+          {!isFree && (
+            <div className="flex flex-col mt-2">
+              <span className="font-['IBM_Plex_Mono'] text-[13px] font-bold uppercase tracking-widest text-[#D9C5B2]">
+                VNĐ
+              </span>
+              <span className="font-['IBM_Plex_Mono'] text-[9px] uppercase tracking-[0.2em] opacity-40 mt-1">
+                / {plan.durationDays || plan.DurationDays || 30} NGÀY
+              </span>
+            </div>
+          )}
+        </div>
+
+        <ul className="space-y-5 mb-14 flex-1 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest">
+          <li className="flex items-center gap-4 group/item">
+            <span className="w-[5px] h-[5px] bg-[#D9C5B2] transition-transform duration-300 group-hover/item:scale-[2]"></span>
+            <span className="opacity-70">TỐI ĐA <strong className="font-bold opacity-100 text-[12px]">{plan.maxOutfits || plan.MaxOutfits}</strong> BỘ PHỐI ĐỒ</span>
           </li>
-          <li className="flex items-start gap-3">
-            <Check size={16} strokeWidth={1.5} className={`mt-0.5 shrink-0 ${isPopular ? 'text-[#D9C5B2]' : 'text-[#1A1A1A]'}`} />
-            <span className={`font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-wider ${isPopular ? 'text-white/90' : 'text-[#1A1A1A]'}`}>
-              LƯỢT TẠO PHỐI ĐỒ AI: <strong>{plan.aiOutfitDailyQuota || plan.AiOutfitDailyQuota || '∞'}</strong> / NGÀY
-            </span>
+          <li className="flex items-center gap-4 group/item">
+            <span className="w-[5px] h-[5px] bg-[#D9C5B2] transition-transform duration-300 group-hover/item:scale-[2]"></span>
+            <span className="opacity-70">TẠO PHỐI ĐỒ AI: <strong className="font-bold opacity-100 text-[12px]">{plan.aiOutfitDailyQuota || plan.AiOutfitDailyQuota || '∞'}</strong> LẦN/NGÀY</span>
           </li>
-          <li className="flex items-start gap-3">
-            <Check size={16} strokeWidth={1.5} className={`mt-0.5 shrink-0 ${isPopular ? 'text-[#D9C5B2]' : 'text-[#1A1A1A]'}`} />
-            <span className={`font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-wider ${isPopular ? 'text-white/90' : 'text-[#1A1A1A]'}`}>
-              LƯỢT CHAT AI: <strong>{plan.aiChatDailyQuota || plan.AiChatDailyQuota || '∞'}</strong> / NGÀY
-            </span>
+          <li className="flex items-center gap-4 group/item">
+            <span className="w-[5px] h-[5px] bg-[#D9C5B2] transition-transform duration-300 group-hover/item:scale-[2]"></span>
+            <span className="opacity-70">CHAT VỚI AI: <strong className="font-bold opacity-100 text-[12px]">{plan.aiChatDailyQuota || plan.AiChatDailyQuota || '∞'}</strong> LẦN/NGÀY</span>
           </li>
           {plan.features?.map((feature, idx) => (
-            <li key={idx} className="flex items-start gap-3">
-              <Check size={16} strokeWidth={1.5} className={`mt-0.5 shrink-0 ${isPopular ? 'text-[#D9C5B2]' : 'text-[#1A1A1A]'}`} />
-              <span className={`font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-wider ${isPopular ? 'text-white/90' : 'text-[#1A1A1A]'}`}>
-                {feature}
-              </span>
+            <li key={idx} className="flex items-center gap-4 group/item">
+              <span className="w-[5px] h-[5px] bg-[#D9C5B2] transition-transform duration-300 group-hover/item:scale-[2]"></span>
+              <span className="opacity-70">{feature}</span>
             </li>
           ))}
         </ul>
+
+        {!shouldHideButton && (
+          <div className="mt-auto relative z-20">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  className={`w-full h-16 rounded-none font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.25em] relative overflow-hidden group/btn ${
+                    isPopular 
+                      ? 'bg-[#D9C5B2] text-[#1A1A1A] hover:bg-[#F4F1EE]' 
+                      : 'bg-transparent text-current border border-current hover:bg-[#1A1A1A] hover:text-[#F4F1EE]'
+                  }`}
+                >
+                  <span className="relative z-10 flex items-center justify-between w-full px-6">
+                    <span>ĐĂNG KÝ NGAY</span>
+                    <span className="transform translate-x-4 opacity-0 transition-all duration-300 group-hover/btn:translate-x-0 group-hover/btn:opacity-100">→</span>
+                  </span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md bg-[#F4F1EE] border-[#1A1A1A]/10 rounded-none p-8">
+                <DialogHeader>
+                  <DialogTitle className="font-['Playfair_Display'] text-4xl italic tracking-tight font-medium text-[#1A1A1A] mb-2">Thanh toán</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-6 py-4">
+                  <div className="font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-wider text-[#1A1A1A]/70 leading-relaxed border-l-[3px] border-[#D9C5B2] pl-4">
+                    <span className="block mb-1 opacity-60 text-[10px]">GÓI THÀNH VIÊN</span>
+                    <span className="font-bold text-[#1A1A1A] text-[14px] block mb-3">{plan.name || plan.Name}</span>
+                    <span className="block opacity-60 text-[10px]">TỔNG THANH TOÁN</span>
+                    <span className="font-bold text-[#1A1A1A] text-[14px]">{priceValue.toLocaleString('vi-VN')} VNĐ</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-4 mt-4">
+                    <Button 
+                      onClick={handlePurchaseDirect} 
+                      disabled={purchaseDirect.isPending}
+                      className="h-14 rounded-none bg-[#1A1A1A] text-white hover:bg-[#D9C5B2] hover:text-[#1A1A1A] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.1em] flex items-center justify-between px-6 transition-colors group/pay"
+                    >
+                      <span>Chuyển khoản (VietQR)</span>
+                      <span className="opacity-50 group-hover/pay:opacity-100 group-hover/pay:translate-x-1 transition-all">→</span>
+                    </Button>
+                    
+                    <Button 
+                      onClick={handlePurchaseWallet} 
+                      disabled={purchaseWallet.isPending}
+                      variant="outline"
+                      className="h-14 rounded-none border border-[#1A1A1A] bg-transparent hover:bg-[#1A1A1A] hover:text-[#F4F1EE] text-[#1A1A1A] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.1em] flex items-center justify-between px-6 transition-colors group/wallet"
+                    >
+                      <span>Số dư ví CLOSY</span>
+                      <span className="opacity-50 group-hover/wallet:opacity-100 group-hover/wallet:translate-x-1 transition-all">→</span>
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
       </div>
-
-      {!shouldHideButton && (
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button 
-              className={`w-full h-12 rounded-none font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.15em] transition-all duration-300 ${
-                isPopular 
-                  ? 'bg-[#D9C5B2] text-white hover:bg-white hover:text-[#1A1A1A]' 
-                  : 'bg-transparent text-[#1A1A1A] border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white'
-              }`}
-            >
-              Đăng ký ngay
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md bg-[#F4F1EE] border-[#1A1A1A]/10 rounded-none p-8">
-            <DialogHeader>
-              <DialogTitle className="font-['Playfair_Display'] text-3xl font-medium text-[#1A1A1A]">Phương thức thanh toán</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col gap-5 py-6">
-              <p className="font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-wider text-[#1A1A1A]/70 leading-relaxed border-l-2 border-[#D9C5B2] pl-3">
-                Kích hoạt gói <span className="font-bold text-[#1A1A1A]">{plan.name || plan.Name}</span><br />
-                Tổng cộng: <span className="font-bold text-[#1A1A1A]">{(plan.price || plan.Price || 0).toLocaleString('vi-VN')} VNĐ</span>
-              </p>
-              
-              <Button 
-                onClick={handlePurchaseDirect} 
-                disabled={purchaseDirect.isPending}
-                className="h-14 rounded-none bg-[#1A1A1A] text-white hover:bg-[#D9C5B2] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.1em] flex items-center justify-center gap-2 transition-colors"
-              >
-                {purchaseDirect.isPending ? 'Đang xử lý...' : 'Chuyển khoản (VietQR / PayOS)'}
-              </Button>
-              
-              <div className="relative flex items-center py-2">
-                <div className="flex-grow border-t border-[#1A1A1A]/10"></div>
-                <span className="flex-shrink-0 mx-4 text-[#1A1A1A]/40 text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-widest">HOẶC</span>
-                <div className="flex-grow border-t border-[#1A1A1A]/10"></div>
-              </div>
-
-              <Button 
-                onClick={handlePurchaseWallet} 
-                disabled={purchaseWallet.isPending}
-                variant="outline"
-                className="h-14 rounded-none border border-[#1A1A1A] bg-transparent hover:bg-[#1A1A1A] hover:text-white text-[#1A1A1A] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.1em] flex items-center justify-center gap-2 transition-colors"
-              >
-                {purchaseWallet.isPending ? 'Đang xử lý...' : 'Thanh toán bằng số dư ví'}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };

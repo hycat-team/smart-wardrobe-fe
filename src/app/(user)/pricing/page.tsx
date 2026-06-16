@@ -67,16 +67,16 @@ export default function PricingPage() {
               Chọn gói phù hợp với phong cách của bạn
             </p>
           </div>
-          
+
           <div className={`grid grid-cols-1 md:grid-cols-2 ${plans.length === 2 ? 'max-w-4xl mx-auto' : 'lg:grid-cols-3'} gap-px bg-[#1A1A1A]/10 border border-[#1A1A1A]/10 p-px mt-4`}>
             {plans.length > 0 ? (
               plans.map((plan, index) => {
                 const isPopular = index === 1; // Vd: gói ở giữa là popular
                 return (
-                  <div key={plan.id} className={`bg-[#F4F1EE] ${isPopular ? 'z-10 relative' : 'z-0 relative'}`}>
-                    <PricingCard 
-                      plan={plan} 
-                      isPopular={isPopular} 
+                  <div key={plan.id} className={`flex flex-col h-full ${isPopular ? 'z-20 relative' : 'z-10 relative'}`}>
+                    <PricingCard
+                      plan={plan}
+                      isPopular={isPopular}
                       currentPlanSlug={mySubscription?.planSlug || mySubscription?.PlanSlug}
                     />
                   </div>

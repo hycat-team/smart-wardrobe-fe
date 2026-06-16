@@ -8,8 +8,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/button";
-import { 
-  Sparkles, ArrowDown, Check, Heart, MessageCircle, Share2, 
+import {
+  Sparkles, ArrowDown, Check, Heart, MessageCircle, Share2,
   Clock, Smartphone, Target, Timer, Shirt, AlertCircle, RefreshCw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -29,11 +29,11 @@ export function LandingClient() {
         scrub: true,
       }
     });
-    
+
     tlBg.to(".bg-gradient-layer", { backgroundColor: "#EDE8E3", duration: 1 })
-        .to(".bg-gradient-layer", { backgroundColor: "#F0E8DC", duration: 1 })
-        .to(".bg-gradient-layer", { backgroundColor: "#EBE5DE", duration: 1 })
-        .to(".bg-gradient-layer", { backgroundColor: "#E8E4DF", duration: 1 });
+      .to(".bg-gradient-layer", { backgroundColor: "#F0E8DC", duration: 1 })
+      .to(".bg-gradient-layer", { backgroundColor: "#EBE5DE", duration: 1 })
+      .to(".bg-gradient-layer", { backgroundColor: "#E8E4DF", duration: 1 });
 
     // Ambient Blobs Parallax
     gsap.to(".ambient-blob-1", {
@@ -138,15 +138,15 @@ export function LandingClient() {
       const targetStr = counter.getAttribute("data-target") || "0";
       const targetVal = parseFloat(targetStr.replace(/,/g, ''));
       const suffix = counter.getAttribute("data-suffix") || "";
-      
-      gsap.fromTo(counter, 
-        { textContent: 0 }, 
-        { 
-          textContent: targetVal, 
-          duration: 2, 
-          ease: "power1.out", 
+
+      gsap.fromTo(counter,
+        { textContent: 0 },
+        {
+          textContent: targetVal,
+          duration: 2,
+          ease: "power1.out",
           snap: { textContent: 1 },
-          onUpdate: function() {
+          onUpdate: function () {
             counter.innerHTML = Math.round(Number(this.targets()[0].textContent)).toLocaleString('en-US') + suffix;
           },
           scrollTrigger: {
@@ -158,26 +158,26 @@ export function LandingClient() {
     });
 
     // 2. Before / After Reveal
-    gsap.fromTo(".before-card", 
-      { x: -60, opacity: 0 }, 
+    gsap.fromTo(".before-card",
+      { x: -60, opacity: 0 },
       { x: 0, opacity: 1, duration: 0.8, scrollTrigger: { trigger: ".before-after-section", start: "top 75%" } }
     );
-    gsap.fromTo(".after-card", 
-      { x: 60, opacity: 0 }, 
+    gsap.fromTo(".after-card",
+      { x: 60, opacity: 0 },
       { x: 0, opacity: 1, duration: 0.8, scrollTrigger: { trigger: ".before-after-section", start: "top 75%" } }
     );
-    gsap.fromTo(".before-item", 
-      { y: 20, opacity: 0 }, 
+    gsap.fromTo(".before-item",
+      { y: 20, opacity: 0 },
       { y: 0, opacity: 1, stagger: 0.15, duration: 0.6, scrollTrigger: { trigger: ".before-card", start: "top 85%" } }
     );
-    gsap.fromTo(".after-item", 
-      { y: 20, opacity: 0 }, 
+    gsap.fromTo(".after-item",
+      { y: 20, opacity: 0 },
       { y: 0, opacity: 1, stagger: 0.15, duration: 0.6, scrollTrigger: { trigger: ".after-card", start: "top 85%" } }
     );
 
     // 3. Testimonials
-    gsap.fromTo(".testimonial-bubble", 
-      { y: 30, opacity: 0 }, 
+    gsap.fromTo(".testimonial-bubble",
+      { y: 30, opacity: 0 },
       { y: 0, opacity: 1, stagger: 0.25, duration: 0.8, scrollTrigger: { trigger: ".testimonials-section", start: "top 75%" } }
     );
 
@@ -195,7 +195,7 @@ export function LandingClient() {
 
   return (
     <div ref={containerRef} className="w-full bg-[#F4F1EE] text-[#1A1A1A] font-sans overflow-x-hidden selection:bg-[#D9C5B2] selection:text-white">
-      
+
       {/* Grain overlay */}
       <div className="grain-overlay mix-blend-multiply" />
 
@@ -204,7 +204,7 @@ export function LandingClient() {
 
         {/* Background Layers */}
         <div className="bg-gradient-layer absolute inset-0 z-0 bg-[#F4F1EE]" />
-        
+
         {/* Ambient Blobs */}
         <div className="ambient-blob-1 absolute top-[10%] left-[15%] w-[500px] h-[500px] md:w-[700px] md:h-[700px] rounded-full bg-[radial-gradient(circle,_#D9C5B2_0%,_transparent_70%)] opacity-[0.12] z-[1] pointer-events-none mix-blend-multiply" />
         <div className="ambient-blob-2 absolute top-[40%] right-[10%] w-[500px] h-[500px] md:w-[700px] md:h-[700px] rounded-full bg-[radial-gradient(circle,_#E8DFD4_0%,_transparent_70%)] opacity-[0.12] z-[1] pointer-events-none mix-blend-multiply" />
@@ -219,7 +219,7 @@ export function LandingClient() {
             "Hôm nay mặc gì?"
           </h2>
         </div>
-        
+
         <div className="hero-cta absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 animate-bounce">
           <span className="text-xs font-medium uppercase tracking-widest text-[#707070]">Cuộn để mở khóa tủ đồ ↓</span>
         </div>
@@ -443,7 +443,7 @@ export function LandingClient() {
       <section className="before-after-section w-full py-32 px-6 bg-[#F4F1EE] relative z-10">
         <h2 className="font-heading text-4xl md:text-6xl text-center text-[#1A1A1A] mb-16 font-medium">Trước & Sau khi có Closy</h2>
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
-          
+
           {/* Before Card */}
           <div className="before-card bg-white rounded-3xl p-10 border border-[#1A1A1A]/5 shadow-sm opacity-0">
             <h3 className="text-2xl font-bold text-[#1A1A1A] mb-8">Trước Closy</h3>
@@ -489,7 +489,7 @@ export function LandingClient() {
       <section className="testimonials-section w-full py-32 px-6 bg-[#EBE7E2] relative z-10">
         <h2 className="font-heading text-4xl md:text-6xl text-center text-[#1A1A1A] mb-16 font-medium">Gen Z nói gì về Closy?</h2>
         <div className="max-w-3xl mx-auto space-y-8 flex flex-col">
-          
+
           <div className="flex justify-start">
             <div className="testimonial-bubble opacity-0 bg-white rounded-2xl p-6 shadow-lg max-w-md border border-[#1A1A1A]/5 flex items-start gap-4">
               <div className="size-10 rounded-full bg-[#D9C5B2] flex items-center justify-center shrink-0 font-bold text-white text-sm">LF</div>
@@ -526,14 +526,14 @@ export function LandingClient() {
       {/* NEW COMPONENT 4: Final CTA */}
       <section className="final-cta-section w-full min-h-[70vh] flex items-center justify-center px-6 bg-[#1A1A1A] relative overflow-hidden z-10">
         <div className="absolute w-[400px] h-[400px] bg-[radial-gradient(circle,_#D9C5B2_0%,_transparent_70%)] rounded-full opacity-20 z-0 pointer-events-none mix-blend-screen" />
-        
+
         <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto">
           <h2 className="font-heading text-4xl md:text-6xl lg:text-7xl text-white leading-tight font-medium">
             <div className="cta-heading-line opacity-0">Sẵn sàng để không bao giờ hỏi</div>
             <div className="cta-heading-line opacity-0 mt-2"><span className="text-[#D9C5B2] italic">"Hôm nay mặc gì?"</span> nữa?</div>
           </h2>
           <p className="text-[#707070] text-lg mt-6 cta-heading-line opacity-0">Không cần thẻ tín dụng. 30 giây.</p>
-          
+
           <Link href="/auth/register" className="cta-button opacity-0 mt-10">
             <Button className="bg-white text-[#1A1A1A] rounded-full px-12 py-7 text-lg font-bold hover:scale-[1.03] shadow-[0_0_40px_rgba(217,197,178,0.3)] hover:bg-white transition-all duration-300">
               Bắt Đầu Miễn Phí →
