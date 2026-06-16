@@ -96,11 +96,11 @@ export function WardrobeCard({
             {getWardrobeItemName(item)}
           </h3>
           <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#666] mt-2 truncate">
-            {item.brand || (typeof item.category === 'object' ? (item.category as any)?.name : item.category) || "ACNE STUDIOS"}
+            {(item as any).brand || (typeof item.category === 'object' ? (item.category as any)?.name : item.category) || "ACNE STUDIOS"}
           </p>
         </div>
         <div className="font-['IBM_Plex_Mono'] text-[11px] text-[#888]">
-          <span>Size {item.size || "S"}</span>
+          <span>Size {(item as any).size || "S"}</span>
           {item.color && <span> • {item.color}</span>}
         </div>
       </div>

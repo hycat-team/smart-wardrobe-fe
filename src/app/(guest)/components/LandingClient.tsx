@@ -292,7 +292,7 @@ export function LandingClient() {
               </div>
               <div className="ml-auto flex gap-1">
                 <div className="size-2 rounded-full bg-[#4A8C6E] animate-pulse" />
-                <span className="text-[10px] text-[#4A8C6E] font-medium">Online</span>
+                <span className="text-[10px] text-[#4A8C6E] font-medium">Trực tuyến</span>
               </div>
             </div>
 
@@ -377,7 +377,7 @@ export function LandingClient() {
         <div className="absolute top-[38%] left-[5vw] z-50 w-[35vw] max-w-[300px] text-left pointer-events-none">
           <div className="copy-1 opacity-0 absolute top-0 left-0 w-full">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#1A1A1A]/10 text-xs font-bold text-[#D9C5B2] uppercase tracking-widest mb-4 shadow-sm">
-              <Sparkles className="size-3" /> Digital Wardrobe
+              <Sparkles className="size-3" /> Tủ đồ kỹ thuật số
             </div>
             <h2 className="font-heading text-4xl md:text-5xl font-medium text-[#1A1A1A] mb-4 leading-tight whitespace-nowrap">
               Số hoá tủ đồ.
@@ -387,7 +387,7 @@ export function LandingClient() {
 
           <div className="copy-2 opacity-0 absolute top-0 left-0 w-full">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#1A1A1A]/10 text-xs font-bold text-[#D9C5B2] uppercase tracking-widest mb-4 shadow-sm">
-              <Check className="size-3" /> AI Recommendation
+              <Check className="size-3" /> Gợi ý từ AI
             </div>
             <h2 className="font-heading text-4xl md:text-5xl font-medium text-[#1A1A1A] mb-4 leading-tight whitespace-nowrap">
               Stylist Cá Nhân.
@@ -397,7 +397,7 @@ export function LandingClient() {
 
           <div className="copy-3 opacity-0 absolute top-0 left-0 w-full">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#1A1A1A]/10 text-xs font-bold text-[#D9C5B2] uppercase tracking-widest mb-4 shadow-sm">
-              <MessageCircle className="size-3" /> AI Chatbot
+              <MessageCircle className="size-3" /> Trợ lý AI
             </div>
             <h2 className="font-heading text-4xl md:text-5xl font-medium text-[#1A1A1A] mb-4 leading-tight whitespace-nowrap">
               Hiểu gu của bạn.
@@ -407,7 +407,7 @@ export function LandingClient() {
 
           <div className="copy-4 opacity-0 absolute top-0 left-0 w-full">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#1A1A1A]/10 text-xs font-bold text-[#D9C5B2] uppercase tracking-widest mb-4 shadow-sm">
-              <Share2 className="size-3" /> Community
+              <Share2 className="size-3" /> Cộng đồng
             </div>
             <h2 className="font-heading text-4xl md:text-5xl font-medium text-[#1A1A1A] mb-4 leading-tight whitespace-nowrap">
               Chia sẻ & Pass đồ.

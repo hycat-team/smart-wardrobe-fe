@@ -33,36 +33,43 @@ export function DashboardClient() {
   const totalCatalog = catalogData?.totalItems || 0;
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in duration-500 font-sans pb-16">
+    <div className="flex flex-col gap-10 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full pb-24 text-[#111]">
       
-      {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">Dashboard Tổng Quan</h1>
-        <p className="text-sm text-muted-foreground">Theo dõi sức khỏe và hoạt động của nền tảng Smart Wardrobe.</p>
+      {/* High-end Editorial Header */}
+      <div className="flex flex-col gap-8 pt-6 border-b border-black/10 pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-4 max-w-2xl">
+            <h1 className="text-5xl md:text-6xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1] uppercase">
+              OVERVIEW
+            </h1>
+            <p className="text-[12px] text-[#666] font-['IBM_Plex_Mono'] uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4">
+              Theo dõi sức khỏe và hoạt động của nền tảng. Các thông số vận hành theo thời gian thực.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Người dùng hệ thống", value: usersLoading ? "..." : totalUsers.toLocaleString('vi-VN'), change: "Thực tế", icon: Users },
-          { label: "Bài viết cộng đồng", value: postsLoading ? "..." : totalPosts.toLocaleString('vi-VN'), change: "Thực tế", icon: Sparkles },
-          { label: "Trang phục mẫu", value: catalogLoading ? "..." : totalCatalog.toLocaleString('vi-VN'), change: "Thực tế", icon: TrendingUp },
-          { label: "Report chờ duyệt (Mock)", value: "14", change: "-2", icon: ShieldAlert, alert: true },
+          { label: "Người Dùng", value: usersLoading ? "..." : totalUsers.toLocaleString('vi-VN'), change: "Thực tế", icon: Users },
+          { label: "Cộng Đồng", value: postsLoading ? "..." : totalPosts.toLocaleString('vi-VN'), change: "Thực tế", icon: Sparkles },
+          { label: "Catalog", value: catalogLoading ? "..." : totalCatalog.toLocaleString('vi-VN'), change: "Thực tế", icon: TrendingUp },
+          { label: "Cần Duyệt (Mock)", value: "14", change: "Alert", icon: ShieldAlert, alert: true },
         ].map((stat, i) => (
-          <div key={i} className="bg-card border border-border p-6 rounded-2xl flex flex-col gap-4 shadow-sm relative overflow-hidden">
+          <div key={i} className="bg-white border border-black/10 p-6 flex flex-col gap-6 shadow-sm relative group hover:border-black/30 transition-colors">
             <div className="flex justify-between items-start">
-              <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
-              <div className={cn("p-2 rounded-lg", stat.alert ? "bg-red-500/10 text-red-500" : "bg-primary/10 text-primary")}>
-                <stat.icon className="size-5" />
+              <span className="text-[10px] font-['IBM_Plex_Mono'] font-bold text-[#888] uppercase tracking-[0.15em] group-hover:text-[#111] transition-colors">{stat.label}</span>
+              <div className="text-[#A3A3A3] group-hover:text-[#111] transition-colors">
+                <stat.icon className="size-4" strokeWidth={1.5} />
               </div>
             </div>
-            <div className="flex items-end gap-2">
-              <span className="text-3xl font-heading font-bold text-foreground">{stat.value}</span>
+            <div className="flex items-end justify-between">
+              <span className="text-4xl font-['Playfair_Display'] font-medium text-[#111]">{stat.value}</span>
               <span className={cn(
-                "text-xs font-medium mb-1 flex items-center", 
-                stat.change.startsWith("+") ? "text-green-500" : stat.alert ? "text-green-500" : "text-red-500"
+                "text-[9px] font-['IBM_Plex_Mono'] font-bold uppercase tracking-widest mb-1", 
+                stat.alert ? "text-[#111] border-b border-[#111]" : "text-[#A3A3A3]"
               )}>
-                <ArrowUpRight className="size-3 mr-0.5" />
                 {stat.change}
               </span>
             </div>
@@ -74,64 +81,64 @@ export function DashboardClient() {
       <div className="grid lg:grid-cols-3 gap-6">
         
         {/* Main Chart */}
-        <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6 shadow-sm">
-          <div className="mb-6 space-y-1">
-            <h3 className="font-heading font-semibold text-lg">Hoạt động trong tuần</h3>
-            <p className="text-xs text-muted-foreground">So sánh lượng người dùng truy cập và số lượt sử dụng AI Stylist.</p>
+        <div className="lg:col-span-2 bg-white border border-black/10 p-6 shadow-sm">
+          <div className="mb-8 border-b border-black/5 pb-4">
+            <h3 className="font-['Playfair_Display'] text-2xl text-[#111] mb-2">Hoạt Động Tuần</h3>
+            <p className="text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#666]">Lượt dùng AI & Lưu lượng truy cập</p>
           </div>
           
           <div className="h-[300px] w-full relative">
             <ResponsiveContainer width="100%" height="100%" minHeight={300} minWidth={100}>
               <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                <XAxis dataKey="name" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000}k`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
+                <XAxis dataKey="name" stroke="#A3A3A3" fontSize={10} fontFamily="IBM Plex Mono" tickLine={false} axisLine={false} />
+                <YAxis stroke="#A3A3A3" fontSize={10} fontFamily="IBM Plex Mono" tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000}k`} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#1A1A1A', borderColor: '#333', borderRadius: '8px' }}
-                  itemStyle={{ color: '#E5E5E5' }}
+                  contentStyle={{ backgroundColor: '#111', borderColor: '#111', borderRadius: '0', color: '#FFF', fontFamily: 'IBM Plex Mono', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+                  itemStyle={{ color: '#FFF' }}
                 />
-                <Line type="monotone" dataKey="aiCalls" name="Lượt dùng AI" stroke="#B8975A" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                <Line type="monotone" dataKey="users" name="Lượng truy cập" stroke="#4B5563" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="aiCalls" name="Lượt dùng AI" stroke="#111" strokeWidth={2} dot={{ r: 3, strokeWidth: 1, fill: '#111' }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="users" name="Truy cập" stroke="#A3A3A3" strokeWidth={1.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* System Load */}
-        <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col">
-          <div className="mb-6 space-y-1">
-            <h3 className="font-heading font-semibold text-lg">Tải Hệ Thống (AI)</h3>
-            <p className="text-xs text-muted-foreground">Trạng thái server xử lý mô hình AI gợi ý.</p>
+        <div className="bg-white border border-black/10 p-6 shadow-sm flex flex-col">
+          <div className="mb-8 border-b border-black/5 pb-4">
+            <h3 className="font-['Playfair_Display'] text-2xl text-[#111] mb-2">Tải Hệ Thống</h3>
+            <p className="text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#666]">Trạng thái xử lý thời gian thực</p>
           </div>
 
           <div className="flex-1 flex flex-col justify-center gap-8">
             <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tải Server LLM</span>
-                <span className="font-medium text-green-500">Bình thường (45%)</span>
+              <div className="flex justify-between text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#111] font-bold">
+                <span>LLM Engine</span>
+                <span>45%</span>
               </div>
-              <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                <div className="h-full bg-green-500 w-[45%] rounded-full" />
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tải Computer Vision (Cắt nền)</span>
-                <span className="font-medium text-orange-500">Hơi cao (78%)</span>
-              </div>
-              <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                <div className="h-full bg-orange-500 w-[78%] rounded-full" />
+              <div className="h-1 w-full bg-[#F8F7F5] overflow-hidden">
+                <div className="h-full bg-[#111] w-[45%]" />
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Database Query Tủ Đồ</span>
-                <span className="font-medium text-primary">Tốt (12%)</span>
+              <div className="flex justify-between text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#111] font-bold">
+                <span>Computer Vision</span>
+                <span>78%</span>
               </div>
-              <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-[12%] rounded-full" />
+              <div className="h-1 w-full bg-[#F8F7F5] overflow-hidden">
+                <div className="h-full bg-[#666] w-[78%]" />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#111] font-bold">
+                <span>Database Query</span>
+                <span>12%</span>
+              </div>
+              <div className="h-1 w-full bg-[#F8F7F5] overflow-hidden">
+                <div className="h-full bg-[#A3A3A3] w-[12%]" />
               </div>
             </div>
           </div>

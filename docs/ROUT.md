@@ -4,17 +4,22 @@
 
 | Method | Endpoint | Summary | Req Body/Params | Response Schema |
 | --- | --- | --- | --- | --- |
+| **GET** | `/api/v1/admin/categories` | Lấy danh sách danh mục trang phục (Admin) |  | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.CategoryRes[]` |
+| **POST** | `/api/v1/admin/categories` | Tạo danh mục trang phục (Admin) | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.CreateCategoryReq` | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.CategoryRes` |
+| **GET** | `/api/v1/admin/categories/{id}` | Lấy chi tiết danh mục trang phục (Admin) | Params: id (path, required) | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.CategoryRes` |
+| **PUT** | `/api/v1/admin/categories/{id}` | Cập nhật danh mục trang phục (Admin) | Params: id (path, required)<br>Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.UpdateCategoryReq` | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.CategoryRes` |
+| **DELETE** | `/api/v1/admin/categories/{id}` | Xóa danh mục trang phục (Admin) | Params: id (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **DELETE** | `/api/v1/admin/comments/{commentID}` | Xóa bình luận community | Params: commentID (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **PATCH** | `/api/v1/admin/comments/{commentID}/restore` | Khôi phục bình luận community | Params: commentID (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
-| **GET** | `/api/v1/admin/post-items` | Lấy danh sách listing (Admin) | Params: status (query), transferState (query), page (query), limit (query) | `smart-wardrobe-be_internal_modules_community_application_dto.AdminPostItemListRes` |
+| **GET** | `/api/v1/admin/post-items` | Lấy danh sách listing (Admin) | Params: limit (query), page (query), status (query), transferState (query) | `smart-wardrobe-be_internal_modules_community_application_dto.AdminPostItemListRes` |
 | **DELETE** | `/api/v1/admin/post-items/{postItemID}` | Xóa listing community | Params: postItemID (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **PATCH** | `/api/v1/admin/post-items/{postItemID}/hide` | Ẩn listing community | Params: postItemID (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
-| **GET** | `/api/v1/admin/posts` | Lấy danh sách bài đăng (Admin) | Params: postType (query), isDeleted (query), q (query), page (query), limit (query) | `smart-wardrobe-be_internal_modules_community_application_dto.AdminPostListRes` |
+| **GET** | `/api/v1/admin/posts` | Lấy danh sách bài đăng (Admin) | Params: isDeleted (query), limit (query), page (query), postType (query), q (query) | `smart-wardrobe-be_internal_modules_community_application_dto.AdminPostListRes` |
 | **DELETE** | `/api/v1/admin/posts/{postPublicID}` | Xóa bài đăng community | Params: postPublicID (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **PATCH** | `/api/v1/admin/posts/{postPublicID}/restore` | Khôi phục bài đăng community | Params: postPublicID (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
-| **GET** | `/api/v1/admin/users` | Lấy danh sách người dùng | Params: roleSlug (query), isActive (query), q (query), page (query), limit (query) | `smart-wardrobe-be_internal_modules_identity_application_dto.AdminUserListRes` |
+| **GET** | `/api/v1/admin/users` | Lấy danh sách người dùng | Params: isActive (query), limit (query), page (query), q (query), roleSlug (query) | `smart-wardrobe-be_internal_modules_identity_application_dto.AdminUserListRes` |
 | **PATCH** | `/api/v1/admin/users/{id}/status` | Cập nhật trạng thái tài khoản người dùng | Params: id (path, required)<br>Body: `smart-wardrobe-be_internal_modules_identity_application_dto.UpdateUserStatusReq` | `smart-wardrobe-be_internal_modules_identity_application_dto.UserRes` |
-| **GET** | `/api/v1/admin/wardrobe-items` | Lấy danh sách trang phục mẫu (Admin) | Params: page (query), limit (query), q (query), category_slug (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_WardrobeItemRes` |
+| **GET** | `/api/v1/admin/wardrobe-items` | Lấy danh sách trang phục mẫu (Admin) | Params: categorySlug (query), limit (query), page (query), q (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_WardrobeItemRes` |
 | **PUT** | `/api/v1/admin/wardrobe-items/{id}` | Cập nhật trang phục mẫu (Admin) | Params: id (path, required)<br>Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.UpdateSystemCatalogItemReq` | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.WardrobeItemRes` |
 | **DELETE** | `/api/v1/admin/wardrobe-items/{id}` | Xóa trang phục mẫu (Admin) | Params: id (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 
@@ -25,7 +30,7 @@
 | **GET** | `/api/v1/ai/chat/sessions` | Lấy danh sách cuộc trò chuyện AI |  | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.ChatSessionRes[]` |
 | **POST** | `/api/v1/ai/chat/sessions` | Tạo cuộc trò chuyện AI mới | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.CreateChatSessionReq` | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.ChatSessionRes` |
 | **PATCH** | `/api/v1/ai/chat/sessions/{contextID}/archive` | Lưu trữ cuộc trò chuyện AI | Params: contextID (path, required) | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
-| **GET** | `/api/v1/ai/chat/sessions/{contextID}/messages` | Lấy lịch sử tin nhắn AI | Params: contextID (path, required), page (query), limit (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_ChatMessageRes` |
+| **GET** | `/api/v1/ai/chat/sessions/{contextID}/messages` | Lấy lịch sử tin nhắn AI | Params: contextID (path, required), limit (query), page (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_ChatMessageRes` |
 | **POST** | `/api/v1/ai/chat/sessions/{contextID}/messages/stream` | Nhắn tin với stylist AI (Stream SSE) | Params: contextID (path, required)<br>Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.SendChatMessageReq` | N/A |
 | **POST** | `/api/v1/ai/outfit-recommendations` | Gợi ý phối đồ từ tủ đồ | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.RecommendOutfitReq` | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.RecommendedOutfitRes` |
 
@@ -63,7 +68,7 @@
 
 | Method | Endpoint | Summary | Req Body/Params | Response Schema |
 | --- | --- | --- | --- | --- |
-| **GET** | `/api/v1/me/outfits` | Lấy danh sách bộ phối đồ của tôi | Params: page (query), limit (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_OutfitRes` |
+| **GET** | `/api/v1/me/outfits` | Lấy danh sách bộ phối đồ của tôi | Params: limit (query), page (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_OutfitRes` |
 | **POST** | `/api/v1/outfits` | Tạo bộ phối đồ mới | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.SaveOutfitReq` | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.OutfitRes` |
 | **GET** | `/api/v1/outfits/upload-signature` | Lấy chữ ký tải ảnh bìa bộ phối đồ |  | `smart-wardrobe-be_internal_shared_application_dto.UploadSignatureResult` |
 | **GET** | `/api/v1/outfits/{id}` | Chi tiết bộ phối đồ và tọa độ canvas | Params: id (path, required) | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.OutfitRes` |
@@ -74,22 +79,23 @@
 
 | Method | Endpoint | Summary | Req Body/Params | Response Schema |
 | --- | --- | --- | --- | --- |
-| **GET** | `/api/v1/me/wardrobe-items` | Lấy danh sách trang phục | Params: page (query), limit (query), category_slug (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_WardrobeItemRes` |
+| **GET** | `/api/v1/me/wardrobe-items` | Lấy danh sách trang phục | Params: categorySlug (query), limit (query), page (query), status (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_WardrobeItemRes` |
+| **GET** | `/api/v1/system-catalog/wardrobe-items` | Lấy danh sách trang phục hệ thống | Params: categorySlug (query), limit (query), page (query), q (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_SearchWardrobeItemRes` |
 | **POST** | `/api/v1/wardrobe-items/batch-upload` | Số hóa trang phục hàng loạt | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.BatchUploadWardrobeItemsReq` | N/A |
 | **DELETE** | `/api/v1/wardrobe-items/bulk` | Xóa hàng loạt trang phục | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.BulkDeleteItemsReq` | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **POST** | `/api/v1/wardrobe-items/catalog-init` | Khởi tạo nhanh tủ đồ cá nhân | Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.InitClosetFromCatalogReq` | N/A |
 | **DELETE** | `/api/v1/wardrobe-items/locked` | Xóa toàn bộ trang phục bị khóa |  | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
-| **GET** | `/api/v1/wardrobe-items/search` | Tìm kiếm trang phục có sẵn của hệ thống (Elasticsearch CQRS) | Params: page (query), limit (query), q (query), category_slug (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_SearchWardrobeItemRes` |
 | **GET** | `/api/v1/wardrobe-items/upload-signature` | Lấy chữ ký tải ảnh trang phục |  | `smart-wardrobe-be_internal_shared_application_dto.UploadSignatureResult` |
 | **GET** | `/api/v1/wardrobe-items/{id}` | Xem chi tiết trang phục | Params: id (path, required) | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.WardrobeItemRes` |
 | **POST** | `/api/v1/wardrobe-items/{id}/clone` | Nhân bản trang phục | Params: id (path, required)<br>Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.CloneWardrobeItemReq` | N/A |
 | **PUT** | `/api/v1/wardrobe-items/{id}/manual-classify` | Tự phân loại trang phục thủ công | Params: id (path, required)<br>Body: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.ManualClassifyReq` | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.WardrobeItemRes` |
+| **POST** | `/api/v1/wardrobe-items/{id}/retry-analysis` | Thử phân tích lại trang phục | Params: id (path, required) | `smart-wardrobe-be_internal_modules_wardrobe_application_dto.WardrobeItemRes` |
 
 ## Community
 
 | Method | Endpoint | Summary | Req Body/Params | Response Schema |
 | --- | --- | --- | --- | --- |
-| **GET** | `/api/v1/posts` | Lấy danh sách bài đăng cộng đồng | Params: sort (query), page (query), limit (query), username (query), postType (query) | `smart-wardrobe-be_internal_modules_community_application_dto.GetFeedRes` |
+| **GET** | `/api/v1/posts` | Lấy danh sách bài đăng cộng đồng | Params: limit (query), page (query), postType (query), sort (query), username (query) | `smart-wardrobe-be_internal_modules_community_application_dto.GetFeedRes` |
 | **POST** | `/api/v1/posts` | Tạo bài đăng cộng đồng mới | Body: `smart-wardrobe-be_internal_modules_community_application_dto.CreatePostReq` | `smart-wardrobe-be_internal_modules_community_application_dto.PostRes` |
 | **GET** | `/api/v1/posts/upload-signature` | Lấy chữ ký tải media bài đăng |  | `smart-wardrobe-be_internal_shared_application_dto.UploadSignatureResult` |
 | **GET** | `/api/v1/posts/{postPublicID}` | Lấy chi tiết bài đăng | Params: postPublicID (path, required) | `smart-wardrobe-be_internal_modules_community_application_dto.PostRes` |
@@ -120,7 +126,7 @@
 | **POST** | `/api/v1/subscriptions/me/purchase` | Đăng ký mua gói cước trực tiếp | Body: `smart-wardrobe-be_internal_modules_subscription_application_dto.DirectPurchaseReq` | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **POST** | `/api/v1/subscriptions/me/purchase-with-wallet` | Đăng ký mua gói cước bằng ví nội bộ | Body: `smart-wardrobe-be_internal_modules_subscription_application_dto.DirectPurchaseReq` | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **GET** | `/api/v1/subscriptions/me/wallet` | Lấy số dư ví người dùng |  | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
-| **GET** | `/api/v1/subscriptions/me/wallet/statements` | Lấy lịch sử giao dịch ví nội bộ | Params: page (query), limit (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_subscription_application_dto_WalletStatementDTO` |
+| **GET** | `/api/v1/subscriptions/me/wallet/statements` | Lấy lịch sử giao dịch ví nội bộ | Params: limit (query), page (query) | `smart-wardrobe-be_internal_shared_application_dto.PaginationResult-smart-wardrobe-be_internal_modules_subscription_application_dto_WalletStatementDTO` |
 | **POST** | `/api/v1/subscriptions/me/wallet/topup` | Tạo yêu cầu nạp tiền vào ví nội bộ | Body: `smart-wardrobe-be_internal_modules_subscription_application_dto.WalletTopUpReq` | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 | **POST** | `/api/v1/subscriptions/payos-webhook` | Xử lý Webhook thông báo thanh toán từ PayOS | Body: `smart-wardrobe-be_internal_modules_subscription_application_dto.PayOSWebhookReq` | `smart-wardrobe-be_internal_shared_presentation.APIResponse` |
 
@@ -648,6 +654,13 @@
 | --- | --- | --- |
 | **quantity** | integer |  |
 
+### `CreateCategoryReq`
+
+| Property | Type | Description |
+| --- | --- | --- |
+| **name** | string |  |
+| **slug** | string |  |
+
 ### `CreateChatSessionReq`
 
 | Property | Type | Description |
@@ -678,26 +691,26 @@
 | Property | Type | Description |
 | --- | --- | --- |
 | **id** | string |  |
-| **layer_order** | integer |  |
-| **position_x** | number |  |
-| **position_y** | number |  |
+| **layerOrder** | integer |  |
+| **positionX** | number |  |
+| **positionY** | number |  |
 | **scale** | number |  |
-| **wardrobe_item** | ref: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.WardrobeItemRes` |  |
+| **wardrobeItem** | ref: `smart-wardrobe-be_internal_modules_wardrobe_application_dto.WardrobeItemRes` |  |
 
 ### `OutfitRes`
 
 | Property | Type | Description |
 | --- | --- | --- |
-| **cover_image_url** | string |  |
-| **cover_public_id** | string |  |
-| **created_at** | string |  |
+| **coverImageUrl** | string |  |
+| **coverPublicId** | string |  |
+| **createdAt** | string |  |
 | **description** | string |  |
 | **id** | string |  |
 | **items** | array of `smart-wardrobe-be_internal_modules_wardrobe_application_dto.OutfitItemRes` |  |
 | **name** | string |  |
 | **status** | ref: `smart-wardrobe-be_internal_shared_domain_constants_outfitstatus.OutfitStatus` |  |
-| **updated_at** | string |  |
-| **user_id** | string |  |
+| **updatedAt** | string |  |
+| **userId** | string |  |
 
 ### `RecommendOutfitReq`
 
@@ -733,18 +746,18 @@
 
 | Property | Type | Description |
 | --- | --- | --- |
-| **layer_order** | integer |  |
-| **position_x** | number |  |
-| **position_y** | number |  |
+| **layerOrder** | integer |  |
+| **positionX** | number |  |
+| **positionY** | number |  |
 | **scale** | number |  |
-| **wardrobe_item_id** | string |  |
+| **wardrobeItemId** | string |  |
 
 ### `SaveOutfitReq`
 
 | Property | Type | Description |
 | --- | --- | --- |
-| **cover_image_url** | string |  |
-| **cover_public_id** | string |  |
+| **coverImageUrl** | string |  |
+| **coverPublicId** | string |  |
 | **description** | string |  |
 | **items** | array of `smart-wardrobe-be_internal_modules_wardrobe_application_dto.SaveOutfitItemReq` |  |
 | **name** | string |  |
@@ -775,6 +788,13 @@
 | Property | Type | Description |
 | --- | --- | --- |
 | **content** | string |  |
+
+### `UpdateCategoryReq`
+
+| Property | Type | Description |
+| --- | --- | --- |
+| **name** | string |  |
+| **slug** | string |  |
 
 ### `UpdateSystemCatalogItemReq`
 
@@ -816,6 +836,8 @@
 | **material** | string |  |
 | **pattern** | string |  |
 | **price** | number |  |
+| **processingErrorReason** | string |  |
+| **reviewReason** | string |  |
 | **seasonality** | string |  |
 | **status** | ref: `smart-wardrobe-be_internal_shared_domain_constants_wardrobestatus.WardrobeItemStatus` |  |
 | **style** | string |  |

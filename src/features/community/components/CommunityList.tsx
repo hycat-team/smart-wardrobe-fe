@@ -190,13 +190,13 @@ export const CommunityList = ({
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Title of your post..." 
+              placeholder="Tiêu đề bài viết..." 
               className="w-full bg-transparent border-none outline-none text-lg font-bold pt-1 text-[#1A1A1A] placeholder:text-[#A3A3A3]"
             />
             <textarea 
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Share your latest look or inspiration..." 
+              placeholder="Chia sẻ phong cách hoặc nguồn cảm hứng mới nhất của bạn..." 
               className="w-full bg-transparent border-none outline-none text-[15px] text-[#1A1A1A] placeholder:text-[#A3A3A3] resize-none min-h-[40px]"
               rows={Math.max(1, content.split('\n').length)}
             />
@@ -243,11 +243,11 @@ export const CommunityList = ({
               className="flex items-center gap-2 text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors outline-none"
             >
               <ImageIcon className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1A1A1A]">Upload</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#1A1A1A]">Tải lên</span>
             </button>
             <button type="button" className="flex items-center gap-2 text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors outline-none">
               <TagIcon className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1A1A1A]">Tag Style</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#1A1A1A]">Gắn thẻ</span>
             </button>
           </div>
           <Button 
@@ -255,7 +255,7 @@ export const CommunityList = ({
             disabled={!content.trim() || isPending || isUploading}
             className="rounded-none bg-black text-white hover:bg-black/80 font-bold uppercase tracking-widest text-xs px-8 h-10 disabled:opacity-50"
           >
-            {isPending || isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Post'}
+            {isPending || isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Đăng bài'}
           </Button>
         </div>
       </form>
@@ -291,19 +291,19 @@ export const CommunityList = ({
         {isFetchingNextPage && (
           <div className="flex items-center space-x-3 text-black font-bold uppercase tracking-widest text-xs">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Loading...</span>
+            <span>Đang tải...</span>
           </div>
         )}
         {!hasNextPage && allPosts.length > 0 && (
           <p className="text-xs text-black/40 font-bold uppercase tracking-widest">
-            You're all caught up.
+            Bạn đã xem hết bài viết.
           </p>
         )}
         {!hasNextPage && allPosts.length === 0 && !isLoading && (
           <div className="text-center py-10 flex flex-col items-center justify-center space-y-4">
-            <h3 className="font-bold text-2xl text-black tracking-tight">No Posts Yet</h3>
+            <h3 className="font-bold text-2xl text-black tracking-tight">Chưa có bài viết nào</h3>
             <p className="text-sm text-black/60">
-              Be the first to share your style with the community.
+              Hãy trở thành người đầu tiên chia sẻ phong cách với cộng đồng.
             </p>
           </div>
         )}

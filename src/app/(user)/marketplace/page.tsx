@@ -6,7 +6,7 @@ const MARKETPLACE_ITEMS = [
     name: "Structured Wool Coat",
     brand: "Studio Nicholson",
     price: "$450",
-    condition: "Like New",
+    condition: "Như mới",
     size: "Size M",
     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA0FYW6smtxDjgvmjUwqMakLGNgnkh50pSVfvNwEXWOPs_9BQuLr9UURaHp38uo_0L-RaKfBmvalwNgQO5P6wrzHgVDjvYxehj1TRdj-ch_D7xttnNNUFsYUd_Z1XrX5yLW61KKXfaJBax9NdJJWuQbIxftTmfgegPobfSesssQQaK4KYngT1jvab2U6aFSVwID4NIvXiaoiY0WLKELAzF2UX2_aPY7JRuEkXnARGaH159mJ9yXiw9kP14fWaavkQOVDlwyG4yY7iQ",
     badgeClass: "bg-[#111] text-white"
@@ -16,7 +16,7 @@ const MARKETPLACE_ITEMS = [
     name: "Cashmere Blend Knit",
     brand: "Lemaire",
     price: "$280",
-    condition: "Gently Used",
+    condition: "Ít dùng",
     size: "Size L",
     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBQivzdnCeL4RzgHKNCYuZpbO1KWTERYbwElC40Ws_KqbZCCihBQ4dJu4NxayAt12AFunuKYEleNR3mjDQCTPFMufVAGKL5xk7qCKp3bOe9d6_6dTg3J4JG9K4LURPg0yMpFqchuQmum6bM71Jiuh8k2rzFnrJfo8qkfO5hBcdsQysk8QiBKXU_TN4CnfiLDLOSi66UMzNicuQAq4mWPy1rVyObzc1xZtYqgEPTWe7UUUv8YVMxbM82PGPjF3fiJNax5dM4M6CU9eg",
     badgeClass: "bg-white border border-[#111] text-[#111]"
@@ -26,7 +26,7 @@ const MARKETPLACE_ITEMS = [
     name: "Ecru Twill Trousers",
     brand: "Jil Sander",
     price: "$320",
-    condition: "Excellent",
+    condition: "Tuyệt vời",
     size: "Size S",
     img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA_mWmD2DkZj84pyivprF2beHKkkRyQw6gsSdLYLZ7i2nDJwhq_WVF1uHyDJCtgi9RB3QZZwmEG6FCcV6xM8MEsU44PJSOVGi1Aj8-nw3hZ7fpiUqKVSNDezADA3ywxAHLT5GWNYzQOqFCmx-eJneKR8pEvfktk0C1QyZNITRtRokbkY-QuAFhrnKPH05VBYm3Mpx2j2RHUKQGNckVO_2VsBfS4K8vsRtPB5oQqwDdMWja_H_o62DNjc10xksXACaqecyovVQY3Ztk",
     badgeClass: "bg-[#111] text-white"
@@ -60,14 +60,14 @@ export default function Marketplace() {
               MARKETPLACE
             </h1>
             <p className="text-[12px] text-[#666] font-['IBM_Plex_Mono'] uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4">
-              Curated exchange for pre-owned luxury and sustainable pieces. Extend the lifecycle of exceptional garments.
+              Trao đổi, mua bán các sản phẩm thời trang bền vững và thiết kế độc bản. Kéo dài vòng đời của những trang phục chất lượng.
             </p>
           </div>
           
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
             <button className="h-12 px-8 bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black/80 transition-colors">
               <Tag className="size-4" />
-              Sell an Item
+              Đăng bán
             </button>
           </div>
         </div>
@@ -75,7 +75,7 @@ export default function Marketplace() {
         {/* Filters */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 pt-4">
           <div className="flex flex-wrap gap-x-8 gap-y-4">
-            {["All Items", "Outerwear", "Knitwear", "Accessories"].map((tab, idx) => (
+            {["Tất cả", "Áo khoác", "Đồ len", "Phụ kiện"].map((tab, idx) => (
               <button
                 key={tab}
                 className={`text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.12em] relative transition-colors group pb-1 ${
@@ -91,7 +91,7 @@ export default function Marketplace() {
 
           <div className="flex items-center gap-4 border border-black/10 px-4 py-2 bg-[#F8F7F5] cursor-pointer hover:bg-[#111] hover:text-white transition-colors group">
             <SlidersHorizontal className="size-3.5 text-[#888] group-hover:text-white" />
-            <span className="text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#111] font-medium group-hover:text-white">Filters</span>
+            <span className="text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#111] font-medium group-hover:text-white">Bộ lọc</span>
           </div>
         </div>
       </div>
@@ -126,7 +126,7 @@ export default function Marketplace() {
               {/* Hover View Details */}
               <div className="absolute inset-0 bg-white/92 opacity-0 group-hover:opacity-100 transition-opacity duration-250 flex flex-col items-center justify-end pb-8 pointer-events-none">
                 <div className="text-black font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] border-b border-black pb-0.5 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                  View Details
+                  Xem chi tiết
                 </div>
               </div>
             </div>
@@ -152,7 +152,7 @@ export default function Marketplace() {
 
       <div className="mt-16 flex justify-center border-t border-black/10 pt-12">
         <button className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase text-[#666] hover:text-[#111] transition-colors border-b border-transparent hover:border-[#111] pb-1">
-          Load More Pieces
+          Tải Thêm
         </button>
       </div>
     </div>

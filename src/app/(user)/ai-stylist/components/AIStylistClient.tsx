@@ -1,8 +1,9 @@
 "use client";
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import Image from "next/image";
-import { Sparkles, Save, RefreshCw, MoveRight, ZoomOut, ZoomIn, MoveUp, RefreshCcw, Layers } from "lucide-react";
+import { Sparkles, Save, RefreshCw, MoveRight, ZoomOut, ZoomIn, MoveUp, RefreshCcw, Layers, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { aiApi } from "@/features/ai-stylist/api/ai.api";
@@ -20,14 +21,21 @@ gsap.registerPlugin(useGSAP);
 
 const OCCASIONS = ["🎓 Đi học", "💼 Đi làm", "🌙 Hẹn hò", "🎉 Tiệc", "🏃 Thể thao", "🏠 Ở nhà"];
 const STYLES = ["Minimalist", "Casual", "Formal", "Trendy", "Vintage", "Streetwear"];
+const SEASONS = ["Mùa xuân", "Mùa hạ", "Mùa thu", "Mùa đông"];
+const WEATHERS = ["Ấm áp", "Lạnh", "Mưa", "Mát mẻ"];
+const COLOR_TONES = ["Sáng", "Tối", "Trung tính", "Nhiều màu"];
 
 export function AIStylistClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  const [selectedOccasion, setSelectedOccasion] = useState(OCCASIONS[0]);
-  const [selectedStyle, setSelectedStyle] = useState(STYLES[0]);
+  const [selectedOccasion, setSelectedOccasion] = useState<string>("");
+  const [selectedStyle, setSelectedStyle] = useState<string>("");
+  const [selectedSeason, setSelectedSeason] = useState<string>("");
+  const [selectedWeather, setSelectedWeather] = useState<string>("");
+  const [selectedColorTone, setSelectedColorTone] = useState<string>("");
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -75,7 +83,7 @@ export function AIStylistClient() {
     );
   });
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (initialDetails?: string) => {
     try {
       setIsGenerating(true);
       
@@ -89,12 +97,12 @@ export function AIStylistClient() {
       };
 
       const res = await aiApi.getOutfitRecommendation({
-        colorTone: "light",
-        details: "string",
-        occasion: occasionMap[selectedOccasion] || "casual",
-        season: "spring",
-        styleTarget: selectedStyle.toLowerCase(),
-        weather: "warm",
+        colorTone: selectedColorTone ? selectedColorTone.toLowerCase() : "",
+        details: initialDetails || "",
+        occasion: occasionMap[selectedOccasion] || "",
+        season: selectedSeason ? selectedSeason.toLowerCase() : "",
+        styleTarget: selectedStyle ? selectedStyle.toLowerCase() : "",
+        weather: selectedWeather ? selectedWeather.toLowerCase() : "",
       });
 
       setOutfitData(res);
@@ -141,8 +149,36 @@ export function AIStylistClient() {
     }
   };
 
+  const hasSelectedOptions = !!(selectedOccasion || selectedStyle || selectedSeason || selectedWeather || selectedColorTone);
+
   const handleSendMessage = async () => {
-    if (!chatInput.trim() || isChatting || !contextID) return;
+    if (isChatting) return;
+
+    if (!outfitData && !contextID) {
+      if (!chatInput.trim() && !hasSelectedOptions) return;
+
+      let finalInput = chatInput.trim();
+      if (!finalInput) {
+        const opts = [selectedOccasion, selectedStyle, selectedSeason, selectedWeather, selectedColorTone].filter(Boolean);
+        finalInput = `Yêu cầu phối đồ: ${opts.join(', ')}`;
+      }
+
+      const userMsg: ChatMessage = {
+        id: crypto.randomUUID(),
+        role: 'user',
+        content: finalInput,
+        timestamp: Date.now()
+      };
+      setChatMessages(prev => [...prev, userMsg]);
+      const inputForBackend = chatInput.trim();
+      setChatInput("");
+      setPopoverOpen(false);
+      
+      await handleGenerate(inputForBackend);
+      return;
+    }
+
+    if (!chatInput.trim()) return;
 
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
@@ -295,7 +331,7 @@ export function AIStylistClient() {
               {outfitData?.title || "ATELIER STYLIST"}
             </h2>
             <p className="text-xs md:text-sm text-[#666666] tracking-wide uppercase font-medium">
-              {outfitData ? "A CURATED SELECTION DESIGNED FOR YOUR SPECIFIC MOMENTS" : "CONFIGURE YOUR PREFERENCES TO DISCOVER TODAY'S CURATION"}
+              {outfitData ? "BỘ SƯU TẬP ĐƯỢC CHỌN LỌC CHO NHỮNG KHOẢNH KHẮC CỦA BẠN" : "CẤU HÌNH SỞ THÍCH CỦA BẠN ĐỂ KHÁM PHÁ BỘ PHỐI ĐỒ HÔM NAY"}
             </p>
           </div>
         </div>
@@ -324,11 +360,11 @@ export function AIStylistClient() {
                   onSwap={handleSwap}
                   hasAlternativesCheck={(role) => {
                     const outfitItem = outfitData.items.find(i => i.role === role);
-                    return outfitItem && outfitItem.alternatives && outfitItem.alternatives.length > 0;
+                    return !!(outfitItem && outfitItem.alternatives && outfitItem.alternatives.length > 0);
                   }}
                   emptyState={
                     <div className="text-center p-12">
-                      <p className="text-[#666666] text-sm uppercase tracking-widest">NO ITEMS SELECTED.</p>
+                      <p className="text-[#666666] text-sm uppercase tracking-widest">CHƯA CHỌN MÓN ĐỒ NÀO.</p>
                     </div>
                   }
                 />
@@ -338,14 +374,14 @@ export function AIStylistClient() {
                 {isGenerating ? (
                   <div className="flex flex-col items-center justify-center gap-6">
                     <div className="w-12 h-12 border-2 border-[#1A1A1A] border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-[#1A1A1A] font-bold text-sm uppercase tracking-widest">CURATING YOUR STYLE...</p>
+                    <p className="text-[#1A1A1A] font-bold text-sm uppercase tracking-widest">ĐANG TẠO PHONG CÁCH CỦA BẠN...</p>
                   </div>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-center max-w-md">
                     <Sparkles className="w-8 h-8 text-[#A3A3A3] mb-6" strokeWidth={1} />
                     <h3 className="text-2xl font-bold text-[#1A1A1A] uppercase tracking-tight mb-4">THE BLANK CANVAS</h3>
                     <p className="text-[#666666] text-[13px] leading-relaxed">
-                      Please configure your occasion and style preferences on the right panel to generate a bespoke outfit curation.
+                      Vui lòng thiết lập thông số dịp và phong cách ở khung bên phải để hệ thống gợi ý một bộ phối đồ dành riêng cho bạn.
                     </p>
                   </div>
                 )}
@@ -359,14 +395,14 @@ export function AIStylistClient() {
                   onClick={() => { setOutfitData(null); setSelectedItems([]); setChatMessages([]); setContextID(""); }}
                   className="w-full sm:w-1/2 px-6 py-4 border-r border-[#E5E5E5] text-[#1A1A1A] font-bold text-[11px] uppercase tracking-widest hover:bg-[#F9F9F9] transition-colors flex items-center justify-center gap-2"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" /> RE-GENERATE
+                  <RefreshCw className="w-3.5 h-3.5" /> TẠO LẠI
                 </button>
                 <button 
                   onClick={handleSaveOutfit}
                   disabled={isSaving}
                   className="w-full sm:w-1/2 px-8 py-4 bg-[#1A1A1A] text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <Save className="w-3.5 h-3.5" /> {isSaving ? "SAVING..." : "SAVE TO WARDROBE"}
+                  <Save className="w-3.5 h-3.5" /> {isSaving ? "ĐANG LƯU..." : "LƯU VÀO TỦ ĐỒ"}
                 </button>
               </div>
             )}
@@ -382,8 +418,8 @@ export function AIStylistClient() {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[13px] text-[#1A1A1A] uppercase tracking-widest">ETHOS AI</h3>
-                  <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">STYLIST ASSISTANT</p>
+                  <h3 className="font-bold text-[13px] text-[#1A1A1A] uppercase tracking-widest">CLOSY AI</h3>
+                  <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">TRỢ LÝ PHỐI ĐỒ</p>
                 </div>
               </div>
             </div>
@@ -391,62 +427,19 @@ export function AIStylistClient() {
             {/* Content Area */}
             <div className="flex-1 p-5 md:p-6 overflow-y-auto space-y-6 flex flex-col bg-white">
               
-              {!outfitData && !isGenerating && (
-                 <div className="flex flex-col gap-8">
-                    <div className="border-b border-[#E5E5E5] pb-4">
-                      <p className="text-xl font-bold text-[#1A1A1A] tracking-tight uppercase">PARAMETERS</p>
-                    </div>
-                    
-                    <div className="flex flex-col gap-4">
-                      <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">OCCASION</p>
-                      <div className="flex flex-wrap gap-2">
-                        {OCCASIONS.map(occ => (
-                          <button 
-                            key={occ} 
-                            onClick={() => setSelectedOccasion(occ)}
-                            className={cn(
-                              "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border", 
-                              selectedOccasion === occ ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black"
-                            )}
-                          >
-                            {occ}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-4">
-                      <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">STYLE DIRECTION</p>
-                      <div className="flex flex-wrap gap-2">
-                        {STYLES.map(style => (
-                          <button 
-                            key={style} 
-                            onClick={() => setSelectedStyle(style)}
-                            className={cn(
-                              "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border", 
-                              selectedStyle === style ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black"
-                            )}
-                          >
-                            {style}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <button 
-                      onClick={handleGenerate}
-                      disabled={isGenerating}
-                      className="mt-6 w-full bg-[#1A1A1A] text-white text-[11px] font-bold py-4 hover:bg-black/80 transition-colors flex justify-center items-center gap-2 disabled:opacity-50 tracking-widest uppercase"
-                    >
-                      <Sparkles className="w-3.5 h-3.5" /> GENERATE LOOKBOOK
-                    </button>
-                 </div>
+              {!outfitData && chatMessages.length === 0 && (
+                <div className="flex flex-col gap-1.5 items-start w-full chat-intro">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>
+                  <div className="bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] p-4 mr-6 md:mr-12 text-[13px] leading-relaxed">
+                    Xin chào, tôi là CLOSY AI Stylist. Bạn muốn phối đồ cho dịp gì hôm nay?
+                  </div>
+                </div>
               )}
 
               {/* Chat Messages */}
               {chatMessages.map((msg) => (
                 <div key={msg.id} className={cn("chat-intro flex flex-col gap-1.5 w-full", msg.role === 'user' ? "items-end" : "items-start")}>
-                  {msg.role === 'ai' && <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">ETHOS AI</span>}
+                  {msg.role === 'ai' && <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>}
                   {msg.role === 'user' && <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">YOU</span>}
                   
                   <div className={cn(
@@ -462,7 +455,7 @@ export function AIStylistClient() {
 
               {isChatting && (
                 <div className="flex flex-col gap-1.5 items-start w-full">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">ETHOS AI</span>
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>
                   <div className="bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] p-4 mr-12 flex items-center justify-center gap-1.5 min-w-[60px] h-[52px]">
                     <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{animationDelay: '0ms'}}></div>
                     <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{animationDelay: '150ms'}}></div>
@@ -476,18 +469,83 @@ export function AIStylistClient() {
             {/* Chat Input */}
             <div className="p-4 bg-[#F9F9F9] border-t border-[#E5E5E5]">
               <div className="relative flex items-center bg-white border border-[#E5E5E5] focus-within:border-[#1A1A1A] transition-colors">
+                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                  <PopoverTrigger className="pl-4 pr-2 text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors outline-none flex items-center justify-center">
+                    <SlidersHorizontal className="w-4 h-4" />
+                  </PopoverTrigger>
+                  <PopoverContent side="top" align="start" className="w-[320px] max-h-[400px] overflow-y-auto p-5 border-[#E5E5E5] rounded-none shadow-xl bg-white">
+                    <div className="flex flex-col gap-6">
+                      <div className="border-b border-[#E5E5E5] pb-2">
+                        <p className="text-[11px] font-bold text-[#1A1A1A] tracking-widest uppercase">THÔNG SỐ NHANH</p>
+                      </div>
+                      
+                      <div className="flex flex-col gap-3">
+                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">DỊP (OCCASION)</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {OCCASIONS.map(occ => (
+                            <button key={occ} onClick={() => setSelectedOccasion(prev => prev === occ ? "" : occ)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedOccasion === occ ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{occ}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">PHONG CÁCH (STYLE)</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {STYLES.map(style => (
+                            <button key={style} onClick={() => setSelectedStyle(prev => prev === style ? "" : style)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedStyle === style ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{style}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">MÙA (SEASON)</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {SEASONS.map(s => (
+                            <button key={s} onClick={() => setSelectedSeason(prev => prev === s ? "" : s)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedSeason === s ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{s}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">THỜI TIẾT (WEATHER)</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {WEATHERS.map(w => (
+                            <button key={w} onClick={() => setSelectedWeather(prev => prev === w ? "" : w)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedWeather === w ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{w}</button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">TÔNG MÀU (COLOR TONE)</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {COLOR_TONES.map(c => (
+                            <button key={c} onClick={() => setSelectedColorTone(prev => prev === c ? "" : c)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedColorTone === c ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{c}</button>
+                          ))}
+                        </div>
+                      </div>
+                      <button 
+                        onClick={handleSendMessage}
+                        disabled={isGenerating || (!chatInput.trim() && !hasSelectedOptions)}
+                        className="mt-2 w-full bg-[#1A1A1A] text-white text-[11px] font-bold py-3.5 hover:bg-black/80 transition-colors flex justify-center items-center gap-2 disabled:opacity-50 tracking-widest uppercase"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" /> TẠO NGAY
+                      </button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
                 <input 
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  disabled={!outfitData || isChatting}
-                  className="w-full bg-transparent border-none outline-none pl-4 pr-12 py-3.5 text-[13px] text-[#1A1A1A] placeholder:text-[#A3A3A3] disabled:opacity-50 font-medium" 
-                  placeholder={outfitData ? "Type a message..." : "Generate an outfit first..."} 
+                  disabled={isChatting}
+                  className="w-full bg-transparent border-none outline-none pl-2 pr-12 py-3.5 text-[13px] text-[#1A1A1A] placeholder:text-[#A3A3A3] disabled:opacity-50 font-medium" 
+                  placeholder="Nhập yêu cầu phối đồ của bạn..." 
                   type="text"
                 />
                 <button 
                   onClick={handleSendMessage}
-                  disabled={!chatInput.trim() || isChatting || !outfitData}
+                  disabled={isChatting || (!chatInput.trim() && !(!outfitData && hasSelectedOptions))}
                   className="absolute right-2 text-[#A3A3A3] hover:text-[#1A1A1A] p-2 transition-colors disabled:opacity-30 outline-none"
                 >
                   <MoveRight className="w-4 h-4" />

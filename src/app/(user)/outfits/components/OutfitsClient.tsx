@@ -49,7 +49,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setFavorites(prev => ({ ...prev, [id]: !prev[id] }));
-    toast.success("Saved to your curations.");
+    toast.success("Đã lưu vào bộ sưu tập.");
   };
 
   const handleDeleteOutfit = (id: string, e: React.MouseEvent) => {
@@ -138,8 +138,8 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
               Curations
             </h1>
             <p className="text-[12px] text-[#666] font-['IBM_Plex_Mono'] uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4">
-              An archive of your personal style. 
-              {outfits.length > 0 ? ` Documenting ${outfits.length} looks.` : " Start composing your wardrobe."}
+              Kho lưu trữ phong cách cá nhân của bạn.
+              {outfits.length > 0 ? ` Đang lưu trữ ${outfits.length} bộ phối.` : " Hãy bắt đầu tạo bộ phối của bạn."}
             </p>
           </div>
           
@@ -148,14 +148,14 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
               onClick={() => router.push("/ai-stylist")}
               className="h-12 px-6 border border-[#E5E5E5] text-[#111] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:border-[#111] transition-colors flex items-center justify-center gap-2"
             >
-              <Sparkles className="size-3.5" /> AI Generate
+              <Sparkles className="size-3.5" /> Tạo bằng AI
             </button>
 
             <button 
               onClick={() => router.push("/outfits/create")}
               className="h-12 px-8 bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
             >
-              <Plus className="size-4" /> Compose Look
+              <Plus className="size-4" /> Tạo Bộ Phối
             </button>
           </div>
         </div>
@@ -164,10 +164,10 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 pt-4">
           <div className="flex flex-wrap gap-x-8 gap-y-4">
             {[
-              { label: "Index", value: "all" },
-              { label: "AI Assisted", value: "ai" },
-              { label: "Manual", value: "manual" },
-              { label: "Archive", value: "saved" }
+              { label: "Tất cả", value: "all" },
+              { label: "Tạo bởi AI", value: "ai" },
+              { label: "Thủ công", value: "manual" },
+              { label: "Đã lưu", value: "saved" }
             ].map(tab => (
               <button
                 key={tab.value}
@@ -185,14 +185,14 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
           </div>
 
           <div className="flex items-center gap-4 border border-black/10 px-4 py-2 bg-[#F8F7F5]">
-            <span className="text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#888]">Sort</span>
+            <span className="text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#888]">Sắp xếp</span>
             <select 
               value={sortParam}
               onChange={(e) => setSortParam(e.target.value as SortOption)}
               className="bg-transparent text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#111] font-medium focus:outline-none focus:ring-0 cursor-pointer appearance-none"
             >
-              <option value="newest">Latest</option>
-              <option value="oldest">Earliest</option>
+              <option value="newest">Mới nhất</option>
+              <option value="oldest">Cũ nhất</option>
             </select>
           </div>
         </div>
@@ -202,7 +202,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
       {isLoading && !outfits.length ? (
         <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-8">
           <div className="size-10 border border-[#111] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[11px] text-[#666] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase animate-pulse">Curating Archive...</p>
+          <p className="text-[11px] text-[#666] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase animate-pulse">Đang tải dữ liệu...</p>
         </div>
       ) : filteredAndSortedOutfits.length > 0 ? (
         <div 
@@ -227,16 +227,16 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
             <Shirt className="size-8 stroke-1" />
           </div>
           <div className="space-y-4">
-            <h3 className="font-['Playfair_Display'] text-3xl text-[#111] uppercase tracking-tight">Void</h3>
+            <h3 className="font-['Playfair_Display'] text-3xl text-[#111] uppercase tracking-tight">Trống</h3>
             <p className="text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#666] leading-relaxed">
-              No looks match your current filter. Return to the index or compose a new look.
+              Không có bộ phối nào phù hợp với bộ lọc hiện tại. Hãy chọn tất cả hoặc tạo bộ phối mới.
             </p>
           </div>
           <button 
             onClick={() => handleFilterChange("all")} 
             className="h-12 px-8 border border-[#111] text-[#111] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:bg-black hover:text-white transition-colors mt-4"
           >
-            Clear Filters
+            Xóa Bộ Lọc
           </button>
         </div>
       )}
@@ -248,7 +248,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
             disabled={isFetchingNextPage}
             className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase text-[#666] hover:text-[#111] disabled:opacity-50 transition-colors border-b border-transparent hover:border-[#111] pb-1"
           >
-            {isFetchingNextPage ? 'Loading...' : 'Load More'}
+            {isFetchingNextPage ? 'Đang tải...' : 'Tải thêm'}
           </button>
         </div>
       )}
@@ -257,9 +257,9 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
       <AlertDialog open={!!outfitToDelete} onOpenChange={(open) => !open && setOutfitToDelete(null)}>
         <AlertDialogContent className="rounded-none border border-black/10 bg-white">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-['Playfair_Display'] text-2xl font-medium text-[#111]">Void Look</AlertDialogTitle>
+            <AlertDialogTitle className="font-['Playfair_Display'] text-2xl font-medium text-[#111]">Xóa Bộ Phối</AlertDialogTitle>
             <AlertDialogDescription className="font-['IBM_Plex_Mono'] text-[12px] text-[#666] leading-relaxed">
-              Are you sure you want to permanently delete this look from your archive? This action cannot be undone.
+              Bạn có chắc chắn muốn xóa bộ phối này khỏi lưu trữ vĩnh viễn không? Hành động này không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6 flex gap-4">

@@ -78,7 +78,7 @@ export function Sidebar() {
                 {user?.name || "Ethos Atelier"}
               </span>
               <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest mt-0.5">
-                View Profile
+                Xem hồ sơ
               </span>
             </div>
             <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
@@ -88,13 +88,13 @@ export function Sidebar() {
           <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
             <Link href="/profile/update" className="flex items-center gap-3 w-full text-foreground/80">
               <Settings className="size-4" />
-              <span className="font-body-sm text-[13px] font-medium">Settings</span>
+              <span className="font-body-sm text-[13px] font-medium">Cài đặt</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
             <Link href="/support" className="flex items-center gap-3 w-full text-foreground/80">
               <HelpCircle className="size-4" />
-              <span className="font-body-sm text-[13px] font-medium">Support</span>
+              <span className="font-body-sm text-[13px] font-medium">Hỗ trợ</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="my-1 bg-border/40" />
@@ -104,7 +104,7 @@ export function Sidebar() {
           >
             <div className="flex items-center gap-3 w-full">
               <LogOut className="size-4" />
-              <span className="font-body-sm text-[13px] font-medium">Sign Out</span>
+              <span className="font-body-sm text-[13px] font-medium">Đăng xuất</span>
             </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -163,13 +163,13 @@ export function Sidebar() {
               </div>
             </div>
             <p className="font-body-sm text-[13px] text-muted-foreground/90 leading-relaxed pr-4">
-              Elevate your style with unlimited AI curation.
+              Nâng tầm phong cách với gợi ý không giới hạn từ AI.
             </p>
             <Link
               href="/pricing"
               className="mt-3 inline-flex items-center gap-2 text-foreground/90 font-medium text-[13px] group/btn"
             >
-              <span className="border-b border-foreground/30 pb-0.5 group-hover/btn:border-foreground/70 transition-colors">Upgrade Access</span>
+              <span className="border-b border-foreground/30 pb-0.5 group-hover/btn:border-foreground/70 transition-colors">Nâng cấp ngay</span>
               <ChevronRight className="size-3 group-hover/btn:translate-x-1 transition-transform" />
             </Link>
           </div>

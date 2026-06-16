@@ -5,7 +5,7 @@ import { CanvasItem } from "@/features/outfits/hooks/useOutfitCanvas";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
 
 export interface OutfitCanvasBoardProps {
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   selectedItems: CanvasItem[];
   updateScale: (id: string, newScale: number) => void;
   bringToFront: (id: string) => void;
@@ -78,7 +78,7 @@ export function OutfitCanvasBoard({
                       className="hover:bg-[#1A1A1A] hover:text-white transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold px-3 py-2"
                       title="Đưa lên trên"
                     >
-                      <MoveUp className="size-3" /> FRONT
+                      <MoveUp className="size-3" /> LÊN TRÊN
                     </button>
                     
                     {onSwap && hasAlternatives && (
@@ -90,7 +90,7 @@ export function OutfitCanvasBoard({
                           className="hover:bg-[#1A1A1A] hover:text-white transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold px-3 py-2"
                           title="Thay thế"
                         >
-                          <RefreshCcw className="size-3" /> SWAP
+                          <RefreshCcw className="size-3" /> THAY THẾ
                         </button>
                       </>
                     )}

@@ -55,6 +55,24 @@ export const adminApi = {
     return res.data;
   },
 
+  // Category
+  getCategories: async (): Promise<any[]> => {
+    const res = await api.get<APIResponse<any[]>>('/admin/categories');
+    return res.data.data || [];
+  },
+  createCategory: async (data: { name: string; slug: string }): Promise<any> => {
+    const res = await api.post<APIResponse>('/admin/categories', data);
+    return res.data.data;
+  },
+  updateCategory: async ({ id, data }: { id: string; data: { name: string; slug: string } }): Promise<any> => {
+    const res = await api.put<APIResponse>(`/admin/categories/${id}`, data);
+    return res.data.data;
+  },
+  deleteCategory: async (id: string): Promise<any> => {
+    const res = await api.delete<APIResponse>(`/admin/categories/${id}`);
+    return res.data.data;
+  },
+
   // Catalog
   getUploadSignature: async (): Promise<any> => {
     const res = await api.get<APIResponse<any>>('/admin/wardrobe-items/upload-signature');

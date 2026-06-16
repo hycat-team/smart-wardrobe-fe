@@ -46,7 +46,7 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
             
             {/* Trending Styles */}
             <div className="flex flex-col gap-4">
-              <h3 className="font-bold text-xl tracking-tight text-black">Trending Styles</h3>
+              <h3 className="font-bold text-xl tracking-tight text-black">Phong cách xu hướng</h3>
               <div className="flex flex-wrap gap-2">
                 {['#MONOCHROME', '#UTILITYCHIC', '#QUIETLUXURY', '#OVERSIZEDTAILORING', '#ARCHIVEFASHION'].map(tag => (
                   <span key={tag} className="px-3 py-1.5 bg-[#F5F2EE] text-[#1A1A1A] text-xs font-bold uppercase tracking-wide cursor-pointer hover:bg-[#E5E2DE] transition-colors">
@@ -58,7 +58,7 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
 
             {/* Atelier Voices */}
             <div className="flex flex-col gap-5">
-              <h3 className="font-bold text-xl tracking-tight text-black">Atelier Voices</h3>
+              <h3 className="font-bold text-xl tracking-tight text-black">Gương mặt nổi bật</h3>
               <div className="flex flex-col gap-5">
                 {[
                   { name: "Elena R.", role: "Minimalist Curator", img: "" },
@@ -77,7 +77,7 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
                       </div>
                     </div>
                     <Button variant="outline" className="h-8 rounded-none border-black/20 text-xs font-bold uppercase tracking-widest text-black hover:bg-black hover:text-white transition-colors px-4">
-                      Follow
+                      Theo dõi
                     </Button>
                   </div>
                 ))}
@@ -88,23 +88,23 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
             <div className="border border-black/10 p-6 flex flex-col gap-6 mt-4">
               <div className="flex items-center gap-2 text-black">
                 <Calendar className="w-5 h-5" />
-                <h3 className="font-bold text-lg tracking-tight">Upcoming</h3>
+                <h3 className="font-bold text-lg tracking-tight">Sắp diễn ra</h3>
               </div>
               
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1 cursor-pointer group">
                   <span className="font-bold text-sm text-black group-hover:underline decoration-1 underline-offset-2">Paris Fashion Week SS24 Debrief</span>
-                  <span className="text-xs text-black/60 font-medium">Live Editorial Discussion • Oct 12</span>
+                  <span className="text-xs text-black/60 font-medium">Thảo luận trực tiếp • 12 Thg 10</span>
                 </div>
                 <div className="flex flex-col gap-1 cursor-pointer group">
                   <span className="font-bold text-sm text-black group-hover:underline decoration-1 underline-offset-2">Archive Sale: 90s Minimalism</span>
-                  <span className="text-xs text-black/60 font-medium">Exclusive Access • Oct 15</span>
+                  <span className="text-xs text-black/60 font-medium">Quyền truy cập đặc biệt • 15 Thg 10</span>
                 </div>
               </div>
 
               <div className="pt-2">
                 <button className="text-[10px] font-bold uppercase tracking-widest text-black/60 hover:text-black transition-colors">
-                  View All Events
+                  Xem tất cả sự kiện
                 </button>
               </div>
             </div>

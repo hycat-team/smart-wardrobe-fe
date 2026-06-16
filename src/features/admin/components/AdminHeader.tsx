@@ -1,18 +1,17 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Sparkles } from 'lucide-react';
 
 export function AdminHeader() {
   return (
-    <header className="h-16 border-b bg-card flex items-center justify-between px-6 sticky top-0 z-10 shrink-0">
-      <h1 className="text-lg font-medium">Trang Quản Trị</h1>
+    <header className="h-16 border-b border-black/10 bg-white flex items-center justify-between px-8 sticky top-0 z-10 shrink-0">
+      <div className="flex items-center gap-3">
+        <Sparkles className="size-4 text-[#A3A3A3]" />
+        <h1 className="text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#111] font-bold">
+          System Control Panel
+        </h1>
+      </div>
       
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium">Admin</span>
-          <Avatar className="size-9">
-            <AvatarImage src="" alt="Admin" />
-            <AvatarFallback>AD</AvatarFallback>
-          </Avatar>
-        </div>
+      <div className="flex items-center gap-4 text-[#666] font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-widest">
+        <span>Status: <span className="text-[#111] font-bold">Online</span></span>
       </div>
     </header>
   );

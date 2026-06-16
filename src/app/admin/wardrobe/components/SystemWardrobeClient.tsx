@@ -26,6 +26,8 @@ export function SystemWardrobeClient() {
   const items = data?.items || [];
 
   useGSAP(() => {
+    if (items.length === 0) return;
+    
     gsap.from(".catalog-row", {
       y: 10,
       opacity: 0,

@@ -6,6 +6,50 @@ export const ADMIN_USERS_KEY = ['admin-users'];
 export const ADMIN_POSTS_KEY = ['admin-posts'];
 export const ADMIN_POST_ITEMS_KEY = ['admin-post-items'];
 export const ADMIN_CATALOG_KEY = ['admin-catalog'];
+export const ADMIN_CATEGORIES_KEY = ['admin-categories'];
+
+export const useAdminCategories = () => {
+  return useQuery({
+    queryKey: ADMIN_CATEGORIES_KEY,
+    queryFn: () => adminApi.getCategories(),
+  });
+};
+
+export const useCreateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.createCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_CATEGORIES_KEY });
+      toast.success('Thêm danh mục thành công');
+    },
+    onError: () => toast.error('Thêm danh mục thất bại'),
+  });
+};
+
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.updateCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_CATEGORIES_KEY });
+      toast.success('Cập nhật danh mục thành công');
+    },
+    onError: () => toast.error('Cập nhật danh mục thất bại'),
+  });
+};
+
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.deleteCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_CATEGORIES_KEY });
+      toast.success('Xóa danh mục thành công');
+    },
+    onError: () => toast.error('Xóa danh mục thất bại'),
+  });
+};
 
 export const useAdminUsers = (params?: Record<string, any>) => {
   return useQuery({

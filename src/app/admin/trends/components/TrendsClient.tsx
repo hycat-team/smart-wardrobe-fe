@@ -1,8 +1,6 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Search, Plus, MoreHorizontal, ShieldCheck, Users, Eye, EyeOff, Heart, MessageCircle, Share2, Loader2, RefreshCcw } from "lucide-react";
+import { Search, Loader2, Eye, Heart, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -13,87 +11,64 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useAdminPosts } from "@/features/admin/queries/admin.queries";
 
 export function TrendsClient() {
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTrend, setSelectedTrend] = useState<any | null>(null);
 
-  // Fetch real data
   const { data, isLoading, isError } = useAdminPosts({ limit: 20, q: searchTerm });
   const trends = data?.items || [];
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in duration-500 font-sans pb-16">
-      
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">Xu Hướng Nổi Bật</h1>
-          <p className="text-sm text-muted-foreground">Theo dõi và kiểm duyệt các bài viết có tương tác cao từ cộng đồng.</p>
+    <div className="flex flex-col gap-10 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full pb-24 text-[#111]">
+      <div className="flex flex-col gap-8 pt-6 border-b border-black/10 pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-4 max-w-2xl">
+            <h1 className="text-5xl md:text-6xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1] uppercase">
+              TRENDS
+            </h1>
+            <p className="text-[12px] text-[#666] font-['IBM_Plex_Mono'] uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4">
+              Theo dõi và kiểm duyệt các bài viết có tương tác cao.
+            </p>
+          </div>
+          <div className="flex gap-4 w-full md:w-auto">
+            <div className="relative flex-1 md:w-64">
+              <Search className="absolute left-0 top-1/2 -translate-y-1/2 size-4 text-[#A3A3A3]" />
+              <input 
+                type="text" 
+                placeholder="TÌM KIẾM NỘI DUNG..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-10 w-full pl-8 pr-4 bg-transparent border-b border-black/10 focus:border-[#111] text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest transition-all outline-none rounded-none"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card border border-border p-3 rounded-xl shadow-sm">
-        <div className="relative w-full sm:w-80 shrink-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <input 
-            type="text" 
-            placeholder="Tìm theo nội dung..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-9 w-full pl-9 pr-4 rounded-lg bg-secondary border-transparent focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-all outline-none text-foreground"
-          />
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-black/10 shadow-sm p-6">
         <Table>
           <TableHeader>
-            <TableRow className="bg-secondary/50 hover:bg-secondary/50">
-              <TableHead className="w-[300px]">Bài viết</TableHead>
-              <TableHead>Nguồn Gốc</TableHead>
-              <TableHead className="text-center">Tương Tác</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead className="text-right">Thao tác</TableHead>
+            <TableRow className="hover:bg-transparent border-b border-black/10">
+              <TableHead className="font-['IBM_Plex_Mono'] text-[10px] text-[#666] uppercase tracking-[0.15em] py-4 h-auto w-[350px]">Bài viết</TableHead>
+              <TableHead className="font-['IBM_Plex_Mono'] text-[10px] text-[#666] uppercase tracking-[0.15em] py-4 h-auto">Người đăng</TableHead>
+              <TableHead className="font-['IBM_Plex_Mono'] text-[10px] text-[#666] uppercase tracking-[0.15em] py-4 h-auto text-center">Tương tác</TableHead>
+              <TableHead className="font-['IBM_Plex_Mono'] text-[10px] text-[#666] uppercase tracking-[0.15em] py-4 h-auto">Trạng thái</TableHead>
+              <TableHead className="font-['IBM_Plex_Mono'] text-[10px] text-[#666] uppercase tracking-[0.15em] py-4 h-auto text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
-                  <Loader2 className="size-6 animate-spin mx-auto mb-2 text-primary" /> Đang tải dữ liệu xu hướng...
-                </TableCell>
-              </TableRow>
+              <TableRow><TableCell colSpan={5} className="h-32 text-center border-b border-black/5"><Loader2 className="animate-spin text-[#A3A3A3] mx-auto" /></TableCell></TableRow>
             ) : isError ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-red-500">
-                  Lỗi khi tải dữ liệu.
-                </TableCell>
-              </TableRow>
+              <TableRow><TableCell colSpan={5} className="h-32 text-center text-[#111] font-['IBM_Plex_Mono'] uppercase text-[11px] border-b border-black/5">Lỗi tải dữ liệu.</TableCell></TableRow>
             ) : trends.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
-                  Không tìm thấy xu hướng nào phù hợp.
-                </TableCell>
-              </TableRow>
+              <TableRow><TableCell colSpan={5} className="h-32 text-center text-[#A3A3A3] font-['IBM_Plex_Mono'] uppercase text-[11px] tracking-widest border-b border-black/5">Không có dữ liệu.</TableCell></TableRow>
             ) : trends.map((trend: any) => {
               const imageUrl = trend.media?.[0]?.mediaUrl || trend.imageUrl || "https://placehold.co/200x200?text=No+Image";
               const title = trend.title || trend.content || "Bài viết không có tiêu đề";
@@ -102,46 +77,33 @@ export function TrendsClient() {
               const isHidden = trend.isDeleted || trend.status === "DELETED";
 
               return (
-                <TableRow key={trend.id || trend.publicId} className={cn(isHidden && "opacity-60 bg-muted/30")}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="size-12 rounded-lg bg-muted overflow-hidden shrink-0">
+                <TableRow key={trend.id || trend.publicId} className={cn("border-b border-black/5 hover:bg-[#F8F7F5] transition-colors", isHidden && "opacity-60")}>
+                  <TableCell className="py-5">
+                    <div className="flex items-center gap-4">
+                      <div className="size-16 bg-black/5 overflow-hidden shrink-0">
                         <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-bold text-foreground text-sm line-clamp-1">{title}</span>
-                        <span className="text-xs text-muted-foreground mt-0.5">{date}</span>
+                        <span className="font-['Playfair_Display'] font-medium text-base text-[#111] line-clamp-2">{title}</span>
+                        <span className="font-['IBM_Plex_Mono'] text-[10px] text-[#666] uppercase tracking-widest mt-1">{date}</span>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-purple-500/10 text-purple-500 text-xs font-medium border border-purple-500/20">
-                      <Users className="size-3" /> Community
-                    </span>
-                    <div className="text-[10px] text-muted-foreground mt-1.5">@{creator}</div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground font-mono">
-                      <span className="flex items-center gap-1"><Heart className="size-3 text-red-400" /> {trend.likeCount || 0}</span>
-                      <span className="flex items-center gap-1"><MessageCircle className="size-3" /> {trend.commentCount || 0}</span>
+                  <TableCell className="py-5 font-['IBM_Plex_Mono'] text-[12px] text-[#111]">@{creator}</TableCell>
+                  <TableCell className="py-5">
+                    <div className="flex items-center justify-center gap-4 font-['IBM_Plex_Mono'] text-[11px] text-[#666]">
+                      <span className="flex items-center gap-1.5"><Heart className="size-3" strokeWidth={1.5} /> {trend.likeCount || 0}</span>
+                      <span className="flex items-center gap-1.5"><MessageCircle className="size-3" strokeWidth={1.5} /> {trend.commentCount || 0}</span>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <span className={cn(
-                      "inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
-                      !isHidden ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
-                    )}>
-                      {!isHidden ? "Đang chạy" : "Đã Xóa"}
+                  <TableCell className="py-5">
+                    <span className={cn("font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-widest font-medium border px-2 py-1", !isHidden ? "text-[#111] border-[#111]" : "text-[#A3A3A3] border-black/10")}>
+                      {!isHidden ? "ACTIVE" : "DELETED"}
                     </span>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => setSelectedTrend({ ...trend, title, creator, date, imageUrl })}
-                      className="text-xs"
-                    >
-                      <Eye className="size-4 mr-2" /> Xem
+                  <TableCell className="text-right py-5">
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedTrend({ ...trend, title, creator, date, imageUrl })} className="text-[#A3A3A3] hover:text-[#111] hover:bg-transparent rounded-none font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-widest">
+                      <Eye className="size-4 mr-2" strokeWidth={1.5} /> VIEW
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -151,41 +113,28 @@ export function TrendsClient() {
         </Table>
       </div>
 
-      {/* Detail Dialog */}
       <Dialog open={!!selectedTrend} onOpenChange={() => setSelectedTrend(null)}>
-        <DialogContent className="sm:max-w-md font-sans bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-heading font-bold text-foreground">Chi tiết Xu Hướng</DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              Thông tin hiệu suất của xu hướng trên nền tảng.
-            </DialogDescription>
-          </DialogHeader>
-          
+        <DialogContent className="sm:max-w-md font-sans bg-white border border-black/10 p-0 rounded-none overflow-hidden">
           {selectedTrend && (
-            <div className="space-y-6 py-4">
-              <div className="aspect-video w-full rounded-xl overflow-hidden relative">
+            <div className="flex flex-col">
+              <div className="aspect-square w-full relative">
                 <img src={selectedTrend.imageUrl} alt={selectedTrend.title} className="w-full h-full object-cover" />
-                <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-500/90 backdrop-blur-md text-white text-xs font-bold shadow-sm">
-                    <Users className="size-3.5" /> Community
-                  </span>
+              </div>
+              <div className="p-8 border-t border-black/10 space-y-6">
+                <div>
+                  <h3 className="font-['Playfair_Display'] text-3xl font-medium text-[#111] line-clamp-3 leading-snug">{selectedTrend.title}</h3>
+                  <p className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-widest text-[#666] mt-4">
+                    TÁC GIẢ <span className="text-[#111] font-medium">@{selectedTrend.creator}</span> — {selectedTrend.date}
+                  </p>
                 </div>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold font-heading text-foreground line-clamp-2">{selectedTrend.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1">Đăng bởi <span className="font-medium text-foreground">@{selectedTrend.creator}</span> vào ngày {selectedTrend.date}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-secondary/50 p-4 rounded-xl flex flex-col justify-center gap-3 border border-border">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2 text-muted-foreground"><Heart className="size-4 text-red-400" /> Lượt tim</span>
-                    <span className="font-mono font-medium text-foreground">{selectedTrend.likeCount || 0}</span>
+                <div className="flex gap-8 border-t border-black/10 pt-6">
+                  <div className="space-y-1">
+                    <p className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-widest text-[#A3A3A3]">LƯỢT THÍCH</p>
+                    <p className="font-['IBM_Plex_Mono'] text-lg text-[#111]">{selectedTrend.likeCount || 0}</p>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2 text-muted-foreground"><MessageCircle className="size-4" /> Bình luận</span>
-                    <span className="font-mono font-medium text-foreground">{selectedTrend.commentCount || 0}</span>
+                  <div className="space-y-1">
+                    <p className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-widest text-[#A3A3A3]">BÌNH LUẬN</p>
+                    <p className="font-['IBM_Plex_Mono'] text-lg text-[#111]">{selectedTrend.commentCount || 0}</p>
                   </div>
                 </div>
               </div>
