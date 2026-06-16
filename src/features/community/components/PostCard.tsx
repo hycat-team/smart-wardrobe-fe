@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { PostRes } from '../types';
 import { ImageOff, Heart, MessageSquare, Trash2, Loader2 } from 'lucide-react';
 import gsap from 'gsap';
@@ -20,15 +20,20 @@ export const PostCard = ({ post }: PostCardProps) => {
   const { mutate: likePost } = useLikePost();
   const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
   const { data: profile } = useProfile();
-  
+
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  
+
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasImageError, setHasImageError] = useState(false);
 
   const handleLike = () => {
     const newIsLiked = !post.isLiked;
-    
+
     if (heartIconRef.current) {
       gsap.fromTo(
         heartIconRef.current,
@@ -46,8 +51,13 @@ export const PostCard = ({ post }: PostCardProps) => {
     likePost({ postPublicID: post.publicId, isLiked: newIsLiked });
   };
 
-  const hasMedia = post.media && post.media.length > 0;
-  const mediaUrl = hasMedia ? post.media[0].mediaUrl : null;
+  const mediaUrl = post.media && post.media.length > 0
+    ? post.media[0].mediaUrl
+    : post.items && post.items.length > 0
+      ? (post.items[0].item as any).imageUrl
+      : null;
+
+  const hasMedia = !!mediaUrl;
 
   return (
     <>
@@ -63,7 +73,7 @@ export const PostCard = ({ post }: PostCardProps) => {
             {!isImageLoaded && !hasImageError && (
               <Skeleton className="absolute inset-0 w-full h-full rounded-none bg-gray-100" />
             )}
-            
+
             {hasImageError ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                 <ImageOff className="w-8 h-8 mb-2 opacity-50 stroke-1" />
@@ -86,63 +96,83 @@ export const PostCard = ({ post }: PostCardProps) => {
         )}
 
         {/* Content Section */}
-        <div className="p-6 md:p-8 flex flex-col gap-4">
-          <h2 className="font-bold text-3xl md:text-4xl text-[#1A1A1A] leading-[1.1] tracking-tight">
-            {post.title || `The Editorial Feature #${post.publicId.slice(0, 4)}`}
-          </h2>
-          
-          <p className="text-[#666666] text-[15px] leading-relaxed">
-            {post.content}
-          </p>
-        </div>
-
-        {/* Footer Section */}
-        <div className="mx-6 md:mx-8 border-t border-[#E5E5E5] py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">
-              BY {post.username || 'ATELIER CURATORS'}
-            </span>
-            {profile?.username && profile.username === post.username && (
-              <button 
-                onClick={() => deletePost(post.publicId)} 
-                disabled={isDeleting} 
-                className="text-[#A3A3A3] hover:text-red-500 transition-colors"
+        <div className="p-5 md:p-6 flex flex-col">
+          {/* Header row: Avatar + Username + Delete Button */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-full bg-[#E5E5E5] overflow-hidden relative border border-[#1A1A1A]/10 flex-shrink-0">
+                {post.avatarUrl ? (
+                  <Image src={post.avatarUrl} alt={post.username} fill className="object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[#888888] font-bold text-[10px] uppercase bg-[#F3F0EA]">
+                    {(post.username || 'A')[0]}
+                  </div>
+                )}
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A]">
+                {post.username || 'ATELIER CURATORS'}
+              </span>
+            </div>
+            
+            {isMounted && profile?.username && profile.username === post.username && (
+              <button
+                onClick={() => deletePost(post.publicId)}
+                disabled={isDeleting}
+                className="text-[#A3A3A3] hover:text-[#D03027] transition-colors p-1"
                 title="Delete Post"
               >
-                {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-5 text-[#888888]">
-            <button 
-              onClick={handleLike}
-              className="flex items-center gap-1.5 hover:text-[#1A1A1A] transition-colors outline-none"
-            >
-              <Heart 
-                ref={heartIconRef}
-                className={cn("w-4 h-4", post.isLiked ? "fill-current text-rose-500" : "")} 
-                strokeWidth={2}
-              />
-              <span className="text-xs font-medium">
-                {post.likeCount >= 1000 ? `${(post.likeCount / 1000).toFixed(1)}k` : post.likeCount}
-              </span>
-            </button>
-            <button 
-              onClick={() => setIsCommentsOpen(true)}
-              className="flex items-center gap-1.5 hover:text-[#1A1A1A] transition-colors outline-none"
-            >
-              <MessageSquare className="w-4 h-4" strokeWidth={2} />
-              <span className="text-xs font-medium">{post.commentCount}</span>
-            </button>
+          {/* Title & Content */}
+          <h2 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] leading-[1.2] tracking-tight mb-2">
+            {post.title || `The Editorial Feature #${post.publicId.slice(0, 4)}`}
+          </h2>
+
+          <p className="text-[#666666] text-sm leading-relaxed mb-6 line-clamp-3">
+            {post.content}
+          </p>
+
+          {/* Footer Section */}
+          <div className="border-t border-[#E5E5E5] pt-4 flex items-center justify-between mt-auto">
+            <div className="flex items-center gap-5 text-[#888888]">
+              <button
+                onClick={handleLike}
+                className="flex items-center gap-1.5 hover:text-[#1A1A1A] transition-colors outline-none group"
+              >
+                <Heart
+                  ref={heartIconRef}
+                  className={cn("w-4 h-4 transition-colors", post.isLiked ? "fill-[#D03027] text-[#D03027]" : "group-hover:text-[#D03027]")}
+                  strokeWidth={2}
+                />
+                <span className="text-[11px] font-medium">
+                  {post.likeCount}
+                </span>
+              </button>
+              <button
+                onClick={() => setIsCommentsOpen(true)}
+                className="flex items-center gap-1.5 hover:text-[#1A1A1A] transition-colors outline-none"
+              >
+                <MessageSquare className="w-4 h-4" strokeWidth={2} />
+                <span className="text-[11px] font-medium">
+                  {post.commentCount}
+                </span>
+              </button>
+            </div>
+            
+            <span className="text-[10px] uppercase tracking-widest text-[#A3A3A3]">
+              {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+            </span>
           </div>
         </div>
       </article>
 
-      <PostCommentsModal 
-        isOpen={isCommentsOpen} 
-        onClose={() => setIsCommentsOpen(false)} 
-        post={post} 
+      <PostCommentsModal
+        isOpen={isCommentsOpen}
+        onClose={() => setIsCommentsOpen(false)}
+        post={post}
       />
     </>
   );

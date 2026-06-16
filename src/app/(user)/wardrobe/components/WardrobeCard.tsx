@@ -35,9 +35,19 @@ export function WardrobeCard({
       <div className="relative aspect-[4/5] bg-[#F7F6F4] p-[24px] overflow-hidden flex-shrink-0">
         <img
           alt={getWardrobeItemName(item)}
-          className="w-full h-full object-contain mix-blend-multiply transition-transform duration-250 group-hover:scale-[1.02]"
+          className={cn(
+            "w-full h-full object-contain drop-shadow-sm transition-transform duration-250",
+            !isProcessing && "group-hover:scale-[1.02]",
+            isProcessing && "blur-md opacity-60"
+          )}
           src={applyCloudinaryTrim(item.imageUrl || undefined)}
         />
+        {isProcessing && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
+            <div className="size-8 border-2 border-black/20 border-t-black rounded-full animate-spin mb-3"></div>
+            <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-black bg-white/90 px-3 py-1.5 shadow-sm tracking-widest">AI ĐANG XỬ LÝ</span>
+          </div>
+        )}
         
         {/* Selection State */}
         {isSelectMode ? (

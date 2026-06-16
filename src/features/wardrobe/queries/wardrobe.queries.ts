@@ -20,18 +20,6 @@ export const useMyWardrobe = (categorySlug?: string) => {
       if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
       return undefined;
     },
-    refetchInterval: (query) => {
-      const pages = query.state.data?.pages;
-      if (pages) {
-        const hasProcessing = pages.some(page => 
-          page.items.some((item) => item.status === WardrobeItemStatus.Processing)
-        );
-        if (hasProcessing) {
-          return 5000; // Poll every 5s if there is any item processing
-        }
-      }
-      return false;
-    },
     placeholderData: keepPreviousData,
   });
 };

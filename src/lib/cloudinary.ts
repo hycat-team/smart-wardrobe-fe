@@ -63,8 +63,8 @@ export function applyCloudinaryBackgroundRemoval(url: string): string {
   
   if (newUrl.includes("/upload/")) {
     // Bắt buộc dùng f_png thay vì f_auto để đảm bảo Cloudinary trả về định dạng hỗ trợ trong suốt
-    // Thêm e_trim:10 để tự động cắt bỏ khoảng trắng và shadow thừa
-    return newUrl.replace("/upload/", "/upload/e_background_removal,e_trim:10,f_png,q_auto/");
+    // Thêm e_trim:10 để tự động cắt bỏ khoảng trắng và shadow thừa. Lưu ý: e_background_removal phải đứng riêng rẽ bằng dấu /
+    return newUrl.replace("/upload/", "/upload/e_background_removal/e_trim:10,f_png,q_auto/");
   }
   
   return newUrl;

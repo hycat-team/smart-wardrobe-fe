@@ -155,8 +155,8 @@ export function WardrobeItemDetailClient({ itemId, initialItem }: WardrobeItemDe
             
             <img 
               src={applyCloudinaryTrim(item.imageUrl)} 
-              alt={itemName} 
-              className="w-full h-full object-contain mix-blend-multiply" 
+              alt={itemName}
+              className="w-full h-full object-contain drop-shadow-sm" 
             />
 
             <div className="absolute top-6 left-6 flex flex-col gap-2 z-20">

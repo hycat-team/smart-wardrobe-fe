@@ -100,6 +100,10 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   const [searchInput, setSearchInput] = useState(searchParam);
   const lastPushedQ = useRef(searchParam);
 
+  // Anti-spam refs for refetch
+  const spamClickCount = useRef(0);
+  const spamClickTimeout = useRef<NodeJS.Timeout | null>(null);
+
   // Map category param to backend slug
   const slugToFetch = categoryParam === "Tất cả" ? undefined : CATEGORY_SLUG_MAP[categoryParam] || categoryParam;
 
@@ -110,7 +114,8 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     isFetching,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage
+    isFetchingNextPage,
+    refetch
   } = useMyWardrobe(slugToFetch);
 
   const rawInitialItems = Array.isArray(initialData) ? initialData : ((initialData as any)?.items || []);
@@ -278,25 +283,25 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
                 <AlertDialogTrigger asChild>
                   <Button 
                     disabled={isDeleting}
-                    className="rounded-none bg-[#D03027] hover:bg-[#A9221B] text-[#F3F0EA] text-xs font-mono tracking-[0.15em] h-[42px] px-4 transition-all uppercase shadow-[3px_3px_0px_0px_rgba(26,26,26,1)] active:translate-y-[3px] active:translate-x-[3px] active:shadow-none border border-[#1A1A1A]"
+                    className="rounded-none bg-[#D03027] text-cream hover:bg-[#D03027]/90 text-xs font-mono tracking-[0.15em] h-[42px] px-6 transition-colors uppercase border-none"
                   >
                     {isDeleting ? <Loader2 className="size-4 animate-spin mr-2" /> : <Trash2 className="size-4 mr-2" />}
                     Xóa ({selectedIds.length})
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="rounded-none border-2 border-[#1A1A1A] bg-[#F3F0EA] p-8 shadow-[12px_12px_0px_0px_rgba(26,26,26,1)] sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
+                <AlertDialogContent className="rounded-none border border-ink/10 bg-cream p-8 shadow-xl sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
                   <AlertDialogHeader className="space-y-4 text-left">
-                    <AlertDialogTitle className="font-heading text-4xl uppercase tracking-tighter text-[#1A1A1A] leading-none">
+                    <AlertDialogTitle className="font-heading text-4xl uppercase tracking-tighter text-ink leading-none">
                       Cảnh báo <br/><span className="text-[#D03027]">Xóa Dữ Liệu</span>
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="font-mono text-[11px] text-[#1A1A1A]/70 uppercase tracking-widest leading-relaxed border-l-2 border-[#D03027] pl-4 mt-6">
+                    <AlertDialogDescription className="font-mono text-[11px] text-ink-muted uppercase tracking-widest leading-relaxed border-l-2 border-[#D03027] pl-4 mt-6">
                       Bạn đang chuẩn bị xóa vĩnh viễn {selectedIds.length} trang phục khỏi hệ thống.
                       <br/><br/>
                       Hành động này không thể hoàn tác. Các item này sẽ bị gỡ bỏ khỏi mọi outfit liên quan.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter className="mt-10 flex gap-4 sm:space-x-0 w-full sm:justify-between">
-                    <AlertDialogCancel className="flex-1 rounded-none border-2 border-[#1A1A1A] bg-transparent text-[#1A1A1A] font-mono text-xs tracking-widest uppercase hover:bg-[#1A1A1A] hover:text-[#F3F0EA] h-12 transition-all m-0 shadow-[4px_4px_0px_0px_rgba(26,26,26,1)] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none">
+                    <AlertDialogCancel className="flex-1 rounded-none border border-ink/20 bg-transparent text-ink font-mono text-xs tracking-widest uppercase hover:bg-ink hover:text-cream h-12 transition-colors m-0">
                       Hủy bỏ
                     </AlertDialogCancel>
                     <AlertDialogAction 
@@ -308,7 +313,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
                           }
                         });
                       }}
-                      className="flex-1 rounded-none border-2 border-[#1A1A1A] bg-[#D03027] text-[#F3F0EA] font-mono text-xs tracking-widest uppercase hover:bg-transparent hover:text-[#D03027] h-12 transition-all m-0 shadow-[4px_4px_0px_0px_rgba(26,26,26,1)] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none"
+                      className="flex-1 rounded-none border-none bg-[#D03027] text-cream font-mono text-xs tracking-widest uppercase hover:bg-[#D03027]/90 h-12 transition-colors m-0"
                     >
                       Xác nhận
                     </AlertDialogAction>
@@ -387,7 +392,24 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
                 return;
               }
               if (isProcessing) {
-                toast.info("AI đang xử lý hình ảnh này. Vui lòng đợi trong giây lát!");
+                if (isFetching) return; // Prevent concurrent fetches
+
+                if (spamClickCount.current >= 5) {
+                  toast.error("Bạn thao tác quá nhanh, vui lòng chờ trong giây lát!");
+                  return;
+                }
+
+                spamClickCount.current += 1;
+                if (spamClickTimeout.current) clearTimeout(spamClickTimeout.current);
+                spamClickTimeout.current = setTimeout(() => {
+                  spamClickCount.current = 0;
+                }, 10000); // Reset limit after 10 seconds
+
+                toast.promise(refetch(), {
+                  loading: 'Đang làm mới dữ liệu từ AI...',
+                  success: 'Đã cập nhật kết quả mới nhất!',
+                  error: 'Lỗi khi tải dữ liệu',
+                });
                 return;
               }
               router.push(`/wardrobe/item/${item.id}`);

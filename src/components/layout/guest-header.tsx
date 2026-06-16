@@ -109,7 +109,7 @@ export function GuestHeader() {
                 <div className={`w-px h-5 transition-colors duration-500 ${scrolled ? "bg-white/10" : "bg-[#1A1A1A]/10"}`} />
 
                 {/* Avatar Dropdown */}
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <button className="relative group/avatar outline-none">
                       <div className={`
