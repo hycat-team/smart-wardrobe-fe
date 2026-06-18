@@ -208,6 +208,8 @@ export function GuestHeader() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Đóng menu" : "Mở menu"}
+            aria-expanded={mobileMenuOpen}
             className={`
               md:hidden size-10 flex items-center justify-center transition-colors duration-300
               ${scrolled ? "text-white" : "text-[#1A1A1A]"}

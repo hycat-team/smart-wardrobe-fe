@@ -1,0 +1,94 @@
+"use client";
+
+import { useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import { ChevronDown } from "lucide-react";
+import { FAQ_ITEMS } from "../data/landing-data";
+
+gsap.registerPlugin(ScrollTrigger);
+
+export function FAQSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  useGSAP(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
+    gsap.fromTo(".faq-item",
+      { y: 20, opacity: 0 },
+      {
+        y: 0, opacity: 1,
+        stagger: 0.12,
+        duration: 0.6,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".faq-section", start: "top 75%" }
+      }
+    );
+  }, { scope: sectionRef });
+
+  const toggle = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return (
+    <section
+      ref={sectionRef}
+      className="faq-section w-full py-24 md:py-32 px-6 bg-[#F4F1EE] relative z-10"
+      role="region"
+      aria-labelledby="faq-heading"
+    >
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#1A1A1A]/10 text-xs font-bold text-[#D9C5B2] uppercase tracking-widest mb-6 shadow-sm">
+            Câu hỏi thường gặp
+          </div>
+          <h2
+            id="faq-heading"
+            className="font-heading text-4xl md:text-6xl text-[#1A1A1A] font-medium"
+          >
+            Bạn thắc mắc?
+          </h2>
+        </div>
+
+        <div className="space-y-3">
+          {FAQ_ITEMS.map((item, index) => (
+            <div
+              key={index}
+              className="faq-item opacity-0 bg-white rounded-2xl border border-[#1A1A1A]/5 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+            >
+              <button
+                onClick={() => toggle(index)}
+                className="w-full flex items-center justify-between p-6 text-left group"
+                aria-expanded={openIndex === index}
+                aria-controls={`faq-answer-${index}`}
+              >
+                <span className="text-base md:text-lg font-bold text-[#1A1A1A] pr-4 group-hover:text-[#D9C5B2] transition-colors duration-200">
+                  {item.question}
+                </span>
+                <ChevronDown
+                  className={`size-5 shrink-0 text-[#707070] transition-transform duration-300 ${
+                    openIndex === index ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              <div
+                id={`faq-answer-${index}`}
+                role="region"
+                className={`overflow-hidden transition-all duration-300 ease-out ${
+                  openIndex === index ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <p className="px-6 pb-6 text-[#5A5A5A] text-base leading-relaxed">
+                  {item.answer}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
