@@ -11,7 +11,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Không có refresh token' }, { status: 401 });
     }
 
-    const response = await fetch(`${API_URL}/auth/refresh-token`, {
+    const cleanBaseUrl = API_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
+    const response = await fetch(`${cleanBaseUrl}/auth/refresh-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

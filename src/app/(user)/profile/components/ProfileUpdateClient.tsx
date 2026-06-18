@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { UserRes } from "@/features/profile/types";
+import { getUserAvatar } from "@/lib/utils";
 
 export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRes }) {
   const { data: profile } = useProfile(initialProfile);
@@ -71,7 +72,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
       lastName: profileData.lastName,
       address: profileData.address,
       gender: profileData.gender,
-      dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toISOString() : undefined,
+      dateOfBirth: profileData.dateOfBirth ? profileData.dateOfBirth : undefined,
     });
   };
 
@@ -108,7 +109,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
       <div className="flex justify-center mb-12 relative">
         <div className="size-24 rounded-full overflow-hidden border border-cream-dark/50 bg-cream-dark/30 relative group cursor-not-allowed">
           <img
-            src={`https://api.dicebear.com/7.x/notionists/svg?seed=${profile?.username}` || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"}
+            src={getUserAvatar(profile)}
             alt="Avatar"
             className="w-full h-full object-cover opacity-90 transition-opacity group-hover:opacity-75"
           />

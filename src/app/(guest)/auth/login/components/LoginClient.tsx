@@ -5,44 +5,61 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useLogin } from "@/features/auth/queries/auth.queries";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const loginSchema = z.object({
+  email: z.string().min(1, "Vui lòng nhập email hoặc username"),
+  password: z.string().min(1, "Vui lòng nhập mật khẩu"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginClient() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
   const { mutate: login, isPending } = useLogin();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
-      toast.error("Vui lòng nhập đầy đủ email và mật khẩu.");
-      return;
-    }
-
-    login({ loginName: email, password }, {
-      onSuccess: (res: any) => {
-        if (res?.isAdmin) {
-          router.push("/admin/dashboard");
-        } else {
-          router.push("/wardrobe");
-        }
+  const onSubmit = (data: LoginFormValues) => {
+    login(
+      { loginName: data.email, password: data.password },
+      {
+        onSuccess: (res: any) => {
+          if (res?.isAdmin) {
+            router.push("/admin/dashboard");
+          } else {
+            router.push("/wardrobe");
+          }
+        },
       }
-    });
+    );
   };
 
   return (
     <div className="bg-ethos-surface text-ethos-on-surface font-inter text-base min-h-screen flex antialiased">
       {/* Split Layout Container */}
       <main className="w-full flex flex-col md:flex-row min-h-screen">
-        
+
         {/* Left Side: Editorial Image */}
         <section className="hidden md:block md:w-1/2 relative bg-ethos-surface-low overflow-hidden">
-          <Image 
-            alt="Ethos Atelier Editorial" 
-            className="absolute inset-0 w-full h-full object-cover grayscale-[20%]" 
-            src="https://lh3.googleusercontent.com/aida/AP1WRLtaCdgB7jZ1fDTLXuC0CIEx_vyosxOTPqoHCZTPCYKJCVSSKIRzNGCGljBg5xl9HH8F_0TvA3-F1hVLKJEuj6VdVLMQtwSZRFmyePdeoGXjTJ4FnYwbaLz1dqoj0J_cMMzy7azwPQ1_VznHKIqeW8iTJl_LLhHpnfjTS0a_eqkATMMkGNG5bu1z2swXkFPXReTJPGkht5Tq1HBp08l3kq-AtYvgCVXJQyEOw5GVykd4QAkvLO8UqDDGPLc"
+          <Image
+            alt="Ethos Atelier Editorial"
+            className="absolute inset-0 w-full h-full object-cover grayscale-[20%]"
+            src="/images-login.png"
             fill
           />
           <div className="absolute inset-0 bg-ethos-primary/10"></div>
@@ -53,60 +70,56 @@ export function LoginClient() {
             <p className="font-inter text-[16px] text-ethos-surface-lowest/90 drop-shadow-sm">Consciously crafted. Meticulously curated. Your digital atelier awaits.</p>
           </div>
         </section>
-        
+
         {/* Right Side: Login Form */}
         <section className="w-full md:w-1/2 flex flex-col justify-center px-[20px] md:px-[64px] lg:px-24 xl:px-32 relative bg-ethos-surface-lowest md:bg-transparent">
-          
+
           {/* Mobile Brand */}
           <div className="md:hidden mt-[20px] mb-12 flex justify-center w-full">
             <h2 className="font-playfair text-[36px] font-semibold text-ethos-primary tracking-tight">Closy.</h2>
           </div>
-          
+
           <div className="w-full max-w-md mx-auto">
             <div className="mb-12">
               <h1 className="font-playfair text-[36px] md:text-[48px] font-semibold text-ethos-primary mb-2">Welcome Back.</h1>
               <p className="font-inter text-[16px] text-ethos-on-surface-variant">Sign in to access your curated wardrobe.</p>
             </div>
-            
-            <form className="space-y-8" onSubmit={handleLogin}>
+
+            <form noValidate className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-2">
-                <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="email">Email Address</label>
-                <input 
-                  id="email" 
-                  name="email" 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="email">Email / Username</label>
+                <input
+                  id="email"
+                  type="text"
+                  placeholder="your@email.com or username"
+                  {...register("email")}
                   onFocus={() => setFocusedInput('email')}
                   onBlur={() => setFocusedInput(null)}
-                  placeholder="your@email.com" 
-                  required 
-                  className={`w-full block font-inter text-[16px] text-ethos-primary placeholder:text-ethos-outline-variant py-3 focus:outline-none focus:ring-0 border-0 border-b border-ethos-primary bg-transparent transition-all duration-300 ${focusedInput === 'email' ? 'bg-ethos-surface-low border-b-2 px-4 rounded-none' : 'px-0'}`}
+                  className={`w-full block font-inter text-[16px] text-ethos-primary placeholder:text-ethos-outline-variant py-3 focus:outline-none focus:ring-0 border-0 border-b border-ethos-primary bg-transparent transition-all duration-300 ${focusedInput === 'email' ? 'bg-ethos-surface-low border-b-2 px-4 rounded-none' : 'px-0'} ${errors.email ? 'border-red-500' : ''}`}
                 />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="password">Password</label>
                   <Link href="/auth/forgot-password" className="font-inter text-[14px] text-ethos-on-surface-variant hover:text-ethos-primary transition-colors">Forgot?</Link>
                 </div>
-                <input 
-                  id="password" 
-                  name="password" 
+                <input
+                  id="password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  {...register("password")}
                   onFocus={() => setFocusedInput('password')}
                   onBlur={() => setFocusedInput(null)}
-                  placeholder="••••••••" 
-                  required 
-                  className={`w-full block font-inter text-[16px] text-ethos-primary placeholder:text-ethos-outline-variant py-3 focus:outline-none focus:ring-0 border-0 border-b border-ethos-primary bg-transparent transition-all duration-300 ${focusedInput === 'password' ? 'bg-ethos-surface-low border-b-2 px-4 rounded-none' : 'px-0'}`}
+                  className={`w-full block font-inter text-[16px] text-ethos-primary placeholder:text-ethos-outline-variant py-3 focus:outline-none focus:ring-0 border-0 border-b border-ethos-primary bg-transparent transition-all duration-300 ${focusedInput === 'password' ? 'bg-ethos-surface-low border-b-2 px-4 rounded-none' : 'px-0'} ${errors.password ? 'border-red-500' : ''}`}
                 />
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
               </div>
-              
+
               <div className="pt-4">
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isPending}
                   className="w-full h-12 bg-ethos-primary text-ethos-on-primary font-inter text-[16px] font-medium flex items-center justify-center hover:bg-ethos-primary-container hover:shadow-[0_10px_30px_rgba(45,45,45,0.15)] transition-all duration-300 ease-in-out group disabled:opacity-70 disabled:cursor-not-allowed"
                 >
@@ -119,7 +132,7 @@ export function LoginClient() {
                 </button>
               </div>
             </form>
-            
+
             <div className="mt-8">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -144,7 +157,7 @@ export function LoginClient() {
                 </button>
               </div>
             </div>
-            
+
             <div className="mt-12 text-center">
               <p className="font-inter text-[16px] text-ethos-on-surface-variant">
                 New to Closy?{' '}
@@ -154,7 +167,7 @@ export function LoginClient() {
               </p>
             </div>
           </div>
-          
+
           {/* Decorative Elements */}
           <div className="absolute bottom-4 right-4 text-ethos-outline font-inter text-[14px] hidden lg:block">
             © 2024 Ethos Atelier

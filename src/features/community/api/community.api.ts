@@ -35,6 +35,15 @@ export const communityApi = {
     return res.data.data!;
   },
 
+  getCommentReplies: async (
+    postPublicID: string,
+    commentID: string,
+    axiosInstance: AxiosInstance = api
+  ): Promise<CommentRes[]> => {
+    const res = await axiosInstance.get<APIResponse<CommentRes[]>>(`/posts/${postPublicID}/comments/${commentID}/replies`);
+    return res.data.data!;
+  },
+
   likePost: async (
     postPublicID: string,
     data: LikePostReq
@@ -62,6 +71,11 @@ export const communityApi = {
 
   deleteComment: async (postPublicID: string, commentID: string): Promise<void> => {
     await api.delete(`/posts/${postPublicID}/comments/${commentID}`);
+  },
+
+  updateComment: async (postPublicID: string, commentID: string, data: { content: string }): Promise<CommentRes> => {
+    const res = await api.put<APIResponse<CommentRes>>(`/posts/${postPublicID}/comments/${commentID}`, data);
+    return res.data.data!;
   },
 
   getPostUploadSignature: async (): Promise<UploadSignatureResult> => {

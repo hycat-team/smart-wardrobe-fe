@@ -1,0 +1,184 @@
+import React, { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { CommentRes } from '../types';
+import { useCommentReplies, useDeleteComment, useUpdateComment } from '../queries/community.queries';
+import { Loader2, Trash2, MoreHorizontal, Pencil, X } from 'lucide-react';
+import { useProfile } from '@/features/profile/queries/profile.queries';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+
+interface CommentItemProps {
+  comment: CommentRes;
+  postPublicID: string;
+  onReply: (commentId: string, username: string) => void;
+  isReply?: boolean;
+}
+
+export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }: CommentItemProps) => {
+  const [showReplies, setShowReplies] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
+  const { data: profile } = useProfile();
+  const { mutate: deleteComment, isPending: isDeleting } = useDeleteComment();
+  const { mutate: updateComment, isPending: isUpdating } = useUpdateComment();
+  
+  // Fetch replies only for top-level comments
+  const { data: replies, isLoading: isLoadingReplies } = useCommentReplies(postPublicID, comment.id, !isReply);
+
+  const getInitials = (firstName?: string, lastName?: string, username?: string) => {
+    if (firstName && lastName) return `${firstName[0]}${lastName[0]}`;
+    if (firstName) return firstName[0];
+    if (username) return username[0].toUpperCase();
+    return 'U';
+  };
+
+  const isOwner = profile?.id === comment.userId || profile?.username === comment.username;
+  const hasReplies = replies && replies.length > 0;
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editContent.trim() || editContent === comment.content) {
+      setIsEditing(false);
+      return;
+    }
+    updateComment(
+      { postPublicID, commentID: comment.id, content: editContent },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+        }
+      }
+    );
+  };
+
+  return (
+    <div className={`flex flex-col gap-3 ${isReply ? 'mt-4' : ''}`}>
+      <div className="flex gap-3 group items-start">
+        <Avatar className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} rounded-md ring-1 ring-black/5 shrink-0 mt-0.5`}>
+          <AvatarImage src={comment.avatarUrl || ''} className="rounded-md object-cover" />
+          <AvatarFallback className={`rounded-md ${isReply ? 'text-[9px]' : 'text-[10px]'} bg-[#F5F2EE] text-[#1A1A1A] font-bold`}>
+            {getInitials(comment.firstName, comment.lastName, comment.username)}
+          </AvatarFallback>
+        </Avatar>
+        
+        <div className="flex-1 flex flex-col gap-1 min-w-0">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-xs text-[#1A1A1A]">@{comment.username}</span>
+              <span className="text-[10px] text-[#A3A3A3] font-medium">
+                {new Date(comment.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+              </span>
+            </div>
+            {isOwner && !isEditing && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="opacity-0 group-hover:opacity-100 outline-none text-[#A3A3A3] hover:text-[#1A1A1A] transition-all p-1 -mt-1 -mr-1">
+                  {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MoreHorizontal className="w-4 h-4" />}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-32 bg-white rounded-md shadow-sm border border-[#E5E5E5] p-1">
+                  <DropdownMenuItem 
+                    onClick={() => setIsEditing(true)}
+                    className="text-xs text-[#1A1A1A] cursor-pointer focus:bg-[#F5F2EE] rounded-sm p-2 flex items-center gap-2"
+                  >
+                    <Pencil className="w-3 h-3" /> Chỉnh sửa
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => deleteComment({ postPublicID, commentID: comment.id })}
+                    className="text-xs text-red-500 cursor-pointer focus:bg-red-50 rounded-sm p-2 flex items-center gap-2"
+                  >
+                    <Trash2 className="w-3 h-3" /> Xóa
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+          
+          {isEditing ? (
+            <form onSubmit={handleEditSubmit} className="flex flex-col gap-2 mt-1">
+              <input
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full bg-[#F5F2EE] border border-[#E5E5E5] text-[13px] text-[#1A1A1A] rounded-sm p-2 outline-none"
+                autoFocus
+              />
+              <div className="flex items-center gap-2 justify-end">
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setIsEditing(false);
+                    setEditContent(comment.content);
+                  }}
+                  className="text-[10px] font-semibold text-[#A3A3A3] hover:text-[#1A1A1A] uppercase tracking-wider transition-colors px-2 py-1"
+                >
+                  Hủy
+                </button>
+                <button 
+                  type="submit"
+                  disabled={!editContent.trim() || isUpdating}
+                  className="text-[10px] font-bold text-white bg-[#1A1A1A] hover:bg-black uppercase tracking-wider transition-colors px-3 py-1 rounded-sm disabled:opacity-50"
+                >
+                  {isUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Lưu'}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <p className={`${isReply ? 'text-xs' : 'text-[13px]'} text-[#333333] leading-relaxed break-words`}>
+              {comment.content}
+            </p>
+          )}
+          
+          {/* Actions */}
+          <div className="flex items-center gap-4 mt-1">
+            <button 
+              onClick={() => onReply(isReply && comment.parentCommentId ? comment.parentCommentId : comment.id, comment.username)}
+              className="text-[11px] font-semibold text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors"
+            >
+              Reply
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Replies Section */}
+      {!isReply && (
+        <div className="pl-11 flex flex-col gap-2">
+          {hasReplies && !showReplies && (
+            <button 
+              onClick={() => setShowReplies(true)}
+              className="flex items-center gap-2 text-[11px] font-bold text-[#666666] hover:text-[#1A1A1A] transition-colors self-start py-1"
+            >
+              <div className="w-6 h-[1px] bg-[#E5E5E5]" />
+              View {replies.length} replies
+            </button>
+          )}
+
+          {showReplies && (
+            <div className="flex flex-col relative border-l border-[#E5E5E5]/50 ml-3 pl-4">
+              {isLoadingReplies ? (
+                <div className="flex items-center gap-2 py-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[#A3A3A3]" />
+                  <span className="text-[11px] text-[#A3A3A3]">Loading replies...</span>
+                </div>
+              ) : (
+                replies?.map((reply) => (
+                  <CommentItem 
+                    key={reply.id} 
+                    comment={reply} 
+                    postPublicID={postPublicID} 
+                    onReply={onReply}
+                    isReply={true} 
+                  />
+                ))
+              )}
+              
+              <button 
+                onClick={() => setShowReplies(false)}
+                className="text-[10px] font-semibold text-[#A3A3A3] hover:text-[#1A1A1A] uppercase tracking-wider transition-colors self-start mt-3 mb-1"
+              >
+                Hide replies
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};

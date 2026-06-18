@@ -8,6 +8,7 @@ export const COMMUNITY_QUERY_KEYS = {
   feed: (filters?: Record<string, unknown>) => [...COMMUNITY_QUERY_KEYS.all, 'feed', filters] as const,
   detail: (id: string) => [...COMMUNITY_QUERY_KEYS.all, 'detail', id] as const,
   comments: (id: string) => [...COMMUNITY_QUERY_KEYS.all, 'comments', id] as const,
+  replies: (postId: string, commentId: string) => [...COMMUNITY_QUERY_KEYS.comments(postId), 'replies', commentId] as const,
 };
 
 export const useInfiniteCommunity = (filters?: { sort?: string; username?: string; postType?: string }) => {
@@ -37,6 +38,14 @@ export const usePostComments = (postPublicID: string) => {
     queryKey: COMMUNITY_QUERY_KEYS.comments(postPublicID),
     queryFn: () => communityApi.getPostComments(postPublicID),
     enabled: !!postPublicID,
+  });
+};
+
+export const useCommentReplies = (postPublicID: string, commentID: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: COMMUNITY_QUERY_KEYS.replies(postPublicID, commentID),
+    queryFn: () => communityApi.getCommentReplies(postPublicID, commentID),
+    enabled: !!postPublicID && !!commentID && enabled,
   });
 };
 
@@ -102,8 +111,8 @@ export const useLikePost = () => {
 export const useAddComment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postPublicID, content }: { postPublicID: string; content: string }) =>
-      communityApi.addComment(postPublicID, { content }),
+    mutationFn: ({ postPublicID, content, parentCommentId }: { postPublicID: string; content: string; parentCommentId?: string }) =>
+      communityApi.addComment(postPublicID, { content, parentCommentId }),
     onSuccess: (res, variables) => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
@@ -158,6 +167,22 @@ export const useDeleteComment = () => {
     },
     onError: () => {
       toast.error('Có lỗi xảy ra khi xoá bình luận.');
+    }
+  });
+};
+
+export const useUpdateComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ postPublicID, commentID, content }: { postPublicID: string, commentID: string, content: string }) => 
+      communityApi.updateComment(postPublicID, commentID, { content }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
+      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
+      toast.success('Đã cập nhật bình luận.');
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi cập nhật bình luận.');
     }
   });
 };

@@ -9,7 +9,8 @@ export async function POST(request: NextRequest) {
 
     // Optional: Call the backend to invalidate the token if the backend has a stateful logout
     if (accessToken) {
-      await fetch(`${API_URL}/auth/logout`, {
+      const cleanBaseUrl = API_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
+      await fetch(`${cleanBaseUrl}/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

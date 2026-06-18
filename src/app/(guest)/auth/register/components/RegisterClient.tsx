@@ -9,23 +9,51 @@ import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const registerSchema = z.object({
+  firstName: z.string().min(1, "Vui lòng nhập họ"),
+  lastName: z.string().min(1, "Vui lòng nhập tên"),
+  username: z.string().min(3, "Tên đăng nhập từ 3 ký tự").max(50, "Tối đa 50 ký tự"),
+  email: z.string().min(1, "Vui lòng nhập email").email("Email không hợp lệ"),
+  dateOfBirth: z.string().min(1, "Vui lòng chọn ngày sinh"),
+  gender: z.number({ message: "Vui lòng chọn giới tính" }),
+  address: z.string().min(1, "Vui lòng nhập địa chỉ"),
+  password: z.string().min(8, "Mật khẩu tối thiểu 8 ký tự"),
+  confirmPassword: z.string().min(1, "Vui lòng nhập lại mật khẩu"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Mật khẩu xác nhận không khớp",
+  path: ["confirmPassword"],
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterClient() {
   const router = useRouter();
   const [step, setStep] = useState<"register" | "otp">("register");
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    dateOfBirth: "",
-    address: "",
-    gender: undefined as unknown as Gender,
+  const {
+    register: registerField,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      username: "",
+      email: "",
+      dateOfBirth: "",
+      address: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
-  
+
   const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
@@ -49,15 +77,10 @@ export function RegisterClient() {
     return () => clearTimeout(timer);
   }, [step, timeLeft]);
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Mật khẩu xác nhận không khớp");
-      return;
-    }
-    
-    register(formData, {
+  const onRegisterSubmit = (data: RegisterFormValues) => {
+    register(data, {
       onSuccess: () => {
+        setRegisteredEmail(data.email);
         setStep("otp");
         setTimeLeft(59);
         setCanResend(false);
@@ -73,21 +96,16 @@ export function RegisterClient() {
       return;
     }
 
-    confirmOtp({ email: formData.email, otpCode: otpString }, {
+    confirmOtp({ email: registeredEmail, otpCode: otpString }, {
       onSuccess: () => {
         router.push("/auth/login");
       }
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: name === 'gender' ? Number(value) : value }));
-  };
-
   const handleOtpChange = (index: number, value: string) => {
     if (!/^[0-9]*$/.test(value)) return;
-    
+
     const newOtp = [...otpCode];
     newOtp[index] = value;
     setOtpCode(newOtp);
@@ -109,7 +127,6 @@ export function RegisterClient() {
     otpRefs[0].current?.focus();
     setCanResend(false);
     setTimeLeft(59);
-    // In a real app, you would also trigger the resend API here
     toast.success("Mã OTP đã được gửi lại");
   };
 
@@ -126,7 +143,7 @@ export function RegisterClient() {
               Xác Thực Tài Khoản
             </h1>
             <p className="font-inter text-[16px] text-ethos-on-surface-variant max-w-[280px] mx-auto">
-              Vui lòng nhập mã OTP đã được gửi đến {formData.email || 'email của bạn'}
+              Vui lòng nhập mã OTP đã được gửi đến {registeredEmail || 'email của bạn'}
             </p>
           </div>
 
@@ -150,8 +167,8 @@ export function RegisterClient() {
               ))}
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isConfirming || otpCode.join("").length !== 6}
               className="w-full max-w-[340px] h-[48px] bg-ethos-primary text-ethos-on-primary font-inter text-[16px] font-medium flex items-center justify-center hover:bg-ethos-surface-tint hover:shadow-[0px_10px_30px_rgba(45,45,45,0.1)] transition-all duration-300 rounded group mb-12 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -165,8 +182,8 @@ export function RegisterClient() {
 
             <div className="flex items-center justify-center font-inter text-[14px] text-ethos-on-surface-variant">
               <span>Chưa nhận được mã?</span>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={handleResend}
                 disabled={!canResend}
                 className="ml-1 text-ethos-primary font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:underline"
@@ -175,7 +192,7 @@ export function RegisterClient() {
               </button>
             </div>
 
-            <button 
+            <button
               type="button"
               onClick={() => setStep("register")}
               className="mt-8 text-ethos-on-surface-variant hover:text-ethos-primary transition-colors flex items-center gap-1 font-inter text-[14px]"
@@ -197,11 +214,12 @@ export function RegisterClient() {
       {/* Left Side: Editorial Image */}
       <section className="hidden lg:block lg:w-[55%] relative bg-ethos-surface-variant">
         <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/20 to-transparent pointer-events-none mix-blend-overlay"></div>
-        <Image 
-          alt="High-end editorial fashion photography" 
-          className="absolute inset-0 w-full h-full object-cover object-center" 
-          src="https://lh3.googleusercontent.com/aida/AP1WRLtaCdgB7jZ1fDTLXuC0CIEx_vyosxOTPqoHCZTPCYKJCVSSKIRzNGCGljBg5xl9HH8F_0TvA3-F1hVLKJEuj6VdVLMQtwSZRFmyePdeoGXjTJ4FnYwbaLz1dqoj0J_cMMzy7azwPQ1_VznHKIqeW8iTJl_LLhHpnfjTS0a_eqkATMMkGNG5bu1z2swXkFPXReTJPGkht5Tq1HBp08l3kq-AtYvgCVXJQyEOw5GVykd4QAkvLO8UqDDGPLc"
+        <Image
+          alt="High-end editorial fashion photography"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          src="/images-regis.png"
           fill
+
         />
         <div className="absolute bottom-[64px] left-[64px] z-20">
           <span className="font-playfair text-[48px] font-semibold text-ethos-surface-lowest drop-shadow-md tracking-tight">Closy.</span>
@@ -211,7 +229,7 @@ export function RegisterClient() {
       {/* Right Side: Registration Form */}
       <section className="w-full lg:w-[45%] flex flex-col justify-center px-[20px] md:px-[64px] py-[80px] bg-ethos-surface z-20 relative overflow-y-auto">
         <div className="w-full max-w-[420px] mx-auto flex flex-col gap-10">
-          
+
           {/* Mobile Brand Header */}
           <div className="lg:hidden text-center mb-4">
             <span className="font-playfair text-[36px] font-semibold text-ethos-primary tracking-tight">Closy.</span>
@@ -222,130 +240,156 @@ export function RegisterClient() {
             <p className="font-inter text-[16px] text-ethos-on-surface-variant">Begin your journey towards a more conscious, curated wardrobe.</p>
           </header>
 
-          <form className="flex flex-col gap-6" onSubmit={handleRegister}>
+          <form noValidate className="flex flex-col gap-6" onSubmit={handleSubmit(onRegisterSubmit)}>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2 relative group">
                 <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="firstName">Họ</label>
-                <input 
-                  id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Nguyễn" required 
+                <input
+                  id="firstName" placeholder="Nguyễn"
+                  {...registerField("firstName")}
                   onFocus={() => setFocusedInput('firstName')} onBlur={() => setFocusedInput(null)}
-                  className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'firstName' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'}`}
+                  className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'firstName' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'} ${errors.firstName ? 'border-red-500' : ''}`}
                 />
+                {errors.firstName && <p className="text-red-500 text-xs ml-1">{errors.firstName.message}</p>}
               </div>
               <div className="flex flex-col gap-2 relative group">
                 <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="lastName">Tên</label>
-                <input 
-                  id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Văn A" required 
+                <input
+                  id="lastName" placeholder="Văn A"
+                  {...registerField("lastName")}
                   onFocus={() => setFocusedInput('lastName')} onBlur={() => setFocusedInput(null)}
-                  className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'lastName' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'}`}
+                  className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'lastName' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'} ${errors.lastName ? 'border-red-500' : ''}`}
                 />
+                {errors.lastName && <p className="text-red-500 text-xs ml-1">{errors.lastName.message}</p>}
               </div>
             </div>
 
             <div className="flex flex-col gap-2 relative group">
               <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="username">Tên đăng nhập</label>
-              <input 
-                id="username" name="username" value={formData.username} onChange={handleChange} placeholder="nguyenvana" required 
+              <input
+                id="username" placeholder="nguyenvana"
+                {...registerField("username")}
                 onFocus={() => setFocusedInput('username')} onBlur={() => setFocusedInput(null)}
-                className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'username' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'}`}
+                className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'username' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'} ${errors.username ? 'border-red-500' : ''}`}
               />
+              {errors.username && <p className="text-red-500 text-xs ml-1">{errors.username.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2 relative group">
               <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="email">Email Address</label>
-              <input 
-                id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="jane@example.com" required 
+              <input
+                id="email" type="email" placeholder="jane@example.com"
+                {...registerField("email")}
                 onFocus={() => setFocusedInput('email')} onBlur={() => setFocusedInput(null)}
-                className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'email' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'}`}
+                className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'email' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'} ${errors.email ? 'border-red-500' : ''}`}
               />
+              {errors.email && <p className="text-red-500 text-xs ml-1">{errors.email.message}</p>}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2 relative group">
                 <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="dateOfBirth">Ngày sinh</label>
-                <div className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 flex items-center transition-all duration-300 focus-within:bg-ethos-surface-low focus-within:border-b-2 focus-within:border-ethos-primary focus-within:px-4 px-1 group`}>
-                  <input
-                    type="date"
-                    id="dateOfBirth"
+                <div className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 flex items-center transition-all duration-300 focus-within:bg-ethos-surface-low focus-within:border-b-2 focus-within:border-ethos-primary focus-within:px-4 px-1 group ${errors.dateOfBirth ? 'border-red-500' : ''}`}>
+                  <Controller
+                    control={control}
                     name="dateOfBirth"
-                    value={formData.dateOfBirth}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedInput('dateOfBirth')}
-                    onBlur={() => setFocusedInput(null)}
-                    className="w-full bg-transparent border-none outline-none text-ethos-primary font-inter text-[16px] [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
+                    render={({ field }) => (
+                      <>
+                        <input
+                          type="date"
+                          id="dateOfBirth"
+                          value={field.value}
+                          onChange={field.onChange}
+                          onFocus={() => setFocusedInput('dateOfBirth')}
+                          onBlur={() => setFocusedInput(null)}
+                          className="w-full bg-transparent border-none outline-none text-ethos-primary font-inter text-[16px] [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
+                        />
+                        <Popover>
+                          <PopoverTrigger className="p-1 outline-none text-ethos-on-surface-variant group-focus-within:text-ethos-primary transition-colors shrink-0">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0 bg-ethos-surface border-ethos-primary/20 shadow-xl shadow-black/10" align="start">
+                            <Calendar
+                              mode="single"
+                              captionLayout="dropdown"
+                              startMonth={new Date(1900, 0)}
+                              endMonth={new Date(new Date().getFullYear() + 10, 11)}
+                              selected={field.value ? new Date(field.value) : undefined}
+                              onSelect={(date) => {
+                                if (date) {
+                                  const y = date.getFullYear();
+                                  const m = String(date.getMonth() + 1).padStart(2, '0');
+                                  const d = String(date.getDate()).padStart(2, '0');
+                                  field.onChange(`${y}-${m}-${d}`);
+                                } else {
+                                  field.onChange("");
+                                }
+                              }}
+                              className="bg-ethos-surface text-ethos-on-surface"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </>
+                    )}
                   />
-                  <Popover>
-                    <PopoverTrigger className="p-1 outline-none text-ethos-on-surface-variant group-focus-within:text-ethos-primary transition-colors shrink-0">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 bg-ethos-surface border-ethos-primary/20 shadow-xl shadow-black/10" align="start">
-                      <Calendar
-                        mode="single"
-                        captionLayout="dropdown"
-                        startMonth={new Date(1900, 0)}
-                        endMonth={new Date(new Date().getFullYear() + 10, 11)}
-                        selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined}
-                        onSelect={(date) => {
-                          if (date) {
-                            const y = date.getFullYear();
-                            const m = String(date.getMonth() + 1).padStart(2, '0');
-                            const d = String(date.getDate()).padStart(2, '0');
-                            setFormData({...formData, dateOfBirth: `${y}-${m}-${d}`});
-                          } else {
-                            setFormData({...formData, dateOfBirth: ""});
-                          }
-                        }}
-                        className="bg-ethos-surface text-ethos-on-surface"
-                      />
-                    </PopoverContent>
-                  </Popover>
                 </div>
+                {errors.dateOfBirth && <p className="text-red-500 text-xs ml-1">{errors.dateOfBirth.message}</p>}
               </div>
               <div className="flex flex-col gap-2 relative group">
                 <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="gender">Giới tính</label>
-                <Select 
-                  value={formData.gender ? formData.gender.toString() : ""} 
-                  onValueChange={(value) => setFormData({...formData, gender: Number(value) as Gender})}
-                  onOpenChange={setIsGenderOpen}
-                >
-                  <SelectTrigger
-                    onFocus={() => setFocusedInput('gender')}
-                    onBlur={() => setFocusedInput(null)}
-                    className={`w-full h-[48px] data-[size=default]:h-[48px] bg-transparent border-0 border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:ring-0 focus:outline-none hover:bg-ethos-surface-low rounded-none shadow-none [&>span]:line-clamp-1 data-placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'gender' || isGenderOpen ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4' : 'px-1'}`}
-                  >
-                    <SelectValue placeholder="Chọn giới tính">
-                      {formData.gender === Gender.Male && "Nam"}
-                      {formData.gender === Gender.Female && "Nữ"}
-                      {formData.gender === Gender.Other && "Khác"}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent alignItemWithTrigger={false} className="bg-ethos-surface border-ethos-primary/20 text-ethos-on-surface shadow-xl shadow-black/10 z-50">
-                    <SelectItem value={Gender.Male.toString()} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Nam</SelectItem>
-                    <SelectItem value={Gender.Female.toString()} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Nữ</SelectItem>
-                    <SelectItem value={Gender.Other.toString()} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Khác</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  control={control}
+                  name="gender"
+                  render={({ field }) => (
+                    <Select
+                      value={field.value !== undefined ? field.value.toString() : ""}
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      onOpenChange={setIsGenderOpen}
+                    >
+                      <SelectTrigger
+                        onFocus={() => setFocusedInput('gender')}
+                        onBlur={() => setFocusedInput(null)}
+                        className={`w-full h-[48px] data-[size=default]:h-[48px] bg-transparent border-0 border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:ring-0 focus:outline-none hover:bg-ethos-surface-low rounded-none shadow-none [&>span]:line-clamp-1 data-placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'gender' || isGenderOpen ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4' : 'px-1'} ${errors.gender ? 'border-red-500' : ''}`}
+                      >
+                        <SelectValue placeholder="Chọn giới tính">
+                          {field.value === Gender.Male && "Nam"}
+                          {field.value === Gender.Female && "Nữ"}
+                          {field.value === Gender.Other && "Khác"}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent alignItemWithTrigger={false} className="bg-ethos-surface border-ethos-primary/20 text-ethos-on-surface shadow-xl shadow-black/10 z-50">
+                        <SelectItem value={Gender.Male.toString()} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Nam</SelectItem>
+                        <SelectItem value={Gender.Female.toString()} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Nữ</SelectItem>
+                        <SelectItem value={Gender.Other.toString()} className="focus:bg-ethos-surface-low focus:text-ethos-primary cursor-pointer py-3">Khác</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.gender && <p className="text-red-500 text-xs ml-1">{errors.gender.message}</p>}
               </div>
             </div>
 
             <div className="flex flex-col gap-2 relative group">
               <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="address">Địa chỉ</label>
-              <input 
-                id="address" name="address" value={formData.address} onChange={handleChange} placeholder="123 Đường ABC, Quận 1, TP.HCM" required 
+              <input
+                id="address" placeholder="123 Đường ABC, Quận 1, TP.HCM"
+                {...registerField("address")}
                 onFocus={() => setFocusedInput('address')} onBlur={() => setFocusedInput(null)}
-                className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'address' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'}`}
+                className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'address' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary px-4 rounded-none' : 'px-1'} ${errors.address ? 'border-red-500' : ''}`}
               />
+              {errors.address && <p className="text-red-500 text-xs ml-1">{errors.address.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2 relative group">
               <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="password">Password</label>
               <div className="relative flex items-center">
-                <input 
-                  id="password" name="password" type={passwordVisible ? "text" : "password"} value={formData.password} onChange={handleChange} placeholder="••••••••" required 
+                <input
+                  id="password" type={passwordVisible ? "text" : "password"} placeholder="••••••••"
+                  {...registerField("password")}
                   onFocus={() => setFocusedInput('password')} onBlur={() => setFocusedInput(null)}
-                  className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] pr-10 transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'password' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary pl-4 rounded-none' : 'pl-1'}`}
+                  className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] pr-10 transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'password' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary pl-4 rounded-none' : 'pl-1'} ${errors.password ? 'border-red-500' : ''}`}
                 />
                 <button type="button" onClick={() => setPasswordVisible(!passwordVisible)} className="absolute right-2 flex items-center justify-center p-1 shrink-0 text-ethos-on-surface-variant hover:text-ethos-primary transition-colors focus:outline-none">
                   <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -360,15 +404,17 @@ export function RegisterClient() {
                   </svg>
                 </button>
               </div>
+              {errors.password && <p className="text-red-500 text-xs ml-1">{errors.password.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2 relative group">
               <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="confirmPassword">Confirm Password</label>
               <div className="relative flex items-center">
-                <input 
-                  id="confirmPassword" name="confirmPassword" type={confirmPasswordVisible ? "text" : "password"} value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" required 
+                <input
+                  id="confirmPassword" type={confirmPasswordVisible ? "text" : "password"} placeholder="••••••••"
+                  {...registerField("confirmPassword")}
                   onFocus={() => setFocusedInput('confirmPassword')} onBlur={() => setFocusedInput(null)}
-                  className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] pr-10 transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'confirmPassword' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary pl-4 rounded-none' : 'pl-1'}`}
+                  className={`w-full h-[48px] bg-transparent border-b border-ethos-primary/30 text-ethos-primary font-inter text-[16px] pr-10 transition-all duration-300 focus:outline-none placeholder:text-ethos-on-surface-variant/50 ${focusedInput === 'confirmPassword' ? 'bg-ethos-surface-low border-b-2 border-ethos-primary pl-4 rounded-none' : 'pl-1'} ${errors.confirmPassword ? 'border-red-500' : ''}`}
                 />
                 <button type="button" onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)} className="absolute right-2 flex items-center justify-center p-1 shrink-0 text-ethos-on-surface-variant hover:text-ethos-primary transition-colors focus:outline-none">
                   <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -383,10 +429,11 @@ export function RegisterClient() {
                   </svg>
                 </button>
               </div>
+              {errors.confirmPassword && <p className="text-red-500 text-xs ml-1">{errors.confirmPassword.message}</p>}
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isRegistering}
               className="w-full h-[48px] mt-4 bg-ethos-primary text-ethos-on-primary font-inter text-[16px] font-medium rounded shadow-[0px_4px_10px_rgba(24,25,25,0.05)] hover:shadow-[0px_10px_30px_rgba(24,25,25,0.15)] hover:-translate-y-[2px] transition-all duration-300 ease-out flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >

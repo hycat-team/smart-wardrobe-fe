@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WalletPageContent } from "@/features/wallet/components/WalletPageContent";
 import { UserRes } from "@/features/profile/types";
 import { useProfile } from "@/features/profile/queries/profile.queries";
+import { getUserAvatar } from "@/lib/utils";
 import { useEffect } from "react";
 
 export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
@@ -17,7 +18,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
     (!!(profile as any)?.planSlug && (profile as any)?.planSlug !== "free");
 
   // Format avatar and name to display
-  const avatar = `https://api.dicebear.com/7.x/notionists/svg?seed=${profile?.username}`;
+  const avatar = getUserAvatar(profile);
   const name = profile?.firstName + (profile?.lastName ? ` ${profile.lastName}` : "");
 
   return (

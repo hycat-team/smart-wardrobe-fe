@@ -6,14 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/useAuthStore";
 import { UserCircle, LayoutDashboard, User as UserIcon, Settings, LogOut, Menu, X } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLogout } from "@/features/auth/queries/auth.queries";
+import { getUserAvatar } from "@/lib/utils";
 
 import { useEffect, useState, useCallback } from "react";
 
@@ -120,21 +115,12 @@ export function GuestHeader() {
                           : "ring-[#1A1A1A]/10 ring-offset-[#F4F1EE]"
                         }
                       `}>
-                        {user?.avatarUrl ? (
-                          <Avatar className="size-9">
-                            <AvatarImage src={user.avatarUrl} alt={user.username || "User"} />
-                            <AvatarFallback className="bg-[#D9C5B2] text-white font-['IBM_Plex_Mono'] text-xs">
-                              {user.firstName?.charAt(0) || user.username?.charAt(0) || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                        ) : (
-                          <div className={`
-                            size-full flex items-center justify-center font-['IBM_Plex_Mono'] text-xs font-medium
-                            ${scrolled ? "bg-white/10 text-white" : "bg-[#1A1A1A]/5 text-[#1A1A1A]"}
-                          `}>
+                        <Avatar className="size-9">
+                          <AvatarImage src={getUserAvatar(user)} alt={user?.username || "User"} className="object-cover" />
+                          <AvatarFallback className="bg-[#D9C5B2] text-white font-['IBM_Plex_Mono'] text-xs">
                             {user?.firstName?.charAt(0) || user?.username?.charAt(0) || 'U'}
-                          </div>
-                        )}
+                          </AvatarFallback>
+                        </Avatar>
                       </div>
                     </button>
                   </DropdownMenuTrigger>
@@ -232,16 +218,10 @@ export function GuestHeader() {
             {/* User Info */}
             <div className="flex flex-col items-center gap-4 mb-8">
               <div className="size-16 rounded-full overflow-hidden ring-2 ring-[#D9C5B2] ring-offset-4 ring-offset-[#1A1A1A]">
-                {user?.avatarUrl ? (
-                  <Avatar className="size-16">
-                    <AvatarImage src={user.avatarUrl} alt={user.username || "User"} />
-                    <AvatarFallback className="bg-[#D9C5B2] text-white text-lg">{user.firstName?.charAt(0) || 'U'}</AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <div className="size-full bg-[#D9C5B2] flex items-center justify-center text-white font-['Playfair_Display'] text-2xl">
-                    {user?.firstName?.charAt(0) || 'U'}
-                  </div>
-                )}
+                <Avatar className="size-16 ring-2 ring-[#D9C5B2] ring-offset-4 ring-offset-[#1A1A1A]">
+                  <AvatarImage src={getUserAvatar(user)} alt={user?.username || "User"} className="object-cover" />
+                  <AvatarFallback className="bg-[#D9C5B2] text-white text-lg">{user?.firstName?.charAt(0) || 'U'}</AvatarFallback>
+                </Avatar>
               </div>
               <p className="font-['Playfair_Display'] text-white text-xl">
                 {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username}

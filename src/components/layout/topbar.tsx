@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Sparkles, UserCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getUserAvatar } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -25,7 +25,7 @@ export function Topbar() {
           )}
           <Link href="/settings">
             <Avatar className="size-8 cursor-pointer">
-              <AvatarImage src={user?.avatarUrl} alt={user?.username} />
+              <AvatarImage src={getUserAvatar(user)} alt={user?.username} className="object-cover" />
               <AvatarFallback>{user?.firstName?.charAt(0) || user?.username?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
           </Link>

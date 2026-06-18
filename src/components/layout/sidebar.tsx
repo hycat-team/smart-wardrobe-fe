@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLogout } from "@/features/auth/queries/auth.queries";
+import { getUserAvatar } from "@/lib/utils";
 
 export const NAV_ITEMS = [
   { icon: Shirt, label: "Wardrobe", path: "/wardrobe" },
@@ -69,7 +70,7 @@ export function Sidebar() {
         <DropdownMenuTrigger asChild>
           <div className="flex items-center gap-4 mb-6 p-3 rounded-2xl bg-muted/20 border border-border/30 backdrop-blur-sm transition-all hover:bg-muted/40 cursor-pointer group outline-none">
             <img
-              src={user?.avatarUrl || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100"}
+              src={getUserAvatar(user)}
               alt="Avatar"
               className="size-11 rounded-full object-cover ring-2 ring-transparent group-hover:ring-[#D9C5B2]/30 transition-all"
             />

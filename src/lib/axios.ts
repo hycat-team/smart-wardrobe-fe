@@ -38,14 +38,14 @@ api.interceptors.response.use(
     const originalRequest = error.config as any;
 
     if (error.response) {
-      const isAuthError = 
-        error.response.status === 401 || 
-        (error.response.status === 500 && 
-          (error.response.data?.message === "Vui lòng đăng nhập" || 
-           error.response.data?.detail === "Vui lòng đăng nhập" || 
-           error.response.data?.Detail === "Vui lòng đăng nhập" ||
-           error.response.data?.message === "Đã xảy ra lỗi hệ thống" ||
-           error.response.data?.detail === "Đã xảy ra lỗi hệ thống"
+      const isAuthError =
+        error.response.status === 401 ||
+        (error.response.status === 500 &&
+          (error.response.data?.message === "Vui lòng đăng nhập" ||
+            error.response.data?.detail === "Vui lòng đăng nhập" ||
+            error.response.data?.Detail === "Vui lòng đăng nhập" ||
+            error.response.data?.message === "Đã xảy ra lỗi hệ thống" ||
+            error.response.data?.detail === "Đã xảy ra lỗi hệ thống"
           )
         );
 
@@ -96,7 +96,7 @@ api.interceptors.response.use(
       const errorData = error.response.data;
       const errorMessage = errorData?.message || errorData?.detail;
       const errorTitle = errorData?.title;
-      
+
       if (errorTitle && errorMessage) {
         toast.error(errorTitle, { description: errorMessage });
       } else if (errorTitle) {
@@ -108,7 +108,7 @@ api.interceptors.response.use(
       } else {
         toast.error('Đã có lỗi xảy ra. Vui lòng thử lại.');
       }
-      
+
     } else {
       // Network error or timeout
       toast.error('Không thể kết nối đến máy chủ.');

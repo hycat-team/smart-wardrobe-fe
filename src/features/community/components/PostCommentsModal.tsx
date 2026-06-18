@@ -6,6 +6,7 @@ import { useProfile } from '@/features/profile/queries/profile.queries';
 import { Loader2, X, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PostRes } from '../types';
+import { CommentItem } from './CommentItem';
 
 interface PostCommentsModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface PostCommentsModalProps {
 
 export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalProps) => {
   const [commentContent, setCommentContent] = useState('');
+  const [replyingTo, setReplyingTo] = useState<{ commentId: string; username: string } | null>(null);
   const { data: comments, isLoading } = usePostComments(post.publicId);
   const { mutate: addComment, isPending } = useAddComment();
   const { mutate: deleteComment, isPending: isDeletingComment } = useDeleteComment();
@@ -25,13 +27,18 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
     if (!commentContent.trim()) return;
 
     addComment(
-      { postPublicID: post.publicId, content: commentContent },
+      { postPublicID: post.publicId, content: commentContent, parentCommentId: replyingTo?.commentId },
       {
         onSuccess: () => {
           setCommentContent('');
+          setReplyingTo(null);
         },
       }
     );
+  };
+
+  const handleReply = (commentId: string, username: string) => {
+    setReplyingTo({ commentId, username });
   };
 
   const getInitials = (firstName?: string, lastName?: string, username?: string) => {
@@ -104,34 +111,12 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
               </div>
             ) : comments && comments.length > 0 ? (
               comments.map((comment) => (
-                <div key={comment.id} className="flex gap-3 group">
-                  <Avatar className="w-8 h-8 rounded-md ring-1 ring-black/5">
-                    <AvatarImage src={comment.avatarUrl || ''} className="rounded-md" />
-                    <AvatarFallback className="rounded-md text-[10px] bg-[#F5F2EE] text-[#1A1A1A] font-bold">
-                      {getInitials(comment.firstName, comment.lastName, comment.username)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 flex justify-between items-start">
-                    <div className="flex flex-col gap-0.5">
-                      <p className="font-bold text-xs text-[#1A1A1A]">
-                        @{comment.username}
-                      </p>
-                      <p className="text-[13px] text-[#666666] leading-relaxed">
-                        {comment.content}
-                      </p>
-                    </div>
-                    {profile?.username === comment.username && (
-                      <button
-                        onClick={() => deleteComment({ postPublicID: post.publicId, commentID: comment.id })}
-                        disabled={isDeletingComment}
-                        className="opacity-0 group-hover:opacity-100 text-[#A3A3A3] hover:text-red-500 transition-all p-1"
-                        title="Delete comment"
-                      >
-                        {isDeletingComment ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                      </button>
-                    )}
-                  </div>
-                </div>
+                <CommentItem 
+                  key={comment.id} 
+                  comment={comment} 
+                  postPublicID={post.publicId} 
+                  onReply={handleReply} 
+                />
               ))
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-[#A3A3A3] space-y-2">
@@ -141,7 +126,18 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
           </div>
 
           {/* Comment Input */}
-          <div className="p-4 border-t border-[#E5E5E5] bg-white mt-auto">
+          <div className="p-4 border-t border-[#E5E5E5] bg-white mt-auto flex flex-col gap-2">
+            {replyingTo && (
+              <div className="flex items-center justify-between text-[11px] font-medium text-[#666666] px-2 py-1 bg-[#F5F2EE] rounded-sm">
+                <span>Replying to <span className="font-bold text-[#1A1A1A]">@{replyingTo.username}</span></span>
+                <button 
+                  onClick={() => setReplyingTo(null)}
+                  className="hover:text-[#1A1A1A] p-0.5 transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            )}
             <form onSubmit={handleAddComment} className="flex items-center gap-2">
               <input
                 value={commentContent}

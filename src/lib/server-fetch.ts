@@ -21,15 +21,25 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
     headers.set('Authorization', `Bearer ${token}`);
   }
 
+  console.log(`[serverFetch] BACKEND_URL=${BACKEND_URL}, token=${token ? "exists" : "missing"}, endpoint=${endpoint}`);
+
   try {
-    const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+    // Strip quotes from BACKEND_URL if they exist
+    const cleanBaseUrl = BACKEND_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
+    const url = `${cleanBaseUrl}${endpoint}`;
+    console.log(`[serverFetch] Fetching: ${url}`);
+    
+    const res = await fetch(url, {
       ...options,
       headers,
     });
 
     if (!res.ok) {
-      console.error(`[ServerFetch Error] ${endpoint}: ${res.status} ${res.statusText}`);
-      // Có thể throw error tùy vào logic xử lý lỗi bạn muốn
+      if (res.status === 401 || res.status === 403) {
+        console.warn(`[ServerFetch Warning] ${endpoint}: ${res.status} ${res.statusText}`);
+      } else {
+        console.error(`[ServerFetch Error] ${endpoint}: ${res.status} ${res.statusText}`);
+      }
       return null;
     }
 
