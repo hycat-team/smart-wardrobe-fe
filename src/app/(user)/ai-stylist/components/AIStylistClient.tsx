@@ -86,14 +86,14 @@ export function AIStylistClient() {
   const handleGenerate = async (initialDetails?: string) => {
     try {
       setIsGenerating(true);
-      
+
       const occasionMap: Record<string, string> = {
-        "🎓 Đi học": "casual",
-        "💼 Đi làm": "formal",
-        "🌙 Hẹn hò": "casual",
-        "🎉 Tiệc": "party",
-        "🏃 Thể thao": "sport",
-        "🏠 Ở nhà": "casual",
+        "Đi học": "casual",
+        "Đi làm": "formal",
+        "Hẹn hò": "casual",
+        "Tiệc": "party",
+        "Thể thao": "sport",
+        "Ở nhà": "casual",
       };
 
       const res = await aiApi.getOutfitRecommendation({
@@ -107,7 +107,7 @@ export function AIStylistClient() {
 
       setOutfitData(res);
       setAlternativeIndices({});
-      
+
       // Setup canvas items
       if (res.items && res.items.length > 0) {
         const initialSelected = res.items.map((item, idx) => ({
@@ -173,7 +173,7 @@ export function AIStylistClient() {
       const inputForBackend = chatInput.trim();
       setChatInput("");
       setPopoverOpen(false);
-      
+
       await handleGenerate(inputForBackend);
       return;
     }
@@ -231,15 +231,15 @@ export function AIStylistClient() {
   const handleSwap = (role: string) => {
     const outfitItem = outfitData?.items.find(i => i.role === role);
     if (!outfitItem || !outfitItem.alternatives || outfitItem.alternatives.length === 0) return;
-    
+
     const currentIndex = alternativeIndices[role] ?? -1;
     const totalOptions = outfitItem.alternatives.length + 1;
     const nextIndex = ((currentIndex + 2) % totalOptions) - 1;
-    
-    setAlternativeIndices(prev => ({...prev, [role]: nextIndex}));
-    
+
+    setAlternativeIndices(prev => ({ ...prev, [role]: nextIndex }));
+
     const newItem = nextIndex === -1 ? outfitItem.primary : outfitItem.alternatives[nextIndex];
-    
+
     setSelectedItems(prev => prev.map(item => {
       if (item._role === role) {
         return {
@@ -311,7 +311,7 @@ export function AIStylistClient() {
 
       await createOutfitMutation.mutateAsync(payload);
       toast.success("Lưu bộ phối đồ thành công!", { id: "saving_outfit" });
-      
+
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Đã xảy ra lỗi khi lưu.", { id: "saving_outfit" });
@@ -323,22 +323,35 @@ export function AIStylistClient() {
   return (
     <div ref={containerRef} className="flex-1 min-h-screen bg-white text-[#1A1A1A] pb-24 md:pb-12 font-sans selection:bg-[#1A1A1A] selection:text-white">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col pt-8 lg:pt-12">
-        
+
         {/* Page Header */}
         <div className="mb-8 md:mb-10 border-b border-[#E5E5E5] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-2 uppercase">
-              {outfitData?.title || "ATELIER STYLIST"}
-            </h2>
+          {/* <div>
+            
+            <h1 className="text-5xl md:text-6xl lg:text-[60px] font-medium font-medium tracking-tighter text-ink leading-[0.85] uppercase">
+              AI STYLIST
+            </h1>
             <p className="text-xs md:text-sm text-[#666666] tracking-wide uppercase font-medium">
               {outfitData ? "BỘ SƯU TẬP ĐƯỢC CHỌN LỌC CHO NHỮNG KHOẢNH KHẮC CỦA BẠN" : "CẤU HÌNH SỞ THÍCH CỦA BẠN ĐỂ KHÁM PHÁ BỘ PHỐI ĐỒ HÔM NAY"}
+            </p>
+          </div> */}
+
+          <div className="space-y-4 max-w-2xl">
+            {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
+              Wardrobe
+            </h1> */}
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1] uppercase">
+              AI STYLIST
+            </h1>
+            <p className="text-sm text-ink-muted font-mono uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-ink/20 pl-4">
+              CẤU HÌNH SỞ THÍCH CỦA BẠN ĐỂ KHÁM PHÁ <br /> BỘ PHỐI ĐỒ HÔM NAY
             </p>
           </div>
         </div>
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 flex-1 items-start">
-          
+
           {/* Left Column: Canvas (Span 8) */}
           <div className="lg:col-span-8 flex flex-col gap-8 relative min-h-[600px] h-[600px] lg:h-[800px] border border-[#E5E5E5] bg-[#F9F9F9]">
             {outfitData ? (
@@ -348,9 +361,9 @@ export function AIStylistClient() {
                     <Layers className="size-3.5" /> CANVAS STUDIO
                   </span>
                 </div>
-                
+
                 {/* THE DRAG & DROP CANVAS */}
-                <OutfitCanvasBoard 
+                <OutfitCanvasBoard
                   canvasRef={canvasRef}
                   selectedItems={selectedItems}
                   updateScale={updateScale}
@@ -387,17 +400,17 @@ export function AIStylistClient() {
                 )}
               </div>
             )}
-            
+
             {/* Action Footer */}
             {outfitData && (
               <div className="absolute bottom-0 left-0 right-0 flex flex-col sm:flex-row justify-between items-center border-t border-[#E5E5E5] bg-white z-20">
-                <button 
+                <button
                   onClick={() => { setOutfitData(null); setSelectedItems([]); setChatMessages([]); setContextID(""); }}
                   className="w-full sm:w-1/2 px-6 py-4 border-r border-[#E5E5E5] text-[#1A1A1A] font-bold text-[11px] uppercase tracking-widest hover:bg-[#F9F9F9] transition-colors flex items-center justify-center gap-2"
                 >
                   <RefreshCw className="w-3.5 h-3.5" /> TẠO LẠI
                 </button>
-                <button 
+                <button
                   onClick={handleSaveOutfit}
                   disabled={isSaving}
                   className="w-full sm:w-1/2 px-8 py-4 bg-[#1A1A1A] text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
@@ -410,7 +423,7 @@ export function AIStylistClient() {
 
           {/* Right Column: AI Chat Interface & Form (Span 4) */}
           <div className="lg:col-span-4 h-[600px] lg:h-[800px] border border-[#E5E5E5] bg-white flex flex-col relative shadow-sm">
-            
+
             {/* Chat Header */}
             <div className="p-5 border-b border-[#E5E5E5] flex items-center justify-between bg-[#F9F9F9]">
               <div className="flex items-center gap-3">
@@ -426,7 +439,7 @@ export function AIStylistClient() {
 
             {/* Content Area */}
             <div className="flex-1 p-5 md:p-6 overflow-y-auto space-y-6 flex flex-col bg-white">
-              
+
               {!outfitData && chatMessages.length === 0 && (
                 <div className="flex flex-col gap-1.5 items-start w-full chat-intro">
                   <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>
@@ -441,11 +454,11 @@ export function AIStylistClient() {
                 <div key={msg.id} className={cn("chat-intro flex flex-col gap-1.5 w-full", msg.role === 'user' ? "items-end" : "items-start")}>
                   {msg.role === 'ai' && <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>}
                   {msg.role === 'user' && <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">YOU</span>}
-                  
+
                   <div className={cn(
                     "p-4 text-[13px] leading-relaxed",
-                    msg.role === 'user' 
-                      ? "bg-[#1A1A1A] text-white ml-6 md:ml-12" 
+                    msg.role === 'user'
+                      ? "bg-[#1A1A1A] text-white ml-6 md:ml-12"
                       : "bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] mr-6 md:mr-12"
                   )}>
                     {msg.content}
@@ -457,9 +470,9 @@ export function AIStylistClient() {
                 <div className="flex flex-col gap-1.5 items-start w-full">
                   <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>
                   <div className="bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] p-4 mr-12 flex items-center justify-center gap-1.5 min-w-[60px] h-[52px]">
-                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{animationDelay: '0ms'}}></div>
-                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{animationDelay: '150ms'}}></div>
-                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{animationDelay: '300ms'}}></div>
+                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{ animationDelay: '300ms' }}></div>
                   </div>
                 </div>
               )}
@@ -478,7 +491,7 @@ export function AIStylistClient() {
                       <div className="border-b border-[#E5E5E5] pb-2">
                         <p className="text-[11px] font-bold text-[#1A1A1A] tracking-widest uppercase">THÔNG SỐ NHANH</p>
                       </div>
-                      
+
                       <div className="flex flex-col gap-3">
                         <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">DỊP (OCCASION)</p>
                         <div className="flex flex-wrap gap-1.5">
@@ -523,7 +536,7 @@ export function AIStylistClient() {
                           ))}
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={handleSendMessage}
                         disabled={isGenerating || (!chatInput.trim() && !hasSelectedOptions)}
                         className="mt-2 w-full bg-[#1A1A1A] text-white text-[11px] font-bold py-3.5 hover:bg-black/80 transition-colors flex justify-center items-center gap-2 disabled:opacity-50 tracking-widest uppercase"
@@ -534,16 +547,16 @@ export function AIStylistClient() {
                   </PopoverContent>
                 </Popover>
 
-                <input 
+                <input
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   disabled={isChatting}
-                  className="w-full bg-transparent border-none outline-none pl-2 pr-12 py-3.5 text-[13px] text-[#1A1A1A] placeholder:text-[#A3A3A3] disabled:opacity-50 font-medium" 
-                  placeholder="Nhập yêu cầu phối đồ của bạn..." 
+                  className="w-full bg-transparent border-none outline-none pl-2 pr-12 py-3.5 text-[13px] text-[#1A1A1A] placeholder:text-[#A3A3A3] disabled:opacity-50 font-medium"
+                  placeholder="Nhập yêu cầu phối đồ của bạn..."
                   type="text"
                 />
-                <button 
+                <button
                   onClick={handleSendMessage}
                   disabled={isChatting || (!chatInput.trim() && !(!outfitData && hasSelectedOptions))}
                   className="absolute right-2 text-[#A3A3A3] hover:text-[#1A1A1A] p-2 transition-colors disabled:opacity-30 outline-none"
@@ -552,10 +565,10 @@ export function AIStylistClient() {
                 </button>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

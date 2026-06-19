@@ -322,7 +322,7 @@ export function UploadClient() {
                       <Select 
                         disabled={isUploading}
                         value={item.categoryId} 
-                        onValueChange={(val) => updateFileCategory(item.id, val)}
+                        onValueChange={(val) => updateFileCategory(item.id, val || "")}
                       >
                         <SelectTrigger className="w-full h-8 bg-[#F7F6F4] border border-black/10 text-[10px] font-['IBM_Plex_Mono'] font-medium uppercase tracking-widest rounded-none shadow-none outline-none focus:ring-0">
                           <SelectValue placeholder="Danh mục">
@@ -369,7 +369,7 @@ export function UploadClient() {
                 <Select 
                   disabled={isUploading}
                   value={selectedCategory} 
-                  onValueChange={setSelectedCategory}
+                  onValueChange={(val) => setSelectedCategory(val || "")}
                 >
                   <SelectTrigger className="w-40 h-8 bg-transparent border-b border-t-0 border-l-0 border-r-0 border-black/20 text-[11px] font-['IBM_Plex_Mono'] font-medium uppercase tracking-[0.1em] rounded-none shadow-none focus:ring-0 px-0 data-[state=open]:border-black transition-colors text-[#111]">
                     <SelectValue placeholder="Chọn danh mục">

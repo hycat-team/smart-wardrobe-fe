@@ -9,6 +9,7 @@ import { UserRes } from "@/features/profile/types";
 import { useProfile } from "@/features/profile/queries/profile.queries";
 import { getUserAvatar } from "@/lib/utils";
 import { useEffect } from "react";
+import Image from "next/image";
 
 export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   // Pass initialProfile to useProfile so React Query hydrates it immediately
@@ -22,7 +23,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   const name = profile?.firstName + (profile?.lastName ? ` ${profile.lastName}` : "");
 
   return (
-    <div className="max-w-4xl mx-auto flex flex-col gap-8 animate-in fade-in duration-500 pb-16 pt-8 font-sans px-4">
+    <div className="max-w-4xl mx-auto flex flex-col gap-8 animate-in fade-in duration-500 pb-16 pt-10 font-sans px-4">
 
       {/* Profile Header */}
       <div className={cn(
@@ -34,7 +35,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
         )}
 
         <div className="relative z-10 size-32 rounded-full border-4 border-background overflow-hidden shrink-0 shadow-lg">
-          <img src={avatar} alt={name} className="w-full h-full object-cover" />
+          <Image src={avatar} alt={name || "User Avatar"} width={128} height={128} className="w-full h-full object-cover" />
           {isPremium && (
             <div className="absolute bottom-0 inset-x-0 bg-primary/90 text-primary-foreground text-[10px] font-bold text-center py-0.5 uppercase tracking-widest backdrop-blur-sm">
               Atelier

@@ -27,11 +27,12 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useLogout } from "@/features/auth/queries/auth.queries";
 import { getUserAvatar } from "@/lib/utils";
+import Image from "next/image";
 
 export const NAV_ITEMS = [
   { icon: Shirt, label: "Wardrobe", path: "/wardrobe" },
   { icon: Sparkles, label: "AI Stylist", path: "/ai-stylist" },
-  {icon: ScanQrCode, label: "Outfit", path:"/outfits"},
+  { icon: ScanQrCode, label: "Outfit", path: "/outfits" },
   { icon: LayoutGrid, label: "Community", path: "/community" },
   { icon: Store, label: "Marketplace", path: "/marketplace" },
 ];
@@ -52,7 +53,7 @@ export function Sidebar() {
 
   return (
     <aside className="hidden md:flex flex-col w-[280px] border-r border-border/60 h-dvh sticky top-0 bg-[#FAFAFA] dark:bg-[#111111] z-40 px-6 py-6">
-      
+
       {/* Editorial Logo */}
       <div className="mb-6 flex flex-col pl-1">
         <div className="flex items-center gap-1.5 mb-1.5 opacity-50">
@@ -69,9 +70,11 @@ export function Sidebar() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex items-center gap-4 mb-6 p-3 rounded-2xl bg-muted/20 border border-border/30 backdrop-blur-sm transition-all hover:bg-muted/40 cursor-pointer group outline-none">
-            <img
+            <Image
               src={getUserAvatar(user)}
               alt="Avatar"
+              width={44}
+              height={44}
               className="size-11 rounded-full object-cover ring-2 ring-transparent group-hover:ring-[#D9C5B2]/30 transition-all"
             />
             <div className="flex flex-col flex-1 min-w-0">
@@ -99,7 +102,7 @@ export function Sidebar() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="my-1 bg-border/40" />
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={handleLogout}
             className="rounded-xl px-3 py-2.5 cursor-pointer text-red-500/80 hover:text-red-500 hover:bg-red-500/10 focus:text-red-500 focus:bg-red-500/10"
           >
@@ -130,13 +133,13 @@ export function Sidebar() {
               {isActive && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-[#D9C5B2] rounded-r-full" />
               )}
-              
-              <Icon 
+
+              <Icon
                 className={cn(
                   "size-5 transition-transform duration-300 group-hover:scale-110",
                   isActive ? "text-[#D9C5B2]" : "text-muted-foreground group-hover:text-foreground"
-                )} 
-                strokeWidth={isActive ? 2.5 : 1.5} 
+                )}
+                strokeWidth={isActive ? 2.5 : 1.5}
               />
               <span className={cn(
                 "font-body-sm text-[14px] tracking-wide",

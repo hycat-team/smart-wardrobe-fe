@@ -33,7 +33,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filterParam = searchParams.get("filter") || "all";
-  
+
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useMyOutfits();
   const rawInitialOutfits = Array.isArray(initialOutfits) ? initialOutfits : ((initialOutfits as any)?.items || []);
   const outfits = data ? data.pages.flatMap(p => p.items) : rawInitialOutfits;
@@ -42,7 +42,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [sortParam, setSortParam] = useState<SortOption>("newest");
   const [outfitToDelete, setOutfitToDelete] = useState<string | null>(null);
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -97,7 +97,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
     const filtered = outfits.filter((o: Outfit) => {
       const isFavorite = favorites[o.id] || false;
       if (filterParam === "all") return true;
-      if (filterParam === "ai") return o.status === 1; 
+      if (filterParam === "ai") return o.status === 1;
       if (filterParam === "manual") return o.status === 0 || o.status === 2;
       if (filterParam === "saved") return isFavorite;
       return true;
@@ -129,12 +129,15 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
 
   return (
     <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-[#111]">
-      
+
       {/* High-end Editorial Header */}
       <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-black/10 pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4 max-w-2xl">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1]">
+            {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
+              Curations
+            </h1> */}
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1] uppercase">
               Curations
             </h1>
             <p className="text-[12px] text-[#666] font-['IBM_Plex_Mono'] uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4">
@@ -142,7 +145,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
               {outfits.length > 0 ? ` Đang lưu trữ ${outfits.length} bộ phối.` : " Hãy bắt đầu tạo bộ phối của bạn."}
             </p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
             <button
               onClick={() => router.push("/ai-stylist")}
@@ -151,7 +154,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
               <Sparkles className="size-3.5" /> Tạo bằng AI
             </button>
 
-            <button 
+            <button
               onClick={() => router.push("/outfits/create")}
               className="h-12 px-8 bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
             >
@@ -174,8 +177,8 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                 onClick={() => handleFilterChange(tab.value)}
                 className={cn(
                   "text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.12em] relative transition-colors group pb-1",
-                  filterParam === tab.value 
-                    ? "text-[#111] font-medium border-b border-[#111]" 
+                  filterParam === tab.value
+                    ? "text-[#111] font-medium border-b border-[#111]"
                     : "text-[#666] hover:text-[#111] border-b border-transparent hover:border-[#111]"
                 )}
               >
@@ -186,7 +189,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
 
           <div className="flex items-center gap-4 border border-black/10 px-4 py-2 bg-[#F8F7F5]">
             <span className="text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#888]">Sắp xếp</span>
-            <select 
+            <select
               value={sortParam}
               onChange={(e) => setSortParam(e.target.value as SortOption)}
               className="bg-transparent text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#111] font-medium focus:outline-none focus:ring-0 cursor-pointer appearance-none"
@@ -205,14 +208,14 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
           <p className="text-[11px] text-[#666] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase animate-pulse">Đang tải dữ liệu...</p>
         </div>
       ) : filteredAndSortedOutfits.length > 0 ? (
-        <div 
+        <div
           ref={gridRef}
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8"
         >
           {filteredAndSortedOutfits.map((outfit: Outfit, index: number) => (
-            <OutfitCard 
-              key={outfit.id} 
-              outfit={outfit} 
+            <OutfitCard
+              key={outfit.id}
+              outfit={outfit}
               index={index}
               isFavorite={favorites[outfit.id] || false}
               onToggleFavorite={toggleFavorite}
@@ -232,18 +235,18 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
               Không có bộ phối nào phù hợp với bộ lọc hiện tại. Hãy chọn tất cả hoặc tạo bộ phối mới.
             </p>
           </div>
-          <button 
-            onClick={() => handleFilterChange("all")} 
+          <button
+            onClick={() => handleFilterChange("all")}
             className="h-12 px-8 border border-[#111] text-[#111] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:bg-black hover:text-white transition-colors mt-4"
           >
             Xóa Bộ Lọc
           </button>
         </div>
       )}
-      
+
       {hasNextPage && (
         <div className="mt-16 flex justify-center border-t border-black/10 pt-12">
-          <button 
+          <button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
             className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase text-[#666] hover:text-[#111] disabled:opacity-50 transition-colors border-b border-transparent hover:border-[#111] pb-1"
@@ -264,8 +267,8 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6 flex gap-4">
             <AlertDialogCancel className="rounded-none border border-black/10 bg-white font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest flex-1 hover:bg-[#F8F7F5] transition-colors m-0">HỦY BỎ</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDelete} 
+            <AlertDialogAction
+              onClick={confirmDelete}
               className="rounded-none bg-red-600 text-white hover:bg-red-700 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest flex-1 transition-colors m-0"
             >
               ĐỒNG Ý XÓA

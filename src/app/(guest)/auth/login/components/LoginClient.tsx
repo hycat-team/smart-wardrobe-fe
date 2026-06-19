@@ -58,7 +58,7 @@ export function LoginClient() {
         <section className="hidden md:block md:w-1/2 relative bg-ethos-surface-low overflow-hidden">
           <Image
             alt="Ethos Atelier Editorial"
-            className="absolute inset-0 w-full h-full object-cover grayscale-[20%]"
+            className="absolute inset-0 w-full h-full object-containet  grayscale-[20%]"
             src="/images-login.png"
             fill
           />

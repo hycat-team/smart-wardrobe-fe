@@ -240,15 +240,18 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
       <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-ink/10 pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4 max-w-2xl">
-            <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
+            {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
+              Wardrobe
+            </h1> */}
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1] uppercase">
               Wardrobe
             </h1>
             <p className="text-sm text-ink-muted font-mono uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-ink/20 pl-4">
-              Bộ sưu tập của bạn. 
+              Bộ sưu tập của bạn.
               {realItems.length > 0 ? ` Đang lưu trữ ${realItems.length} món đồ.` : " Hãy bắt đầu thêm đồ."}
             </p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
             {/* Search Input */}
             <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-[240px]">
@@ -262,13 +265,13 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
               />
             </form>
 
-            <Button 
+            <Button
               onClick={() => router.push("/wardrobe/upload")}
               className="rounded-none bg-ink text-cream hover:bg-ink/80 text-xs font-mono tracking-[0.15em] h-[42px] px-8 transition-colors uppercase"
             >
               <Plus className="mr-2 size-4" /> Thêm Món Đồ
             </Button>
-            <Button 
+            <Button
               onClick={() => {
                 setIsSelectMode(!isSelectMode);
                 setSelectedIds([]);
@@ -281,7 +284,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
             {isSelectMode && selectedIds.length > 0 && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button 
+                  <Button
                     disabled={isDeleting}
                     className="rounded-none bg-[#D03027] text-cream hover:bg-[#D03027]/90 text-xs font-mono tracking-[0.15em] h-[42px] px-6 transition-colors uppercase border-none"
                   >
@@ -292,11 +295,11 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
                 <AlertDialogContent className="rounded-none border border-ink/10 bg-cream p-8 shadow-xl sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
                   <AlertDialogHeader className="space-y-4 text-left">
                     <AlertDialogTitle className="font-heading text-4xl uppercase tracking-tighter text-ink leading-none">
-                      Cảnh báo <br/><span className="text-[#D03027]">Xóa Dữ Liệu</span>
+                      Cảnh báo <br /><span className="text-[#D03027]">Xóa Dữ Liệu</span>
                     </AlertDialogTitle>
                     <AlertDialogDescription className="font-mono text-[11px] text-ink-muted uppercase tracking-widest leading-relaxed border-l-2 border-[#D03027] pl-4 mt-6">
                       Bạn đang chuẩn bị xóa vĩnh viễn {selectedIds.length} trang phục khỏi hệ thống.
-                      <br/><br/>
+                      <br /><br />
                       Hành động này không thể hoàn tác. Các item này sẽ bị gỡ bỏ khỏi mọi outfit liên quan.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -304,7 +307,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
                     <AlertDialogCancel className="flex-1 rounded-none border border-ink/20 bg-transparent text-ink font-mono text-xs tracking-widest uppercase hover:bg-ink hover:text-cream h-12 transition-colors m-0">
                       Hủy bỏ
                     </AlertDialogCancel>
-                    <AlertDialogAction 
+                    <AlertDialogAction
                       onClick={() => {
                         bulkDelete({ ids: selectedIds }, {
                           onSuccess: () => {
@@ -335,8 +338,8 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
                   onClick={() => handleCategoryChange(cat)}
                   className={cn(
                     "text-xs font-mono uppercase tracking-[0.2em] relative transition-colors group pb-2",
-                    categoryParam === cat 
-                      ? "text-ink font-bold" 
+                    categoryParam === cat
+                      ? "text-ink font-bold"
                       : "text-ink-muted hover:text-ink"
                   )}
                 >
@@ -352,7 +355,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
           <div className="flex items-center gap-4 border border-ink/20 px-4 py-2">
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-muted">Sắp xếp</span>
-            <select 
+            <select
               value={sortParam}
               onChange={(e) => handleSortChange(e.target.value)}
               className="bg-transparent text-xs font-mono uppercase tracking-widest text-ink font-bold focus:outline-none focus:ring-0 cursor-pointer appearance-none"
@@ -440,9 +443,9 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
               Tủ đồ của bạn đang trống. Hãy bắt đầu số hóa các món đồ thực tế của bạn để tạo ra những bộ phối đồ mới.
             </p>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={() => router.push("/wardrobe/upload")} 
+          <Button
+            variant="outline"
+            onClick={() => router.push("/wardrobe/upload")}
             className="rounded-none border-ink text-ink hover:bg-ink hover:text-cream text-xs font-mono tracking-[0.2em] uppercase h-14 px-8 mt-4"
           >
             Thêm Món Đồ Mới
@@ -452,7 +455,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
       {hasNextPage && (
         <div className="mt-32 flex justify-center border-t border-ink/10 pt-16">
-          <Button 
+          <Button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
             variant="ghost"

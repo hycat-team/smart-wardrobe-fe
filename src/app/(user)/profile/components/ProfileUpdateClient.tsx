@@ -98,7 +98,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
   const labelClassName = "block text-[11px] font-label-caps text-ink-muted uppercase tracking-wider mb-2 font-bold";
 
   return (
-    <div className="animate-in fade-in duration-700 max-w-2xl mx-auto w-full pb-20">
+    <div className="animate-in fade-in duration-700 max-w-2xl mx-auto w-full pb-20 pt-10">
       {/* Profile Header */}
       <div className="text-center mb-10 space-y-3">
         <h1 className="font-heading text-4xl md:text-5xl text-ink font-bold tracking-tight">Profile Information</h1>

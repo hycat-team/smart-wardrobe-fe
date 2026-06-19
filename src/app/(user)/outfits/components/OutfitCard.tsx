@@ -35,6 +35,7 @@ export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, ind
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover mix-blend-multiply opacity-90 transition-all duration-700 group-hover:opacity-100 group-hover:scale-[1.02]"
             priority={index < 4}
+            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
