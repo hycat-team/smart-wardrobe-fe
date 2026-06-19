@@ -52,9 +52,9 @@ export function LandingClient() {
         <div className="bg-gradient-layer absolute inset-0 z-0 bg-[#F4F1EE]" />
 
         {/* Ambient Blobs */}
-        <div className="ambient-blob-1 absolute top-[10%] left-[15%] w-[350px] h-[350px] md:w-[700px] md:h-[700px] rounded-full bg-[radial-gradient(circle,_#D9C5B2_0%,_transparent_70%)] opacity-[0.12] z-[1] pointer-events-none mix-blend-multiply" aria-hidden="true" />
-        <div className="ambient-blob-2 absolute top-[40%] right-[10%] w-[350px] h-[350px] md:w-[700px] md:h-[700px] rounded-full bg-[radial-gradient(circle,_#E8DFD4_0%,_transparent_70%)] opacity-[0.12] z-[1] pointer-events-none mix-blend-multiply" aria-hidden="true" />
-        <div className="ambient-blob-3 absolute top-[70%] left-[40%] w-[350px] h-[350px] md:w-[700px] md:h-[700px] rounded-full bg-[radial-gradient(circle,_#D4DECE_0%,_transparent_70%)] opacity-[0.12] z-[1] pointer-events-none mix-blend-multiply" aria-hidden="true" />
+        <div className="ambient-blob-1 absolute top-[10%] left-[15%] w-[350px] h-[350px] md:w-[700px] md:h-[700px] rounded-full bg-[radial-gradient(circle,_#D9C5B2_0%,_transparent_70%)] opacity-[0.12] z-[1] pointer-events-none" aria-hidden="true" />
+        <div className="ambient-blob-2 absolute top-[40%] right-[10%] w-[350px] h-[350px] md:w-[700px] md:h-[700px] rounded-full bg-[radial-gradient(circle,_#E8DFD4_0%,_transparent_70%)] opacity-[0.12] z-[1] pointer-events-none" aria-hidden="true" />
+        <div className="ambient-blob-3 absolute top-[70%] left-[40%] w-[350px] h-[350px] md:w-[700px] md:h-[700px] rounded-full bg-[radial-gradient(circle,_#D4DECE_0%,_transparent_70%)] opacity-[0.12] z-[1] pointer-events-none" aria-hidden="true" />
 
         {/* ── HERO CONTENT (Scene 0) ── */}
         <div className="hero-content absolute left-[5vw] md:left-[5vw] top-1/2 -translate-y-1/2 text-left z-50 flex flex-col items-start gap-2 max-w-[90vw] md:max-w-[50vw]">
@@ -98,7 +98,7 @@ export function LandingClient() {
               sizes="(max-width: 768px) 300px, 600px"
             />
             {/* Scan Line Effect */}
-            <div className="scan-line absolute left-[15%] w-[70%] md:left-25 md:w-[400px] h-1 bg-[#f5b158] shadow-[0_0_20px_5px_rgba(217,197,178,0.5)] z-20 opacity-0 rounded-full" />
+            <div className="scan-line absolute top-0 left-[15%] w-[70%] md:left-25 md:w-[400px] h-1 bg-[#f5b158] shadow-[0_0_20px_5px_rgba(217,197,178,0.5)] z-20 opacity-0 rounded-full" />
           </div>
         </div>
 
@@ -133,7 +133,7 @@ export function LandingClient() {
 
         {/* ── CHAT INTERFACE (Scene 3) ── */}
         <div className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center">
-          <div className="chat-interface opacity-0 w-[85vw] sm:w-[70vw] md:w-[380px] p-4 md:p-6 rounded-3xl bg-white/70 backdrop-blur-xl border border-white shadow-2xl absolute">
+          <div className="chat-interface opacity-0 w-[85vw] sm:w-[70vw] md:w-[380px] p-4 md:p-6 rounded-3xl bg-white/95 border border-white shadow-2xl absolute">
             <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6 pb-3 md:pb-4 border-b border-[#1A1A1A]/5">
               <div className="relative size-10 md:size-12 rounded-full overflow-hidden bg-white flex items-center justify-center border border-[#1A1A1A]/10 shadow-sm">
                 <Image src="/landing-page/Robot-AI.png" alt="Closy AI" fill sizes="48px" className="object-cover p-1" />
@@ -169,7 +169,7 @@ export function LandingClient() {
           </div>
 
           {/* Floating Context Elements */}
-          <div className="chat-float-1 absolute opacity-0 top-[15vh] right-[8vw] md:right-[15vw] bg-white/80 backdrop-blur-md rounded-2xl px-4 md:px-5 py-2 md:py-3 shadow-lg border border-white/60 flex items-center gap-2 md:gap-3">
+          <div className="chat-float-1 absolute opacity-0 top-[15vh] right-[8vw] md:right-[15vw] bg-white/95 rounded-2xl px-4 md:px-5 py-2 md:py-3 shadow-lg border border-white/60 flex items-center gap-2 md:gap-3">
             <span className="text-xl md:text-2xl">☀️</span>
             <div>
               <div className="text-[10px] md:text-xs font-bold text-[#1A1A1A]">Hôm nay</div>
@@ -177,7 +177,7 @@ export function LandingClient() {
             </div>
           </div>
 
-          <div className="chat-float-2 absolute opacity-0 bottom-[15vh] right-[8vw] md:right-[12vw] bg-white/80 backdrop-blur-md rounded-2xl p-3 md:p-4 shadow-lg border border-white/60 w-[160px] md:w-[180px]">
+          <div className="chat-float-2 absolute opacity-0 bottom-[15vh] right-[8vw] md:right-[12vw] bg-white/95 rounded-2xl p-3 md:p-4 shadow-lg border border-white/60 w-[160px] md:w-[180px]">
             <div className="text-[9px] md:text-[10px] uppercase tracking-widest text-[#D9C5B2] font-bold mb-2">Gợi ý outfit</div>
             <div className="flex gap-1.5 md:gap-2">
               {["/landing-page/top-1.png", "/landing-page/bottom-1.png", "/landing-page/shoe-1.png"].map((src) => (
@@ -190,10 +190,10 @@ export function LandingClient() {
 
           <div className="chat-float-3 absolute opacity-0 top-[22vh] left-[5vw] md:left-[42vw] flex gap-1.5 md:gap-2">
             <div className="bg-[#1A1A1A] text-white text-[9px] md:text-[10px] px-2.5 md:px-3 py-1 md:py-1.5 rounded-full font-bold shadow-md">Streetwear</div>
-            <div className="bg-white/80 backdrop-blur-md text-[#1A1A1A] text-[9px] md:text-[10px] px-2.5 md:px-3 py-1 md:py-1.5 rounded-full font-bold border border-[#1A1A1A]/10 shadow-sm">Casual</div>
+            <div className="bg-white/95 text-[#1A1A1A] text-[9px] md:text-[10px] px-2.5 md:px-3 py-1 md:py-1.5 rounded-full font-bold border border-[#1A1A1A]/10 shadow-sm">Casual</div>
           </div>
 
-          <div className="chat-float-4 absolute opacity-0 bottom-[20vh] md:bottom-[25vh] left-[5vw] md:left-[40vw] bg-white/80 backdrop-blur-md rounded-2xl px-4 md:px-5 py-2 md:py-3 shadow-lg border border-white/60 flex items-center gap-2 md:gap-3">
+          <div className="chat-float-4 absolute opacity-0 bottom-[20vh] md:bottom-[25vh] left-[5vw] md:left-[40vw] bg-white/95 rounded-2xl px-4 md:px-5 py-2 md:py-3 shadow-lg border border-white/60 flex items-center gap-2 md:gap-3">
             <div className="size-8 md:size-10 rounded-full bg-[#4A8C6E]/10 flex items-center justify-center">
               <Check className="size-4 md:size-5 text-[#4A8C6E]" />
             </div>

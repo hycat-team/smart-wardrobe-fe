@@ -19,9 +19,16 @@ export function ScrollProgressBar() {
     if (prefersReducedMotion) return;
 
     ScrollTrigger.create({
-      trigger: ".scrolly-container",
-      start: "top top",
-      end: "+=12000",
+      // Lấy trực tiếp class ngoài component (tránh lỗi scope)
+      trigger: document.querySelector(".scrolly-container"), 
+      
+      // 'start' điều chỉnh lúc BẮT ĐẦU HIỂN THỊ: 
+      // "top top" = khi mép trên scrolly-container chạm đỉnh màn hình
+      // Có thể đổi thành "top 20%" hoặc "200px top" để delay hiển thị
+      start: "top top", 
+      
+      // 'end' điều chỉnh lúc KẾT THÚC (biến mất):
+      end: "+=12000", 
       scrub: true,
       onUpdate: (self) => {
         setProgress(self.progress);

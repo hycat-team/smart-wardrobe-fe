@@ -24,7 +24,7 @@ export function FAQSection() {
         stagger: 0.12,
         duration: 0.6,
         ease: "power2.out",
-        scrollTrigger: { trigger: ".faq-section", start: "top 75%" }
+        scrollTrigger: { trigger: sectionRef.current, start: "top 75%" }
       }
     );
   }, { scope: sectionRef });

@@ -22,7 +22,7 @@ export function HowItWorksSection() {
         stagger: 0.2,
         duration: 0.8,
         ease: "power2.out",
-        scrollTrigger: { trigger: ".how-it-works-section", start: "top 75%" }
+        scrollTrigger: { trigger: sectionRef.current, start: "top 75%" }
       }
     );
 
@@ -33,7 +33,7 @@ export function HowItWorksSection() {
         stagger: 0.3,
         duration: 0.6,
         ease: "power2.inOut",
-        scrollTrigger: { trigger: ".how-it-works-section", start: "top 70%" }
+        scrollTrigger: { trigger: sectionRef.current, start: "top 70%" }
       }
     );
   }, { scope: sectionRef });

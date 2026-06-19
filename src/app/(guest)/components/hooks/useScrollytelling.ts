@@ -26,7 +26,7 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
     // ── Background Parallax & Color Shift ──
     const tlBg = gsap.timeline({
       scrollTrigger: {
-        trigger: ".scrolly-container",
+        trigger: containerRef.current?.querySelector('.scrolly-container'),
         start: "top top",
         end: `+=${scrollDistance}`,
         scrub: true,
@@ -42,25 +42,25 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
     if (!isMobile) {
       gsap.to(".ambient-blob-1", {
         y: 300,
-        scrollTrigger: { trigger: ".scrolly-container", start: "top top", end: `+=${scrollDistance}`, scrub: 0.3 }
+        scrollTrigger: { trigger: containerRef.current?.querySelector('.scrolly-container'), start: "top top", end: `+=${scrollDistance}`, scrub: 0.3 }
       });
       gsap.to(".ambient-blob-2", {
         y: 400,
-        scrollTrigger: { trigger: ".scrolly-container", start: "top top", end: `+=${scrollDistance}`, scrub: 0.5 }
+        scrollTrigger: { trigger: containerRef.current?.querySelector('.scrolly-container'), start: "top top", end: `+=${scrollDistance}`, scrub: 0.5 }
       });
       gsap.to(".ambient-blob-3", {
         x: 100, y: 350,
-        scrollTrigger: { trigger: ".scrolly-container", start: "top top", end: `+=${scrollDistance}`, scrub: 0.4 }
+        scrollTrigger: { trigger: containerRef.current?.querySelector('.scrolly-container'), start: "top top", end: `+=${scrollDistance}`, scrub: 0.4 }
       });
     }
 
     // ── Main Scrollytelling Timeline ──
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: ".scrolly-container",
+        trigger: containerRef.current?.querySelector('.scrolly-container'),
         start: "top top",
         end: `+=${scrollDistance}`,
-        scrub: 2.5,
+        scrub: 1,
         pin: true,
       }
     });
@@ -74,7 +74,7 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
     if (isMobile) {
       // Mobile: wardrobe stays centered, just scales down
       tl.to(".wardrobe-container", { scale: 0.45, opacity: 0.8, y: "-20vh", duration: 2, ease: "power2.inOut" }, "wardrobe-scan")
-        .fromTo(".scan-line", { top: "0%", opacity: 0 }, { top: "100%", opacity: 1, duration: 1.5, ease: "power1.inOut" }, "wardrobe-scan")
+        .fromTo(".scan-line", { y: 0, opacity: 0 }, { y: 300, opacity: 1, duration: 1.5, ease: "power1.inOut" }, "wardrobe-scan")
         .to(".wardrobe-frame-2", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=0.55")
         .to(".wardrobe-frame-3", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=1")
         .to(".scan-line", { opacity: 0, duration: 0.2 })
@@ -96,7 +96,7 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
     } else {
       // Desktop: original layout
       tl.to(".wardrobe-container", { x: "-45vw", scale: 0.65, opacity: 0.85, duration: 2, ease: "power2.inOut" }, "wardrobe-scan")
-        .fromTo(".scan-line", { top: "0%", opacity: 0 }, { top: "100%", opacity: 1, duration: 1.5, ease: "power1.inOut" }, "wardrobe-scan")
+        .fromTo(".scan-line", { y: 0, opacity: 0 }, { y: 600, opacity: 1, duration: 1.5, ease: "power1.inOut" }, "wardrobe-scan")
         .to(".wardrobe-frame-2", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=0.55")
         .to(".wardrobe-frame-3", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=1")
         .to(".scan-line", { opacity: 0, duration: 0.2 })
