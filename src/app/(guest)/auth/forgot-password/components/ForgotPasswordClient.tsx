@@ -110,10 +110,9 @@ export function ForgotPasswordClient() {
 
   const onPasswordSubmit = (data: ResetPasswordFormValues) => {
     resetPassword({
-      email: resetEmail,
       newPassword: data.password,
       confirmPassword: data.confirmPassword,
-      token: resetToken // If API uses token, else pass OTP or email
+      logoutAllDevices: true
     }, {
       onSuccess: () => {
         router.push("/auth/login");
