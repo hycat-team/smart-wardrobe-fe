@@ -26,7 +26,7 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
     // ── Background Parallax & Color Shift ──
     const tlBg = gsap.timeline({
       scrollTrigger: {
-        trigger: containerRef.current?.querySelector('.scrolly-container'),
+        trigger: ".scrolly-container",
         start: "top top",
         end: `+=${scrollDistance}`,
         scrub: true,
@@ -42,22 +42,22 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
     if (!isMobile) {
       gsap.to(".ambient-blob-1", {
         y: 300,
-        scrollTrigger: { trigger: containerRef.current?.querySelector('.scrolly-container'), start: "top top", end: `+=${scrollDistance}`, scrub: 0.3 }
+        scrollTrigger: { trigger: ".scrolly-container", start: "top top", end: `+=${scrollDistance}`, scrub: 0.3 }
       });
       gsap.to(".ambient-blob-2", {
         y: 400,
-        scrollTrigger: { trigger: containerRef.current?.querySelector('.scrolly-container'), start: "top top", end: `+=${scrollDistance}`, scrub: 0.5 }
+        scrollTrigger: { trigger: ".scrolly-container", start: "top top", end: `+=${scrollDistance}`, scrub: 0.5 }
       });
       gsap.to(".ambient-blob-3", {
         x: 100, y: 350,
-        scrollTrigger: { trigger: containerRef.current?.querySelector('.scrolly-container'), start: "top top", end: `+=${scrollDistance}`, scrub: 0.4 }
+        scrollTrigger: { trigger: ".scrolly-container", start: "top top", end: `+=${scrollDistance}`, scrub: 0.4 }
       });
     }
 
     // ── Main Scrollytelling Timeline ──
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: containerRef.current?.querySelector('.scrolly-container'),
+        trigger: ".scrolly-container",
         start: "top top",
         end: `+=${scrollDistance}`,
         scrub: 1,
@@ -135,7 +135,7 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
       .to(".wardrobe-container", { opacity: 0, duration: 1 }, "<")
       .fromTo(".chat-interface",
         { opacity: 0, x: "40vw", y: "5vh", scale: 0.9 },
-        { opacity: 1, x: isMobile ? "0vw" : "8vw", y: "-5vh", scale: 1, duration: 1.5, ease: "back.out(1)" }, "<")
+        { opacity: 1, x: isMobile ? "0vw" : "12vw", y: "-5vh", scale: 1, duration: 1.5, ease: "back.out(1)" }, "<")
       .fromTo(".chat-bubble-1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "+=0.2")
       .fromTo(".chat-bubble-2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "+=0.2");
 
@@ -226,11 +226,7 @@ function animateStaticSections(isMobile: boolean) {
     { y: 0, opacity: 1, stagger: 0.15, duration: 0.6, scrollTrigger: { trigger: ".after-card", start: "top 85%" } }
   );
 
-  // Testimonials
-  gsap.fromTo(".testimonial-bubble",
-    { y: 30, opacity: 0 },
-    { y: 0, opacity: 1, stagger: 0.25, duration: 0.8, scrollTrigger: { trigger: ".testimonials-section", start: "top 75%" } }
-  );
+  // Testimonials section animation removed as it's handled internally by StaggerTestimonials
 
   // Final CTA
   gsap.fromTo(".cta-heading-line",

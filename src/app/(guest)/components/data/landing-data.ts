@@ -103,7 +103,7 @@ export const OUTFIT_CARDS: ClothData[] = [
 // ─── How It Works ────────────────────────────────────────────────
 export interface Step {
   number: string;
-  emoji: string;
+  iconSrc: string;
   title: string;
   description: string;
 }
@@ -111,19 +111,19 @@ export interface Step {
 export const HOW_IT_WORKS_STEPS: Step[] = [
   {
     number: "01",
-    emoji: "📸",
+    iconSrc: "/Icon/camera.png",
     title: "Chụp & Upload",
     description: "Chụp ảnh tủ đồ, AI tự động bóc tách nền, phân loại màu sắc và chất liệu cho từng món.",
   },
   {
     number: "02",
-    emoji: "🤖",
+    iconSrc: "/Icon/technical-support.png",
     title: "AI Gợi Ý Outfit",
     description: "Nhận gợi ý phối đồ phù hợp thời tiết, hoàn cảnh và phong cách riêng của bạn mỗi ngày.",
   },
   {
     number: "03",
-    emoji: "🔄",
+    iconSrc: "/Icon/swap.png",
     title: "Chia Sẻ & Pass Đồ",
     description: "Kết nối cộng đồng Gen Z, pass đồ ít mặc và tìm nguồn cảm hứng mới mỗi ngày.",
   },

@@ -26,7 +26,7 @@ export function UploadClient() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [files, setFiles] = useState<SelectedFile[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [uploadState, setUploadState] = useState<{ status: 'idle' | 'uploading' | 'analyzing' | 'success', current: number, total: number }>({
@@ -34,7 +34,7 @@ export function UploadClient() {
   });
 
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
-  
+
   useEffect(() => {
     if (categories.length > 0 && !selectedCategory) {
       setSelectedCategory(categories[0].id);
@@ -46,7 +46,7 @@ export function UploadClient() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files);
-      
+
       if (files.length + selectedFiles.length > 5) {
         toast.error("Bạn chỉ được upload tối đa 5 ảnh mỗi lần!");
         return;
@@ -58,7 +58,7 @@ export function UploadClient() {
         preview: URL.createObjectURL(file),
         categoryId: selectedCategory || (categories.length > 0 ? categories[0].id : ""),
       }));
-      
+
       setFiles(prev => [...prev, ...newFiles]);
     }
   };
@@ -86,14 +86,14 @@ export function UploadClient() {
     try {
       // 1. Get secure upload signature
       const signatureResult = await wardrobeApi.getUploadSignature();
-      
+
       const uploadedItems = [];
 
       // 2. Upload direct to Cloudinary sequentially to track progress accurately
       for (let i = 0; i < files.length; i++) {
         const item = files[i];
         setUploadState({ status: 'uploading', current: i + 1, total: files.length });
-        
+
         const uploadResData = await uploadToCloudinary({
           file: item.file,
           signatureParams: {
@@ -110,7 +110,7 @@ export function UploadClient() {
 
         // 3. Apply background removal & format/quality optimization transformations
         const optimizedUrl = applyCloudinaryBackgroundRemoval(originalUrl);
-        
+
         uploadedItems.push({
           categoryId: item.categoryId,
           imagePublicId: publicId,
@@ -184,12 +184,12 @@ export function UploadClient() {
 
   return (
     <div ref={containerRef} className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 mt-12 font-sans selection:bg-ink selection:text-cream">
-      
+
       {/* Editorial Header */}
       <div className="flex flex-col gap-6 border-b border-black/10 pb-8 gsap-header">
         <div className="space-y-4 max-w-2xl">
           <h1 className="text-4xl md:text-5xl lg:text-[72px] font-['Playfair_Display'] font-medium tracking-tight text-[#111] leading-[1.1]">
-            Số hóa Trang phục
+            DIGITAL FASHION
           </h1>
           <p className="text-[11px] text-[#666] font-['IBM_Plex_Mono'] uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-black/20 pl-4">
             Tải lên tối đa 5 ảnh thô cùng lúc. AI sẽ tự động tách nền, tối ưu dung lượng, và phân tích các thông số về chất liệu & phong cách.
@@ -200,14 +200,14 @@ export function UploadClient() {
       {files.length === 0 ? (
         // Step 1: Upload Area
         <div className="w-full grid md:grid-cols-12 gap-12 items-start gsap-upload-container">
-          
+
           {/* Category Selector */}
           <div className="md:col-span-5 space-y-8 gsap-step">
             <div className="flex items-center gap-4 border-b border-black/10 pb-4">
               <span className="bg-[#111] text-white font-['IBM_Plex_Mono'] text-[10px] uppercase px-2 py-1 tracking-widest font-bold">01</span>
               <h2 className="font-['Playfair_Display'] text-xl tracking-[0.05em] text-[#111] uppercase">Chọn Danh Mục</h2>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-3">
               {isLoadingCategories ? (
                 <div className="col-span-2 flex justify-center py-12 border border-dashed border-black/10">
@@ -238,7 +238,7 @@ export function UploadClient() {
               <h2 className="font-['Playfair_Display'] text-xl tracking-[0.05em] text-[#111] uppercase">Tải Lên Hình Ảnh</h2>
             </div>
 
-            <div 
+            <div
               onClick={() => fileInputRef.current?.click()}
               className="w-full aspect-square md:aspect-[4/3] border border-dashed border-black/30 bg-[#F8F7F5] hover:bg-[#F4F3F0] flex flex-col items-center justify-center gap-6 cursor-pointer transition-colors group"
             >
@@ -250,39 +250,39 @@ export function UploadClient() {
                 <p className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-[0.2em] text-[#666]">PNG, JPG, HEIC (Tối đa 5 file, mỗi file max 5MB)</p>
               </div>
             </div>
-            
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileSelect} 
-              accept="image/*" 
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept="image/*"
               multiple
-              className="hidden" 
+              className="hidden"
             />
           </div>
         </div>
       ) : (
         // Step 2: Preview & Send Action
         <div className="w-full grid md:grid-cols-12 gap-12 items-start gsap-preview-container">
-          
+
           <div className="md:col-span-7 flex flex-col h-full space-y-6 pt-2">
             <div className="flex items-center justify-between border-b border-black/10 pb-4">
-               <h2 className="font-['Playfair_Display'] text-2xl tracking-[0.05em] text-[#111] uppercase">Đã chọn {files.length}/5 ảnh</h2>
-               {!isUploading && files.length < 5 && (
-                 <button 
-                   onClick={() => fileInputRef.current?.click()}
-                   className="text-[10px] font-['IBM_Plex_Mono'] font-medium uppercase tracking-[0.1em] text-[#666] hover:text-[#111] flex items-center gap-2 transition-colors"
-                 >
-                   <ImagePlus className="size-4 stroke-[1.5]" /> Thêm ảnh
-                 </button>
-               )}
+              <h2 className="font-['Playfair_Display'] text-2xl tracking-[0.05em] text-[#111] uppercase">Đã chọn {files.length}/5 ảnh</h2>
+              {!isUploading && files.length < 5 && (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-[10px] font-['IBM_Plex_Mono'] font-medium uppercase tracking-[0.1em] text-[#666] hover:text-[#111] flex items-center gap-2 transition-colors"
+                >
+                  <ImagePlus className="size-4 stroke-[1.5]" /> Thêm ảnh
+                </button>
+              )}
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
               {files.map((item, idx) => (
                 <div key={item.id} className="preview-card group flex flex-col relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out">
-                  
-                  <button 
+
+                  <button
                     onClick={() => removeFile(item.id)}
                     className="absolute -top-3 -right-3 size-8 bg-[#D03027] text-white flex items-center justify-center hover:bg-black transition-all z-30 outline-none rounded-full shadow-md"
                     disabled={isUploading}
@@ -296,22 +296,22 @@ export function UploadClient() {
                   {/* Image Area - 75% Visual Weight */}
                   <div className="relative aspect-[4/5] bg-[#F7F6F4] p-[16px] overflow-hidden flex-shrink-0">
                     <img src={item.preview} alt="Preview" className="w-full h-full object-contain drop-shadow-sm" />
-                    
+
                     {/* Uploading Overlay */}
                     {isUploading && uploadState.current === idx + 1 && uploadState.status === 'uploading' && (
                       <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                         <div className="size-8 border-2 border-black/20 border-t-black rounded-full animate-spin mb-3" />
-                         <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-black bg-white/90 px-3 py-1.5 shadow-sm tracking-widest">ĐANG TẢI LÊN</span>
+                        <div className="size-8 border-2 border-black/20 border-t-black rounded-full animate-spin mb-3" />
+                        <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-black bg-white/90 px-3 py-1.5 shadow-sm tracking-widest">ĐANG TẢI LÊN</span>
                       </div>
                     )}
                     {isUploading && (uploadState.current > idx + 1 || uploadState.status === 'analyzing') && (
                       <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
-                         <div className="bg-black text-white p-1.5 rounded-full mb-2"><Sparkles className="size-4" /></div>
-                         <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-black bg-white/90 px-3 py-1.5 shadow-sm tracking-widest">AI XỬ LÝ</span>
+                        <div className="bg-black text-white p-1.5 rounded-full mb-2"><Sparkles className="size-4" /></div>
+                        <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-black bg-white/90 px-3 py-1.5 shadow-sm tracking-widest">AI XỬ LÝ</span>
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Information Area - 25% Visual Weight */}
                   <div className="flex flex-col p-4 pt-4 flex-grow justify-between gap-3 bg-white border-t border-black/5">
                     <div>
@@ -319,9 +319,9 @@ export function UploadClient() {
                         {item.file.name.replace(/\.[^/.]+$/, "")}
                       </h3>
                       {/* Individual Category Selector */}
-                      <Select 
+                      <Select
                         disabled={isUploading}
-                        value={item.categoryId} 
+                        value={item.categoryId}
                         onValueChange={(val) => updateFileCategory(item.id, val || "")}
                       >
                         <SelectTrigger className="w-full h-8 bg-[#F7F6F4] border border-black/10 text-[10px] font-['IBM_Plex_Mono'] font-medium uppercase tracking-widest rounded-none shadow-none outline-none focus:ring-0">
@@ -329,16 +329,16 @@ export function UploadClient() {
                             {categories.find(c => c.id === item.categoryId)?.name || "Danh mục"}
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent 
-                          alignItemWithTrigger={false} 
-                          side="bottom" 
+                        <SelectContent
+                          alignItemWithTrigger={false}
+                          side="bottom"
                           sideOffset={4}
                           className="bg-white border border-black/10 rounded-none shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-1 z-50"
                         >
                           {categories.map(cat => (
-                            <SelectItem 
-                              key={cat.id} 
-                              value={cat.id} 
+                            <SelectItem
+                              key={cat.id}
+                              value={cat.id}
                               className="font-['IBM_Plex_Mono'] text-[10px] uppercase font-medium tracking-[0.05em] py-2 px-3 text-[#333] cursor-pointer rounded-none focus:bg-[#F4F4F4] focus:text-black data-[state=checked]:bg-[#111] data-[state=checked]:text-white transition-colors duration-150"
                             >
                               {cat.name}
@@ -352,13 +352,13 @@ export function UploadClient() {
               ))}
             </div>
 
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileSelect} 
-              accept="image/*" 
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept="image/*"
               multiple
-              className="hidden" 
+              className="hidden"
             />
           </div>
 
@@ -366,9 +366,9 @@ export function UploadClient() {
             <div className="space-y-6">
               <div className="inline-flex items-center gap-3">
                 <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-[0.1em] text-[#666]">Danh mục chung (Mặc định)</span>
-                <Select 
+                <Select
                   disabled={isUploading}
-                  value={selectedCategory} 
+                  value={selectedCategory}
                   onValueChange={(val) => setSelectedCategory(val || "")}
                 >
                   <SelectTrigger className="w-40 h-8 bg-transparent border-b border-t-0 border-l-0 border-r-0 border-black/20 text-[11px] font-['IBM_Plex_Mono'] font-medium uppercase tracking-[0.1em] rounded-none shadow-none focus:ring-0 px-0 data-[state=open]:border-black transition-colors text-[#111]">
@@ -376,16 +376,16 @@ export function UploadClient() {
                       {categories.find(c => c.id === selectedCategory)?.name || "Chọn danh mục"}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent 
-                    alignItemWithTrigger={false} 
-                    side="bottom" 
+                  <SelectContent
+                    alignItemWithTrigger={false}
+                    side="bottom"
                     sideOffset={4}
                     className="bg-white border border-black/10 rounded-none shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-1 z-50"
                   >
                     {categories.map(cat => (
-                      <SelectItem 
-                        key={cat.id} 
-                        value={cat.id} 
+                      <SelectItem
+                        key={cat.id}
+                        value={cat.id}
                         className="font-['IBM_Plex_Mono'] text-[11px] uppercase font-medium tracking-[0.05em] py-2 px-3 text-[#333] cursor-pointer rounded-none focus:bg-[#F4F4F4] focus:text-black data-[state=checked]:bg-[#111] data-[state=checked]:text-white transition-colors duration-150"
                       >
                         {cat.name}
@@ -394,11 +394,11 @@ export function UploadClient() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-['Playfair_Display'] tracking-[0.02em] text-[#111] leading-[1.1] uppercase">
-                Sẵn sàng <br/><span className="text-[#666] italic lowercase tracking-normal">trích xuất</span>
+                Sẵn sàng <br /><span className="text-[#666] italic lowercase tracking-normal">trích xuất</span>
               </h2>
-              
+
               <p className="font-['IBM_Plex_Mono'] text-[11px] text-[#666] leading-relaxed tracking-[0.05em] border-l border-black/20 pl-5 max-w-sm">
                 Các hình ảnh sẽ được gửi qua nền tảng đám mây để AI loại bỏ phông nền, tối ưu hóa kích thước, sau đó đi qua hệ thống AI Stylist để phân tích dữ liệu thời trang.
               </p>
@@ -410,7 +410,7 @@ export function UploadClient() {
                     <span>{Math.round((uploadState.current / uploadState.total) * 100)}%</span>
                   </div>
                   <div className="w-full h-[3px] bg-[#F4F3F0] overflow-hidden">
-                    <div 
+                    <div
                       className="h-full bg-[#111] transition-all duration-300 ease-out"
                       style={{ width: `${(uploadState.current / uploadState.total) * 100}%` }}
                     />
@@ -418,19 +418,19 @@ export function UploadClient() {
                 </div>
               )}
             </div>
-            
+
             <div className="flex flex-col xl:flex-row gap-4 pt-4">
-              <Button 
-                onClick={handleUploadAndAnalyze} 
+              <Button
+                onClick={handleUploadAndAnalyze}
                 disabled={isUploading || files.length === 0}
                 className="flex-1 h-12 rounded-none bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] tracking-[0.15em] uppercase hover:bg-black/80 transition-colors flex items-center justify-center gap-3 shadow-sm"
               >
                 {isUploading ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
                 Phân tích tất cả
               </Button>
-              <Button 
-                variant="outline" 
-                onClick={handleReset} 
+              <Button
+                variant="outline"
+                onClick={handleReset}
                 disabled={isUploading}
                 className="xl:w-32 h-12 rounded-none bg-transparent border border-black/10 text-[#666] font-['IBM_Plex_Mono'] text-[11px] tracking-[0.1em] uppercase hover:bg-[#F8F7F5] hover:text-[#111] transition-colors"
               >

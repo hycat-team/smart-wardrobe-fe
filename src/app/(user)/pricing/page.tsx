@@ -38,12 +38,12 @@ export default function PricingPage() {
       {/* Editorial Hero Section */}
       <div className="pt-32 pb-20 px-6 md:px-12 text-center max-w-4xl mx-auto border-b border-[#1A1A1A]/10 mb-20 relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-[#1A1A1A]/20" />
-        <h1 className="font-['Playfair_Display'] text-5xl md:text-7xl font-medium tracking-tight mb-8 leading-[1.1] text-[#1A1A1A]">
+        <h1 className="font-['Playfair_Display'] text-5xl md:text-7xl font-medium tracking-tight mb-8 leading-[1.3] text-[#1A1A1A]">
           Khám phá tiềm năng<br />
           <span className="italic text-[#D9C5B2]">tủ đồ của bạn.</span>
         </h1>
-        <p className="font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-[0.2em] text-[#1A1A1A]/60 max-w-xl mx-auto leading-loose">
-          Trải nghiệm quyền năng của AI Stylist với các thẻ hội viên cao cấp từ CLOSY. Thanh toán an toàn, linh hoạt mọi lúc.
+        <p className="font-sans text-base md:text-lg text-[#5A5A5A] max-w-2xl mx-auto leading-relaxed">
+          Trải nghiệm quyền năng của AI Stylist với các thẻ hội viên cao cấp từ Closy. Thanh toán an toàn, linh hoạt mọi lúc.
         </p>
       </div>
 

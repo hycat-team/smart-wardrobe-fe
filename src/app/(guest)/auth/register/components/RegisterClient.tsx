@@ -132,11 +132,7 @@ export function RegisterClient() {
 
   if (step === "otp") {
     return (
-      <div className="bg-ethos-surface text-ethos-on-surface min-h-screen flex items-center justify-center selection:bg-ethos-primary-container selection:text-ethos-on-primary-container flex-col antialiased">
-        <main className="w-full max-w-md px-[20px] md:px-0 py-[80px] flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="mb-16">
-            <span className="font-playfair text-[32px] font-medium text-ethos-primary tracking-tight">Closy</span>
-          </div>
+      <div className="w-full px-6 py-10 sm:px-10 flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
 
           <div className="text-center w-full mb-14">
             <h1 className="font-playfair text-[36px] md:text-[48px] font-semibold text-ethos-primary mb-4">
@@ -172,7 +168,7 @@ export function RegisterClient() {
               disabled={isConfirming || otpCode.join("").length !== 6}
               className="w-full max-w-[340px] h-[48px] bg-ethos-primary text-ethos-on-primary font-inter text-[16px] font-medium flex items-center justify-center hover:bg-ethos-surface-tint hover:shadow-[0px_10px_30px_rgba(45,45,45,0.1)] transition-all duration-300 rounded group mb-12 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isConfirming ? "Đang xác thực..." : "Verify"}
+              {isConfirming ? "Đang xác thực..." : "Xác Nhận"}
               {!isConfirming && (
                 <svg className="ml-2 w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -203,42 +199,15 @@ export function RegisterClient() {
               Trở lại đăng ký
             </button>
           </form>
-        </main>
       </div>
     );
   }
 
   // Registration UI
   return (
-    <div className="bg-ethos-surface text-ethos-on-surface min-h-screen flex w-full relative overflow-hidden antialiased">
-      {/* Left Side: Editorial Image */}
-      <section className="hidden lg:block lg:w-[55%] relative bg-ethos-surface-variant">
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/20 to-transparent pointer-events-none mix-blend-overlay"></div>
-        <Image
-          alt="High-end editorial fashion photography"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          src="/images-regis.png"
-          fill
+    <div className="w-full px-6 py-8 sm:px-10 sm:py-10 max-h-[85vh] overflow-y-auto no-scrollbar">
+        <div className="w-full flex flex-col gap-8">
 
-        />
-        <div className="absolute bottom-[64px] left-[64px] z-20">
-          <span className="font-playfair text-[48px] font-semibold text-ethos-surface-lowest drop-shadow-md tracking-tight">Closy.</span>
-        </div>
-      </section>
-
-      {/* Right Side: Registration Form */}
-      <section className="w-full lg:w-[45%] flex flex-col justify-center px-[20px] md:px-[64px] py-[80px] bg-ethos-surface z-20 relative overflow-y-auto">
-        <div className="w-full max-w-[420px] mx-auto flex flex-col gap-10">
-
-          {/* Mobile Brand Header */}
-          <div className="lg:hidden text-center mb-4">
-            <span className="font-playfair text-[36px] font-semibold text-ethos-primary tracking-tight">Closy.</span>
-          </div>
-
-          <header className="flex flex-col gap-2">
-            <h1 className="font-playfair text-[24px] md:text-[32px] font-medium text-ethos-primary">Create an Account</h1>
-            <p className="font-inter text-[16px] text-ethos-on-surface-variant">Begin your journey towards a more conscious, curated wardrobe.</p>
-          </header>
 
           <form noValidate className="flex flex-col gap-6" onSubmit={handleSubmit(onRegisterSubmit)}>
             <div className="grid grid-cols-2 gap-4">
@@ -276,7 +245,7 @@ export function RegisterClient() {
             </div>
 
             <div className="flex flex-col gap-2 relative group">
-              <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="email">Email Address</label>
+              <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="email">Email</label>
               <input
                 id="email" type="email" placeholder="jane@example.com"
                 {...registerField("email")}
@@ -383,7 +352,7 @@ export function RegisterClient() {
             </div>
 
             <div className="flex flex-col gap-2 relative group">
-              <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="password">Password</label>
+              <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="password">Mật khẩu</label>
               <div className="relative flex items-center">
                 <input
                   id="password" type={passwordVisible ? "text" : "password"} placeholder="••••••••"
@@ -408,7 +377,7 @@ export function RegisterClient() {
             </div>
 
             <div className="flex flex-col gap-2 relative group">
-              <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="confirmPassword">Confirm Password</label>
+              <label className="font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em] group-focus-within:text-ethos-primary transition-colors duration-300 ml-1" htmlFor="confirmPassword">Xác nhận mật khẩu</label>
               <div className="relative flex items-center">
                 <input
                   id="confirmPassword" type={confirmPasswordVisible ? "text" : "password"} placeholder="••••••••"
@@ -437,7 +406,7 @@ export function RegisterClient() {
               disabled={isRegistering}
               className="w-full h-[48px] mt-4 bg-ethos-primary text-ethos-on-primary font-inter text-[16px] font-medium rounded shadow-[0px_4px_10px_rgba(24,25,25,0.05)] hover:shadow-[0px_10px_30px_rgba(24,25,25,0.15)] hover:-translate-y-[2px] transition-all duration-300 ease-out flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {isRegistering ? "Đang xử lý..." : "Create Account"}
+              {isRegistering ? "Đang xử lý..." : "Tạo Tài Khoản"}
               {!isRegistering && (
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -448,7 +417,7 @@ export function RegisterClient() {
 
           <div className="flex items-center gap-4">
             <div className="flex-1 h-[1px] bg-ethos-surface-variant"></div>
-            <span className="font-inter text-[12px] font-bold tracking-[0.1em] text-ethos-on-surface-variant uppercase">Or register with</span>
+            <span className="font-inter text-[12px] font-bold tracking-[0.1em] text-ethos-on-surface-variant uppercase">Hoặc đăng ký với</span>
             <div className="flex-1 h-[1px] bg-ethos-surface-variant"></div>
           </div>
 
@@ -459,13 +428,12 @@ export function RegisterClient() {
           </div>
 
           <p className="text-center font-inter text-[14px] text-ethos-on-surface-variant mt-2">
-            Already have an account?{' '}
+            Đã có tài khoản?{' '}
             <Link href="/auth/login" className="text-ethos-primary font-medium hover:text-ethos-secondary transition-colors underline-offset-4 hover:underline ml-1">
-              Sign In
+              Đăng Nhập
             </Link>
           </p>
         </div>
-      </section>
     </div>
   );
 }

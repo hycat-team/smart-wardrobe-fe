@@ -16,7 +16,9 @@ import { FeedCard } from "./cards/FeedCard";
 import { SoftAurora } from "./backgrounds/SoftAurora";
 import { ScrollProgressBar } from "./ScrollProgressBar";
 import { HowItWorksSection } from "./sections/HowItWorksSection";
-import { FAQSection } from "./sections/FAQSection";
+import { FAQs } from "@/components/faqs-component";
+import { WeatherWidget } from "@/components/WeatherWidget";
+import { StaggerTestimonials } from "@/components/stagger-testimonials";
 import { useScrollytelling } from "./hooks/useScrollytelling";
 import {
   METRICS, BEFORE_ITEMS, AFTER_ITEMS, TESTIMONIALS,
@@ -58,7 +60,7 @@ export function LandingClient() {
 
         {/* ── HERO CONTENT (Scene 0) ── */}
         <div className="hero-content absolute left-[5vw] md:left-[5vw] top-1/2 -translate-y-1/2 text-left z-50 flex flex-col items-start gap-2 max-w-[90vw] md:max-w-[50vw]">
-          <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter text-[#1A1A1A] leading-[0.9]">
+          <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter text-[#1A1A1A] leading-[1.1]">
             Tủ đầy ắp đồ,<br />nhưng lại...
           </h1>
           <h2 className="font-heading text-3xl sm:text-4xl md:text-6xl text-[#D9C5B2] italic mt-4">
@@ -68,8 +70,9 @@ export function LandingClient() {
 
         <div className="hero-cta absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 animate-bounce">
           <span className="text-[10px] md:text-xs font-medium uppercase tracking-widest text-[#707070]">
-            Cuộn để mở khóa tủ đồ ↓
+            Cuộn để mở khóa tủ đồ
           </span>
+          <ArrowDown className="size-4" />
         </div>
 
         {/* ── CENTRAL WARDROBE (Scene 0 → Scene 1) ── */}
@@ -133,73 +136,92 @@ export function LandingClient() {
 
         {/* ── CHAT INTERFACE (Scene 3) ── */}
         <div className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center">
-          <div className="chat-interface opacity-0 w-[85vw] sm:w-[70vw] md:w-[380px] p-4 md:p-6 rounded-3xl bg-white/95 border border-white shadow-2xl absolute">
-            <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6 pb-3 md:pb-4 border-b border-[#1A1A1A]/5">
-              <div className="relative size-10 md:size-12 rounded-full overflow-hidden bg-white flex items-center justify-center border border-[#1A1A1A]/10 shadow-sm">
-                <Image src="/landing-page/Robot-AI.png" alt="Closy AI" fill sizes="48px" className="object-cover p-1" />
+          <div className="chat-interface opacity-0 w-[90%] sm:w-[320px] md:w-[380px] bg-white/70 backdrop-blur-2xl rounded-3xl p-5 md:p-6 shadow-[0_20px_40px_rgba(0,0,0,0.05)] border border-white/60 absolute z-0">
+            <div className="flex items-center justify-between mb-4 md:mb-5 pb-4 md:pb-5 border-b border-black/5">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="size-8 md:size-10 rounded-full bg-gradient-to-tr from-[#D9C5B2] to-[#f4ebe1] flex items-center justify-center shadow-inner">
+                  <Image src="/landing-page/Robot-AI.png" alt="AI Avatar" width={24} height={24} className="object-cover" unoptimized />
+                </div>
+                <div>
+                  <h4 className="font-heading font-bold text-base md:text-lg text-[#1A1A1A]">Closy AI</h4>
+                  <p className="text-[9px] md:text-[10px] text-[#B8975A] uppercase tracking-widest font-bold">Stylist <br /> Cá Nhân</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-heading font-bold text-base md:text-lg text-[#1A1A1A]">Closy AI</h4>
-                <p className="text-[10px] md:text-xs text-[#D9C5B2] uppercase tracking-widest font-bold">Stylist Cá Nhân</p>
-              </div>
-              <div className="ml-auto flex gap-1 items-center">
-                <div className="size-2 rounded-full bg-[#4A8C6E] animate-pulse" />
+              <div className="flex gap-1.5 items-center px-2.5 py-1.5 bg-[#4A8C6E]/10 rounded-full border border-[#4A8C6E]/20">
+                <div className="relative flex size-1.5 md:size-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4A8C6E] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full size-1.5 md:size-2 bg-[#4A8C6E]"></span>
+                </div>
                 <span className="text-[9px] md:text-[10px] text-[#4A8C6E] font-medium">Trực tuyến</span>
               </div>
             </div>
 
             <div className="space-y-3 md:space-y-4">
-              <div className="chat-bubble-1 opacity-0 bg-[#F4F1EE] text-[#1A1A1A] text-xs md:text-sm p-3 md:p-4 rounded-2xl rounded-tl-sm w-[90%] border border-[#1A1A1A]/5">
+              <div className="chat-bubble-1 opacity-0 bg-white/80 backdrop-blur-sm text-[#1A1A1A] text-xs md:text-sm p-3 md:p-4 rounded-2xl rounded-tl-sm w-[90%] shadow-sm border border-white/60">
                 Thứ 7 này đi dạo phố mặc gì?
               </div>
-              <div className="chat-bubble-2 opacity-0 bg-[#D9C5B2] text-white text-xs md:text-sm p-3 md:p-4 rounded-2xl rounded-tr-sm w-[95%] ml-auto shadow-md">
+              <div className="chat-bubble-2 opacity-0 bg-gradient-to-r from-[#D9C5B2] to-[#C9B39E] text-white text-xs md:text-sm p-3 md:p-4 rounded-2xl rounded-tr-sm w-[95%] ml-auto shadow-md">
                 Thử set này nhé: Thun basic và Jeans ống rộng cực thoải mái!
               </div>
-              <div className="chat-bubble-3 opacity-0 bg-[#F4F1EE] text-[#1A1A1A] text-xs md:text-sm p-3 md:p-4 rounded-2xl rounded-tl-sm w-[85%] border border-[#1A1A1A]/5">
+              <div className="chat-bubble-3 opacity-0 bg-white/80 backdrop-blur-sm text-[#1A1A1A] text-xs md:text-sm p-3 md:p-4 rounded-2xl rounded-tl-sm w-[85%] shadow-sm border border-white/60">
                 Có set nào khác trendy hơn không? 👀
               </div>
             </div>
 
-            <div className="mt-3 md:mt-4 flex items-center gap-2 md:gap-3 p-2 md:p-3 rounded-2xl bg-[#F4F1EE] border border-[#1A1A1A]/5">
-              <div className="flex-1 text-[10px] md:text-xs text-[#A3A3A3]">Nhập tin nhắn...</div>
-              <div className="size-7 md:size-8 rounded-full bg-[#D9C5B2] flex items-center justify-center" aria-label="Gửi tin nhắn">
-                <ArrowDown className="size-3 text-white rotate-[-90deg]" />
+            <div className="mt-4 md:mt-5 flex items-center gap-2 md:gap-3 p-1.5 md:p-2 rounded-full bg-white/80 backdrop-blur-md shadow-inner border border-black/5">
+              <div className="flex-1 px-3 text-[10px] md:text-xs text-[#A3A3A3]">Nhập tin nhắn...</div>
+              <div className="size-8 md:size-10 rounded-full bg-[#1A1A1A] hover:bg-[#D9C5B2] transition-colors flex items-center justify-center shadow-md cursor-pointer" aria-label="Gửi tin nhắn">
+                <ArrowDown className="size-3 md:size-4 text-white rotate-[-90deg]" />
               </div>
             </div>
           </div>
 
           {/* Floating Context Elements */}
-          <div className="chat-float-1 absolute opacity-0 top-[15vh] right-[8vw] md:right-[15vw] bg-white/95 rounded-2xl px-4 md:px-5 py-2 md:py-3 shadow-lg border border-white/60 flex items-center gap-2 md:gap-3">
-            <span className="text-xl md:text-2xl">☀️</span>
-            <div>
-              <div className="text-[10px] md:text-xs font-bold text-[#1A1A1A]">Hôm nay</div>
-              <div className="text-[9px] md:text-[10px] text-[#5A5A5A]">32°C — Nắng nhẹ</div>
-            </div>
-          </div>
+          <WeatherWidget className="chat-float-1 absolute opacity-0 top-[15vh] right-[8vw] md:right-[15vw] z-50" />
 
-          <div className="chat-float-2 absolute opacity-0 bottom-[15vh] right-[8vw] md:right-[12vw] bg-white/95 rounded-2xl p-3 md:p-4 shadow-lg border border-white/60 w-[160px] md:w-[180px]">
-            <div className="text-[9px] md:text-[10px] uppercase tracking-widest text-[#D9C5B2] font-bold mb-2">Gợi ý outfit</div>
-            <div className="flex gap-1.5 md:gap-2">
-              {["/landing-page/top-1.png", "/landing-page/bottom-1.png", "/landing-page/shoe-1.png"].map((src) => (
-                <div key={src} className="relative size-11 md:size-14 rounded-xl bg-[#F4F1EE] overflow-hidden border border-[#1A1A1A]/5">
-                  <Image src={src} alt="Outfit suggestion" fill sizes="56px" className="object-contain p-1" />
+          <div className="chat-float-2 absolute opacity-0 bottom-[15vh] right-[8vw] md:right-[17vw] bg-white/70 backdrop-blur-xl rounded-3xl p-3 md:p-4 shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-white/60 w-[160px] md:w-[180px] hover:scale-105 transition-transform duration-500">
+            <div className="flex items-center gap-1.5 mb-3">
+              <Sparkles className="size-3 text-[#B8975A]" />
+              <div className="text-[9px] md:text-[10px] uppercase tracking-widest text-[#B8975A] font-bold">Gợi ý outfit</div>
+            </div>
+            <div className="flex -space-x-3 md:-space-x-4 pl-2">
+              {["/landing-page/top-1.png", "/landing-page/bottom-1.png", "/landing-page/shoe-1.png"].map((src, i) => (
+                <div key={src} className="relative size-12 md:size-14 rounded-full bg-white shadow-md border-2 border-white overflow-hidden z-30" style={{ zIndex: 30 - i }}>
+                  <Image src={src} alt="Outfit suggestion" fill sizes="56px" className="object-contain p-1.5" />
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="chat-float-3 absolute opacity-0 top-[22vh] left-[5vw] md:left-[42vw] flex gap-1.5 md:gap-2">
-            <div className="bg-[#1A1A1A] text-white text-[9px] md:text-[10px] px-2.5 md:px-3 py-1 md:py-1.5 rounded-full font-bold shadow-md">Streetwear</div>
-            <div className="bg-white/95 text-[#1A1A1A] text-[9px] md:text-[10px] px-2.5 md:px-3 py-1 md:py-1.5 rounded-full font-bold border border-[#1A1A1A]/10 shadow-sm">Casual</div>
+          <div className="chat-float-3 absolute opacity-0 top-[16vh] left-[5vw] md:left-[41vw] flex flex-col gap-3 md:gap-4 z-20">
+            {/* Streetwear Tag */}
+            <div className="relative group flex items-center gap-2.5 bg-[#1A1A1A]/85 backdrop-blur-xl p-1.5 pr-4 md:pr-5 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.25)] border border-white/15 cursor-pointer hover:rotate-3 hover:scale-105 transition-all duration-400">
+              <div className="flex items-center justify-center size-7 md:size-8 rounded-full bg-gradient-to-br from-white/20 to-transparent shadow-inner border border-white/10 overflow-hidden">
+                <Image src="/Icon/Thời-trang-dạo-phố.png" alt="Thời trang dạo phố" width={18} height={18} className="object-contain" unoptimized />
+              </div>
+              <span className="text-[9px] md:text-[10px] font-heading font-bold tracking-widest uppercase text-white/90">Thời trang dạo phố</span>
+            </div>
+
+            {/* Casual Tag */}
+            <div className="relative group flex items-center gap-2.5 bg-white/80 backdrop-blur-xl p-1.5 pr-4 md:pr-5 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-white/60 cursor-pointer hover:-rotate-3 hover:scale-105 transition-all duration-400 md:ml-10">
+              <div className="flex items-center justify-center size-7 md:size-8 rounded-full bg-gradient-to-br from-[#D9C5B2]/40 to-transparent shadow-sm border border-white overflow-hidden">
+                <Image src="/Icon/Bình-thường.png" alt="Bình thường" width={18} height={18} className="object-contain" unoptimized />
+              </div>
+              <span className="text-[9px] md:text-[10px] font-heading font-bold tracking-widest uppercase text-[#1A1A1A]">Bình thường</span>
+            </div>
           </div>
 
-          <div className="chat-float-4 absolute opacity-0 bottom-[20vh] md:bottom-[25vh] left-[5vw] md:left-[40vw] bg-white/95 rounded-2xl px-4 md:px-5 py-2 md:py-3 shadow-lg border border-white/60 flex items-center gap-2 md:gap-3">
-            <div className="size-8 md:size-10 rounded-full bg-[#4A8C6E]/10 flex items-center justify-center">
-              <Check className="size-4 md:size-5 text-[#4A8C6E]" />
+          <div className="chat-float-4 absolute opacity-0 bottom-[20vh] md:bottom-[25vh] left-[5vw] md:left-[40vw] bg-white/70 backdrop-blur-xl rounded-2xl px-4 md:px-5 py-2.5 md:py-3 shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-white/60 flex items-center gap-3 md:gap-4 hover:scale-105 transition-transform duration-500">
+            <div className="relative size-10 md:size-12 rounded-full bg-gradient-to-tr from-[#D9C5B2] to-[#B8975A] flex items-center justify-center shadow-lg">
+              <div className="absolute inset-[2px] bg-white rounded-full flex items-center justify-center">
+                <Check className="size-4 md:size-5 text-[#B8975A]" />
+              </div>
             </div>
             <div>
-              <div className="text-[10px] md:text-xs font-bold text-[#1A1A1A]">Phù hợp 95%</div>
-              <div className="text-[9px] md:text-[10px] text-[#5A5A5A]">Với phong cách của bạn</div>
+              <div className="text-[12px] md:text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#B8975A] to-[#8C6E4A]">
+                Phù hợp 95%
+              </div>
+              <div className="text-[9px] md:text-[10px] text-[#5A5A5A] font-medium mt-0.5">Với phong cách của bạn</div>
             </div>
           </div>
         </div>
@@ -217,7 +239,7 @@ export function LandingClient() {
         </div>
 
         {/* ── COPY TEXTS (Left Side) ── */}
-        <div className="absolute top-[30%] md:top-[38%] left-[5vw] z-50 w-[90vw] md:w-[35vw] md:max-w-[300px] text-left pointer-events-none">
+        <div className="absolute top-[30%] md:top-[38%] left-[5vw] z-50 w-[90vw] md:w-[35vw] md:max-w-[400px] text-left pointer-events-none">
           <CopyBlock className="copy-1" badge={<><Sparkles className="size-3" /> Tủ đồ kỹ thuật số</>} heading="Số hoá tủ đồ." body="Chụp 1 lần. AI tự động bóc tách nền, phân loại màu sắc và chất liệu." />
           <CopyBlock className="copy-2" badge={<><Check className="size-3" /> Gợi ý từ AI</>} heading="Stylist Cá Nhân." body="Hàng ngàn gợi ý phối đồ từ chính tủ đồ của bạn. Đổi món cực nhanh chỉ với 1 chạm." />
           <CopyBlock className="copy-3" badge={<><MessageCircle className="size-3" /> Trợ lý AI</>} heading="Hiểu gu của bạn." body="Closy phân tích thời tiết, hoàn cảnh và thấu hiểu phong cách riêng để tư vấn mỗi ngày." />
@@ -306,30 +328,15 @@ export function LandingClient() {
         <h2 id="testimonials-heading" className="font-heading text-3xl sm:text-4xl md:text-6xl text-center text-[#1A1A1A] mb-12 md:mb-16 font-medium">
           Gen Z nói gì về Closy?
         </h2>
-        <div className="max-w-3xl mx-auto space-y-6 md:space-y-8 flex flex-col">
-          {TESTIMONIALS.map((t, i) => (
-            <div key={i} className={`flex justify-${t.align}`}>
-              <div className="testimonial-bubble opacity-0 bg-white rounded-2xl p-5 md:p-6 shadow-lg max-w-md border border-[#1A1A1A]/5 flex items-start gap-3 md:gap-4 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div
-                  className="size-9 md:size-10 rounded-full flex items-center justify-center shrink-0 font-bold text-white text-xs md:text-sm"
-                  style={{ backgroundColor: t.bgColor }}
-                >
-                  {t.initials}
-                </div>
-                <div>
-                  <div className="text-xs md:text-sm font-bold text-[#1A1A1A]">{t.user}</div>
-                  <div className="text-[#5A5A5A] text-sm md:text-base mt-1 md:mt-2 italic">{t.quote}</div>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="max-w-4xl mx-auto flex flex-col">
+          <StaggerTestimonials />
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          6. FAQ
+          7. FAQ
           ═══════════════════════════════════════════════════════ */}
-      <FAQSection />
+      <FAQs />
 
       {/* ═══════════════════════════════════════════════════════
           7. FINAL CTA
@@ -363,16 +370,16 @@ export function LandingClient() {
       {/* ═══════════════════════════════════════════════════════
           8. FOOTER
           ═══════════════════════════════════════════════════════ */}
-      <footer className="w-full bg-[#1A1A1A] border-t border-white/10 text-[#707070] py-10 md:py-12 px-6 relative z-10" role="contentinfo">
+      <footer className="w-full bg-[#1A1A1A] bg-[url('/footer.png')] bg-cover bg-center border-t border-white/10 text-[#707070] py-10 md:py-12 px-6 relative z-10" role="contentinfo">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="font-heading text-2xl font-bold text-white">Closy.</div>
+          <div className="font-heading text-5xl md:text-6xl font-bold text-[#1A1A1A]">CLOSY</div>
           <div className="flex gap-6 md:gap-8 text-sm">
             <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Instagram">Instagram</a>
             <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="TikTok">TikTok</a>
             <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Chính sách bảo mật">Chính sách</a>
             <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Liên hệ">Liên hệ</a>
           </div>
-          <p className="text-xs md:text-sm">© 2026 Closy. Built for Gen Z.</p>
+          <p className="text-xs md:text-sm">© 2026 Closy. Built by HYCAT TEAM.</p>
         </div>
       </footer>
     </div>
@@ -388,7 +395,7 @@ function CopyBlock({
 }: {
   className: string;
   badge: React.ReactNode;
-  heading: string;
+  heading: React.ReactNode;
   body: string;
 }) {
   return (

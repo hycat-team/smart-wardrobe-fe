@@ -88,7 +88,7 @@ export function DashboardClient() {
           </div>
           
           <div className="h-[300px] w-full relative">
-            <ResponsiveContainer width="100%" height="100%" minHeight={300} minWidth={100}>
+            <ResponsiveContainer width="99%" height={300}>
               <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
                 <XAxis dataKey="name" stroke="#A3A3A3" fontSize={10} fontFamily="IBM Plex Mono" tickLine={false} axisLine={false} />

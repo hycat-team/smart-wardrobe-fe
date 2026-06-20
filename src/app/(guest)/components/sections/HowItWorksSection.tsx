@@ -4,6 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import Image from "next/image";
 import { HOW_IT_WORKS_STEPS } from "../data/landing-data";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -15,75 +16,110 @@ export function HowItWorksSection() {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) return;
 
-    gsap.fromTo(".step-card",
-      { y: 40, opacity: 0 },
+    const tl = gsap.timeline({
+      scrollTrigger: { 
+        trigger: sectionRef.current, 
+        start: "top 70%",
+        toggleActions: "play none none reverse"
+      }
+    });
+
+    tl.fromTo(".step-card",
+      { y: 60, opacity: 0, scale: 0.95 },
       {
-        y: 0, opacity: 1,
+        y: 0, opacity: 1, scale: 1,
         stagger: 0.2,
-        duration: 0.8,
-        ease: "power2.out",
-        scrollTrigger: { trigger: sectionRef.current, start: "top 75%" }
+        duration: 1,
+        ease: "back.out(1.5)",
       }
     );
 
-    gsap.fromTo(".step-connector",
-      { scaleX: 0 },
+    tl.fromTo(".step-connector",
+      { scaleX: 0, opacity: 0 },
       {
         scaleX: 1,
-        stagger: 0.3,
-        duration: 0.6,
+        opacity: 1,
+        stagger: 0.2,
+        duration: 0.8,
         ease: "power2.inOut",
-        scrollTrigger: { trigger: sectionRef.current, start: "top 70%" }
-      }
+      },
+      "-=0.6"
     );
+    
+    // Subtle floating animation for the emojis
+    gsap.to(".step-emoji", {
+      y: -5,
+      duration: 2,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+      stagger: 0.3
+    });
+
   }, { scope: sectionRef });
 
   return (
     <section
       ref={sectionRef}
-      className="how-it-works-section w-full py-24 md:py-32 px-6 bg-[#F4F1EE] relative z-10"
+      className="how-it-works-section w-full py-24 md:py-32 px-6 bg-[#F4F1EE] relative z-10 overflow-hidden"
       role="region"
       aria-labelledby="how-it-works-heading"
     >
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16 md:mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#1A1A1A]/10 text-xs font-bold text-[#D9C5B2] uppercase tracking-widest mb-6 shadow-sm">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,_#D9C5B2_0%,_transparent_70%)] opacity-[0.15]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,_#D4DECE_0%,_transparent_70%)] opacity-[0.15]" />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="text-center mb-16 md:mb-24">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/60 backdrop-blur-md border border-white/40 text-[10px] md:text-xs font-bold text-[#D9C5B2] uppercase tracking-widest mb-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D9C5B2] animate-pulse" />
             Cách hoạt động
           </div>
           <h2
             id="how-it-works-heading"
-            className="font-heading text-4xl md:text-6xl text-[#1A1A1A] font-medium"
+            className="font-heading text-4xl sm:text-5xl md:text-6xl text-[#1A1A1A] font-medium tracking-tight"
           >
             3 Bước Đơn Giản
           </h2>
+          <p className="mt-4 text-[#707070] text-sm md:text-base max-w-lg mx-auto font-medium">
+            Biến tủ đồ lộn xộn thành một không gian thời trang số hóa, thông minh và đầy cảm hứng chỉ với 3 thao tác.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 relative">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 relative">
           {/* Connector lines (desktop only) */}
-          <div className="hidden md:block absolute top-[60px] left-[calc(33.33%+20px)] right-[calc(33.33%+20px)] z-0">
-            <div className="step-connector h-px bg-[#D9C5B2]/40 w-full origin-left" />
+          {/* Positioned at center of circles: circle is 96px, top padding is 32px => 32+48 = 80px */}
+          <div className="hidden md:block absolute top-[80px] left-[calc(16.66%+48px)] w-[calc(33.33%-96px)] z-0">
+            <div className="step-connector h-[2px] bg-gradient-to-r from-[#D9C5B2]/20 via-[#D9C5B2]/80 to-[#D9C5B2]/20 w-full origin-left opacity-0 rounded-full" />
           </div>
-          <div className="hidden md:block absolute top-[60px] left-[calc(66.66%-20px)] w-[calc(33.33%-40px)] z-0">
-            <div className="step-connector h-px bg-[#D9C5B2]/40 w-full origin-left" />
+          <div className="hidden md:block absolute top-[80px] left-[calc(50%+48px)] w-[calc(33.33%-96px)] z-0">
+            <div className="step-connector h-[2px] bg-gradient-to-r from-[#D9C5B2]/20 via-[#D9C5B2]/80 to-[#D9C5B2]/20 w-full origin-left opacity-0 rounded-full" />
           </div>
 
           {HOW_IT_WORKS_STEPS.map((step) => (
             <div
               key={step.number}
-              className="step-card opacity-0 group relative bg-white rounded-3xl p-8 md:p-10 border border-[#1A1A1A]/5 shadow-sm hover:shadow-lg transition-shadow duration-300 z-10"
+              className="step-card group relative bg-white/60 backdrop-blur-xl rounded-[2rem] p-8 md:p-10 border border-white shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(217,197,178,0.15)] hover:-translate-y-2 transition-all duration-500 z-10 flex flex-col items-center text-center"
             >
-              {/* Step number */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="size-12 md:size-14 rounded-2xl bg-[#1A1A1A] flex items-center justify-center text-white font-heading text-xl md:text-2xl font-bold group-hover:bg-[#D9C5B2] transition-colors duration-300">
-                  {step.number}
+              {/* Step number & Icon container */}
+              <div className="relative mb-8">
+                <div className="absolute inset-0 bg-[#D9C5B2]/20 rounded-full blur-xl scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative size-20 md:size-24 rounded-full bg-white shadow-md border border-[#1A1A1A]/5 flex items-center justify-center overflow-hidden group-hover:border-[#D9C5B2]/30 transition-colors duration-300">
+                  <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-bold text-[#A3A3A3] group-hover:text-[#D9C5B2] transition-colors">
+                    {step.number}
+                  </div>
+                  <span className="step-emoji mt-2 block group-hover:scale-110 transition-transform duration-300">
+                    <Image src={step.iconSrc} alt={step.title} width={48} height={48} className="object-contain drop-shadow-sm" />
+                  </span>
                 </div>
-                <span className="text-3xl">{step.emoji}</span>
               </div>
 
-              <h3 className="text-xl md:text-2xl font-bold text-[#1A1A1A] mb-3">
+              <h3 className="text-xl md:text-2xl font-bold text-[#1A1A1A] mb-4 group-hover:text-[#D9C5B2] transition-colors duration-300">
                 {step.title}
               </h3>
-              <p className="text-[#5A5A5A] text-base leading-relaxed">
+              <p className="text-[#5A5A5A] text-sm md:text-base leading-relaxed">
                 {step.description}
               </p>
             </div>
