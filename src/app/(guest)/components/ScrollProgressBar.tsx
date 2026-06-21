@@ -20,15 +20,15 @@ export function ScrollProgressBar() {
 
     ScrollTrigger.create({
       // Lấy trực tiếp class ngoài component (tránh lỗi scope)
-      trigger: document.querySelector(".scrolly-container"), 
-      
+      trigger: document.querySelector(".scrolly-container"),
+
       // 'start' điều chỉnh lúc BẮT ĐẦU HIỂN THỊ: 
       // "top top" = khi mép trên scrolly-container chạm đỉnh màn hình
       // Có thể đổi thành "top 20%" hoặc "200px top" để delay hiển thị
-      start: "top top", 
-      
+      start: "top top",
+
       // 'end' điều chỉnh lúc KẾT THÚC (biến mất):
-      end: "+=12000", 
+      end: "+=12000",
       scrub: true,
       onUpdate: (self) => {
         setProgress(self.progress);
@@ -37,12 +37,16 @@ export function ScrollProgressBar() {
     });
   }, { scope: containerRef });
 
-  const activeScene = Math.min(Math.floor(progress * 4), 3);
+  // const activeScene = Math.min(Math.floor(progress * 4), 3);
+  let activeScene = 0;
+  if (progress >= 0.40) activeScene = 1; // Cuộn qua 15% sẽ nhảy sang step 2
+  if (progress >= 0.55) activeScene = 2; // Cuộn qua 45% sẽ nhảy sang step 3
+  if (progress >= 0.85) activeScene = 3; // Cuộn qua 80% sẽ nhảy sang step 4
 
   return (
     <div
       ref={containerRef}
-      className={`fixed right-6 md:right-8 top-1/2 -translate-y-1/2 z-[90] flex flex-col items-end gap-3 transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0 pointer-events-none"
+      className={`hidden md:flex fixed right-6 md:right-8 top-1/2 -translate-y-1/2 z-[90] flex-col items-end gap-3 transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       role="navigation"
       aria-label="Scroll progress"
@@ -52,8 +56,8 @@ export function ScrollProgressBar() {
           {/* Label (right side, hidden on mobile) */}
           <span
             className={`hidden md:block text-[10px] font-bold uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${i === activeScene
-                ? "text-[#1A1A1A] opacity-100 translate-x-0"
-                : "text-[#707070] opacity-0 translate-x-2 group-hover:opacity-70 group-hover:translate-x-0"
+              ? "text-[#1A1A1A] opacity-100 translate-x-0"
+              : "text-[#707070] opacity-0 translate-x-2 group-hover:opacity-70 group-hover:translate-x-0"
               }`}
           >
             {label}
@@ -63,10 +67,10 @@ export function ScrollProgressBar() {
           <div className="relative flex items-center justify-center w-6 h-6">
             <div
               className={`rounded-full transition-all duration-500 ${i === activeScene
-                  ? "size-3 bg-[#D9C5B2] shadow-[0_0_12px_rgba(217,197,178,0.5)]"
-                  : i < activeScene
-                    ? "size-2 bg-[#1A1A1A]"
-                    : "size-2 bg-[#1A1A1A]/20"
+                ? "size-3 bg-[#D9C5B2] shadow-[0_0_12px_rgba(217,197,178,0.5)]"
+                : i < activeScene
+                  ? "size-2 bg-[#1A1A1A]"
+                  : "size-2 bg-[#1A1A1A]/20"
                 }`}
             />
             {/* Active ring */}
