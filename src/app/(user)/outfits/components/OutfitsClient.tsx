@@ -28,6 +28,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 gsap.registerPlugin(useGSAP);
 
@@ -42,9 +51,11 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const searchParams = useSearchParams();
   const filterParam = searchParams.get("filter") || "all";
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useMyOutfits();
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
+  const { data, isLoading } = useMyOutfits(pageParam);
   const rawInitialOutfits = Array.isArray(initialOutfits) ? initialOutfits : ((initialOutfits as any)?.items || []);
-  const outfits = data ? data.pages.flatMap(p => p.items) : rawInitialOutfits;
+  const outfits = data ? data.items : rawInitialOutfits;
+  const metadata = data?.metadata;
   const deleteOutfitMutation = useDeleteOutfit();
 
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
@@ -83,6 +94,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
     } else {
       params.set("filter", filter);
     }
+    params.set("page", "1");
     router.push("?" + params.toString(), { scroll: false });
   };
 
@@ -245,16 +257,79 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
         </div>
       )}
 
-      {hasNextPage && (
-        <div className="mt-16 flex justify-center border-t border-black/10 pt-12">
-          <button
-            onClick={() => fetchNextPage()}
-            disabled={isFetchingNextPage}
-            className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase text-[#666] hover:text-[#111] disabled:opacity-50 transition-colors border-b border-transparent hover:border-[#111] pb-1"
-          >
-            {isFetchingNextPage ? 'Đang tải...' : 'Tải thêm'}
-          </button>
-        </div>
+      {metadata && metadata.totalPages > 1 && (
+        <Pagination className="mt-16 pb-12">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (pageParam > 1) {
+                    const params = new URLSearchParams(searchParams);
+                    params.set("page", (pageParam - 1).toString());
+                    router.push("?" + params.toString(), { scroll: false });
+                  }
+                }}
+                className={pageParam <= 1 ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                text="TRƯỚC"
+              />
+            </PaginationItem>
+
+            {[...Array(metadata.totalPages)].map((_, i) => {
+              const pageNum = i + 1;
+              if (
+                pageNum === 1 ||
+                pageNum === metadata.totalPages ||
+                (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)
+              ) {
+                return (
+                  <PaginationItem key={pageNum}>
+                    <PaginationLink
+                      href="#"
+                      isActive={pageParam === pageNum}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const params = new URLSearchParams(searchParams);
+                        params.set("page", pageNum.toString());
+                        router.push("?" + params.toString(), { scroll: false });
+                      }}
+                      className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest rounded-none border-black/10"
+                    >
+                      {pageNum}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              }
+
+              if (pageNum === pageParam - 2 || pageNum === pageParam + 2) {
+                return (
+                  <PaginationItem key={pageNum}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                );
+              }
+
+              return null;
+            })}
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (pageParam < metadata.totalPages) {
+                    const params = new URLSearchParams(searchParams);
+                    params.set("page", (pageParam + 1).toString());
+                    router.push("?" + params.toString(), { scroll: false });
+                  }
+                }}
+                className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                text="SAU"
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       )}
 
       {/* Delete Confirmation Popup */}

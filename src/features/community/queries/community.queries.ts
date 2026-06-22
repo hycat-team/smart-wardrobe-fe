@@ -17,7 +17,7 @@ export const useInfiniteCommunity = (filters?: { sort?: string; username?: strin
     queryFn: ({ pageParam = 1 }) => communityApi.getCommunityPosts({ ...filters, page: pageParam as number, limit: 10 }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
+      if (lastPage.metadata.page < lastPage.metadata.totalPages) return lastPage.metadata.page + 1;
       return undefined;
     },
     placeholderData: keepPreviousData,

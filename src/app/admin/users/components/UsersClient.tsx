@@ -22,6 +22,15 @@ import {
   DialogContent,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 import { useAdminUsers, useUpdateUserStatus } from "@/features/admin/queries/admin.queries";
 
 export function UsersClient() {
@@ -144,15 +153,68 @@ export function UsersClient() {
         </Table>
 
         {data?.metadata && data.metadata.totalPages > 1 && (
-          <div className="flex justify-between items-center mt-6 pt-4 border-t border-black/10">
-            <span className="font-['IBM_Plex_Mono'] text-[10px] text-[#666] uppercase tracking-widest">
-              TRANG {page} / {data.metadata.totalPages}
-            </span>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="rounded-none border-black/10 font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-widest text-[#111] hover:bg-black/5" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>TRƯỚC</Button>
-              <Button variant="outline" size="sm" className="rounded-none border-black/10 font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-widest text-[#111] hover:bg-black/5" disabled={page >= data.metadata.totalPages} onClick={() => setPage(p => p + 1)}>SAU</Button>
-            </div>
-          </div>
+          <Pagination className="mt-16 pb-12">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (page > 1) setPage((p) => p - 1);
+                  }}
+                  className={page <= 1 ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                  text="TRƯỚC"
+                />
+              </PaginationItem>
+
+              {[...Array(data.metadata.totalPages)].map((_, i) => {
+                const pageNum = i + 1;
+                if (
+                  pageNum === 1 ||
+                  pageNum === data.metadata.totalPages ||
+                  (pageNum >= page - 1 && pageNum <= page + 1)
+                ) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        href="#"
+                        isActive={page === pageNum}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage(pageNum);
+                        }}
+                        className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest rounded-none border-black/10"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
+
+                if (pageNum === page - 2 || pageNum === page + 2) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
+
+                return null;
+              })}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (page < data.metadata.totalPages) setPage((p) => p + 1);
+                  }}
+                  className={page >= data.metadata.totalPages ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                  text="SAU"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         )}
       </div>
 

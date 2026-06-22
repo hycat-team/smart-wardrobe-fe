@@ -62,7 +62,7 @@ export default function WalletPage() {
               <TransactionHistory 
                 statements={statementsResult?.items || []} 
                 page={page}
-                totalPages={statementsResult?.totalPages || 1}
+                totalPages={statementsResult?.metadata?.totalPages || 1}
                 onPageChange={setPage}
               />
             </div>

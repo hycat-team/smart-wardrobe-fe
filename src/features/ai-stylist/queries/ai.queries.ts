@@ -20,8 +20,8 @@ export const useChatMessages = (contextID: string, enabled: boolean = true) => {
     queryFn: ({ pageParam = 1 }) => aiApi.getChatMessages(contextID, { page: pageParam, limit: 20 }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) {
-        return lastPage.page + 1;
+      if (lastPage.metadata.page < lastPage.metadata.totalPages) {
+        return lastPage.metadata.page + 1;
       }
       return undefined;
     },

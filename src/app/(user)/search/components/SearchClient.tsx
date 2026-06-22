@@ -34,7 +34,7 @@ export function SearchClient() {
 
   // Searching logic
   const { data: myWardrobeData, isLoading: isSearchLoading } = useMyWardrobe();
-  const rawItems = myWardrobeData ? myWardrobeData.pages.flatMap(page => page.items) : [];
+  const rawItems = myWardrobeData ? myWardrobeData.items : [];
 
   const realItems = rawItems.filter((item: any) => {
     if (!query) return true;

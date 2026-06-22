@@ -22,7 +22,8 @@ import {
   ScanBarcode,
   ScanBarcodeIcon,
   ScanQrCode,
-  PlusCircle
+  PlusCircle,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -101,17 +102,23 @@ export function Sidebar() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[240px] rounded-2xl bg-background/95 backdrop-blur-xl border-border/40 p-2 shadow-xl">
           <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+            <Link href="/profile" className="flex items-center gap-3 w-full text-foreground/80">
+              <User className="size-4" />
+              <span className="font-body-sm text-[13px] font-medium">Hồ sơ</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
             <Link href="/profile/update" className="flex items-center gap-3 w-full text-foreground/80">
               <Settings className="size-4" />
               <span className="font-body-sm text-[13px] font-medium">Cài đặt</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+          {/* <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
             <Link href="/support" className="flex items-center gap-3 w-full text-foreground/80">
               <HelpCircle className="size-4" />
               <span className="font-body-sm text-[13px] font-medium">Hỗ trợ</span>
             </Link>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuSeparator className="my-1 bg-border/40" />
           <DropdownMenuItem
             onClick={handleLogout}

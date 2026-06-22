@@ -11,28 +11,18 @@ export const WARDROBE_QUERY_KEYS = {
   categories: () => [...WARDROBE_QUERY_KEYS.all, 'categories'] as const,
 };
 
-export const useMyWardrobe = (categorySlug?: string) => {
-  return useInfiniteQuery({
-    queryKey: [...WARDROBE_QUERY_KEYS.lists(), categorySlug],
-    queryFn: ({ pageParam = 1 }) => wardrobeApi.getMyWardrobeItems({ page: pageParam as number, limit: 20, category_slug: categorySlug }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
-      return undefined;
-    },
+export const useMyWardrobe = (categorySlug?: string, page: number = 1) => {
+  return useQuery({
+    queryKey: [...WARDROBE_QUERY_KEYS.lists(), categorySlug, page],
+    queryFn: () => wardrobeApi.getMyWardrobeItems({ page, limit: 20, categorySlug: categorySlug }),
     placeholderData: keepPreviousData,
   });
 };
 
-export const useSystemCatalogItems = (categorySlug?: string, q?: string) => {
-  return useInfiniteQuery({
-    queryKey: [...WARDROBE_QUERY_KEYS.all, 'system-catalog', categorySlug, q],
-    queryFn: ({ pageParam = 1 }) => wardrobeApi.getSystemCatalogItems({ page: pageParam as number, limit: 20, category_slug: categorySlug, q }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
-      return undefined;
-    },
+export const useSystemCatalogItems = (categorySlug?: string, q?: string, page: number = 1) => {
+  return useQuery({
+    queryKey: [...WARDROBE_QUERY_KEYS.all, 'system-catalog', categorySlug, q, page],
+    queryFn: () => wardrobeApi.getSystemCatalogItems({ page, limit: 20, categorySlug: categorySlug, q }),
     placeholderData: keepPreviousData,
   });
 };
@@ -125,10 +115,10 @@ export const useBulkDeleteWardrobeItems = () => {
 export const useSearchWardrobeItems = (query: string, categorySlug?: string) => {
   return useInfiniteQuery({
     queryKey: [...WARDROBE_QUERY_KEYS.search(query), categorySlug],
-    queryFn: ({ pageParam = 1 }) => wardrobeApi.searchWardrobeItems({ q: query, page: pageParam as number, limit: 20, category_slug: categorySlug }),
+    queryFn: ({ pageParam = 1 }) => wardrobeApi.searchWardrobeItems({ q: query, page: pageParam as number, limit: 20, categorySlug: categorySlug }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
+      if (lastPage.metadata.page < lastPage.metadata.totalPages) return lastPage.metadata.page + 1;
       return undefined;
     },
     enabled: query.trim().length > 0,

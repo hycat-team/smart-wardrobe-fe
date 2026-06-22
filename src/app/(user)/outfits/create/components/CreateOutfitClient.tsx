@@ -41,7 +41,7 @@ function CreateOutfitContent() {
 
   // Load real wardrobe items
   const { data, isLoading: isLoadingWardrobe } = useMyWardrobe();
-  const realItems = data ? data.pages.flatMap(p => p.items) : [];
+  const realItems = data ? data.items : [];
   const createOutfitMutation = useCreateOutfit();
   const {
     selectedItems,

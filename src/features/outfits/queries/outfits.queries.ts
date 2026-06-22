@@ -8,15 +8,10 @@ export const OUTFIT_QUERY_KEYS = {
   detail: (id: string) => [...OUTFIT_QUERY_KEYS.all, 'detail', id] as const,
 };
 
-export const useMyOutfits = () => {
-  return useInfiniteQuery({
-    queryKey: OUTFIT_QUERY_KEYS.lists(),
-    queryFn: ({ pageParam = 1 }) => outfitsApi.getMyOutfits({ page: pageParam as number, limit: 20 }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
-      return undefined;
-    },
+export const useMyOutfits = (page: number = 1) => {
+  return useQuery({
+    queryKey: [...OUTFIT_QUERY_KEYS.lists(), page],
+    queryFn: () => outfitsApi.getMyOutfits({ page, limit: 20 }),
   });
 };
 
