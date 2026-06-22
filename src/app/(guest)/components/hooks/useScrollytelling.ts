@@ -121,12 +121,13 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
 
     tl.to(".copy-1", { opacity: 0, y: -50, duration: 0.5 })
       .to(".cloth-card:not(.outfit-item)", { scale: 0, opacity: 0, stagger: 0.05, duration: 0.5 })
-      .to(".outfit-top", { x: outfitX, y: isMobile ? "-22vh" : "-18vh", rotation: 0, scale: isMobile ? 1 : 1.2, duration: 1.5, ease: "power3.inOut", zIndex: 30 }, "<")
-      .to(".outfit-bottom", { x: outfitX, y: isMobile ? "-2vh" : "2vh", rotation: 0, scale: isMobile ? 1 : 1.2, duration: 1.5, ease: "power3.inOut", zIndex: 20 }, "<")
-      .to(".outfit-shoes", { x: outfitX, y: isMobile ? "16vh" : "18vh", rotation: 0, scale: isMobile ? 0.9 : 1.1, duration: 1.5, ease: "power3.inOut", zIndex: 10 }, "<")
-      .to(".outfit-acc", { x: isMobile ? "18vw" : "22vw", y: "0vh", rotation: 15, scale: isMobile ? 0.8 : 1, duration: 1.5, ease: "power3.inOut", zIndex: 40 }, "<")
+      .to(".wardrobe-container", { opacity: isMobile ? 0 : 0.85, duration: 1 }, "<")
+      .to(".outfit-top", { x: outfitX, y: isMobile ? "8vh" : "-18vh", rotation: isMobile ? -2 : 0, scale: isMobile ? 0.85 : 1.2, duration: 1.5, ease: "power3.inOut", zIndex: 30 }, "<")
+      .to(".outfit-bottom", { x: isMobile ? "-10vw" : outfitX, y: isMobile ? "18vh" : "2vh", rotation: isMobile ? 2 : 0, scale: isMobile ? 0.85 : 1.2, duration: 1.5, ease: "power3.inOut", zIndex: 20 }, "<")
+      .to(".outfit-shoes", { x: isMobile ? "-45vw" : outfitX, y: isMobile ? "-20vh" : "18vh", rotation: isMobile ? -5 : 0, scale: isMobile ? 0.75 : 1.1, duration: 1.5, ease: "power3.inOut", zIndex: 10 }, "<")
+      .to(".outfit-acc", { x: isMobile ? "10vw" : "22vw", y: isMobile ? "15vh" : "5vh", rotation: 15, scale: isMobile ? 0.7 : 1, duration: 1.5, ease: "power3.inOut", zIndex: 40 }, "<")
       .fromTo(".magic-glow", { opacity: 0, scale: 0, x: "0vw" }, { opacity: 1, scale: 1.5, x: outfitX, duration: 1 }, "<0.5")
-      .fromTo(".outfit-ai-core", { scale: 0, opacity: 0, x: outfitX, y: "-2vh" }, { scale: 1, opacity: 1, x: outfitX, y: "-2vh", duration: 1, ease: "back.out(1.5)" }, "<0.2")
+      .fromTo(".outfit-ai-core", { scale: 0, opacity: 0, x: outfitX, y: "-2vh" }, { scale: 1, opacity: 1, x: isMobile ? "-20vw" : outfitX, y: isMobile ? "7vh" : "-2vh", duration: 1, ease: "back.out(1.5)" }, "<0.2")
       .fromTo(".copy-2", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 }, "<");
 
     // ── SCENE 3: AI Chatbot ──
@@ -134,8 +135,8 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
       .to(".outfit-group", { opacity: 0, scale: 0.5, duration: 1 }, "<")
       .to(".wardrobe-container", { opacity: 0, duration: 1 }, "<")
       .fromTo(".chat-interface",
-        { opacity: 0, x: "40vw", y: "5vh", scale: 0.9 },
-        { opacity: 1, x: isMobile ? "0vw" : "12vw", y: "-5vh", scale: 1, duration: 1.5, ease: "back.out(1)" }, "<")
+        { opacity: 0, x: "40vw", y: isMobile ? "20vh" : "5vh", scale: 0.9 },
+        { opacity: 1, x: isMobile ? "0vw" : "12vw", y: isMobile ? "12vh" : "-5vh", scale: 1, duration: 1.5, ease: "back.out(1)" }, "<")
       .fromTo(".chat-bubble-1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "+=0.2")
       .fromTo(".chat-bubble-2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "+=0.2");
 
@@ -146,8 +147,9 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
         .fromTo(".chat-float-3", { opacity: 0, y: -30, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.2")
         .fromTo(".chat-float-4", { opacity: 0, x: 20, y: -20, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.2");
     } else {
-      // Mobile: show only match score
-      tl.fromTo(".chat-float-4", { opacity: 0, y: 20, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.3");
+      // Mobile: show match score and weather
+      tl.fromTo(".chat-float-4", { opacity: 0, y: 20, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.3")
+        .fromTo(".chat-float-1", { opacity: 0, x: 20, y: 10, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.2");
     }
 
     tl.fromTo(".chat-bubble-3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "+=0.1")
@@ -159,9 +161,9 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
       .to(".chat-float-1, .chat-float-2, .chat-float-3, .chat-float-4", { opacity: 0, scale: 0.5, duration: 0.5 }, "<");
 
     if (isMobile) {
-      tl.fromTo(".feed-card-1", { x: "30vw", y: "0vh", opacity: 0, rotation: 10 }, { x: "-3vw", y: "-12vh", opacity: 1, rotation: -2, duration: 1.5, ease: "power2.out" }, "<0.2")
-        .fromTo(".feed-card-2", { x: "30vw", y: "0vh", opacity: 0, rotation: -10 }, { x: "5vw", y: "-25vh", opacity: 1, rotation: 3, duration: 1.5, ease: "power2.out" }, "<0.2")
-        .fromTo(".feed-card-3", { x: "30vw", y: "0vh", opacity: 0, rotation: 15 }, { x: "0vw", y: "8vh", opacity: 1, rotation: -1, duration: 1.5, ease: "power2.out" }, "<0.2");
+      tl.fromTo(".feed-card-1", { x: "30vw", y: "0vh", opacity: 0, rotation: 10, scale: 0.8 }, { x: "-12vw", y: "2vh", opacity: 1, rotation: -6, scale: 0.85, duration: 1.5, ease: "power2.out", zIndex: 10 }, "<0.2")
+        .fromTo(".feed-card-2", { x: "30vw", y: "0vh", opacity: 0, rotation: -10, scale: 0.8 }, { x: "15vw", y: "15vh", opacity: 1, rotation: 6, scale: 0.85, duration: 1.5, ease: "power2.out", zIndex: 20 }, "<0.2")
+        .fromTo(".feed-card-3", { x: "30vw", y: "0vh", opacity: 0, rotation: 15, scale: 0.8 }, { x: "-5vw", y: "30vh", opacity: 1, rotation: -2, scale: 0.85, duration: 1.5, ease: "power2.out", zIndex: 30 }, "<0.2");
     } else {
       tl.fromTo(".feed-card-1", { x: "30vw", y: "0vh", opacity: 0, rotation: 10 }, { x: "-5vw", y: "-8vh", opacity: 1, rotation: -3, duration: 1.5, ease: "power2.out" }, "<0.2")
         .fromTo(".feed-card-2", { x: "30vw", y: "0vh", opacity: 0, rotation: -10 }, { x: "12vw", y: "-15vh", opacity: 1, rotation: 5, duration: 1.5, ease: "power2.out" }, "<0.2")

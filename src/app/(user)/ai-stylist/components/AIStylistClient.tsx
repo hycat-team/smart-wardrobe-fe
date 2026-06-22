@@ -1,13 +1,13 @@
 "use client";
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import Image from "next/image";
-import { Sparkles, Save, RefreshCw, MoveRight, ZoomOut, ZoomIn, MoveUp, RefreshCcw, Layers, SlidersHorizontal } from "lucide-react";
+import { Sparkles, Save, RefreshCw, MoveRight, Layers, History, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { aiApi } from "@/features/ai-stylist/api/ai.api";
-import { AIOutfitRecommendationRes, ChatMessage } from "@/features/ai-stylist/types";
+import { AIOutfitRecommendationRes, ChatMessage, ChatSessionRes } from "@/features/ai-stylist/types";
+import { useChatSessions } from "@/features/ai-stylist/queries/ai.queries";
 import { useOutfitCanvas } from "@/features/outfits/hooks/useOutfitCanvas";
 import { OutfitCanvasBoard } from "@/features/outfits/components/OutfitCanvasBoard";
 import { motion } from "framer-motion";
@@ -19,11 +19,9 @@ import { toast } from "sonner";
 
 gsap.registerPlugin(useGSAP);
 
-const OCCASIONS = ["🎓 Đi học", "💼 Đi làm", "🌙 Hẹn hò", "🎉 Tiệc", "🏃 Thể thao", "🏠 Ở nhà"];
-const STYLES = ["Minimalist", "Casual", "Formal", "Trendy", "Vintage", "Streetwear"];
-const SEASONS = ["Mùa xuân", "Mùa hạ", "Mùa thu", "Mùa đông"];
-const WEATHERS = ["Ấm áp", "Lạnh", "Mưa", "Mát mẻ"];
-const COLOR_TONES = ["Sáng", "Tối", "Trung tính", "Nhiều màu"];
+import { AIChatMessage } from "@/features/ai-stylist/components/AIChatMessage";
+import { AIQuickOptions, OCCASIONS, STYLES, SEASONS, WEATHERS, COLOR_TONES, occasionMap } from "@/features/ai-stylist/components/AIQuickOptions";
+import { AIChatHistorySidebar } from "@/features/ai-stylist/components/AIChatHistorySidebar";
 
 export function AIStylistClient() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,6 +34,9 @@ export function AIStylistClient() {
   const [selectedWeather, setSelectedWeather] = useState<string>("");
   const [selectedColorTone, setSelectedColorTone] = useState<string>("");
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  const { data: chatSessionsData, isLoading: isLoadingSessions } = useChatSessions();
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -83,18 +84,55 @@ export function AIStylistClient() {
     );
   });
 
+  const handleSelectSession = async (session: ChatSessionRes) => {
+    setIsHistoryOpen(false);
+    setContextID(session.id);
+    setOutfitData(null); // Clear canvas to focus on chat
+    setSelectedItems([]);
+    setAlternativeIndices({});
+    setChatMessages([]);
+    
+    try {
+      toast.loading("Đang tải lịch sử...", { id: "load_history" });
+      const res = await aiApi.getChatMessages(session.id, { limit: 100 });
+      // Javascript Date().getTime() có thể bỏ qua microsecond.
+      // Dùng localeCompare để so sánh chuỗi ISO gốc chính xác đến microsecond.
+      // Nếu 2 tin nhắn có createdAt Y HỆT NHAU (do lưu cùng lúc vào DB), dùng originalIndex để gỡ hòa.
+      // Backend mặc định trả về tin nhắn mới nhất trước (DESC), nên index lớn hơn là tin nhắn cũ hơn.
+      const formattedMessages: ChatMessage[] = res.items.map((msg, index) => ({
+        id: msg.id,
+        role: (msg.sender.toLowerCase() === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+        content: msg.content,
+        timestamp: new Date(msg.createdAt).getTime(),
+        _rawTime: msg.createdAt,
+        _originalIndex: index
+      })).sort((a, b) => {
+        const timeDiff = a._rawTime.localeCompare(b._rawTime);
+        if (timeDiff !== 0) return timeDiff;
+        return b._originalIndex - a._originalIndex;
+      });
+      
+      setChatMessages(formattedMessages);
+      toast.success("Đã tải lịch sử trò chuyện", { id: "load_history" });
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Không thể tải lịch sử", { id: "load_history" });
+    }
+  };
+
+  const handleNewChat = () => {
+    setContextID("");
+    setOutfitData(null);
+    setSelectedItems([]);
+    setAlternativeIndices({});
+    setChatMessages([]);
+    setChatInput("");
+    setIsHistoryOpen(false);
+  };
+
   const handleGenerate = async (initialDetails?: string) => {
     try {
       setIsGenerating(true);
-
-      const occasionMap: Record<string, string> = {
-        "Đi học": "casual",
-        "Đi làm": "formal",
-        "Hẹn hò": "casual",
-        "Tiệc": "party",
-        "Thể thao": "sport",
-        "Ở nhà": "casual",
-      };
 
       const res = await aiApi.getOutfitRecommendation({
         colorTone: selectedColorTone ? selectedColorTone.toLowerCase() : "",
@@ -123,20 +161,32 @@ export function AIStylistClient() {
         setSelectedItems([]);
       }
 
-      setChatMessages([
-        {
-          id: crypto.randomUUID(),
-          role: 'ai',
-          content: res.explanation,
-          timestamp: Date.now(),
-        }
-      ]);
+      if (contextID) {
+        setChatMessages(prev => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            role: 'ai',
+            content: res.explanation,
+            timestamp: Date.now(),
+          }
+        ]);
+      } else {
+        setChatMessages([
+          {
+            id: crypto.randomUUID(),
+            role: 'ai',
+            content: res.explanation,
+            timestamp: Date.now(),
+          }
+        ]);
 
-      try {
-        const session = await aiApi.createChatSession({ title: res.title });
-        setContextID(session.id);
-      } catch (e) {
-        console.error("Failed to create chat session", e);
+        try {
+          const session = await aiApi.createChatSession({ title: res.title });
+          setContextID(session.id);
+        } catch (e) {
+          console.error("Failed to create chat session", e);
+        }
       }
 
       requestAnimationFrame(() => {
@@ -151,18 +201,42 @@ export function AIStylistClient() {
 
   const hasSelectedOptions = !!(selectedOccasion || selectedStyle || selectedSeason || selectedWeather || selectedColorTone);
 
+  const handleQuickGenerate = async () => {
+    let finalInput = chatInput.trim();
+    if (!finalInput && hasSelectedOptions) {
+      const opts = [selectedOccasion, selectedStyle, selectedSeason, selectedWeather, selectedColorTone].filter(Boolean);
+      finalInput = `Yêu cầu phối đồ: ${opts.join(', ')}`;
+    }
+
+    if (!finalInput) return;
+
+    const userMsg: ChatMessage = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: finalInput,
+      timestamp: Date.now()
+    };
+    
+    setChatMessages(prev => [...prev, userMsg]);
+    const inputForBackend = chatInput.trim();
+    setChatInput("");
+    setPopoverOpen(false);
+
+    await handleGenerate(inputForBackend);
+  };
+
   const handleSendMessage = async () => {
     if (isChatting) return;
 
+    let finalInput = chatInput.trim();
+    if (!finalInput && hasSelectedOptions) {
+      const opts = [selectedOccasion, selectedStyle, selectedSeason, selectedWeather, selectedColorTone].filter(Boolean);
+      finalInput = `Yêu cầu phối đồ: ${opts.join(', ')}`;
+    }
+
+    if (!finalInput) return;
+
     if (!outfitData && !contextID) {
-      if (!chatInput.trim() && !hasSelectedOptions) return;
-
-      let finalInput = chatInput.trim();
-      if (!finalInput) {
-        const opts = [selectedOccasion, selectedStyle, selectedSeason, selectedWeather, selectedColorTone].filter(Boolean);
-        finalInput = `Yêu cầu phối đồ: ${opts.join(', ')}`;
-      }
-
       const userMsg: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'user',
@@ -178,12 +252,10 @@ export function AIStylistClient() {
       return;
     }
 
-    if (!chatInput.trim()) return;
-
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
       role: 'user',
-      content: chatInput,
+      content: finalInput,
       timestamp: Date.now()
     };
 
@@ -312,6 +384,19 @@ export function AIStylistClient() {
       await createOutfitMutation.mutateAsync(payload);
       toast.success("Lưu bộ phối đồ thành công!", { id: "saving_outfit" });
 
+      // Reset state to initial
+      setOutfitData(null);
+      setSelectedItems([]);
+      setChatMessages([]);
+      setContextID("");
+      setSelectedOccasion("");
+      setSelectedStyle("");
+      setSelectedSeason("");
+      setSelectedWeather("");
+      setSelectedColorTone("");
+      setChatInput("");
+      setAlternativeIndices({});
+
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Đã xảy ra lỗi khi lưu.", { id: "saving_outfit" });
@@ -422,10 +507,10 @@ export function AIStylistClient() {
           </div>
 
           {/* Right Column: AI Chat Interface & Form (Span 4) */}
-          <div className="lg:col-span-4 h-[600px] lg:h-[800px] border border-[#E5E5E5] bg-white flex flex-col relative shadow-sm">
+          <div className="lg:col-span-4 h-[600px] lg:h-[800px] border border-[#E5E5E5] bg-white flex flex-col relative shadow-sm overflow-hidden">
 
             {/* Chat Header */}
-            <div className="p-5 border-b border-[#E5E5E5] flex items-center justify-between bg-[#F9F9F9]">
+            <div className="p-5 border-b border-[#E5E5E5] flex items-center justify-between bg-[#F9F9F9] z-10">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-black flex items-center justify-center text-white">
                   <Sparkles className="w-4 h-4" />
@@ -434,6 +519,24 @@ export function AIStylistClient() {
                   <h3 className="font-bold text-[13px] text-[#1A1A1A] uppercase tracking-widest">CLOSY AI</h3>
                   <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">TRỢ LÝ PHỐI ĐỒ</p>
                 </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleNewChat}
+                  className="text-[#1A1A1A] bg-white border border-[#E5E5E5] hover:border-[#1A1A1A] transition-colors py-1.5 px-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                  title="Tạo phiên chat mới"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Tạo mới</span>
+                </button>
+                <button 
+                  onClick={() => setIsHistoryOpen(true)}
+                  className="text-[#1A1A1A] bg-white border border-[#E5E5E5] hover:border-[#1A1A1A] transition-colors py-1.5 px-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                  title="Lịch sử trò chuyện"
+                >
+                  <History className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Lịch sử</span>
+                </button>
               </div>
             </div>
 
@@ -451,101 +554,40 @@ export function AIStylistClient() {
 
               {/* Chat Messages */}
               {chatMessages.map((msg) => (
-                <div key={msg.id} className={cn("chat-intro flex flex-col gap-1.5 w-full", msg.role === 'user' ? "items-end" : "items-start")}>
-                  {msg.role === 'ai' && <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>}
-                  {msg.role === 'user' && <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">YOU</span>}
-
-                  <div className={cn(
-                    "p-4 text-[13px] leading-relaxed",
-                    msg.role === 'user'
-                      ? "bg-[#1A1A1A] text-white ml-6 md:ml-12"
-                      : "bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] mr-6 md:mr-12"
-                  )}>
-                    {msg.content}
-                  </div>
-                </div>
+                <AIChatMessage
+                  key={msg.id}
+                  msg={msg}
+                  isChatting={isChatting}
+                  isGenerating={isGenerating}
+                  onGenerateRedirect={handleGenerate}
+                  fullChatContext={chatMessages.filter(m => m.role === 'user').map(m => m.content).join('. ')}
+                />
               ))}
 
-              {isChatting && (
-                <div className="flex flex-col gap-1.5 items-start w-full">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>
-                  <div className="bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] p-4 mr-12 flex items-center justify-center gap-1.5 min-w-[60px] h-[52px]">
-                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-1.5 h-1.5 bg-[#A3A3A3] animate-pulse" style={{ animationDelay: '300ms' }}></div>
-                  </div>
-                </div>
-              )}
               <div ref={chatEndRef} />
             </div>
 
             {/* Chat Input */}
             <div className="p-4 bg-[#F9F9F9] border-t border-[#E5E5E5]">
               <div className="relative flex items-center bg-white border border-[#E5E5E5] focus-within:border-[#1A1A1A] transition-colors">
-                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-                  <PopoverTrigger className="pl-4 pr-2 text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors outline-none flex items-center justify-center">
-                    <SlidersHorizontal className="w-4 h-4" />
-                  </PopoverTrigger>
-                  <PopoverContent side="top" align="start" className="w-[320px] max-h-[400px] overflow-y-auto p-5 border-[#E5E5E5] rounded-none shadow-xl bg-white">
-                    <div className="flex flex-col gap-6">
-                      <div className="border-b border-[#E5E5E5] pb-2">
-                        <p className="text-[11px] font-bold text-[#1A1A1A] tracking-widest uppercase">THÔNG SỐ NHANH</p>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">DỊP (OCCASION)</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {OCCASIONS.map(occ => (
-                            <button key={occ} onClick={() => setSelectedOccasion(prev => prev === occ ? "" : occ)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedOccasion === occ ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{occ}</button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">PHONG CÁCH (STYLE)</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {STYLES.map(style => (
-                            <button key={style} onClick={() => setSelectedStyle(prev => prev === style ? "" : style)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedStyle === style ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{style}</button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">MÙA (SEASON)</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {SEASONS.map(s => (
-                            <button key={s} onClick={() => setSelectedSeason(prev => prev === s ? "" : s)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedSeason === s ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{s}</button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">THỜI TIẾT (WEATHER)</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {WEATHERS.map(w => (
-                            <button key={w} onClick={() => setSelectedWeather(prev => prev === w ? "" : w)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedWeather === w ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{w}</button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <p className="text-[9px] text-[#888888] font-bold uppercase tracking-widest">TÔNG MÀU (COLOR TONE)</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {COLOR_TONES.map(c => (
-                            <button key={c} onClick={() => setSelectedColorTone(prev => prev === c ? "" : c)} className={cn("px-2 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border", selectedColorTone === c ? "bg-black text-white border-black" : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black")}>{c}</button>
-                          ))}
-                        </div>
-                      </div>
-                      <button
-                        onClick={handleSendMessage}
-                        disabled={isGenerating || (!chatInput.trim() && !hasSelectedOptions)}
-                        className="mt-2 w-full bg-[#1A1A1A] text-white text-[11px] font-bold py-3.5 hover:bg-black/80 transition-colors flex justify-center items-center gap-2 disabled:opacity-50 tracking-widest uppercase"
-                      >
-                        <Sparkles className="w-3.5 h-3.5" /> TẠO NGAY
-                      </button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                <AIQuickOptions
+                  popoverOpen={popoverOpen}
+                  setPopoverOpen={setPopoverOpen}
+                  selectedOccasion={selectedOccasion}
+                  setSelectedOccasion={setSelectedOccasion}
+                  selectedStyle={selectedStyle}
+                  setSelectedStyle={setSelectedStyle}
+                  selectedSeason={selectedSeason}
+                  setSelectedSeason={setSelectedSeason}
+                  selectedWeather={selectedWeather}
+                  setSelectedWeather={setSelectedWeather}
+                  selectedColorTone={selectedColorTone}
+                  setSelectedColorTone={setSelectedColorTone}
+                  handleSendMessage={handleQuickGenerate}
+                  isGenerating={isGenerating}
+                  hasSelectedOptions={hasSelectedOptions}
+                  chatInput={chatInput}
+                />
 
                 <input
                   value={chatInput}
@@ -565,6 +607,17 @@ export function AIStylistClient() {
                 </button>
               </div>
             </div>
+
+            {/* Chat History Panel */}
+            <AIChatHistorySidebar
+              isHistoryOpen={isHistoryOpen}
+              setIsHistoryOpen={setIsHistoryOpen}
+              isLoadingSessions={isLoadingSessions}
+              chatSessionsData={chatSessionsData}
+              handleNewChat={handleNewChat}
+              handleSelectSession={handleSelectSession}
+              contextID={contextID}
+            />
 
           </div>
         </div>
