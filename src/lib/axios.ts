@@ -71,7 +71,7 @@ api.interceptors.response.use(
 
         try {
           // Gọi API refresh token của BFF
-          await axios.post('/api/auth/refresh-token', {}, { baseURL: '' });
+          await axios.post('/api/v1/auth/refresh-token', {}, { baseURL: '' });
           processQueue(null);
           // Gọi lại request bị fail
           return api(originalRequest);

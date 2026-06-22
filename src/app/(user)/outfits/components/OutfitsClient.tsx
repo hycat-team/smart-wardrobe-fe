@@ -20,6 +20,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Skeleton } from "@heroui/react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 gsap.registerPlugin(useGSAP);
 
@@ -27,7 +35,7 @@ interface OutfitsClientProps {
   initialOutfits?: Outfit[];
 }
 
-type SortOption = "newest" | "oldest";
+type SortOption = "Mới Nhất" | "Cũ Nhất"
 
 export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const router = useRouter();
@@ -40,7 +48,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const deleteOutfitMutation = useDeleteOutfit();
 
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
-  const [sortParam, setSortParam] = useState<SortOption>("newest");
+  const [sortParam, setSortParam] = useState<SortOption>("Mới Nhất");
   const [outfitToDelete, setOutfitToDelete] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,28 +77,13 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   };
 
   const handleFilterChange = (filter: string) => {
-    const changeRoute = () => {
-      const params = new URLSearchParams(searchParams);
-      if (filter === "all") {
-        params.delete("filter");
-      } else {
-        params.set("filter", filter);
-      }
-      router.push("?" + params.toString(), { scroll: false });
-    };
-
-    if (gridRef.current && gridRef.current.children.length > 0) {
-      gsap.to(gridRef.current.children, {
-        opacity: 0,
-        y: 20,
-        stagger: 0.02,
-        duration: 0.4,
-        ease: "power2.inOut",
-        onComplete: changeRoute
-      });
+    const params = new URLSearchParams(searchParams);
+    if (filter === "all") {
+      params.delete("filter");
     } else {
-      changeRoute();
+      params.set("filter", filter);
     }
+    router.push("?" + params.toString(), { scroll: false });
   };
 
   const filteredAndSortedOutfits = useMemo(() => {
@@ -106,23 +99,16 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
     return filtered.sort((a: Outfit, b: Outfit) => {
       const dateA = new Date(a.createdAt || 0).getTime();
       const dateB = new Date(b.createdAt || 0).getTime();
-      return sortParam === "newest" ? dateB - dateA : dateA - dateB;
+      return sortParam === "Mới Nhất" ? dateB - dateA : dateA - dateB;
     });
   }, [outfits, filterParam, favorites, sortParam]);
 
   useGSAP(() => {
-    if (gridRef.current && filteredAndSortedOutfits.length > 0) {
+    if (filteredAndSortedOutfits.length > 0) {
       gsap.fromTo(
-        gridRef.current.children,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.04,
-          duration: 0.8,
-          ease: "expo.out",
-          clearProps: "all"
-        }
+        ".outfit-card",
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, stagger: 0.05, ease: "power3.out", duration: 0.6, clearProps: "all" }
       );
     }
   }, { dependencies: [filteredAndSortedOutfits], scope: containerRef });
@@ -189,23 +175,37 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
 
           <div className="flex items-center gap-4 border border-black/10 px-4 py-2 bg-[#F8F7F5]">
             <span className="text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#888]">Sắp xếp</span>
-            <select
-              value={sortParam}
-              onChange={(e) => setSortParam(e.target.value as SortOption)}
-              className="bg-transparent text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#111] font-medium focus:outline-none focus:ring-0 cursor-pointer appearance-none"
-            >
-              <option value="newest">Mới nhất</option>
-              <option value="oldest">Cũ nhất</option>
-            </select>
+            <Select value={sortParam} onValueChange={(value) => setSortParam(value as SortOption)}>
+              <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#111] font-medium w-auto">
+                <SelectValue placeholder="Mới nhất" />
+              </SelectTrigger>
+              <SelectContent alignItemWithTrigger={false} align="end" sideOffset={4}>
+                <SelectItem value="Mới Nhất" className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest font-medium">Mới Nhất</SelectItem>
+                <SelectItem value="Cũ Nhất" className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest font-medium">Cũ Nhất</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
 
       {/* Outfits Grid */}
       {isLoading && !outfits.length ? (
-        <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-8">
-          <div className="size-10 border border-[#111] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[11px] text-[#666] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase animate-pulse">Đang tải dữ liệu...</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="flex flex-col h-full bg-[#F8F7F5] border border-black/5">
+              <Skeleton className="relative w-full aspect-[3/4] bg-muted/60 overflow-hidden flex-shrink-0 rounded-none" />
+              <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-3/4 rounded-none bg-muted/60" />
+                  <Skeleton className="h-3 w-1/2 rounded-none bg-muted/60 mt-2" />
+                </div>
+                <div className="flex justify-between items-center mt-3">
+                  <Skeleton className="h-3 w-1/4 rounded-none bg-muted/60" />
+                  <Skeleton className="h-3 w-1/4 rounded-none bg-muted/60" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : filteredAndSortedOutfits.length > 0 ? (
         <div
@@ -213,14 +213,15 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8"
         >
           {filteredAndSortedOutfits.map((outfit: Outfit, index: number) => (
-            <OutfitCard
-              key={outfit.id}
-              outfit={outfit}
-              index={index}
-              isFavorite={favorites[outfit.id] || false}
-              onToggleFavorite={toggleFavorite}
-              onDelete={handleDeleteOutfit}
-            />
+            <div key={outfit.id} className="outfit-card h-full">
+              <OutfitCard
+                outfit={outfit}
+                index={index}
+                isFavorite={favorites[outfit.id] || false}
+                onToggleFavorite={toggleFavorite}
+                onDelete={handleDeleteOutfit}
+              />
+            </div>
           ))}
         </div>
       ) : (

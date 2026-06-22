@@ -1,4 +1,4 @@
-import { Check, Heart } from "lucide-react";
+import { Check, Heart, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WardrobeItemRes as WardrobeItem } from "@/features/wardrobe/types";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
@@ -26,13 +26,13 @@ export function WardrobeCard({
     <div
       onClick={onClick}
       className={cn(
-        "group flex flex-col cursor-pointer relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out",
+        "group flex flex-col h-full cursor-pointer relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out",
         isSelectMode && isSelected && "border-2 border-[#111] shadow-none hover:translate-y-0",
         isLocked && "opacity-75"
       )}
     >
       {/* Image Area - 75% Visual Weight */}
-      <div className="relative aspect-[4/5] bg-[#F7F6F4] p-[24px] overflow-hidden flex-shrink-0">
+      <div className="relative aspect-[4/5] bg-[#F7F6F4] p-3 md:p-6 overflow-hidden flex-shrink-0">
         <img
           alt={getWardrobeItemName(item)}
           className={cn(
@@ -52,9 +52,13 @@ export function WardrobeCard({
         {/* Selection State */}
         {isSelectMode ? (
           <div className="absolute top-4 right-4 z-20">
-            {isSelected && (
-              <div className="bg-[#111] text-white flex items-center justify-center size-5">
+            {isSelected ? (
+              <div className="bg-[#111] text-white flex items-center justify-center size-5 shadow-sm">
                 <Check className="size-3.5" />
+              </div>
+            ) : (
+              <div className="bg-white text-[#111] flex items-center justify-center size-5 opacity-0 group-hover:opacity-100 shadow-sm border border-black/10 transition-all duration-200">
+                <Plus className="size-3.5" />
               </div>
             )}
           </div>
@@ -100,7 +104,7 @@ export function WardrobeCard({
       </div>
 
       {/* Information Area - 25% Visual Weight */}
-      <div className="flex flex-col p-4 pt-5 flex-grow justify-between gap-3 bg-white border-t border-black/5">
+      <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
         <div>
           <h3 className="font-['Playfair_Display'] text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
             {getWardrobeItemName(item)}

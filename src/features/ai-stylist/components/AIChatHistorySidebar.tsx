@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { X, Plus, MessageSquare, MoveRight } from "lucide-react";
+import { X, Plus, MessageSquare, MoveRight, Trash2, Edit2 } from "lucide-react";
 import { ChatSessionRes } from "@/features/ai-stylist/types";
+import { useArchiveChatSession } from "@/features/ai-stylist/queries/ai.queries";
+import { toast } from "sonner";
 
 interface AIChatHistorySidebarProps {
   isHistoryOpen: boolean;
@@ -21,6 +24,55 @@ export function AIChatHistorySidebar({
   handleSelectSession,
   contextID
 }: AIChatHistorySidebarProps) {
+  const archiveMutation = useArchiveChatSession();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
+
+  const handleStartRename = (e: React.MouseEvent, session: ChatSessionRes) => {
+    e.stopPropagation();
+    setEditingId(session.id);
+    setEditingTitle(session.title || "");
+  };
+
+  const handleRenameSubmit = (e: React.KeyboardEvent | React.FocusEvent, sessionId: string) => {
+    e.stopPropagation();
+    if ('key' in e && e.key !== 'Enter') return;
+    
+    if (editingTitle.trim()) {
+      archiveMutation.mutate({ sessionId, title: editingTitle.trim() }, {
+        onSuccess: () => {
+          toast.success("Đã đổi tên phiên trò chuyện");
+          setEditingId(null);
+        },
+        onError: () => {
+          toast.error("Không thể đổi tên phiên trò chuyện");
+          setEditingId(null);
+        }
+      });
+    } else {
+      setEditingId(null);
+    }
+  };
+
+  const handleDelete = (e: React.MouseEvent, sessionId: string) => {
+    e.stopPropagation();
+    if (confirm("Bạn có chắc chắn muốn xóa phiên trò chuyện này?")) {
+      archiveMutation.mutate({ sessionId }, {
+        onSuccess: () => {
+          toast.success("Đã xóa phiên trò chuyện");
+          if (contextID === sessionId) {
+            handleNewChat();
+          }
+        },
+        onError: () => {
+          toast.error("Không thể xóa phiên trò chuyện");
+        }
+      });
+    }
+  };
+
+  const activeSessions = chatSessionsData?.filter(session => !session.isArchived) || [];
+
   return (
     <div className={cn(
       "absolute inset-0 bg-white z-50 flex flex-col transition-transform duration-300 ease-in-out",
@@ -55,31 +107,60 @@ export function AIChatHistorySidebar({
           <div className="flex justify-center items-center h-full">
             <div className="w-6 h-6 border-2 border-[#1A1A1A] border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : !chatSessionsData || chatSessionsData.length === 0 ? (
+        ) : activeSessions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center opacity-50">
             <MessageSquare className="w-8 h-8 mb-4 text-[#A3A3A3]" />
             <p className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A]">CHƯA CÓ LỊCH SỬ</p>
           </div>
         ) : (
-          chatSessionsData.map((session) => (
-            <button
+          activeSessions.map((session) => (
+            <div
               key={session.id}
               onClick={() => handleSelectSession(session)}
               className={cn(
-                "w-full text-left p-4 border border-[#E5E5E5] hover:border-[#1A1A1A] transition-colors group relative overflow-hidden bg-[#F9F9F9] hover:bg-white",
+                "w-full text-left p-4 border border-[#E5E5E5] hover:border-[#1A1A1A] transition-colors group relative overflow-hidden bg-[#F9F9F9] hover:bg-white flex items-center cursor-pointer",
                 contextID === session.id && "border-[#1A1A1A] bg-white ring-1 ring-[#1A1A1A]"
               )}
             >
-              <div className="flex flex-col gap-1.5">
-                <span className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-wider truncate pr-4">
-                  {session.title || "PHIÊN TRÒ CHUYỆN MỚI"}
-                </span>
+              <div className="flex flex-col gap-1.5 pr-20 flex-1">
+                {editingId === session.id ? (
+                  <input
+                    type="text"
+                    value={editingTitle}
+                    onChange={(e) => setEditingTitle(e.target.value)}
+                    onKeyDown={(e) => handleRenameSubmit(e, session.id)}
+                    onBlur={(e) => handleRenameSubmit(e, session.id)}
+                    autoFocus
+                    className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-wider bg-white border border-[#E5E5E5] px-1 py-0.5 outline-none focus:border-[#1A1A1A] w-full"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span className="text-[11px] font-bold text-[#1A1A1A] uppercase tracking-wider truncate">
+                    {session.title || "PHIÊN TRÒ CHUYỆN MỚI"}
+                  </span>
+                )}
                 <span className="text-[9px] font-bold text-[#888888] uppercase tracking-widest">
                   {new Date(session.createdAt).toLocaleDateString('vi-VN')}
                 </span>
               </div>
-              <MoveRight className="w-3.5 h-3.5 absolute right-4 top-1/2 -translate-y-1/2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-[#1A1A1A]" />
-            </button>
+              <MoveRight className="w-3.5 h-3.5 absolute right-20 top-1/2 -translate-y-1/2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-[#1A1A1A]" />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-[#F9F9F9] group-hover:bg-white pl-2 gap-1">
+                <div
+                  onClick={(e) => handleStartRename(e, session)}
+                  className="p-1.5 hover:bg-blue-50 text-blue-500 rounded"
+                  title="Đổi tên"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </div>
+                <div
+                  onClick={(e) => handleDelete(e, session.id)}
+                  className="p-1.5 hover:bg-red-50 text-red-500 rounded"
+                  title="Xóa phiên"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
           ))
         )}
       </div>

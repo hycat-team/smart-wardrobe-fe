@@ -14,7 +14,7 @@ export function MobileBottomNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 w-full h-[72px] pb-4 pt-2 bg-card border-t border-border flex items-center justify-around px-2 z-50">
-      {[...NAV_ITEMS.slice(0,4), { icon: UserCircle, label: "Hồ sơ", path: "/profile" }].map((item) => {
+      {[...NAV_ITEMS.slice(0,4), { icon: UserCircle, label: "", path: "/profile" }].map((item) => {
         const isActive = pathname.startsWith(item.path);
         const Icon = item.icon;
         
@@ -28,7 +28,7 @@ export function MobileBottomNav() {
                 isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <span className={cn("text-[10px] font-medium uppercase tracking-widest", isActive && "text-primary font-bold")}>{item.label.split(" ")[0]}</span>
+              <Icon className={cn("size-5", isActive && "text-primary")} />
               {isActive && <div className="w-1 h-1 rounded-full bg-primary mt-1" />}
             </Link>
           );
@@ -44,7 +44,6 @@ export function MobileBottomNav() {
             )}
           >
             <Icon className={cn("size-5", isActive && "fill-primary/20")} />
-            <span className="text-[10px] font-medium">{item.label}</span>
           </Link>
         );
       })}

@@ -8,6 +8,7 @@ import { useCreatePost } from '../queries/community.queries';
 import { communityApi } from '../api/community.api';
 import { toast } from 'sonner';
 import { uploadToCloudinary } from '@/lib/cloudinary';
+import Image from 'next/image';
 
 export const CreatePostModal = () => {
   const [open, setOpen] = useState(false);
@@ -131,7 +132,7 @@ export const CreatePostModal = () => {
               <div className="grid grid-cols-3 gap-2 mt-4">
                 {images.map((file, index) => (
                   <div key={index} className="relative aspect-square rounded-md overflow-hidden bg-muted">
-                    <img 
+                    <Image 
                       src={URL.createObjectURL(file)} 
                       alt="preview" 
                       className="w-full h-full object-cover" 

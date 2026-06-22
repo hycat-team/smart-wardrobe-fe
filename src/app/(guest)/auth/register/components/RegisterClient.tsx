@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRegister, useConfirmRegisterOtp } from "@/features/auth/queries/auth.queries";
+import { useRegister, useConfirmRegisterOtp, useResendRegisterOtp } from "@/features/auth/queries/auth.queries";
 import { toast } from "sonner";
 import { Gender } from "@/common/enum";
 import Image from "next/image";
@@ -66,6 +66,7 @@ export function RegisterClient() {
 
   const { mutate: register, isPending: isRegistering } = useRegister();
   const { mutate: confirmOtp, isPending: isConfirming } = useConfirmRegisterOtp();
+  const { mutate: resendOtp, isPending: isResending } = useResendRegisterOtp();
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -122,12 +123,16 @@ export function RegisterClient() {
   };
 
   const handleResend = () => {
-    if (!canResend) return;
-    setOtpCode(["", "", "", "", "", ""]);
-    otpRefs[0].current?.focus();
-    setCanResend(false);
-    setTimeLeft(59);
-    toast.success("Mã OTP đã được gửi lại");
+    if (!canResend || isResending) return;
+    
+    resendOtp({ email: registeredEmail }, {
+      onSuccess: () => {
+        setOtpCode(["", "", "", "", "", ""]);
+        otpRefs[0].current?.focus();
+        setCanResend(false);
+        setTimeLeft(59);
+      }
+    });
   };
 
   if (step === "otp") {
@@ -181,10 +186,10 @@ export function RegisterClient() {
               <button
                 type="button"
                 onClick={handleResend}
-                disabled={!canResend}
+                disabled={!canResend || isResending}
                 className="ml-1 text-ethos-primary font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:underline"
               >
-                <span>{canResend ? "Gửi lại ngay" : `Gửi lại (00:${timeLeft < 10 ? `0${timeLeft}` : timeLeft})`}</span>
+                <span>{isResending ? "Đang gửi..." : canResend ? "Gửi lại ngay" : `Gửi lại (00:${timeLeft < 10 ? `0${timeLeft}` : timeLeft})`}</span>
               </button>
             </div>
 

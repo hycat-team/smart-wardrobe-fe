@@ -108,6 +108,7 @@
     --spacing-section-gap: 80px;
     --animate-accordion-down: accordion-down 0.2s ease-out;
     --animate-accordion-up: accordion-up 0.2s ease-out;
+    --skeleton-animation: var(----skeleton-animation);
   @keyframes accordion-down {
   from {
     height: 0;
@@ -122,6 +123,16 @@
         }
   to {
     height: 0;
+        }
+    }
+  @keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(200%);
+        }
+    }
+  @keyframes skeleton-pulse {
+  50% {
+    opacity: 0.55;
         }
     }
 }
@@ -159,6 +170,7 @@
     --sidebar-accent-foreground: var(--color-primary-base);
     --sidebar-border: #EAE6DF;
     --sidebar-ring: var(--color-primary-base);
+    --skeleton-animation: shimmer;
 }
 
 .dark {
@@ -193,6 +205,7 @@
     --sidebar-accent-foreground: var(--color-cream);
     --sidebar-border: var(--color-ink-muted);
     --sidebar-ring: var(--color-terracotta);
+    --skeleton-animation: pulse;
 }
 
 .dark-atelier {

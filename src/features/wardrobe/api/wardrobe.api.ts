@@ -18,6 +18,12 @@ export const wardrobeApi = {
     return res.data.data!;
   },
 
+  getSystemCatalogItems: async (params?: { page?: number; limit?: number; category_slug?: string, q?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<WardrobeItemRes>> => {
+    const res = await axiosInstance.get<APIResponse<PaginationResult<WardrobeItemRes>>>('/system-catalog/wardrobe-items', { params });
+    return res.data.data!;
+  },
+
+
   getUploadSignature: async (axiosInstance: AxiosInstance = api): Promise<UploadSignatureResult> => {
     const res = await axiosInstance.get<APIResponse<UploadSignatureResult>>('/wardrobe-items/upload-signature');
     return res.data.data!;

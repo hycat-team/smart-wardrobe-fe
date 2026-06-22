@@ -24,6 +24,19 @@ export const useMyWardrobe = (categorySlug?: string) => {
   });
 };
 
+export const useSystemCatalogItems = (categorySlug?: string, q?: string) => {
+  return useInfiniteQuery({
+    queryKey: [...WARDROBE_QUERY_KEYS.all, 'system-catalog', categorySlug, q],
+    queryFn: ({ pageParam = 1 }) => wardrobeApi.getSystemCatalogItems({ page: pageParam as number, limit: 20, category_slug: categorySlug, q }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.totalPages) return lastPage.page + 1;
+      return undefined;
+    },
+    placeholderData: keepPreviousData,
+  });
+};
+
 export const useCategories = () => {
   return useQuery({
     queryKey: WARDROBE_QUERY_KEYS.categories(),
