@@ -35,7 +35,8 @@ export const aiApi = {
     signal?: AbortSignal
   ) => {
     try {
-      const response = await fetch(`/api/v1/ai/chat/sessions/${contextID}/messages/stream`, {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+      const response = await fetch(`${backendUrl}/ai/chat/sessions/${contextID}/messages/stream`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
