@@ -80,7 +80,6 @@ function AIStylistContent() {
         clothingItemId: item.primary.id,
         imageUrl: item.primary.imageUrl,
         category: item.primary.category,
-        subCategory: item.primary.subCategory,
         _role: item.role,
         x: Math.random() * 100 + 50,
         y: Math.random() * 100 + 50,
@@ -143,7 +142,6 @@ function AIStylistContent() {
         clothingItemId: nextItem.id,
         imageUrl: nextItem.imageUrl,
         category: nextItem.category,
-        subCategory: nextItem.subCategory,
       };
 
       return newItems;

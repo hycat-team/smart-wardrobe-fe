@@ -99,7 +99,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
     return filtered.sort((a: Outfit, b: Outfit) => {
       const dateA = new Date(a.createdAt || 0).getTime();
       const dateB = new Date(b.createdAt || 0).getTime();
-      return sortParam === "newest" ? dateB - dateA : dateA - dateB;
+      return sortParam === "Mới Nhất" ? dateB - dateA : dateA - dateB;
     });
   }, [outfits, filterParam, favorites, sortParam]);
 

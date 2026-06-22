@@ -233,13 +233,13 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     const timeA = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : ((a as any).dateAdded ? new Date((a as any).dateAdded).getTime() : 0);
     const timeB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : ((b as any).dateAdded ? new Date((b as any).dateAdded).getTime() : 0);
 
-    if (sortParam === "newest") {
+    if (sortParam === "Mới nhất" || sortParam === "newest") {
       return timeB - timeA;
     }
-    if (sortParam === "oldest") {
+    if (sortParam === "Cũ nhất" || sortParam === "oldest") {
       return timeA - timeB;
     }
-    if (sortParam === "name") {
+    if (sortParam === "Tên" || sortParam === "name") {
       return getWardrobeItemName(a).localeCompare(getWardrobeItemName(b));
     }
     return 0;
@@ -376,7 +376,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
           <div className="flex items-center gap-4 border border-ink/20 px-4 py-2">
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-muted">Sắp xếp</span>
-            <Select value={sortParam} onValueChange={(value) => handleSortChange(value)}>
+            <Select value={sortParam} onValueChange={(value) => handleSortChange(value as string)}>
               <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-xs font-mono uppercase tracking-widest text-ink font-bold w-auto">
                 <SelectValue placeholder="Mới nhất" />
               </SelectTrigger>
