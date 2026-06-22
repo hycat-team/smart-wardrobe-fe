@@ -28,6 +28,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Skeleton } from "@heroui/react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useMyWardrobe, useBulkDeleteWardrobeItems } from "@/features/wardrobe/queries/wardrobe.queries";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
@@ -59,7 +67,8 @@ const COLORS = [
 
 const TAGS = ["Casual", "Minimalist", "Denim", "Elegant", "Summer", "Formal", "Workwear", "Sporty"];
 
-
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import { getWardrobeItemName, getColorHex } from "@/features/wardrobe/utils";
 
 // Helper to map color string to standard filter value
@@ -84,13 +93,15 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   const isPremium = user?.isPremium;
   const searchParams = useSearchParams();
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Sync Search state with query params
   const categoryParam = searchParams.get("category") || "Tất cả";
   const colorParam = searchParams.get("color") || "";
   const tagParam = searchParams.get("tag") || "";
-  const sortParam = searchParams.get("sort") || "newest";
+  const sortParam = searchParams.get("sort") || "Mới nhất";
   const searchParam = searchParams.get("q") || "";
 
   const [isSelectMode, setIsSelectMode] = useState(false);
@@ -234,8 +245,18 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     return 0;
   });
 
+  useGSAP(() => {
+    if (sortedItems.length > 0 && !isFetching) {
+      gsap.fromTo(
+        ".wardrobe-card",
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, stagger: 0.05, ease: "power3.out", duration: 0.6, clearProps: "all" }
+      );
+    }
+  }, { scope: containerRef, dependencies: [sortedItems.length, isFetching] });
+
   return (
-    <div className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans selection:bg-ink selection:text-cream">
+    <div className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans selection:bg-ink selection:text-cream" ref={containerRef}>
       {/* High-end Editorial Header */}
       <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-ink/10 pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -355,24 +376,35 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
           <div className="flex items-center gap-4 border border-ink/20 px-4 py-2">
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-muted">Sắp xếp</span>
-            <select
-              value={sortParam}
-              onChange={(e) => handleSortChange(e.target.value)}
-              className="bg-transparent text-xs font-mono uppercase tracking-widest text-ink font-bold focus:outline-none focus:ring-0 cursor-pointer appearance-none"
-            >
-              <option value="newest">Mới nhất</option>
-              <option value="oldest">Cũ nhất</option>
-              <option value="name">Theo tên</option>
-            </select>
+            <Select value={sortParam} onValueChange={(value) => handleSortChange(value)}>
+              <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-xs font-mono uppercase tracking-widest text-ink font-bold w-auto">
+                <SelectValue placeholder="Mới nhất" />
+              </SelectTrigger>
+              <SelectContent alignItemWithTrigger={false} align="end" sideOffset={4}>
+                <SelectItem value="Mới nhất" className="font-mono text-xs uppercase tracking-widest font-bold">Mới nhất</SelectItem>
+                <SelectItem value="Cũ nhất" className="font-mono text-xs uppercase tracking-widest font-bold">Cũ nhất</SelectItem>
+                <SelectItem value="Tên" className="font-mono text-xs uppercase tracking-widest font-bold">Theo tên</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
 
       {/* Grid Content */}
       {isLoadingItems ? (
-        <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-8">
-          <div className="size-24 border border-ink/20 border-t-ink rounded-full animate-spin" />
-          <p className="text-[10px] text-ink-muted font-mono tracking-[0.3em] uppercase">Đang tải Tủ Đồ...</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="flex flex-col h-full bg-[#F8F7F5] border border-black/5">
+              <Skeleton className="relative aspect-[4/5] bg-muted/60 p-3 md:p-6 overflow-hidden flex-shrink-0 rounded-none" />
+              <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-3/4 rounded-none bg-muted/60" />
+                  <Skeleton className="h-3 w-1/2 rounded-none bg-muted/60 mt-2" />
+                </div>
+                <Skeleton className="h-3 w-1/3 rounded-none bg-muted/60" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : sortedItems.length > 0 ? (
         <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", (isFetching && !isFetchingNextPage) && "opacity-60 blur-[1px]")}>
@@ -419,16 +451,17 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
             };
 
             return (
-              <WardrobeCard
-                key={item.id}
-                item={item}
-                isLocked={isLocked}
-                isProcessing={isProcessing}
-                isSelectMode={isSelectMode}
-                isSelected={selectedIds.includes(item.id)}
-                onClick={handleCardClick}
-                getWardrobeItemName={getWardrobeItemName}
-              />
+              <div key={item.id} className="wardrobe-card">
+                <WardrobeCard
+                  item={item}
+                  isLocked={isLocked}
+                  isProcessing={isProcessing}
+                  isSelectMode={isSelectMode}
+                  isSelected={selectedIds.includes(item.id)}
+                  onClick={handleCardClick}
+                  getWardrobeItemName={getWardrobeItemName}
+                />
+              </div>
             );
           })}
         </div>

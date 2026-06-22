@@ -8,6 +8,7 @@ import {
   ConfirmForgotPasswordOtpReq,
   ResetPasswordReq,
   AuthTokenRes,
+  ResendOtpReq,
 } from '../types';
 
 export const authApi = {
@@ -29,6 +30,11 @@ export const authApi = {
 
   confirmRegisterOtp: async (data: ConfirmRegisterOtpReq): Promise<{ message?: string }> => {
     const res = await api.post<APIResponse>('/auth/register/confirm-otp', data);
+    return { message: res.data.message };
+  },
+
+  resendRegisterOtp: async (data: ResendOtpReq): Promise<{ message?: string }> => {
+    const res = await api.post<APIResponse>('/auth/register/resend-otp', data);
     return { message: res.data.message };
   },
 

@@ -49,6 +49,15 @@ export const useConfirmRegisterOtp = () => {
   });
 };
 
+export const useResendRegisterOtp = () => {
+  return useMutation({
+    mutationFn: authApi.resendRegisterOtp,
+    onSuccess: (res) => {
+      toast.success(res?.message || 'Đã gửi lại mã OTP. Vui lòng kiểm tra email của bạn.');
+    },
+  });
+};
+
 export const useLogout = () => {
   const queryClient = useQueryClient();
   return useMutation({

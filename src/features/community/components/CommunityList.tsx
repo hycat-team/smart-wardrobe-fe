@@ -255,7 +255,7 @@ export const CommunityList = ({
             disabled={!content.trim() || isPending || isUploading}
             className="rounded-none bg-black text-white hover:bg-black/80 font-bold uppercase tracking-widest text-xs px-8 h-10 disabled:opacity-50"
           >
-            {isPending || isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Đăng bài'}
+            {isPending || isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Đăng'}
           </Button>
         </div>
       </form>

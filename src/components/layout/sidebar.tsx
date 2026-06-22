@@ -21,7 +21,8 @@ import {
   Code,
   ScanBarcode,
   ScanBarcodeIcon,
-  ScanQrCode
+  ScanQrCode,
+  PlusCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -29,12 +30,22 @@ import { useLogout } from "@/features/auth/queries/auth.queries";
 import { getUserAvatar } from "@/lib/utils";
 import Image from "next/image";
 
+// export const NAV_ITEMS = [
+//   { icon: PlusCircle, label: "Thêm đồ nhanh", path: "/wardrobe/explore" },
+//   { icon: Shirt, label: "Wardrobe", path: "/wardrobe" },
+//   { icon: Sparkles, label: "AI Stylist", path: "/ai-stylist" },
+//   { icon: ScanQrCode, label: "Outfit", path: "/outfits" },
+//   { icon: LayoutGrid, label: "Community", path: "/community" },
+//   { icon: Store, label: "Marketplace", path: "/marketplace", comingSoon: true },
+// ];
+
 export const NAV_ITEMS = [
-  { icon: Shirt, label: "Wardrobe", path: "/wardrobe" },
-  { icon: Sparkles, label: "AI Stylist", path: "/ai-stylist" },
-  { icon: ScanQrCode, label: "Outfit", path: "/outfits" },
-  { icon: LayoutGrid, label: "Community", path: "/community" },
-  { icon: Store, label: "Marketplace", path: "/marketplace" },
+  { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
+  { icon: Shirt, label: "Tủ Quần Áo", path: "/wardrobe" },
+  { icon: Sparkles, label: "AI Phối Đồ", path: "/ai-stylist" },
+  { icon: ScanQrCode, label: "Trang Phục", path: "/outfits" },
+  { icon: LayoutGrid, label: "Cộng Đồng", path: "/community" },
+  { icon: Store, label: "Thanh Lý", path: "/marketplace", comingSoon: true },
 ];
 
 
@@ -117,7 +128,10 @@ export function Sidebar() {
       {/* Main Navigation (Minimalist List) */}
       <nav className="flex-1 flex flex-col gap-0.5">
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname.startsWith(item.path);
+          const isActive = item.path === '/wardrobe'
+            ? pathname === '/wardrobe' || (pathname.startsWith('/wardrobe/') && !pathname.startsWith('/wardrobe/explore'))
+            : pathname.startsWith(item.path);
+
           const Icon = item.icon;
 
           return (
@@ -147,6 +161,11 @@ export function Sidebar() {
               )}>
                 {item.label}
               </span>
+              {item.comingSoon && (
+                <span className="ml-auto text-[9px] font-medium uppercase tracking-widest px-2 py-0.5 rounded-sm bg-foreground text-background">
+                  Sắp ra mắt
+                </span>
+              )}
             </Link>
           );
         })}

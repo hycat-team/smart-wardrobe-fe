@@ -23,7 +23,7 @@ export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, ind
   return (
     <div
       onClick={() => router.push(`/outfits/${outfit.id}`)}
-      className="group flex flex-col cursor-pointer relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out"
+      className="group flex flex-col h-full cursor-pointer relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out"
     >
       {/* Image Area - Keep old image styling but in new card design */}
       <div className="relative w-full overflow-hidden bg-[#e0dcd5] aspect-[3/4] flex-shrink-0">
@@ -85,7 +85,7 @@ export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, ind
       </div>
 
       {/* Information Area - 25% Visual Weight */}
-      <div className="flex flex-col p-4 pt-5 flex-grow justify-between gap-3 bg-white border-t border-black/5">
+      <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
         <div>
           <h3 className="font-['Playfair_Display'] text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
             {outfit.name}

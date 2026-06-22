@@ -22,6 +22,10 @@ export interface ConfirmRegisterOtpReq {
   otpCode: string;
 }
 
+export interface ResendOtpReq {
+  email: string;
+}
+
 export interface SendForgotPasswordOtpReq {
   email: string;
 }

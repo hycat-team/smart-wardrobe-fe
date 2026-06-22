@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 import { Sparkles, SlidersHorizontal } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export const OCCASIONS = ["🎓 Đi học", "💼 Đi làm", "🌙 Hẹn hò", "🎉 Tiệc", "🏃 Thể thao", "🏠 Ở nhà"];
-export const STYLES = ["Minimalist", "Casual", "Formal", "Trendy", "Vintage", "Streetwear"];
+export const OCCASIONS = ["Đi học", "Đi làm", "Hẹn hò", "Tiệc", "Thể thao", "Ở nhà"];
+export const STYLES = ["Tối giản", "Thường ngày", "Trang trọng", "Thời thượng", "Cổ điển", "Đường phố"];
 export const SEASONS = ["Mùa xuân", "Mùa hạ", "Mùa thu", "Mùa đông"];
 export const WEATHERS = ["Ấm áp", "Lạnh", "Mưa", "Mát mẻ"];
 export const COLOR_TONES = ["Sáng", "Tối", "Trung tính", "Nhiều màu"];

@@ -529,6 +529,62 @@ Yêu cầu tạo cuộc trò chuyện
 
 ---
 
+### `DELETE` `/api/v1/ai/chat/sessions/{contextID}`
+
+**Summary**: Xóa cuộc trò chuyện AI
+
+**Description**: Xóa vĩnh viễn cuộc trò chuyện với stylist AI và toàn bộ lịch sử tin nhắn liên quan
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `contextID` | path | string | Yes | ID cuộc trò chuyện |
+
+**Responses**:
+
+- **200**: Xóa cuộc trò chuyện thành công
+  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
+    **Properties**:
+    - `data` (object)
+    - `message` (string)
+
+---
+
+### `PATCH` `/api/v1/ai/chat/sessions/{contextID}`
+
+**Summary**: Cập nhật thông tin cuộc trò chuyện AI
+
+**Description**: Cập nhật thông tin chi tiết của phiên trò chuyện với stylist AI (ví dụ: đổi tiêu đề)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `contextID` | path | string | Yes | ID cuộc trò chuyện |
+
+**Request Body**:
+
+Thông tin cập nhật cuộc trò chuyện
+
+- Schema: [UpdateChatSessionReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtoupdatechatsessionreq)
+    **Properties**:
+    - `title` (string)
+
+**Responses**:
+
+- **200**: Cập nhật cuộc trò chuyện thành công
+  - Data Schema: [ChatSessionRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtochatsessionres)
+    **Properties**:
+    - `contextSummary` (string)
+    - `createdAt` (string)
+    - `id` (string)
+    - `isArchived` (boolean)
+    - `title` (string)
+    - `updatedAt` (string)
+
+---
+
 ### `PATCH` `/api/v1/ai/chat/sessions/{contextID}/archive`
 
 **Summary**: Lưu trữ cuộc trò chuyện AI
@@ -580,13 +636,10 @@ Yêu cầu tạo cuộc trò chuyện
 **Summary**: Nhắn tin với stylist AI (Stream SSE)
 
 **Description**: Gửi tin nhắn cho stylist AI và nhận phản hồi dạng stream sự kiện (Server-Sent Events).
-Nếu mô hình AI phát hiện người dùng yêu cầu phối đồ từ tủ đồ cá nhân, nó sẽ thêm token '[ACTION:REDIRECT_OUTFIT]' vào cuối phản hồi stream.
-CHÚ Ý: Token '[ACTION:REDIRECT_OUTFIT]' có thể bị phân mảnh (split) thành nhiều chunk nhỏ khi truyền tải stream (ví dụ: chunk 1 nhận '[ACTION:RE', chunk 2 nhận 'DIRECT_OUTFIT]').
-Frontend cần tích luỹ toàn bộ chuỗi (accumulated string) hoặc ghép các chunk lại trước khi kiểm tra sự tồn tại của token này để hiển thị nút/card điều hướng sang tính năng Phối đồ chuyên dụng, thay vì chỉ kiểm tra đơn lẻ trên từng chunk nhận được.
-
-**NOTE**: Gửi tin nhắn cho stylist AI và nhận phản hồi dạng stream sự kiện (Server-Sent Events).
 Nội dung tin nhắn được giới hạn tối đa 2.000 ký tự Unicode sau khi chuẩn hóa NFC. Frontend nên kiểm tra giới hạn trước khi gửi để đảm bảo trải nghiệm người dùng.
 Nếu mô hình AI phát hiện người dùng yêu cầu phối đồ từ tủ đồ cá nhân, nó sẽ thêm token '[ACTION:REDIRECT_OUTFIT]' vào cuối phản hồi stream.
+- CHÚ Ý: Token '[ACTION:REDIRECT_OUTFIT]' có thể bị phân mảnh (split) thành nhiều chunk nhỏ khi truyền tải stream (ví dụ: chunk 1 nhận '[ACTION:RE', chunk 2 nhận 'DIRECT_OUTFIT]').
+- Frontend cần tích luỹ toàn bộ chuỗi (accumulated string) hoặc ghép các chunk lại trước khi kiểm tra sự tồn tại của token này để hiển thị nút/card điều hướng sang tính năng Phối đồ chuyên dụng, thay vì chỉ kiểm tra đơn lẻ trên từng chunk nhận được.
 
 **Request Parameters**:
 
@@ -621,18 +674,7 @@ Các trường trong Request Body:
 - season (Mùa phối đồ, enum: spring, summer, autumn, winter, all)
 - weather (Thời tiết hiện tại, gợi ý: hot, cold, warm, cool, rainy,...)
 - colorTone (Tông màu phối đồ, gợi ý: light, dark, pastel, earthy, neon,...)
-- details (Ghi chú thêm bằng tay - tự do)
-
-**NOTE**Nhận gợi ý phối đồ từ các trang phục có sẵn trong tủ đồ của người dùng dựa trên dịp, thời tiết và phong cách.
-
-Các trường trong Request Body:
-
-occasion (Dịp phối đồ, gợi ý: casual, work, date, party, sport,...)
-styleTarget (Phong cách hướng tới, gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant,...)
-season (Mùa phối đồ, enum: spring, summer, autumn, winter, all)
-weather (Thời tiết hiện tại, gợi ý: hot, cold, warm, cool, rainy,...)
-colorTone (Tông màu phối đồ, gợi ý: light, dark, pastel, earthy, neon,...)
-details (Ghi chú thêm bằng tay, tối đa 1.000 ký tự Unicode sau khi chuẩn hóa NFC. Frontend nên kiểm tra giới hạn trước khi gửi để đảm bảo trải nghiệm người dùng.)
+- details (Ghi chú thêm bằng tay, tối đa 1.000 ký tự Unicode sau khi chuẩn hóa NFC. Frontend nên kiểm tra giới hạn trước khi gửi để đảm bảo trải nghiệm người dùng.)
 
 **Request Body**:
 
@@ -700,6 +742,30 @@ Mã OTP và Email
     **Properties**:
     - `email` (string) **(Required)**
     - `otpCode` (string) **(Required)**
+
+**Responses**:
+
+- **200**: OK
+  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
+    **Properties**:
+    - `data` (object)
+    - `message` (string)
+
+---
+
+### `POST` `/api/v1/auth/forgot-password/resend-otp`
+
+**Summary**: Gửi lại OTP khôi phục mật khẩu
+
+**Description**: Gửi lại mã OTP xác thực khôi phục mật khẩu qua email dựa vào địa chỉ email đã gửi yêu cầu trước đó
+
+**Request Body**:
+
+Email nhận lại OTP
+
+- Schema: [ResendOtpReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoresendotpreq)
+    **Properties**:
+    - `email` (string) **(Required)**
 
 **Responses**:
 
@@ -811,6 +877,30 @@ Mã OTP xác thực
     **Properties**:
     - `email` (string) **(Required)**
     - `otpCode` (string) **(Required)**
+
+**Responses**:
+
+- **200**: OK
+  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
+    **Properties**:
+    - `data` (object)
+    - `message` (string)
+
+---
+
+### `POST` `/api/v1/auth/register/resend-otp`
+
+**Summary**: Gửi lại OTP đăng ký
+
+**Description**: Gửi lại mã OTP xác thực đăng ký qua email dựa vào địa chỉ email đã đăng ký trước đó
+
+**Request Body**:
+
+Email nhận lại OTP
+
+- Schema: [ResendOtpReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoresendotpreq)
+    **Properties**:
+    - `email` (string) **(Required)**
 
 **Responses**:
 
@@ -2860,6 +2950,12 @@ Danh sách sản phẩm xin mua
 | `password` | string | Yes |  |
 | `username` | string | Yes |  |
 
+### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoresendotpreq"></a>`ResendOtpReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `email` | string | Yes |  |
+
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoresetpasswordreq"></a>`ResetPasswordReq`
 
 | Property | Type | Required | Description |
@@ -3287,6 +3383,12 @@ Danh sách sản phẩm xin mua
 | --- | --- | --- | --- |
 | `name` | string | Yes |  |
 | `slug` | string | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtoupdatechatsessionreq"></a>`UpdateChatSessionReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `title` | string | No |  |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtoupdatesystemcatalogitemreq"></a>`UpdateSystemCatalogItemReq`
 
