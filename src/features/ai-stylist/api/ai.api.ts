@@ -16,6 +16,11 @@ export const aiApi = {
     return res.data.data!;
   },
 
+  archiveChatSession: async (contextID: string, data?: { title?: string }): Promise<void> => {
+    await api.patch<APIResponse<null>>(`/ai/chat/sessions/${contextID}/archive`, data);
+  },
+
+
   getChatSessions: async (): Promise<ChatSessionRes[]> => {
     const res = await api.get<APIResponse<ChatSessionRes[]>>('/ai/chat/sessions');
     return res.data.data!;
@@ -35,8 +40,7 @@ export const aiApi = {
     signal?: AbortSignal
   ) => {
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
-      const response = await fetch(`${backendUrl}/ai/chat/sessions/${contextID}/messages/stream`, {
+      const response = await fetch(`/api/v1/ai/chat/sessions/${contextID}/messages/stream`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

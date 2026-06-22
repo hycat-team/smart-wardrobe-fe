@@ -1,4 +1,4 @@
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { aiApi } from "../api/ai.api";
 
 export const aiKeys = {
@@ -26,5 +26,16 @@ export const useChatMessages = (contextID: string, enabled: boolean = true) => {
       return undefined;
     },
     enabled: !!contextID && enabled,
+  });
+};
+
+export const useArchiveChatSession = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ sessionId, title }: { sessionId: string; title?: string }) => 
+      aiApi.archiveChatSession(sessionId, title ? { title } : undefined),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: aiKeys.chatSessions() });
+    },
   });
 };

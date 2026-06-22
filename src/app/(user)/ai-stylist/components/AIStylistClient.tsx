@@ -132,11 +132,19 @@ export function AIStylistClient() {
 
   const handleGenerate = async (initialDetails?: string) => {
     try {
+      let safeDetails = initialDetails || "";
+      if (safeDetails) {
+        let normalized = safeDetails.normalize('NFC');
+        if (normalized.length > 1000) {
+          safeDetails = normalized.substring(0, 1000);
+        }
+      }
+
       setIsGenerating(true);
 
       const res = await aiApi.getOutfitRecommendation({
         colorTone: selectedColorTone ? selectedColorTone.toLowerCase() : "",
-        details: initialDetails || "",
+        details: safeDetails,
         occasion: occasionMap[selectedOccasion] || "",
         season: selectedSeason ? selectedSeason.toLowerCase() : "",
         styleTarget: selectedStyle ? selectedStyle.toLowerCase() : "",
@@ -210,6 +218,15 @@ export function AIStylistClient() {
 
     if (!finalInput) return;
 
+    const inputForBackend = chatInput.trim();
+    if (inputForBackend) {
+      const normalizedDetails = inputForBackend.normalize('NFC');
+      if (normalizedDetails.length > 1000) {
+        toast.error(`Ghi chú quá dài (${normalizedDetails.length}/1000 ký tự). Vui lòng rút gọn nội dung.`);
+        return;
+      }
+    }
+
     const userMsg: ChatMessage = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -218,7 +235,6 @@ export function AIStylistClient() {
     };
     
     setChatMessages(prev => [...prev, userMsg]);
-    const inputForBackend = chatInput.trim();
     setChatInput("");
     setPopoverOpen(false);
 
@@ -236,19 +252,9 @@ export function AIStylistClient() {
 
     if (!finalInput) return;
 
-    if (!outfitData && !contextID) {
-      const userMsg: ChatMessage = {
-        id: crypto.randomUUID(),
-        role: 'user',
-        content: finalInput,
-        timestamp: Date.now()
-      };
-      setChatMessages(prev => [...prev, userMsg]);
-      const inputForBackend = chatInput.trim();
-      setChatInput("");
-      setPopoverOpen(false);
-
-      await handleGenerate(inputForBackend);
+    const normalizedInput = finalInput.normalize('NFC');
+    if (normalizedInput.length > 2000) {
+      toast.error(`Tin nhắn quá dài (${normalizedInput.length}/2000 ký tự). Vui lòng rút gọn nội dung.`);
       return;
     }
 
@@ -261,7 +267,21 @@ export function AIStylistClient() {
 
     setChatMessages(prev => [...prev, userMsg]);
     setChatInput("");
+    setPopoverOpen(false);
     setIsChatting(true);
+
+    let currentContextID = contextID;
+    if (!currentContextID) {
+      try {
+        const session = await aiApi.createChatSession({ title: finalInput.slice(0, 30) });
+        setContextID(session.id);
+        currentContextID = session.id;
+      } catch (e) {
+        console.error("Failed to create chat session", e);
+        setIsChatting(false);
+        return;
+      }
+    }
 
     const aiMsgId = crypto.randomUUID();
     setChatMessages(prev => [
@@ -272,7 +292,7 @@ export function AIStylistClient() {
     abortControllerRef.current = new AbortController();
 
     await aiApi.sendChatMessageStream(
-      contextID,
+      currentContextID,
       userMsg.content,
       (chunk) => {
         setChatMessages(prev =>
@@ -597,6 +617,7 @@ export function AIStylistClient() {
                   className="w-full bg-transparent border-none outline-none pl-2 pr-12 py-3.5 text-[13px] text-[#1A1A1A] placeholder:text-[#A3A3A3] disabled:opacity-50 font-medium"
                   placeholder="Nhập yêu cầu phối đồ của bạn..."
                   type="text"
+                  maxLength={2000}
                 />
                 <button
                   onClick={handleSendMessage}

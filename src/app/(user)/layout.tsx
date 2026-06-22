@@ -1,6 +1,6 @@
+import { MobileBottomNav } from "@/components/layout/mobile-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
-import { MobileBottomNav } from "@/components/layout/mobile-nav";
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
   return (

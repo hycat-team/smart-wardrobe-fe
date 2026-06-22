@@ -28,6 +28,7 @@ export function MobileBottomNav() {
                 isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
+              <Icon className={cn("size-5", isActive && "text-primary")} />
               <span className={cn("text-[10px] font-medium uppercase tracking-widest", isActive && "text-primary font-bold")}>{item.label.split(" ")[0]}</span>
               {isActive && <div className="w-1 h-1 rounded-full bg-primary mt-1" />}
             </Link>
