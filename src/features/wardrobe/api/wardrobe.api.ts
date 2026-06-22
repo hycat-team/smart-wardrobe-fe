@@ -13,12 +13,12 @@ import {
 } from '../types';
 
 export const wardrobeApi = {
-  getMyWardrobeItems: async (params?: { page?: number; limit?: number; category_slug?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<WardrobeItemRes>> => {
+  getMyWardrobeItems: async (params?: { page?: number; limit?: number; categorySlug?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<WardrobeItemRes>> => {
     const res = await axiosInstance.get<APIResponse<PaginationResult<WardrobeItemRes>>>('/me/wardrobe-items', { params });
     return res.data.data!;
   },
 
-  getSystemCatalogItems: async (params?: { page?: number; limit?: number; category_slug?: string, q?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<WardrobeItemRes>> => {
+  getSystemCatalogItems: async (params?: { page?: number; limit?: number; categorySlug?: string, q?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<WardrobeItemRes>> => {
     const res = await axiosInstance.get<APIResponse<PaginationResult<WardrobeItemRes>>>('/system-catalog/wardrobe-items', { params });
     return res.data.data!;
   },
@@ -77,7 +77,7 @@ export const wardrobeApi = {
     return res.data.data!;
   },
 
-  searchWardrobeItems: async (params?: { q?: string; page?: number; limit?: number; category_slug?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<SearchWardrobeItemRes>> => {
+  searchWardrobeItems: async (params?: { q?: string; page?: number; limit?: number; categorySlug?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<SearchWardrobeItemRes>> => {
     const res = await axiosInstance.get<APIResponse<PaginationResult<SearchWardrobeItemRes>>>('/wardrobe-items/search', {
       params,
     });

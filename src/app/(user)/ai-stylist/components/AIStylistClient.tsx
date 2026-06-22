@@ -97,14 +97,11 @@ function AIStylistContent() {
     }
   };
 
-  const handleSwap = (clothingId: string) => {
+  const handleSwap = (role: string) => {
     if (!outfitData) return;
     
-    // Find the role of the item
-    const outfitItem = outfitData.items.find(i => 
-      i.primary.id === clothingId || 
-      i.alternatives?.some(a => a.id === clothingId)
-    );
+    // Find the item by role
+    const outfitItem = outfitData.items.find(i => i.role === role);
     
     if (!outfitItem || !outfitItem.alternatives || outfitItem.alternatives.length === 0) {
       toast.error("Không có lựa chọn thay thế cho món đồ này");
@@ -129,10 +126,7 @@ function AIStylistContent() {
 
     // Replace the item in the canvas
     setSelectedItems(prev => {
-      const existingItemIndex = prev.findIndex(item => 
-        item.clothingItemId === outfitItem.primary.id || 
-        outfitItem.alternatives?.some(a => a.id === item.clothingItemId)
-      );
+      const existingItemIndex = prev.findIndex(item => item._role === role);
 
       if (existingItemIndex === -1) return prev;
 

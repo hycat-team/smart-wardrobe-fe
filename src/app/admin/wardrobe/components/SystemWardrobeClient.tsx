@@ -8,12 +8,22 @@ import { cn } from "@/lib/utils";
 
 import { BatchUploadModal } from "./BatchUploadModal";
 import { ItemEditDrawer } from "./ItemEditDrawer";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 gsap.registerPlugin(useGSAP);
 
 export function SystemWardrobeClient() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data, isLoading, isError } = useAdminCatalog({ q: searchTerm });
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isError } = useAdminCatalog({ q: searchTerm, page, limit: 20 });
   
   const { mutate: deleteItem, isPending: isDeleting } = useDeleteSystemWardrobeItem();
 
@@ -70,7 +80,7 @@ export function SystemWardrobeClient() {
                 type="text" 
                 placeholder="QUERY.ITEMS..." 
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
                 className="h-12 w-full pl-12 pr-4 bg-white border border-gray-300 focus:border-green-500 text-black font-mono text-xs uppercase tracking-widest transition-colors outline-none rounded-none placeholder:text-gray-400"
               />
             </div>
@@ -168,6 +178,71 @@ export function SystemWardrobeClient() {
             )}
           </div>
         </div>
+
+        {data?.metadata && data.metadata.totalPages > 1 && (
+          <Pagination className="mt-16 pb-12">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (page > 1) setPage((p) => p - 1);
+                  }}
+                  className={page <= 1 ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                  text="TRƯỚC"
+                />
+              </PaginationItem>
+
+              {[...Array(data.metadata.totalPages)].map((_, i) => {
+                const pageNum = i + 1;
+                if (
+                  pageNum === 1 ||
+                  pageNum === data.metadata.totalPages ||
+                  (pageNum >= page - 1 && pageNum <= page + 1)
+                ) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        href="#"
+                        isActive={page === pageNum}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage(pageNum);
+                        }}
+                        className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest rounded-none border-black/10"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
+
+                if (pageNum === page - 2 || pageNum === page + 2) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
+
+                return null;
+              })}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (page < data.metadata.totalPages) setPage((p) => p + 1);
+                  }}
+                  className={page >= data.metadata.totalPages ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                  text="SAU"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
 
       {/* Delete Confirmation Modal (Brutalist) */}

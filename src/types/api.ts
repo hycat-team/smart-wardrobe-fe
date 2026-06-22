@@ -32,6 +32,7 @@ export interface PaginationMetadata {
   totalItems: number;
 }
 
-export interface PaginationResult<T> extends PaginationMetadata {
+export interface PaginationResult<T> {
   items: T[];
+  metadata: PaginationMetadata;
 }

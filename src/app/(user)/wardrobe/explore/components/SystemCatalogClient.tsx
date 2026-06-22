@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useSystemCatalogItems, useInitClosetFromCatalog } from "@/features/wardrobe/queries/wardrobe.queries";
@@ -10,9 +10,38 @@ import { WardrobeItemRes } from "@/features/wardrobe/types";
 import { Loader2, Plus, ArrowLeft, Search } from "lucide-react";
 import { WardrobeCard } from "../../components/WardrobeCard";
 import { Skeleton } from "@heroui/react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+import { cn } from "@/lib/utils";
+
+const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
+
+const CATEGORY_SLUG_MAP: Record<string, string> = {
+  "Áo": "ao",
+  "Quần": "quan",
+  "Váy": "vay",
+  "Giày": "giay",
+  "Phụ kiện": "phu-kien",
+  "Áo khoác": "ao-khoac",
+  "Mũ": "mu",
+  "Khác": "other"
+};
 
 export function SystemCatalogClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  
+  const categoryParam = searchParams.get("category") || "Tất cả";
+  const slugToFetch = categoryParam === "Tất cả" ? undefined : CATEGORY_SLUG_MAP[categoryParam] || categoryParam;
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
   const containerRef = useRef<HTMLDivElement>(null);
   const actionBarRef = useRef<HTMLDivElement>(null);
   
@@ -30,15 +59,25 @@ export function SystemCatalogClient() {
   // Queries
   const {
     data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
     isLoading,
-  } = useSystemCatalogItems(undefined, searchQuery);
+  } = useSystemCatalogItems(slugToFetch, searchQuery, pageParam);
+
+  const updateParams = (newParams: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === null || value === "") {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const { mutate: initCloset, isPending: isInitializing } = useInitClosetFromCatalog();
 
-  const items = data?.pages.flatMap((page) => page.items) || [];
+  const items = data?.items || [];
+  const metadata = data?.metadata;
 
   const handleToggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -68,6 +107,7 @@ export function SystemCatalogClient() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchQuery(searchInput);
+    updateParams({ page: "1" });
   };
 
   // GSAP Animations
@@ -80,7 +120,7 @@ export function SystemCatalogClient() {
         { opacity: 1, y: 0, stagger: 0.05, ease: "power3.out", duration: 0.6, clearProps: "all" }
       );
     }
-  }, { scope: containerRef, dependencies: [items.length] });
+  }, { scope: containerRef, dependencies: [items.map((i) => i.id).join(",")] });
 
   useGSAP(() => {
     // Animate Action Bar up/down
@@ -142,6 +182,32 @@ export function SystemCatalogClient() {
             </form>
           </div>
         </div>
+
+        {/* Filters Row */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mt-4">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+            {CATEGORIES.map((cat) => {
+              const isActive = categoryParam === cat;
+              const label = cat === "Tất cả" ? "Tất cả" : cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => updateParams({ category: cat === "Tất cả" ? null : cat, page: "1" })}
+                  className={cn(
+                    "relative pb-2 px-1 text-[11px] font-mono uppercase tracking-[0.2em] transition-colors group",
+                    isActive ? "text-[#111] font-bold" : "text-[#888] hover:text-[#111] font-medium"
+                  )}
+                >
+                  {label}
+                  <span className={cn(
+                    "absolute bottom-0 left-0 h-[2px] bg-[#111] transition-all duration-300",
+                    isActive ? "w-full" : "w-0 group-hover:w-full"
+                  )} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Grid */}
@@ -186,18 +252,69 @@ export function SystemCatalogClient() {
           </div>
         )}
 
-        {hasNextPage && (
-          <div className="mt-12 flex justify-center">
-            <button
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              className="px-6 py-2 rounded-full border border-border hover:border-foreground hover:bg-muted transition-colors text-foreground font-medium text-sm flex items-center gap-2"
-              aria-label="Tải thêm trang phục"
-            >
-              {isFetchingNextPage ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Tải thêm
-            </button>
-          </div>
+        {metadata && metadata.totalPages > 1 && (
+          <Pagination className="mt-16 pb-12">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (pageParam > 1) updateParams({ page: (pageParam - 1).toString() });
+                  }}
+                  className={pageParam <= 1 ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                  text="TRƯỚC"
+                />
+              </PaginationItem>
+
+              {[...Array(metadata.totalPages)].map((_, i) => {
+                const pageNum = i + 1;
+                if (
+                  pageNum === 1 ||
+                  pageNum === metadata.totalPages ||
+                  (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)
+                ) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        href="#"
+                        isActive={pageParam === pageNum}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          updateParams({ page: pageNum.toString() });
+                        }}
+                        className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest rounded-none border-black/10"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
+
+                if (pageNum === pageParam - 2 || pageNum === pageParam + 2) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
+
+                return null;
+              })}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (pageParam < metadata.totalPages) updateParams({ page: (pageParam + 1).toString() });
+                  }}
+                  className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                  text="SAU"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         )}
       </div>
 

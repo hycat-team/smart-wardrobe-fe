@@ -36,6 +36,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 import { useMyWardrobe, useBulkDeleteWardrobeItems } from "@/features/wardrobe/queries/wardrobe.queries";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
@@ -115,6 +124,8 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   const spamClickCount = useRef(0);
   const spamClickTimeout = useRef<NodeJS.Timeout | null>(null);
 
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
+
   // Map category param to backend slug
   const slugToFetch = categoryParam === "Tất cả" ? undefined : CATEGORY_SLUG_MAP[categoryParam] || categoryParam;
 
@@ -123,14 +134,12 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     data,
     isLoading: isLoadingItems,
     isFetching,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
     refetch
-  } = useMyWardrobe(slugToFetch);
+  } = useMyWardrobe(slugToFetch, pageParam);
 
   const rawInitialItems = Array.isArray(initialData) ? initialData : ((initialData as any)?.items || []);
-  const realItems = data ? data.pages.flatMap(page => page.items) : rawInitialItems;
+  const realItems = data ? data.items : rawInitialItems;
+  const metadata = data?.metadata;
 
   // Sync Search state with query params ONLY if changed externally
   useEffect(() => {
@@ -166,7 +175,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   };
 
   const handleCategoryChange = (cat: string) => {
-    updateParams({ category: cat === "Tất cả" ? null : cat });
+    updateParams({ category: cat === "Tất cả" ? null : cat, page: "1" });
   };
 
   const handleColorChange = (color: string) => {
@@ -183,7 +192,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateParams({ q: searchInput, category: null });
+    updateParams({ q: searchInput, category: null, page: "1" });
   };
 
   const handleResetFilters = () => {
@@ -407,7 +416,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
           ))}
         </div>
       ) : sortedItems.length > 0 ? (
-        <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", (isFetching && !isFetchingNextPage) && "opacity-60 blur-[1px]")}>
+        <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", isFetching && "opacity-60 blur-[1px]")}>
           {sortedItems.map((item: any) => {
             const isProcessing = item.status === WardrobeItemStatus.Processing;
             const isFailed = item.status === WardrobeItemStatus.Failed;
@@ -486,17 +495,69 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
         </div>
       )}
 
-      {hasNextPage && (
-        <div className="mt-32 flex justify-center border-t border-ink/10 pt-16">
-          <Button
-            onClick={() => fetchNextPage()}
-            disabled={isFetchingNextPage}
-            variant="ghost"
-            className="text-xs font-mono tracking-[0.3em] uppercase text-ink hover:bg-transparent hover:text-terracotta disabled:opacity-50 transition-colors"
-          >
-            {isFetchingNextPage ? 'Đang tải...' : 'Tải thêm'}
-          </Button>
-        </div>
+      {metadata && metadata.totalPages > 1 && (
+        <Pagination className="mt-16 pb-12 border-t border-ink/10 pt-16">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (pageParam > 1) updateParams({ page: (pageParam - 1).toString() });
+                }}
+                className={pageParam <= 1 ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:text-terracotta transition-colors"}
+                text="TRƯỚC"
+              />
+            </PaginationItem>
+
+            {[...Array(metadata.totalPages)].map((_, i) => {
+              const pageNum = i + 1;
+              if (
+                pageNum === 1 ||
+                pageNum === metadata.totalPages ||
+                (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)
+              ) {
+                return (
+                  <PaginationItem key={pageNum}>
+                    <PaginationLink
+                      href="#"
+                      isActive={pageParam === pageNum}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        updateParams({ page: pageNum.toString() });
+                      }}
+                      className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest rounded-none border-ink/10"
+                    >
+                      {pageNum}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              }
+
+              if (pageNum === pageParam - 2 || pageNum === pageParam + 2) {
+                return (
+                  <PaginationItem key={pageNum}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                );
+              }
+
+              return null;
+            })}
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (pageParam < metadata.totalPages) updateParams({ page: (pageParam + 1).toString() });
+                }}
+                className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:text-terracotta transition-colors"}
+                text="SAU"
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       )}
     </div>
   );
