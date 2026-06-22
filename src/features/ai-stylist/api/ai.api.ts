@@ -16,6 +16,16 @@ export const aiApi = {
     return res.data.data!;
   },
 
+  getChatSessions: async (): Promise<ChatSessionRes[]> => {
+    const res = await api.get<APIResponse<ChatSessionRes[]>>('/ai/chat/sessions');
+    return res.data.data!;
+  },
+
+  getChatMessages: async (contextID: string, params?: { page?: number; limit?: number }): Promise<import('@/types/api').PaginationResult<import('../types').ChatMessageRes>> => {
+    const res = await api.get<APIResponse<import('@/types/api').PaginationResult<import('../types').ChatMessageRes>>>(`/ai/chat/sessions/${contextID}/messages`, { params });
+    return res.data.data!;
+  },
+
   sendChatMessageStream: async (
     contextID: string,
     message: string,
@@ -38,7 +48,8 @@ export const aiApi = {
 
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({}));
-        throw new Error(errBody.message || 'Không thể kết nối đến máy chủ AI');
+        const errorMessage = errBody.message || errBody.detail || errBody.title || `HTTP ${response.status} ${response.statusText}`;
+        throw new Error(`[Status: ${response.status}] ${errorMessage}`);
       }
 
       const reader = response.body?.getReader();

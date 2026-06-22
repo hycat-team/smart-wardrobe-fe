@@ -46,3 +46,12 @@ export interface ChatSessionRes {
   createdAt: string;
   updatedAt: string;
 }
+
+export type MessageSender = 'USER' | 'SYSTEM' | 'ASSISTANT';
+
+export interface ChatMessageRes {
+  id: string;
+  content: string;
+  sender: MessageSender;
+  createdAt: string;
+}
