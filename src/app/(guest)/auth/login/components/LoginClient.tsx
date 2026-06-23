@@ -50,12 +50,13 @@ export function LoginClient() {
   return (
     <div className="w-full px-6 py-8 sm:px-10 sm:py-10">
 
-      <form noValidate className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <form noValidate className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">
           <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="email">Email / Tên Đăng Nhập</label>
           <input
             id="email"
             type="text"
+            tabIndex={1}
             placeholder="your@email.com or username"
             {...register("email")}
             onFocus={() => setFocusedInput('email')}
@@ -68,11 +69,12 @@ export function LoginClient() {
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="password">Mật khẩu</label>
-            <Link href="/auth/forgot-password" className="font-inter text-[13px] text-ethos-on-surface-variant hover:text-ethos-primary transition-colors">Quên mật khẩu?</Link>
+            <Link href="/auth/forgot-password" tabIndex={3} className="font-inter text-[13px] text-ethos-on-surface-variant hover:text-ethos-primary transition-colors">Quên mật khẩu?</Link>
           </div>
           <input
             id="password"
             type="password"
+            tabIndex={2}
             placeholder="••••••••"
             {...register("password")}
             onFocus={() => setFocusedInput('password')}
@@ -86,6 +88,7 @@ export function LoginClient() {
           <button
             type="submit"
             disabled={isPending}
+            tabIndex={4}
             className="w-full h-12 bg-ethos-primary text-ethos-on-primary font-inter text-[15px] font-medium flex items-center justify-center hover:bg-ethos-primary-container hover:shadow-[0_10px_30px_rgba(45,45,45,0.15)] transition-all duration-300 ease-in-out group disabled:opacity-70 disabled:cursor-not-allowed"
           >
             <span>{isPending ? "Đang đăng nhập..." : "Đăng Nhập"}</span>

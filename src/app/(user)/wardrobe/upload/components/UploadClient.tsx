@@ -1,8 +1,9 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { UploadCloud, X, Sparkles, Loader2, ImagePlus } from "lucide-react";
+import { UploadCloud, X, Sparkles, Loader2, ImagePlus, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useBatchUploadWardrobeItems, useCategories } from "@/features/wardrobe/queries/wardrobe.queries";
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
 import { toast } from "sonner";
@@ -187,6 +188,12 @@ export function UploadClient() {
 
       {/* Editorial Header */}
       <div className="flex flex-col gap-6 border-b border-black/10 pb-8 gsap-header">
+        <Link 
+          href="/wardrobe" 
+          className="inline-flex items-center gap-2 text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.12em] text-[#666] hover:text-[#111] transition-colors w-fit"
+        >
+          <ArrowLeft className="size-3.5" /> Trở về tủ đồ
+        </Link>
         <div className="space-y-4 max-w-2xl">
           <h1 className="text-4xl md:text-5xl lg:text-[72px] font-['Playfair_Display'] font-medium tracking-tight text-[#111] leading-[1.1]">
             DIGITAL FASHION

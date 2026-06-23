@@ -48,6 +48,7 @@ export function SystemCatalogClient() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -55,6 +56,14 @@ export function SystemCatalogClient() {
     }, 500);
     return () => clearTimeout(handler);
   }, [searchInput]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 220);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Queries
   const {
@@ -145,9 +154,43 @@ export function SystemCatalogClient() {
 
   const getWardrobeItemName = (item: WardrobeItemRes) => item.category?.name || "Trang phục";
 
+  const renderActions = () => (
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+      {/* Search Input */}
+      <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-[240px]">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888] size-4" />
+        <input
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="w-full bg-[#F8F7F5] border border-black/10 focus:border-black focus:ring-0 pl-10 pr-4 py-3 rounded-none outline-none transition-all font-['IBM_Plex_Mono'] text-[11px] text-[#111] placeholder:text-[#888] uppercase tracking-widest"
+          placeholder="TÌM KIẾM..."
+        />
+      </form>
+    </div>
+  );
+
   return (
-    <div className="max-w-[1400px] mx-auto space-y-8 pb-32 px-4 sm:px-8 lg:px-12 font-sans" ref={containerRef}>
-      {/* High-end Editorial Header */}
+    <>
+      {/* Sticky Top Action Bar */}
+      <div 
+        className={cn(
+          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-[#F4F1EE]/80 dark:bg-[#111]/80 backdrop-blur-xl border-b border-black/10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          isScrolled ? "translate-y-0 shadow-sm opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        )}
+      >
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="hidden md:flex items-center gap-2">
+            <span className="font-['Playfair_Display'] font-medium text-2xl text-[#111] uppercase tracking-wide">
+              Explore
+            </span>
+          </div>
+          {renderActions()}
+        </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto space-y-8 pb-32 px-4 sm:px-8 lg:px-12 font-sans" ref={containerRef}>
+        {/* High-end Editorial Header */}
       <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-black/10 pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4 max-w-2xl flex items-center gap-4">
@@ -163,24 +206,12 @@ export function SystemCatalogClient() {
                 Explore
               </h1>
               <p className="text-[12px] text-[#666] font-['IBM_Plex_Mono'] uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4 mt-4">
-                Thêm nhanh các item từ hệ thống vào tủ đồ của bạn
+                Thêm nhanh các trang phục từ hệ thống vào tủ đồ của bạn
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
-            {/* Search Input */}
-            <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-[240px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888] size-4" />
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full bg-[#F8F7F5] border border-black/10 focus:border-black focus:ring-0 pl-10 pr-4 py-3 rounded-none outline-none transition-all font-['IBM_Plex_Mono'] text-[11px] text-[#111] placeholder:text-[#888] uppercase tracking-widest"
-                placeholder="TÌM KIẾM..."
-              />
-            </form>
-          </div>
+          {renderActions()}
         </div>
 
         {/* Filters Row */}
@@ -245,6 +276,7 @@ export function SystemCatalogClient() {
                     isSelected={isSelected}
                     onClick={() => handleToggleSelect(item.id)}
                     getWardrobeItemName={getWardrobeItemName}
+                    hideDetails={true}
                   />
                 </div>
               );
@@ -347,6 +379,7 @@ export function SystemCatalogClient() {
           )}
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

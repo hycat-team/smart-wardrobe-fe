@@ -1,7 +1,7 @@
 "use client";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, Sparkles, Shirt } from "lucide-react";
+import { Plus, Sparkles, Shirt, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -58,9 +58,48 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const metadata = data?.metadata;
   const deleteOutfitMutation = useDeleteOutfit();
 
+  const searchParam = searchParams.get("q") || "";
+  const [searchInput, setSearchInput] = useState(searchParam);
+  const lastPushedQ = useRef(searchParam);
+
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [sortParam, setSortParam] = useState<SortOption>("Mới Nhất");
   const [outfitToDelete, setOutfitToDelete] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 220);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Sync Search state with query params ONLY if changed externally
+  useEffect(() => {
+    if (searchParam !== lastPushedQ.current) {
+      setSearchInput(searchParam);
+      lastPushedQ.current = searchParam;
+    }
+  }, [searchParam]);
+
+  // Debounced Search effect
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchInput !== searchParam && searchInput !== lastPushedQ.current) {
+        lastPushedQ.current = searchInput;
+        const params = new URLSearchParams(searchParams);
+        if (searchInput) {
+          params.set("q", searchInput);
+        } else {
+          params.delete("q");
+        }
+        params.set("page", "1");
+        router.push("?" + params.toString(), { scroll: false });
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchInput, searchParam, searchParams, router]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -101,10 +140,17 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const filteredAndSortedOutfits = useMemo(() => {
     const filtered = outfits.filter((o: Outfit) => {
       const isFavorite = favorites[o.id] || false;
-      if (filterParam === "all") return true;
-      if (filterParam === "ai") return o.status === 1;
-      if (filterParam === "manual") return o.status === 0 || o.status === 2;
-      if (filterParam === "saved") return isFavorite;
+      if (filterParam === "all") {}
+      else if (filterParam === "ai" && o.status !== 1) return false;
+      else if (filterParam === "manual" && o.status !== 0 && o.status !== 2) return false;
+      else if (filterParam === "saved" && !isFavorite) return false;
+
+      if (searchParam) {
+        const q = searchParam.toLowerCase();
+        const matchName = o.name?.toLowerCase().includes(q);
+        const matchDesc = o.description?.toLowerCase().includes(q);
+        if (!matchName && !matchDesc) return false;
+      }
       return true;
     });
 
@@ -113,7 +159,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
       const dateB = new Date(b.createdAt || 0).getTime();
       return sortParam === "Mới Nhất" ? dateB - dateA : dateA - dateB;
     });
-  }, [outfits, filterParam, favorites, sortParam]);
+  }, [outfits, filterParam, favorites, sortParam, searchParam]);
 
   useGSAP(() => {
     if (filteredAndSortedOutfits.length > 0) {
@@ -125,10 +171,64 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
     }
   }, { dependencies: [filteredAndSortedOutfits], scope: containerRef });
 
-  return (
-    <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-[#111]">
+  const renderActions = () => (
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+      {/* Search Input */}
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        const params = new URLSearchParams(searchParams);
+        if (searchInput) params.set("q", searchInput);
+        else params.delete("q");
+        params.set("page", "1");
+        router.push("?" + params.toString(), { scroll: false });
+      }} className="relative w-full sm:w-[240px]">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888] size-4" />
+        <input
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="w-full bg-[#F8F7F5] border border-black/10 focus:border-black focus:ring-0 pl-10 pr-4 py-3 rounded-none outline-none transition-all font-['IBM_Plex_Mono'] text-[11px] text-[#111] placeholder:text-[#888] uppercase tracking-widest"
+          placeholder="TÌM KIẾM..."
+        />
+      </form>
 
-      {/* High-end Editorial Header */}
+      <button
+        onClick={() => router.push("/ai-stylist")}
+        className="h-12 px-6 border border-[#E5E5E5] text-[#111] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:border-[#111] transition-colors flex items-center justify-center gap-2"
+      >
+        <Sparkles className="size-3.5" /> Tạo bằng AI
+      </button>
+
+      <button
+        onClick={() => router.push("/outfits/create")}
+        className="h-12 px-8 bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
+      >
+        <Plus className="size-4" /> Tạo Bộ Phối
+      </button>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Sticky Top Action Bar */}
+      <div 
+        className={cn(
+          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-[#F4F1EE]/80 dark:bg-[#111]/80 backdrop-blur-xl border-b border-black/10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          isScrolled ? "translate-y-0 shadow-sm opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        )}
+      >
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="hidden md:flex items-center gap-2">
+            <span className="font-['Playfair_Display'] font-medium text-2xl text-[#111] uppercase tracking-wide">
+              Curations
+            </span>
+          </div>
+          {renderActions()}
+        </div>
+      </div>
+
+      <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-[#111]">
+        {/* High-end Editorial Header */}
       <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-black/10 pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4 max-w-2xl">
@@ -144,58 +244,52 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
-            <button
-              onClick={() => router.push("/ai-stylist")}
-              className="h-12 px-6 border border-[#E5E5E5] text-[#111] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:border-[#111] transition-colors flex items-center justify-center gap-2"
-            >
-              <Sparkles className="size-3.5" /> Tạo bằng AI
-            </button>
-
-            <button
-              onClick={() => router.push("/outfits/create")}
-              className="h-12 px-8 bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
-            >
-              <Plus className="size-4" /> Tạo Bộ Phối
-            </button>
-          </div>
+          {renderActions()}
         </div>
 
-        {/* Filters & Sorting */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 pt-4">
-          <div className="flex flex-wrap gap-x-8 gap-y-4">
+        {/* Filters Row */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mt-4">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
             {[
               { label: "Tất cả", value: "all" },
               { label: "Tạo bởi AI", value: "ai" },
               { label: "Thủ công", value: "manual" },
               { label: "Đã lưu", value: "saved" }
-            ].map(tab => (
-              <button
-                key={tab.value}
-                onClick={() => handleFilterChange(tab.value)}
-                className={cn(
-                  "text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.12em] relative transition-colors group pb-1",
-                  filterParam === tab.value
-                    ? "text-[#111] font-medium border-b border-[#111]"
-                    : "text-[#666] hover:text-[#111] border-b border-transparent hover:border-[#111]"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
+            ].map(tab => {
+              const isActive = filterParam === tab.value;
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => handleFilterChange(tab.value)}
+                  className={cn(
+                    "relative pb-2 px-1 text-[11px] font-mono uppercase tracking-[0.2em] transition-colors group",
+                    isActive ? "text-[#111] font-bold" : "text-[#888] hover:text-[#111] font-medium"
+                  )}
+                >
+                  {tab.label}
+                  <span className={cn(
+                    "absolute bottom-0 left-0 h-[2px] bg-[#111] transition-all duration-300",
+                    isActive ? "w-full" : "w-0 group-hover:w-full"
+                  )} />
+                </button>
+              );
+            })}
           </div>
 
-          <div className="flex items-center gap-4 border border-black/10 px-4 py-2 bg-[#F8F7F5]">
-            <span className="text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-[0.2em] text-[#888]">Sắp xếp</span>
-            <Select value={sortParam} onValueChange={(value) => setSortParam(value as SortOption)}>
-              <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-widest text-[#111] font-medium w-auto">
-                <SelectValue placeholder="Mới nhất" />
-              </SelectTrigger>
-              <SelectContent alignItemWithTrigger={false} align="end" sideOffset={4}>
-                <SelectItem value="Mới Nhất" className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest font-medium">Mới Nhất</SelectItem>
-                <SelectItem value="Cũ Nhất" className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest font-medium">Cũ Nhất</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-6">
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono text-[#888] uppercase tracking-[0.15em]">Sort:</span>
+              <Select value={sortParam} onValueChange={(value) => setSortParam(value as SortOption)}>
+                <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-[11px] font-mono uppercase tracking-widest text-[#111] font-medium w-auto gap-1">
+                  <SelectValue placeholder="Mới nhất" />
+                </SelectTrigger>
+                <SelectContent align="end" className="rounded-none border-black/10 bg-white">
+                  <SelectItem value="Mới Nhất" className="font-mono text-[11px] uppercase tracking-widest hover:bg-black/5">Mới nhất</SelectItem>
+                  <SelectItem value="Cũ Nhất" className="font-mono text-[11px] uppercase tracking-widest hover:bg-black/5">Cũ nhất</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>
@@ -353,6 +447,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-    </div>
+      </div>
+    </>
   );
 }

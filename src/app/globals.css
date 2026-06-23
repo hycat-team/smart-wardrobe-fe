@@ -256,9 +256,6 @@
 html.dark-atelier {
     cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23B8975A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m22 2-7 20-4-9-9-4Z'/><path d='M22 2 11 13'/></svg>"), auto;
 }
-html.dark-atelier * {
-    cursor: inherit;
-}
 
 @layer base {
   * {
@@ -269,6 +266,17 @@ html.dark-atelier * {
   }
   html {
     @apply font-sans;
+  }
+  button, 
+  a, 
+  [role="button"], 
+  input[type="button"], 
+  input[type="submit"], 
+  input[type="reset"],
+  summary,
+  select,
+  [tabindex]:not([tabindex="-1"]) {
+    @apply cursor-pointer;
   }
 }
 

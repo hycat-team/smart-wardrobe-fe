@@ -70,7 +70,7 @@ export function Sidebar() {
       <div className="mb-6 flex flex-col pl-1">
         <div className="flex items-center gap-1.5 mb-1.5 opacity-50">
           <Sparkles className="size-3" />
-          <span className="text-[9px] font-semibold tracking-[0.2em] uppercase">Smart Wardrobe</span>
+          <span className="text-[9px] font-semibold tracking-[0.2em] uppercase">Tủ đồ thông minh</span>
         </div>
         <Link href="/" className="flex items-center group w-fit">
           <span className="font-display-lg text-4xl font-light tracking-tighter text-primary">
