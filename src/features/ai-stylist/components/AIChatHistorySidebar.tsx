@@ -4,6 +4,16 @@ import { X, Plus, MessageSquare, MoveRight, Trash2, Edit2 } from "lucide-react";
 import { ChatSessionRes } from "@/features/ai-stylist/types";
 import { useArchiveChatSession } from "@/features/ai-stylist/queries/ai.queries";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AIChatHistorySidebarProps {
   isHistoryOpen: boolean;
@@ -27,6 +37,7 @@ export function AIChatHistorySidebar({
   const archiveMutation = useArchiveChatSession();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   const handleStartRename = (e: React.MouseEvent, session: ChatSessionRes) => {
     e.stopPropagation();
@@ -54,21 +65,21 @@ export function AIChatHistorySidebar({
     }
   };
 
-  const handleDelete = (e: React.MouseEvent, sessionId: string) => {
-    e.stopPropagation();
-    if (confirm("Bạn có chắc chắn muốn xóa phiên trò chuyện này?")) {
-      archiveMutation.mutate({ sessionId }, {
-        onSuccess: () => {
-          toast.success("Đã xóa phiên trò chuyện");
-          if (contextID === sessionId) {
-            handleNewChat();
-          }
-        },
-        onError: () => {
-          toast.error("Không thể xóa phiên trò chuyện");
+  const confirmDelete = () => {
+    if (!sessionToDelete) return;
+    archiveMutation.mutate({ sessionId: sessionToDelete }, {
+      onSuccess: () => {
+        toast.success("Đã xóa phiên trò chuyện");
+        if (contextID === sessionToDelete) {
+          handleNewChat();
         }
-      });
-    }
+        setSessionToDelete(null);
+      },
+      onError: () => {
+        toast.error("Không thể xóa phiên trò chuyện");
+        setSessionToDelete(null);
+      }
+    });
   };
 
   const activeSessions = chatSessionsData?.filter(session => !session.isArchived) || [];
@@ -153,7 +164,10 @@ export function AIChatHistorySidebar({
                   <Edit2 className="w-4 h-4" />
                 </div>
                 <div
-                  onClick={(e) => handleDelete(e, session.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSessionToDelete(session.id);
+                  }}
                   className="p-1.5 hover:bg-red-50 text-red-500 rounded"
                   title="Xóa phiên"
                 >
@@ -164,6 +178,26 @@ export function AIChatHistorySidebar({
           ))
         )}
       </div>
+
+      <AlertDialog open={!!sessionToDelete} onOpenChange={(open) => !open && setSessionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa phiên trò chuyện</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa phiên trò chuyện này không? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-red-500 text-white hover:bg-red-600"
+            >
+              Xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

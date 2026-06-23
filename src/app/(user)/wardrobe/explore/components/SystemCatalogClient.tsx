@@ -277,6 +277,7 @@ export function SystemCatalogClient() {
                     onClick={() => handleToggleSelect(item.id)}
                     getWardrobeItemName={getWardrobeItemName}
                     hideDetails={true}
+                    hideTitle={true}
                   />
                 </div>
               );

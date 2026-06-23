@@ -2,6 +2,7 @@ import { Check, Heart, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WardrobeItemRes as WardrobeItem } from "@/features/wardrobe/types";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
+import Image from "next/image";
 
 interface WardrobeCardProps {
   item: WardrobeItem;
@@ -12,6 +13,7 @@ interface WardrobeCardProps {
   onClick: () => void;
   getWardrobeItemName: (item: WardrobeItem) => string;
   hideDetails?: boolean;
+  hideTitle?: boolean;
 }
 
 export function WardrobeCard({
@@ -23,6 +25,7 @@ export function WardrobeCard({
   onClick,
   getWardrobeItemName,
   hideDetails = false,
+  hideTitle = false,
 }: WardrobeCardProps) {
   return (
     <div
@@ -35,7 +38,7 @@ export function WardrobeCard({
     >
       {/* Image Area - 75% Visual Weight */}
       <div className="relative aspect-[4/5] bg-[#F7F6F4] p-3 md:p-6 overflow-hidden flex-shrink-0">
-        <img
+        <Image
           alt={getWardrobeItemName(item)}
           className={cn(
             "w-full h-full object-contain drop-shadow-sm transition-transform duration-250",
@@ -43,6 +46,7 @@ export function WardrobeCard({
             isProcessing && "blur-md opacity-60"
           )}
           src={applyCloudinaryTrim(item.imageUrl || undefined)}
+        fill
         />
         {isProcessing && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
@@ -105,9 +109,11 @@ export function WardrobeCard({
       {/* Information Area - 25% Visual Weight */}
       <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow bg-white border-t border-black/5">
         <div>
-          <h3 className="font-['Playfair_Display'] text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
-            {getWardrobeItemName(item)}
-          </h3>
+          {!hideTitle && (
+            <h3 className="font-['Playfair_Display'] text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
+              {getWardrobeItemName(item)}
+            </h3>
+          )}
           {item.style && (
             <p className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-[0.15em] text-[#888] mt-1.5 truncate">
               {item.style}

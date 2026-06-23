@@ -13,8 +13,11 @@ const formatAIResponse = (text: string) => {
   // Bỏ các dấu ngoặc kép thừa ở đầu/cuối hoặc kí tự escape \"
   let cleaned = text.replace(/^"+|"+$/g, '').replace(/\\"/g, '"');
   
-  // Xóa bớt các dấu * dùng để in nghiêng/đậm của Markdown để text sạch hơn
-  cleaned = cleaned.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+  // Format markdown: in đậm + nghiêng (***text***), in đậm (**text**), in nghiêng (*text*)
+  cleaned = cleaned
+    .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>');
 
   // Tách theo dòng \n
   const lines = cleaned.split('\n');
@@ -30,12 +33,15 @@ const formatAIResponse = (text: string) => {
           return (
             <div key={idx} className="flex items-start gap-2 ml-2">
               <span className="text-[#1A1A1A] mt-0.5 text-[10px]">●</span>
-              <span className="flex-1">{trimmed.replace(/^[*-]\s+/, '')}</span>
+              <span 
+                className="flex-1"
+                dangerouslySetInnerHTML={{ __html: trimmed.replace(/^[*-]\s+/, '') }}
+              />
             </div>
           );
         }
 
-        return <p key={idx}>{trimmed}</p>;
+        return <p key={idx} dangerouslySetInnerHTML={{ __html: trimmed }} />;
       })}
     </div>
   );
