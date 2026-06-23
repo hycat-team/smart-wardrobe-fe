@@ -37,7 +37,7 @@ export function useOutfitCanvas() {
           zIndex: maxZ + 1,
         },
       ]);
-      toast.success(`Đã thêm ${getWardrobeItemName(item)} vào bàn phối!`);
+      // toast.success(`Đã thêm ${getWardrobeItemName(item)} vào bàn phối!`);
     }
   };
 

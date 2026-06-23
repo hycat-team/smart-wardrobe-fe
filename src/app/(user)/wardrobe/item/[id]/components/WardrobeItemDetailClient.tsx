@@ -97,7 +97,7 @@ export function WardrobeItemDetailClient({ itemId, initialItem }: WardrobeItemDe
             href="/wardrobe" 
             className="inline-flex items-center gap-2 text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.12em] text-[#666] hover:text-[#111] transition-colors"
           >
-            <ArrowLeft className="size-3.5" /> Back to Wardrobe
+            <ArrowLeft className="size-3.5" /> Trở về tủ đồ
           </Link>
 
           <div className="flex items-center gap-6 text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.12em]">
@@ -105,7 +105,7 @@ export function WardrobeItemDetailClient({ itemId, initialItem }: WardrobeItemDe
               onClick={() => router.push(`/wardrobe/item/${itemId}/edit`)}
               className="text-[#666] hover:text-[#111] transition-colors border-b border-transparent hover:border-[#111] pb-0.5"
             >
-              Edit Item
+              Sửa trang phục
             </button>
             
             <AlertDialog>
@@ -114,7 +114,7 @@ export function WardrobeItemDetailClient({ itemId, initialItem }: WardrobeItemDe
                   disabled={isDeleting}
                   className="text-[#666] hover:text-red-500 transition-colors border-b border-transparent hover:border-red-500 pb-0.5 disabled:opacity-50"
                 >
-                  {isDeleting ? "Deleting..." : "Delete"}
+                  {isDeleting ? "Đang xóa..." : "Xóa"}
                 </button>
               </AlertDialogTrigger>
               <AlertDialogContent className="rounded-none border border-black/10 bg-white">
@@ -196,16 +196,7 @@ export function WardrobeItemDetailClient({ itemId, initialItem }: WardrobeItemDe
               </div>
             </div>
 
-            {/* Solid Action Button */}
-            <div className="pt-2">
-              <button 
-                onClick={() => router.push('/outfits/create')}
-                className="w-full sm:w-auto h-14 px-8 bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] flex items-center justify-center gap-3 transition-colors hover:bg-black/80"
-              >
-                <Sparkles className="size-4" />
-                CREATE OUTFIT WITH THIS ITEM
-              </button>
-            </div>
+
 
             {/* AI Metadata Minimalist List */}
             <div className="flex flex-col gap-6 pt-10 border-t border-black/10">

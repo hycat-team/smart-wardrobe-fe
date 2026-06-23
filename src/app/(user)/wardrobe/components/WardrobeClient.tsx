@@ -115,6 +115,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { mutate: bulkDelete, isPending: isDeleting } = useBulkDeleteWardrobeItems();
 
   const [searchInput, setSearchInput] = useState(searchParam);
@@ -160,6 +161,15 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     }, 500);
     return () => clearTimeout(handler);
   }, [searchInput, searchParam]);
+
+  // Track scroll for sticky header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 220);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Update query parameters helper
   const updateParams = (newParams: Record<string, string | null>) => {
@@ -264,9 +274,103 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     }
   }, { scope: containerRef, dependencies: [sortedItems.length, isFetching] });
 
+  const renderActions = () => (
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+      {/* Search Input */}
+      <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-[240px]">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted size-4" />
+        <input
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="w-full bg-cream border border-ink/20 focus:border-ink focus:ring-0 pl-10 pr-4 py-3 rounded-none outline-none transition-all font-mono text-xs text-ink placeholder:text-ink-muted uppercase tracking-widest"
+          placeholder="TÌM KIẾM..."
+        />
+      </form>
+
+      <Button
+        onClick={() => router.push("/wardrobe/upload")}
+        className="rounded-none bg-ink text-cream hover:bg-ink/80 text-xs font-mono tracking-[0.15em] h-[42px] px-8 transition-colors uppercase"
+      >
+        <Plus className="mr-2 size-4" /> Thêm Đồ
+      </Button>
+      <Button
+        onClick={() => {
+          setIsSelectMode(!isSelectMode);
+          setSelectedIds([]);
+        }}
+        variant={isSelectMode ? "default" : "outline"}
+        className={cn("rounded-none text-xs font-mono tracking-[0.15em] h-[42px] px-4 transition-colors uppercase", isSelectMode ? "bg-ink text-cream hover:bg-ink/90" : "border-ink text-ink")}
+      >
+        {isSelectMode ? "Hủy chọn" : "Chọn nhiều"}
+      </Button>
+      {isSelectMode && selectedIds.length > 0 && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              disabled={isDeleting}
+              className="rounded-none bg-[#D03027] text-cream hover:bg-[#D03027]/90 text-xs font-mono tracking-[0.15em] h-[42px] px-4 transition-colors uppercase border-none"
+            >
+              {isDeleting ? <Loader2 className="size-4 animate-spin mr-2" /> : <Trash2 className="size-[15px] mr-1.5" />}
+              Xóa ({selectedIds.length})
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="rounded-none border border-ink/10 bg-cream p-8 shadow-xl sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
+            <AlertDialogHeader className="space-y-4 text-left">
+              <AlertDialogTitle className="font-heading text-4xl uppercase tracking-tighter text-ink leading-none">
+                Cảnh báo <br /><span className="text-[#D03027]">Xóa Dữ Liệu</span>
+              </AlertDialogTitle>
+              <AlertDialogDescription className="font-mono text-[11px] text-ink-muted uppercase tracking-widest leading-relaxed border-l-2 border-[#D03027] pl-4 mt-6">
+                Bạn đang chuẩn bị xóa vĩnh viễn {selectedIds.length} trang phục khỏi hệ thống.
+                <br /><br />
+                Hành động này không thể hoàn tác. Các item này sẽ bị gỡ bỏ khỏi mọi outfit liên quan.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="mt-10 flex gap-4 sm:space-x-0 w-full sm:justify-between">
+              <AlertDialogCancel className="flex-1 rounded-none border border-ink/20 bg-transparent text-ink font-mono text-xs tracking-widest uppercase hover:bg-ink hover:text-cream h-12 transition-colors m-0">
+                Hủy bỏ
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  bulkDelete({ ids: selectedIds }, {
+                    onSuccess: () => {
+                      setIsSelectMode(false);
+                      setSelectedIds([]);
+                    }
+                  });
+                }}
+                className="flex-1 rounded-none border-none bg-[#D03027] text-cream font-mono text-xs tracking-widest uppercase hover:bg-[#D03027]/90 h-12 transition-colors m-0"
+              >
+                Xác nhận
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </div>
+  );
+
   return (
-    <div className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans selection:bg-ink selection:text-cream" ref={containerRef}>
-      {/* High-end Editorial Header */}
+    <>
+      {/* Sticky Top Action Bar */}
+      <div 
+        className={cn(
+          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-[#F4F1EE]/80 dark:bg-[#111]/80 backdrop-blur-xl border-b border-ink/10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          isScrolled ? "translate-y-0 shadow-sm opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        )}
+      >
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="hidden md:flex items-center gap-2">
+            <span className="font-['Playfair_Display'] font-medium text-2xl text-[#111] uppercase tracking-wide">
+              Wardrobe
+            </span>
+          </div>
+          {renderActions()}
+        </div>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans selection:bg-ink selection:text-cream" ref={containerRef}>
+        {/* High-end Editorial Header */}
       <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-ink/10 pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4 max-w-2xl">
@@ -282,79 +386,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
-            {/* Search Input */}
-            <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-[240px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted size-4" />
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full bg-cream border border-ink/20 focus:border-ink focus:ring-0 pl-10 pr-4 py-3 rounded-none outline-none transition-all font-mono text-xs text-ink placeholder:text-ink-muted uppercase tracking-widest"
-                placeholder="TÌM KIẾM..."
-              />
-            </form>
-
-            <Button
-              onClick={() => router.push("/wardrobe/upload")}
-              className="rounded-none bg-ink text-cream hover:bg-ink/80 text-xs font-mono tracking-[0.15em] h-[42px] px-8 transition-colors uppercase"
-            >
-              <Plus className="mr-2 size-4" /> Thêm Món Đồ
-            </Button>
-            <Button
-              onClick={() => {
-                setIsSelectMode(!isSelectMode);
-                setSelectedIds([]);
-              }}
-              variant={isSelectMode ? "default" : "outline"}
-              className={cn("rounded-none text-xs font-mono tracking-[0.15em] h-[42px] px-4 transition-colors uppercase", isSelectMode ? "bg-ink text-cream hover:bg-ink/90" : "border-ink text-ink")}
-            >
-              {isSelectMode ? "Hủy chọn" : "Chọn nhiều"}
-            </Button>
-            {isSelectMode && selectedIds.length > 0 && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    disabled={isDeleting}
-                    className="rounded-none bg-[#D03027] text-cream hover:bg-[#D03027]/90 text-xs font-mono tracking-[0.15em] h-[42px] px-6 transition-colors uppercase border-none"
-                  >
-                    {isDeleting ? <Loader2 className="size-4 animate-spin mr-2" /> : <Trash2 className="size-4 mr-2" />}
-                    Xóa ({selectedIds.length})
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="rounded-none border border-ink/10 bg-cream p-8 shadow-xl sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
-                  <AlertDialogHeader className="space-y-4 text-left">
-                    <AlertDialogTitle className="font-heading text-4xl uppercase tracking-tighter text-ink leading-none">
-                      Cảnh báo <br /><span className="text-[#D03027]">Xóa Dữ Liệu</span>
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="font-mono text-[11px] text-ink-muted uppercase tracking-widest leading-relaxed border-l-2 border-[#D03027] pl-4 mt-6">
-                      Bạn đang chuẩn bị xóa vĩnh viễn {selectedIds.length} trang phục khỏi hệ thống.
-                      <br /><br />
-                      Hành động này không thể hoàn tác. Các item này sẽ bị gỡ bỏ khỏi mọi outfit liên quan.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter className="mt-10 flex gap-4 sm:space-x-0 w-full sm:justify-between">
-                    <AlertDialogCancel className="flex-1 rounded-none border border-ink/20 bg-transparent text-ink font-mono text-xs tracking-widest uppercase hover:bg-ink hover:text-cream h-12 transition-colors m-0">
-                      Hủy bỏ
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => {
-                        bulkDelete({ ids: selectedIds }, {
-                          onSuccess: () => {
-                            setIsSelectMode(false);
-                            setSelectedIds([]);
-                          }
-                        });
-                      }}
-                      className="flex-1 rounded-none border-none bg-[#D03027] text-cream font-mono text-xs tracking-widest uppercase hover:bg-[#D03027]/90 h-12 transition-colors m-0"
-                    >
-                      Xác nhận
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-          </div>
+          {renderActions()}
         </div>
 
         {/* Categories / Tabs - Magazine Index Style */}
@@ -490,7 +522,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
             onClick={() => router.push("/wardrobe/upload")}
             className="rounded-none border-ink text-ink hover:bg-ink hover:text-cream text-xs font-mono tracking-[0.2em] uppercase h-14 px-8 mt-4"
           >
-            Thêm Món Đồ Mới
+            Thêm đồ
           </Button>
         </div>
       )}
@@ -560,5 +592,6 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
         </Pagination>
       )}
     </div>
+    </>
   );
 }
