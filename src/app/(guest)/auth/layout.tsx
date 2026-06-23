@@ -1,10 +1,21 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import AuthCard from "./AuthCard";
 import SplitText from "./SplitText";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen relative flex w-full font-inter overflow-hidden bg-ethos-surface-low">
+      {/* Back to Home Button */}
+      <Link 
+        href="/" 
+        className="absolute top-6 left-6 md:top-8 md:left-8 z-50 flex items-center justify-center h-10 px-4 gap-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md transition-all duration-300 group"
+      >
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        <span className="font-inter text-sm font-medium">Quay lại Closy</span>
+      </Link>
+
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image

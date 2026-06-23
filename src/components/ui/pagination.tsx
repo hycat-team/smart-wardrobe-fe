@@ -42,19 +42,27 @@ function PaginationLink({
   className,
   isActive,
   size = "icon",
+  onClick,
   ...props
 }: PaginationLinkProps) {
   return (
     <Button
-      variant={isActive ? "outline" : "ghost"}
+      variant={isActive ? "default" : "ghost"}
       size={size}
-      className={cn(className)}
+      className={cn(
+        isActive && "bg-[#111] text-white hover:bg-black/90 hover:text-white border-[#111]",
+        className
+      )}
       nativeButton={false}
       render={
         <a
           aria-current={isActive ? "page" : undefined}
           data-slot="pagination-link"
           data-active={isActive}
+          onClick={(e) => {
+            if (onClick) onClick(e);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
           {...props}
         />
       }

@@ -138,7 +138,8 @@ export interface FAQItem {
 export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Closy có miễn phí không?",
-    answer: "Hoàn toàn miễn phí! Bạn có thể số hoá tủ đồ, nhận gợi ý AI và tham gia cộng đồng mà không mất phí.",
+    // answer: "Hoàn toàn miễn phí! Bạn có thể số hoá tủ đồ, nhận gợi ý AI và tham gia cộng đồng mà không mất phí.",
+    answer: "Sẽ có gói trải nghiệm miễn phí. Bạn có thể trải nghiệm các tính năng cơ bản như số hoá tủ đồ và nhận gợi ý AI.",
   },
   {
     question: "AI phối đồ có chính xác không?",
