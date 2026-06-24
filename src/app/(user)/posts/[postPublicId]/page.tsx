@@ -1,0 +1,49 @@
+import { serverFetch } from '@/lib/server-fetch';
+import { PostRes } from '@/features/community/types';
+import PostDetailClient from './components/PostDetailClient';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
+import { notFound } from 'next/navigation';
+
+export async function generateMetadata({ params }: { params: Promise<{ postPublicId: string }> }) {
+  try {
+    const resolvedParams = await params;
+    const post = await serverFetch<PostRes>(`/posts/${resolvedParams.postPublicId}`, { cache: 'no-store' });
+    return {
+      title: `${post?.title || 'Bài viết'} | Atelier Curators`,
+      description: post?.content || 'Xem bài viết này trên Atelier Curators',
+    };
+  } catch (error) {
+    return {
+      title: 'Bài viết | Atelier Curators',
+    };
+  }
+}
+
+export default async function PostDetailPage({ params }: { params: Promise<{ postPublicId: string }> }) {
+  const resolvedParams = await params;
+  let initialData: PostRes | null = null;
+  try {
+    initialData = await serverFetch<PostRes>(`/posts/${resolvedParams.postPublicId}`, {
+      cache: 'no-store'
+    });
+  } catch (error) {
+    // Return 404 if post is not found
+    notFound();
+  }
+
+  if (!initialData) {
+    notFound();
+  }
+
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="size-10 text-[#111] animate-spin" />
+        <p className="text-sm text-muted-foreground font-mono">Đang tải bài viết...</p>
+      </div>
+    }>
+      <PostDetailClient postPublicId={resolvedParams.postPublicId} initialData={initialData} />
+    </Suspense>
+  );
+}

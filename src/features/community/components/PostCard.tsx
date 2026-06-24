@@ -7,6 +7,7 @@ import gsap from 'gsap';
 import { useLikePost, useDeletePost } from '../queries/community.queries';
 import { useProfile } from '@/features/profile/queries/profile.queries';
 import { PostCommentsModal } from './PostCommentsModal';
+import { PostShareModal } from './PostShareModal';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { getUserAvatar } from '@/lib/utils';
@@ -28,6 +29,7 @@ export const PostCard = ({ post }: PostCardProps) => {
   }, []);
 
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasImageError, setHasImageError] = useState(false);
@@ -56,23 +58,8 @@ export const PostCard = ({ post }: PostCardProps) => {
     deletePost(post.publicId);
   };
 
-  const handleShare = async () => {
-    try {
-      const shareUrl = post.sharePath ? `${window.location.origin}${post.sharePath}` : `${window.location.origin}/community/posts/${post.publicId}`;
-      
-      if (navigator.share) {
-        await navigator.share({
-          title: post.title || 'Bài viết trên Atelier Curators',
-          text: 'Xem bài viết này trên Atelier Curators',
-          url: shareUrl,
-        });
-      } else {
-        await navigator.clipboard.writeText(shareUrl);
-        toast.success('Đã sao chép liên kết bài viết');
-      }
-    } catch (error) {
-      console.error('Error sharing:', error);
-    }
+  const handleShare = () => {
+    setIsShareOpen(true);
   };
 
   const mediaUrl = post.media && post.media.length > 0
@@ -198,6 +185,14 @@ export const PostCard = ({ post }: PostCardProps) => {
         onClose={() => setIsCommentsOpen(false)}
         post={post}
       />
+
+      {isMounted && (
+        <PostShareModal 
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          shareUrl={post.sharePath ? `${window.location.origin}${post.sharePath}` : `${window.location.origin}/community/posts/${post.publicId}`}
+        />
+      )}
     </>
   );
 };
