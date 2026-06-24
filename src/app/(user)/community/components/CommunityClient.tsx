@@ -10,6 +10,8 @@ import { Calendar } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Roboto_Mono } from 'next/font/google';
+import { BrandDiscoverySidebar } from './BrandDiscoverySidebar';
+import { BrandPostsFeed } from './BrandPostsFeed';
 
 const robotoMono = Roboto_Mono({
   subsets: ['vietnamese', 'latin'],
@@ -45,10 +47,16 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
               isFetchingNextPage={isFetchingNextPage}
               isLoading={isLoading && !initialData}
             />
+
+            {/* B2B Mock Brand Posts injected after API data */}
+            <BrandPostsFeed />
           </div>
 
           {/* Right Sidebar */}
           <div className="hidden lg:flex lg:col-span-4 flex-col gap-12 sticky top-10 h-fit">
+            
+            {/* Brand Discovery (B2B Feature) */}
+            <BrandDiscoverySidebar />
             
             {/* Trending Styles */}
             <div className="flex flex-col gap-4">

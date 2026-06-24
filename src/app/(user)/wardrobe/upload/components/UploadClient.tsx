@@ -13,6 +13,7 @@ import { uploadToCloudinary, applyCloudinaryBackgroundRemoval } from "@/lib/clou
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import Image from "next/image";
 
 gsap.registerPlugin(useGSAP);
 
@@ -302,7 +303,7 @@ export function UploadClient() {
 
                   {/* Image Area - 75% Visual Weight */}
                   <div className="relative aspect-[4/5] bg-[#F7F6F4] p-[16px] overflow-hidden flex-shrink-0">
-                    <img src={item.preview} alt="Preview" className="w-full h-full object-contain drop-shadow-sm" />
+                    <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={item.preview} alt="Preview" className="w-full h-full object-contain drop-shadow-sm" />
 
                     {/* Uploading Overlay */}
                     {isUploading && uploadState.current === idx + 1 && uploadState.status === 'uploading' && (

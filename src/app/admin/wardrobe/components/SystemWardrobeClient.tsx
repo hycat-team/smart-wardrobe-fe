@@ -17,6 +17,7 @@ import {
   PaginationLink,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import Image from "next/image";
 
 gsap.registerPlugin(useGSAP);
 
@@ -131,7 +132,7 @@ export function SystemWardrobeClient() {
                   {/* Visual */}
                   <div className="size-16 bg-gray-100 border border-gray-300 relative overflow-hidden group-hover:border-black transition-colors">
                     {item.imageUrl ? (
-                      <img src={item.imageUrl} alt="Item" className="w-full h-full object-cover mix-blend-multiply opacity-80 group-hover:opacity-100 transition-all duration-500" />
+                      <Image src={item.imageUrl} alt="Item" fill sizes="64px" className="w-full h-full object-cover mix-blend-multiply opacity-80 group-hover:opacity-100 transition-all duration-500" />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-[8px] font-mono text-gray-400 uppercase">N/A</div>
                     )}

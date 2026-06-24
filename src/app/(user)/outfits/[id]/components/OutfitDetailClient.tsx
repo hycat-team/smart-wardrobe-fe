@@ -22,6 +22,7 @@ import { uploadToCloudinary, applyCloudinaryTrim } from "@/lib/cloudinary";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
+
 gsap.registerPlugin(useGSAP);
 
 const OCCASIONS = ["Casual", "Workwear", "Summer", "Party", "Formal", "Sporty"];
@@ -298,7 +299,7 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
                               : "border-[#E5E5E5] hover:border-[#1A1A1A]"
                           )}
                         >
-                          <img src={applyCloudinaryTrim(item.imageUrl)} alt={getWardrobeItemName(item)} className="w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" />
+                          <img src={applyCloudinaryTrim(item.imageUrl)} alt={getWardrobeItemName(item)} fill sizes="(max-width: 768px) 33vw, 20vw" className="w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" />
                           {isSelected && (
                             <div className="absolute inset-0 border-[3px] border-black flex flex-col items-end justify-start p-1 pointer-events-none">
                               <div className="bg-black size-4 flex items-center justify-center">

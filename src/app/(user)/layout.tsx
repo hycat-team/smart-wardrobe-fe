@@ -2,6 +2,7 @@ import { MobileBottomNav } from "@/components/layout/mobile-nav";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { GlobalAIChat } from "@/components/chat/GlobalAIChat";
+import { GlobalCartDrawer } from "@/components/cart/GlobalCartDrawer";
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,6 +17,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
       </main>
       <MobileBottomNav />
       <GlobalAIChat />
+      <GlobalCartDrawer />
     </div>
   );
 }

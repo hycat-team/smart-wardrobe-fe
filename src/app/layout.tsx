@@ -36,6 +36,8 @@ export const metadata: Metadata = {
   description: "Your digital fashion stylist",
 };
 
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -50,9 +52,11 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeController>
             <AuthProvider>
-              <Suspense fallback={null}>
-                {children}
-              </Suspense>
+              <TooltipProvider delayDuration={0}>
+                <Suspense fallback={null}>
+                  {children}
+                </Suspense>
+              </TooltipProvider>
               <Toaster position="bottom-right" />
             </AuthProvider>
           </ThemeController>

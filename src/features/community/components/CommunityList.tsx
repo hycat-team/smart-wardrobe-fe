@@ -14,6 +14,7 @@ import { useCreatePost } from '../queries/community.queries';
 import { communityApi } from '../api/community.api';
 import { toast } from 'sonner';
 import { uploadToCloudinary } from '@/lib/cloudinary';
+import Image from 'next/image';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -208,8 +209,7 @@ export const CommunityList = ({
           <div className="flex gap-2 mt-2 overflow-x-auto pb-2">
             {images.map((file, index) => (
               <div key={index} className="relative w-24 h-24 shrink-0 rounded-none bg-gray-100 border border-[#E5E5E5]">
-                <img 
-                  src={URL.createObjectURL(file)} 
+                <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={URL.createObjectURL(file)} 
                   alt="preview" 
                   className="w-full h-full object-cover" 
                 />

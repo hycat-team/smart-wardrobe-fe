@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, Loader2, AlertCircle } from "lucide-react";
 import { UpdateWardrobeItemReq, WardrobeItemRes as WardrobeItem, WardrobeItemStatus } from "@/features/wardrobe/types";
+import Image from "next/image";
 
 interface WardrobeItemEditClientProps {
   itemId: string;
@@ -103,9 +104,11 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
         {/* Left Column: Image Preview */}
         <div className="md:col-span-5 flex flex-col gap-4">
           <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-sm border border-cream-dark/50 bg-cream-dark/20">
-            <img 
+            <Image 
               src={item.imageUrl} 
               alt="Preview" 
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="w-full h-full object-cover" 
             />
           </div>

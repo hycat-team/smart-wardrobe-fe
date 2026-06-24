@@ -7,6 +7,7 @@ import { Loader2, X, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PostRes } from '../types';
 import { CommentItem } from './CommentItem';
+import Image from 'next/image';
 
 interface PostCommentsModalProps {
   isOpen: boolean;
@@ -58,8 +59,7 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
         {/* Left Side: Post Image */}
         <div className="hidden md:block w-[60%] h-full bg-[#F5F2EE] relative border-r border-[#E5E5E5]">
           {mediaUrl ? (
-            <img 
-              src={mediaUrl} 
+            <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={mediaUrl} 
               alt="Post" 
               className="w-full h-full object-contain"
             />

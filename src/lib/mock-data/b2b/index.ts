@@ -1,0 +1,1864 @@
+export const mockBrands = [
+  {
+    id: "brand_001",
+    name: "Mori Studio",
+    logoUrl: "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&h=400&fit=crop",
+    description: "Minimal everyday wear for modern women.",
+    story: "A local fashion brand focused on versatile and timeless pieces.",
+    styles: ["Minimal", "Elegant"],
+    isVerified: true,
+    followerCount: 12450,
+    memberCount: 582,
+    isFollowing: true,
+  },
+  {
+    id: "brand_002",
+    name: "Dark Atelier",
+    logoUrl: "https://images.unsplash.com/photo-1549421255-06a928ba4825?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1509319117193-57bab727e09d?w=1200&h=400&fit=crop",
+    description: "High-end street fashion with a dark, sophisticated edge.",
+    story: "Born in the streets, refined in the studio.",
+    styles: ["Streetwear", "Dark", "Avant-Garde"],
+    isVerified: true,
+    followerCount: 8900,
+    memberCount: 310,
+    isFollowing: false,
+  },
+  {
+    id: "brand_003",
+    name: "Lumina Label",
+    logoUrl: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=400&fit=crop",
+    description: "Bright and airy pieces for sunny days.",
+    story: "Embracing the lightness of being through fashion.",
+    styles: ["Casual", "Boho"],
+    isVerified: false,
+    followerCount: 4500,
+    memberCount: 120,
+    isFollowing: false,
+  },
+  {
+    id: "brand_004",
+    name: "Urban Core",
+    logoUrl: "https://images.unsplash.com/photo-1618077360395-f3068be8e001?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1555529733-0e670560f7e1?w=1200&h=400&fit=crop",
+    description: "Functional streetwear for the modern city dweller.",
+    story: "Built for the concrete jungle.",
+    styles: ["Streetwear", "Techwear"],
+    isVerified: true,
+    followerCount: 15600,
+    memberCount: 890,
+    isFollowing: true,
+  },
+  {
+    id: "brand_005",
+    name: "Silk & Thread",
+    logoUrl: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200&h=400&fit=crop",
+    description: "Premium silk garments crafted with care.",
+    story: "Heritage techniques meeting modern silhouettes.",
+    styles: ["Luxury", "Elegant"],
+    isVerified: true,
+    followerCount: 22000,
+    memberCount: 1200,
+    isFollowing: false,
+  },
+  {
+    id: "brand_006",
+    name: "Neo Vintage",
+    logoUrl: "https://images.unsplash.com/photo-1511556820780-d912e42b4980?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1485230405346-71acb9518d9c?w=1200&h=400&fit=crop",
+    description: "Retro styles reimagined for today.",
+    story: "Bringing back the best of the 90s and 00s.",
+    styles: ["Vintage", "Y2K"],
+    isVerified: false,
+    followerCount: 8900,
+    memberCount: 450,
+    isFollowing: true,
+  },
+  {
+    id: "brand_007",
+    name: "Earth Child",
+    logoUrl: "https://images.unsplash.com/photo-1505022610485-0249ba5b3675?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&h=400&fit=crop",
+    description: "Sustainable fashion made from organic materials.",
+    story: "Fashion that cares for our planet.",
+    styles: ["Eco-friendly", "Minimal"],
+    isVerified: true,
+    followerCount: 34000,
+    memberCount: 2100,
+    isFollowing: false,
+  },
+  {
+    id: "brand_008",
+    name: "Noir Collection",
+    logoUrl: "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=400&fit=crop",
+    description: "All black everything. The ultimate monochrome wardrobe.",
+    story: "Mastering the art of darkness.",
+    styles: ["Dark", "Monochrome"],
+    isVerified: true,
+    followerCount: 18500,
+    memberCount: 950,
+    isFollowing: true,
+  },
+  {
+    id: "brand_009",
+    name: "Aura Studio",
+    logoUrl: "https://images.unsplash.com/photo-1524041255072-7da0525d6b34?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1550614000-4b95d466f29a?w=1200&h=400&fit=crop",
+    description: "Ethereal designs that make you float.",
+    story: "Capturing the unseen energy around us.",
+    styles: ["Ethereal", "Feminine"],
+    isVerified: false,
+    followerCount: 6700,
+    memberCount: 230,
+    isFollowing: false,
+  },
+  {
+    id: "brand_010",
+    name: "Bold Move",
+    logoUrl: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=1200&h=400&fit=crop",
+    description: "Athleisure that stands out.",
+    story: "For those who move with purpose.",
+    styles: ["Athleisure", "Sporty"],
+    isVerified: true,
+    followerCount: 42000,
+    memberCount: 3100,
+    isFollowing: true,
+  },
+  {
+    id: "brand_011",
+    name: "Velvet Nights",
+    logoUrl: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1515347619152-47530467540f?w=1200&h=400&fit=crop",
+    description: "Evening wear that steals the spotlight.",
+    story: "Making every night unforgettable.",
+    styles: ["Evening", "Glamour"],
+    isVerified: false,
+    followerCount: 11200,
+    memberCount: 540,
+    isFollowing: false,
+  },
+  {
+    id: "brand_012",
+    name: "Raw Denim Co.",
+    logoUrl: "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1475178626620-a4d074967452?w=1200&h=400&fit=crop",
+    description: "Authentic selvedge denim for denim heads.",
+    story: "We weave our own path.",
+    styles: ["Denim", "Workwear"],
+    isVerified: true,
+    followerCount: 27500,
+    memberCount: 1800,
+    isFollowing: true,
+  },
+  {
+    id: "brand_013",
+    name: "Arctic Core",
+    logoUrl: "https://images.unsplash.com/photo-1506152983158-b4a74a01c721?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1484807352052-23338990c6c6?w=1200&h=400&fit=crop",
+    description: "Premium winter wear and extreme cold gear.",
+    story: "Born in the cold, crafted for warmth.",
+    styles: ["Winter", "Functional"],
+    isVerified: true,
+    followerCount: 14200,
+    memberCount: 890,
+    isFollowing: false,
+  },
+  {
+    id: "brand_014",
+    name: "Summer Haze",
+    logoUrl: "https://images.unsplash.com/photo-1507643179773-3e975d7ac515?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=400&fit=crop",
+    description: "Beachwear and resort collections all year round.",
+    story: "Chase the endless summer.",
+    styles: ["Resort", "Beach"],
+    isVerified: false,
+    followerCount: 9300,
+    memberCount: 420,
+    isFollowing: true,
+  },
+  {
+    id: "brand_015",
+    name: "Leather & Iron",
+    logoUrl: "https://images.unsplash.com/photo-1555529771-835f59bfc50c?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1515347619152-47530467540f?w=1200&h=400&fit=crop",
+    description: "Handcrafted leather jackets and boots.",
+    story: "Ages like fine wine, gets better with every wear.",
+    styles: ["Leather", "Biker"],
+    isVerified: true,
+    followerCount: 31000,
+    memberCount: 2400,
+    isFollowing: false,
+  },
+  {
+    id: "brand_016",
+    name: "Future Retro",
+    logoUrl: "https://images.unsplash.com/photo-1618077360395-f3068be8e001?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=1200&h=400&fit=crop",
+    description: "Cyberpunk inspired streetwear.",
+    story: "Welcome to the year 2077.",
+    styles: ["Cyberpunk", "Techwear"],
+    isVerified: true,
+    followerCount: 19800,
+    memberCount: 1100,
+    isFollowing: true,
+  },
+  {
+    id: "brand_017",
+    name: "Blossom Boutique",
+    logoUrl: "https://images.unsplash.com/photo-1524041255072-7da0525d6b34?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=400&fit=crop",
+    description: "Floral prints and romantic silhouettes.",
+    story: "In full bloom, all year round.",
+    styles: ["Romantic", "Floral"],
+    isVerified: false,
+    followerCount: 5600,
+    memberCount: 310,
+    isFollowing: false,
+  },
+  {
+    id: "brand_018",
+    name: "Concrete Jungle",
+    logoUrl: "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&h=400&fit=crop",
+    description: "Graphic tees and skate wear.",
+    story: "From the skatepark to the streets.",
+    styles: ["Skate", "Streetwear"],
+    isVerified: true,
+    followerCount: 45000,
+    memberCount: 3800,
+    isFollowing: true,
+  },
+  {
+    id: "brand_019",
+    name: "Knitted Cozy",
+    logoUrl: "https://images.unsplash.com/photo-1505022610485-0249ba5b3675?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200&h=400&fit=crop",
+    description: "Chunky knits and oversized sweaters.",
+    story: "Your daily dose of warmth.",
+    styles: ["Cozy", "Knitwear"],
+    isVerified: true,
+    followerCount: 28900,
+    memberCount: 1500,
+    isFollowing: false,
+  },
+  {
+    id: "brand_020",
+    name: "Neon Lights",
+    logoUrl: "https://images.unsplash.com/photo-1511556820780-d912e42b4980?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1485230405346-71acb9518d9c?w=1200&h=400&fit=crop",
+    description: "Vibrant colors and rave-ready outfits.",
+    story: "Be the light of the party.",
+    styles: ["Vibrant", "Rave"],
+    isVerified: false,
+    followerCount: 7800,
+    memberCount: 410,
+    isFollowing: true,
+  },
+  {
+    id: "brand_021",
+    name: "Office Chic",
+    logoUrl: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1555529733-0e670560f7e1?w=1200&h=400&fit=crop",
+    description: "Modern workwear for the ambitious.",
+    story: "Dress for the job you want.",
+    styles: ["Workwear", "Elegant"],
+    isVerified: true,
+    followerCount: 36500,
+    memberCount: 2200,
+    isFollowing: false,
+  },
+  {
+    id: "brand_022",
+    name: "Nomad Traveler",
+    logoUrl: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200&h=200&fit=crop",
+    coverUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=400&fit=crop",
+    description: "Lightweight, packable, and durable clothing.",
+    story: "Explore the world in comfort.",
+    styles: ["Travel", "Functional"],
+    isVerified: true,
+    followerCount: 15400,
+    memberCount: 960,
+    isFollowing: true,
+  }
+];
+
+export const mockProducts = [
+  {
+    id: "product_001",
+    brandId: "brand_001",
+    name: "Luna Structured Blazer",
+    sku: "MORI-BLZ-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1550639524-a6f58345a278?w=600&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1544441893-675973e31985?w=600&h=800&fit=crop"
+    ],
+    price: 1290000,
+    discountPrice: 1090000,
+    category: "Outerwear",
+    subcategory: "Blazer",
+    colors: ["Black"],
+    styles: ["Minimal", "Elegant", "Workwear"],
+    occasions: ["Work", "Meeting", "Date"],
+    sizes: ["S", "M", "L"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_001",
+    isSaved: false,
+    description: "A perfectly tailored blazer for your everyday power look. Made with premium wool-blend fabric."
+  },
+  {
+    id: "product_002",
+    brandId: "brand_001",
+    name: "Silk Slip Dress",
+    sku: "MORI-DRS-002",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600&h=800&fit=crop"
+    ],
+    price: 850000,
+    discountPrice: null,
+    category: "Dress",
+    subcategory: "Slip Dress",
+    colors: ["Champagne", "Black"],
+    styles: ["Elegant", "Evening"],
+    occasions: ["Date", "Party"],
+    sizes: ["XS", "S", "M"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_001",
+    isSaved: true,
+    description: "100% mulberry silk slip dress that drapes beautifully."
+  },
+  {
+    id: "product_003",
+    brandId: "brand_002",
+    name: "Oversized Utility Jacket",
+    sku: "DARK-JKT-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&h=800&fit=crop"
+    ],
+    price: 1850000,
+    discountPrice: null,
+    category: "Outerwear",
+    subcategory: "Jacket",
+    colors: ["Black", "Charcoal"],
+    styles: ["Streetwear", "Dark"],
+    occasions: ["Casual", "Night Out"],
+    sizes: ["M", "L", "XL"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_002",
+    isSaved: false,
+    description: "Heavy duty oversized jacket with multiple functional pockets."
+  },
+  {
+    id: "product_004",
+    brandId: "brand_002",
+    name: "Asymmetric Maxi Skirt",
+    sku: "DARK-SKT-002",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1583496661160-c5dcb4c69c21?w=600&h=800&fit=crop"
+    ],
+    price: 950000,
+    discountPrice: 750000,
+    category: "Bottoms",
+    subcategory: "Skirt",
+    colors: ["Black"],
+    styles: ["Avant-Garde", "Dark"],
+    occasions: ["Party", "Casual"],
+    sizes: ["S", "M"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_002",
+    isSaved: true,
+    description: "Flowing asymmetric skirt with raw edge details."
+  },
+  {
+    id: "product_005",
+    brandId: "brand_003",
+    name: "Linen Crop Top",
+    sku: "LUMI-TOP-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&h=800&fit=crop"
+    ],
+    price: 450000,
+    discountPrice: null,
+    category: "Tops",
+    subcategory: "Crop Top",
+    colors: ["White", "Beige", "Light Blue"],
+    styles: ["Casual", "Boho"],
+    occasions: ["Weekend", "Beach"],
+    sizes: ["XS", "S", "M", "L"],
+    stockStatus: "LOW_STOCK",
+    collectionId: "collection_003",
+    isSaved: false,
+    description: "Breathable linen blend crop top perfect for summer days."
+  },
+  {
+    id: "product_006",
+    brandId: "brand_004",
+    name: "Tech Cargo Pants",
+    sku: "URB-PNT-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&h=800&fit=crop"
+    ],
+    price: 1150000,
+    discountPrice: 990000,
+    category: "Bottoms",
+    subcategory: "Pants",
+    colors: ["Olive", "Black"],
+    styles: ["Techwear", "Streetwear"],
+    occasions: ["Casual"],
+    sizes: ["S", "M", "L", "XL"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_004",
+    isSaved: true,
+    description: "Water-resistant cargo pants with magnetic closures."
+  },
+  {
+    id: "product_007",
+    brandId: "brand_005",
+    name: "Classic Silk Shirt",
+    sku: "SILK-SHT-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=600&h=800&fit=crop"
+    ],
+    price: 1500000,
+    discountPrice: null,
+    category: "Tops",
+    subcategory: "Shirt",
+    colors: ["Navy", "Ivory", "Emerald"],
+    styles: ["Elegant", "Luxury"],
+    occasions: ["Work", "Dinner"],
+    sizes: ["S", "M", "L"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_005",
+    isSaved: false,
+    description: "Luxurious silk shirt with mother-of-pearl buttons."
+  },
+  {
+    id: "product_008",
+    brandId: "brand_006",
+    name: "Y2K Flared Jeans",
+    sku: "NEO-JNS-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&h=800&fit=crop"
+    ],
+    price: 890000,
+    discountPrice: 690000,
+    category: "Bottoms",
+    subcategory: "Jeans",
+    colors: ["Light Wash", "Dark Wash"],
+    styles: ["Vintage", "Y2K"],
+    occasions: ["Casual", "Weekend"],
+    sizes: ["26", "27", "28", "29", "30"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_006",
+    isSaved: true,
+    description: "Low-rise flared jeans that bring back the 2000s vibe."
+  },
+  {
+    id: "product_009",
+    brandId: "brand_007",
+    name: "Organic Cotton Tee",
+    sku: "ERTH-TEE-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop"
+    ],
+    price: 350000,
+    discountPrice: null,
+    category: "Tops",
+    subcategory: "T-Shirt",
+    colors: ["White", "Sage", "Earth Brown"],
+    styles: ["Minimal", "Eco-friendly"],
+    occasions: ["Casual", "Everyday"],
+    sizes: ["XS", "S", "M", "L", "XL"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_007",
+    isSaved: false,
+    description: "The perfect everyday tee made from 100% GOTS certified organic cotton."
+  },
+  {
+    id: "product_010",
+    brandId: "brand_008",
+    name: "Matte Leather Trench",
+    sku: "NOIR-TRN-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"
+    ],
+    price: 3200000,
+    discountPrice: 2800000,
+    category: "Outerwear",
+    subcategory: "Coat",
+    colors: ["Black"],
+    styles: ["Dark", "Monochrome"],
+    occasions: ["Night Out", "Winter"],
+    sizes: ["S", "M", "L"],
+    stockStatus: "LOW_STOCK",
+    collectionId: "collection_008",
+    isSaved: true,
+    description: "Statement leather trench coat with a unique matte finish."
+  },
+  {
+    id: "product_011",
+    brandId: "brand_010",
+    name: "Seamless Active Leggings",
+    sku: "BOLD-LEG-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&h=800&fit=crop"
+    ],
+    price: 650000,
+    discountPrice: null,
+    category: "Bottoms",
+    subcategory: "Leggings",
+    colors: ["Black", "Burgundy", "Navy"],
+    styles: ["Sporty", "Athleisure"],
+    occasions: ["Gym", "Casual"],
+    sizes: ["S", "M", "L"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_010",
+    isSaved: false,
+    description: "High-waisted seamless leggings designed for both performance and comfort."
+  },
+  {
+    id: "product_012",
+    brandId: "brand_012",
+    name: "Selvedge Denim Jacket",
+    sku: "RAW-JKT-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=600&h=800&fit=crop"
+    ],
+    price: 1650000,
+    discountPrice: 1450000,
+    category: "Outerwear",
+    subcategory: "Jacket",
+    colors: ["Indigo"],
+    styles: ["Denim", "Workwear"],
+    occasions: ["Casual"],
+    sizes: ["M", "L", "XL", "XXL"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_012",
+    isSaved: true,
+    description: "Classic Type III jacket made from 14oz Japanese selvedge denim."
+  },
+  {
+    id: "product_013",
+    brandId: "brand_013",
+    name: "Arctic Parka",
+    sku: "ARCT-PRK-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"
+    ],
+    price: 4500000,
+    discountPrice: 3900000,
+    category: "Outerwear",
+    subcategory: "Parka",
+    colors: ["Navy", "Black"],
+    styles: ["Winter", "Functional"],
+    occasions: ["Outdoor", "Winter"],
+    sizes: ["M", "L", "XL"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_013",
+    isSaved: true,
+    description: "Heavy-duty parka built for extreme cold."
+  },
+  {
+    id: "product_014",
+    brandId: "brand_014",
+    name: "Linen Beach Shirt",
+    sku: "SUM-SHT-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&h=800&fit=crop"
+    ],
+    price: 550000,
+    discountPrice: null,
+    category: "Tops",
+    subcategory: "Shirt",
+    colors: ["White", "Beige"],
+    styles: ["Resort", "Beach"],
+    occasions: ["Beach", "Vacation"],
+    sizes: ["S", "M", "L"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_014",
+    isSaved: false,
+    description: "Lightweight linen shirt perfect for beach days."
+  },
+  {
+    id: "product_015",
+    brandId: "brand_015",
+    name: "Classic Biker Jacket",
+    sku: "LTHR-JKT-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"
+    ],
+    price: 5800000,
+    discountPrice: 5200000,
+    category: "Outerwear",
+    subcategory: "Leather Jacket",
+    colors: ["Black", "Brown"],
+    styles: ["Biker", "Leather"],
+    occasions: ["Casual", "Night Out"],
+    sizes: ["S", "M", "L", "XL"],
+    stockStatus: "LOW_STOCK",
+    collectionId: "collection_015",
+    isSaved: true,
+    description: "Genuine full-grain leather biker jacket."
+  },
+  {
+    id: "product_016",
+    brandId: "brand_016",
+    name: "Reflective Windbreaker",
+    sku: "FUT-WND-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&h=800&fit=crop"
+    ],
+    price: 1250000,
+    discountPrice: null,
+    category: "Outerwear",
+    subcategory: "Jacket",
+    colors: ["Silver", "Neon Green"],
+    styles: ["Cyberpunk", "Streetwear"],
+    occasions: ["Casual", "Night"],
+    sizes: ["M", "L", "XL"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_016",
+    isSaved: false,
+    description: "High-visibility reflective windbreaker."
+  },
+  {
+    id: "product_017",
+    brandId: "brand_017",
+    name: "Floral Midi Dress",
+    sku: "BLSM-DRS-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600&h=800&fit=crop"
+    ],
+    price: 790000,
+    discountPrice: 650000,
+    category: "Dress",
+    subcategory: "Midi Dress",
+    colors: ["Pink", "Yellow"],
+    styles: ["Floral", "Romantic"],
+    occasions: ["Date", "Spring"],
+    sizes: ["XS", "S", "M"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_017",
+    isSaved: true,
+    description: "Flowy midi dress with an exclusive floral print."
+  },
+  {
+    id: "product_018",
+    brandId: "brand_018",
+    name: "Graphic Skate Tee",
+    sku: "CONC-TEE-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop"
+    ],
+    price: 350000,
+    discountPrice: null,
+    category: "Tops",
+    subcategory: "T-Shirt",
+    colors: ["Black", "White"],
+    styles: ["Skate", "Streetwear"],
+    occasions: ["Casual", "Skate"],
+    sizes: ["S", "M", "L", "XL"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_018",
+    isSaved: false,
+    description: "Heavyweight cotton tee with custom graphics."
+  },
+  {
+    id: "product_019",
+    brandId: "brand_019",
+    name: "Chunky Cable Knit Sweater",
+    sku: "KNIT-SWT-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=600&h=800&fit=crop"
+    ],
+    price: 950000,
+    discountPrice: null,
+    category: "Tops",
+    subcategory: "Sweater",
+    colors: ["Cream", "Grey"],
+    styles: ["Cozy", "Knitwear"],
+    occasions: ["Winter", "Casual"],
+    sizes: ["S", "M", "L"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_019",
+    isSaved: true,
+    description: "Hand-knit chunky sweater for ultimate warmth."
+  },
+  {
+    id: "product_020",
+    brandId: "brand_020",
+    name: "Neon Mesh Top",
+    sku: "NEON-TOP-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&h=800&fit=crop"
+    ],
+    price: 450000,
+    discountPrice: 350000,
+    category: "Tops",
+    subcategory: "Mesh Top",
+    colors: ["Neon Pink", "Neon Green"],
+    styles: ["Rave", "Vibrant"],
+    occasions: ["Party", "Festival"],
+    sizes: ["XS", "S", "M"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_020",
+    isSaved: false,
+    description: "Breathable mesh top perfect for layering at festivals."
+  },
+  {
+    id: "product_021",
+    brandId: "brand_021",
+    name: "Tailored Trousers",
+    sku: "OFFC-TRS-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1591369822096-11400ee26f10?w=600&h=800&fit=crop"
+    ],
+    price: 890000,
+    discountPrice: null,
+    category: "Bottoms",
+    subcategory: "Trousers",
+    colors: ["Navy", "Grey", "Black"],
+    styles: ["Workwear", "Elegant"],
+    occasions: ["Work", "Meeting"],
+    sizes: ["S", "M", "L"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_021",
+    isSaved: true,
+    description: "High-waisted tailored trousers for a sharp office look."
+  },
+  {
+    id: "product_022",
+    brandId: "brand_022",
+    name: "Convertible Travel Pants",
+    sku: "NMD-PNT-001",
+    imageUrls: [
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&h=800&fit=crop"
+    ],
+    price: 1100000,
+    discountPrice: 950000,
+    category: "Bottoms",
+    subcategory: "Pants",
+    colors: ["Khaki", "Charcoal"],
+    styles: ["Travel", "Functional"],
+    occasions: ["Travel", "Outdoor"],
+    sizes: ["M", "L", "XL"],
+    stockStatus: "IN_STOCK",
+    collectionId: "collection_022",
+    isSaved: false,
+    description: "Quick-dry pants that convert into shorts."
+  }
+];
+
+export const mockBrandPosts = [
+  // {
+  //   id: "post_001",
+  //   brandId: "brand_001",
+  //   type: "LOOKBOOK",
+  //   caption: "Three ways to style our Luna Structured Blazer. From office to evening dinner.",
+  //   mediaUrls: ["https://images.unsplash.com/photo-1548624149-f9b1859aa7d0?w=800&h=800&fit=crop"],
+  //   taggedProductIds: ["product_001"],
+  //   visibility: "PUBLIC",
+  //   likeCount: 1260,
+  //   commentCount: 84,
+  //   saveCount: 342,
+  //   createdAt: "2026-06-20T10:00:00Z"
+  // },
+  {
+    id: "post_002",
+    brandId: "brand_002",
+    type: "ANNOUNCEMENT",
+    caption: "The Midnight Collection drops this Friday. Member early access starts in 24 hours.",
+    mediaUrls: ["https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_003"],
+    visibility: "PUBLIC",
+    likeCount: 890,
+    commentCount: 120,
+    saveCount: 50,
+    createdAt: "2026-06-22T15:30:00Z"
+  },
+  {
+    id: "post_003",
+    brandId: "brand_003",
+    type: "LIFESTYLE",
+    caption: "Catching the golden hour in our new Linen Crop Top.",
+    mediaUrls: ["https://images.unsplash.com/photo-1523450001312-faa4e2e37f0f?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_005"],
+    visibility: "PUBLIC",
+    likeCount: 540,
+    commentCount: 32,
+    saveCount: 110,
+    createdAt: "2026-06-23T17:45:00Z"
+  },
+  {
+    id: "post_004",
+    brandId: "brand_004",
+    type: "BEHIND_THE_SCENES",
+    caption: "Testing the water resistance of the new Tech Cargo Pants.",
+    mediaUrls: ["https://images.unsplash.com/photo-1551232864-3f0890e580d9?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_006"],
+    visibility: "PUBLIC",
+    likeCount: 2100,
+    commentCount: 156,
+    saveCount: 420,
+    createdAt: "2026-06-24T09:15:00Z"
+  },
+  {
+    id: "post_005",
+    brandId: "brand_005",
+    type: "LOOKBOOK",
+    caption: "Elegance is an attitude. Featuring the Classic Silk Shirt.",
+    mediaUrls: ["https://images.unsplash.com/photo-1492447166138-50c3889fccb1?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_007"],
+    visibility: "PUBLIC",
+    likeCount: 3200,
+    commentCount: 210,
+    saveCount: 890,
+    createdAt: "2026-06-19T20:00:00Z"
+  },
+  {
+    id: "post_006",
+    brandId: "brand_006",
+    type: "ANNOUNCEMENT",
+    caption: "Y2K is back! Our new denim line is now live.",
+    mediaUrls: ["https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_008"],
+    visibility: "PUBLIC",
+    likeCount: 1540,
+    commentCount: 98,
+    saveCount: 230,
+    createdAt: "2026-06-21T12:00:00Z"
+  },
+  {
+    id: "post_007",
+    brandId: "brand_007",
+    type: "LIFESTYLE",
+    caption: "A day in nature with our 100% Organic Cotton Tee.",
+    mediaUrls: ["https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_009"],
+    visibility: "PUBLIC",
+    likeCount: 4500,
+    commentCount: 310,
+    saveCount: 670,
+    createdAt: "2026-06-18T10:30:00Z"
+  },
+  {
+    id: "post_009",
+    brandId: "brand_010",
+    type: "LIFESTYLE",
+    caption: "Move without limits. Seamless Active Leggings.",
+    mediaUrls: ["https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_011"],
+    visibility: "PUBLIC",
+    likeCount: 3600,
+    commentCount: 280,
+    saveCount: 450,
+    createdAt: "2026-06-22T08:45:00Z"
+  },
+  {
+    id: "post_010",
+    brandId: "brand_012",
+    type: "BEHIND_THE_SCENES",
+    caption: "The making of our 14oz Selvedge Denim.",
+    mediaUrls: ["https://images.unsplash.com/photo-1542272201-b1ca555f8505?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_012"],
+    visibility: "PUBLIC",
+    likeCount: 1900,
+    commentCount: 110,
+    saveCount: 320,
+    createdAt: "2026-06-23T14:20:00Z"
+  },
+  {
+    id: "post_011",
+    brandId: "brand_001",
+    type: "ANNOUNCEMENT",
+    caption: "Restock alert! The Silk Slip Dress is back in all sizes.",
+    mediaUrls: ["https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_002"],
+    visibility: "PUBLIC",
+    likeCount: 2340,
+    commentCount: 190,
+    saveCount: 480,
+    createdAt: "2026-06-24T11:00:00Z"
+  },
+
+  {
+    id: "post_013",
+    brandId: "brand_013",
+    type: "LOOKBOOK",
+    caption: "Conquer the cold with our new Arctic Parka.",
+    mediaUrls: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_013"],
+    visibility: "PUBLIC",
+    likeCount: 4100,
+    commentCount: 300,
+    saveCount: 850,
+    createdAt: "2026-06-20T10:00:00Z"
+  },
+  {
+    id: "post_014",
+    brandId: "brand_014",
+    type: "LIFESTYLE",
+    caption: "Beach days are better in Linen.",
+    mediaUrls: ["https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_014"],
+    visibility: "PUBLIC",
+    likeCount: 2900,
+    commentCount: 150,
+    saveCount: 430,
+    createdAt: "2026-06-21T14:30:00Z"
+  },
+  {
+    id: "post_015",
+    brandId: "brand_015",
+    type: "LOOKBOOK",
+    caption: "The classic biker jacket. A wardrobe essential.",
+    mediaUrls: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_015"],
+    visibility: "PUBLIC",
+    likeCount: 5200,
+    commentCount: 410,
+    saveCount: 1200,
+    createdAt: "2026-06-22T09:15:00Z"
+  },
+  {
+    id: "post_016",
+    brandId: "brand_016",
+    type: "ANNOUNCEMENT",
+    caption: "Reflective gear restocked! Stay visible.",
+    mediaUrls: ["https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_016"],
+    visibility: "PUBLIC",
+    likeCount: 3800,
+    commentCount: 270,
+    saveCount: 610,
+    createdAt: "2026-06-23T11:00:00Z"
+  },
+  {
+    id: "post_017",
+    brandId: "brand_017",
+    type: "LIFESTYLE",
+    caption: "Spring feels. The Floral Midi Dress in action.",
+    mediaUrls: ["https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_017"],
+    visibility: "PUBLIC",
+    likeCount: 2600,
+    commentCount: 180,
+    saveCount: 390,
+    createdAt: "2026-06-19T16:20:00Z"
+  },
+  {
+    id: "post_018",
+    brandId: "brand_018",
+    type: "BEHIND_THE_SCENES",
+    caption: "Designing the new Graphic Skate Tee.",
+    mediaUrls: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_018"],
+    visibility: "PUBLIC",
+    likeCount: 1700,
+    commentCount: 95,
+    saveCount: 210,
+    createdAt: "2026-06-21T13:45:00Z"
+  },
+  {
+    id: "post_019",
+    brandId: "brand_019",
+    type: "LOOKBOOK",
+    caption: "Stay cozy all season long with our Chunky Knits.",
+    mediaUrls: ["https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_019"],
+    visibility: "PUBLIC",
+    likeCount: 3400,
+    commentCount: 220,
+    saveCount: 580,
+    createdAt: "2026-06-20T18:30:00Z"
+  },
+  {
+    id: "post_020",
+    brandId: "brand_020",
+    type: "LIFESTYLE",
+    caption: "Festival ready. Neon Mesh Top.",
+    mediaUrls: ["https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_020"],
+    visibility: "PUBLIC",
+    likeCount: 2100,
+    commentCount: 140,
+    saveCount: 350,
+    createdAt: "2026-06-22T21:15:00Z"
+  },
+
+  {
+    id: "post_022",
+    brandId: "brand_022",
+    type: "ANNOUNCEMENT",
+    caption: "New arrival: Convertible Travel Pants. Your perfect travel companion.",
+    mediaUrls: ["https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&h=800&fit=crop"],
+    taggedProductIds: ["product_022"],
+    visibility: "PUBLIC",
+    likeCount: 3100,
+    commentCount: 205,
+    saveCount: 470,
+    createdAt: "2026-06-24T10:30:00Z"
+  }
+];
+
+export const mockOrders = [
+  {
+    id: "order_001",
+    userId: "user_001",
+    brandId: "brand_001",
+    items: [
+      {
+        productId: "product_001",
+        quantity: 1,
+        price: 1090000,
+        size: "M",
+        color: "Black"
+      }
+    ],
+    totalAmount: 1090000,
+    status: "DELIVERED",
+    createdAt: "2026-06-10T14:30:00Z"
+  },
+  {
+    id: "order_002",
+    userId: "user_001",
+    brandId: "brand_002",
+    items: [
+      {
+        productId: "product_003",
+        quantity: 1,
+        price: 1850000,
+        size: "L",
+        color: "Charcoal"
+      }
+    ],
+    totalAmount: 1850000,
+    status: "PENDING",
+    createdAt: "2026-06-22T09:15:00Z"
+  },
+  {
+    id: "order_003",
+    userId: "user_001",
+    brandId: "brand_003",
+    items: [
+      {
+        productId: "product_005",
+        quantity: 2,
+        price: 450000,
+        size: "S",
+        color: "White"
+      }
+    ],
+    totalAmount: 900000,
+    status: "DELIVERED",
+    createdAt: "2026-06-05T11:20:00Z"
+  },
+  {
+    id: "order_004",
+    userId: "user_001",
+    brandId: "brand_004",
+    items: [
+      {
+        productId: "product_006",
+        quantity: 1,
+        price: 990000,
+        size: "M",
+        color: "Olive"
+      }
+    ],
+    totalAmount: 990000,
+    status: "SHIPPED",
+    createdAt: "2026-06-20T16:45:00Z"
+  },
+  {
+    id: "order_005",
+    userId: "user_001",
+    brandId: "brand_005",
+    items: [
+      {
+        productId: "product_007",
+        quantity: 1,
+        price: 1500000,
+        size: "M",
+        color: "Emerald"
+      }
+    ],
+    totalAmount: 1500000,
+    status: "DELIVERED",
+    createdAt: "2026-05-28T14:10:00Z"
+  },
+  {
+    id: "order_006",
+    userId: "user_001",
+    brandId: "brand_006",
+    items: [
+      {
+        productId: "product_008",
+        quantity: 1,
+        price: 690000,
+        size: "28",
+        color: "Light Wash"
+      }
+    ],
+    totalAmount: 690000,
+    status: "PENDING",
+    createdAt: "2026-06-23T18:30:00Z"
+  },
+  {
+    id: "order_007",
+    userId: "user_001",
+    brandId: "brand_007",
+    items: [
+      {
+        productId: "product_009",
+        quantity: 3,
+        price: 350000,
+        size: "M",
+        color: "Sage"
+      }
+    ],
+    totalAmount: 1050000,
+    status: "DELIVERED",
+    createdAt: "2026-06-15T10:00:00Z"
+  },
+  {
+    id: "order_008",
+    userId: "user_001",
+    brandId: "brand_008",
+    items: [
+      {
+        productId: "product_010",
+        quantity: 1,
+        price: 2800000,
+        size: "S",
+        color: "Black"
+      }
+    ],
+    totalAmount: 2800000,
+    status: "DELIVERED",
+    createdAt: "2026-06-01T20:15:00Z"
+  },
+  {
+    id: "order_009",
+    userId: "user_001",
+    brandId: "brand_010",
+    items: [
+      {
+        productId: "product_011",
+        quantity: 2,
+        price: 650000,
+        size: "M",
+        color: "Burgundy"
+      }
+    ],
+    totalAmount: 1300000,
+    status: "SHIPPED",
+    createdAt: "2026-06-19T13:40:00Z"
+  },
+  {
+    id: "order_010",
+    userId: "user_001",
+    brandId: "brand_012",
+    items: [
+      {
+        productId: "product_012",
+        quantity: 1,
+        price: 1450000,
+        size: "L",
+        color: "Indigo"
+      }
+    ],
+    totalAmount: 1450000,
+    status: "PENDING",
+    createdAt: "2026-06-24T08:20:00Z"
+  },
+  {
+    id: "order_011",
+    userId: "user_001",
+    brandId: "brand_001",
+    items: [
+      {
+        productId: "product_002",
+        quantity: 1,
+        price: 850000,
+        size: "S",
+        color: "Champagne"
+      }
+    ],
+    totalAmount: 850000,
+    status: "DELIVERED",
+    createdAt: "2026-06-12T15:00:00Z"
+  },
+  {
+    id: "order_012",
+    userId: "user_001",
+    brandId: "brand_013",
+    items: [
+      {
+        productId: "product_013",
+        quantity: 1,
+        price: 3900000,
+        size: "L",
+        color: "Navy"
+      }
+    ],
+    totalAmount: 3900000,
+    status: "PENDING",
+    createdAt: "2026-06-25T09:00:00Z"
+  },
+  {
+    id: "order_013",
+    userId: "user_001",
+    brandId: "brand_014",
+    items: [
+      {
+        productId: "product_014",
+        quantity: 2,
+        price: 550000,
+        size: "M",
+        color: "White"
+      }
+    ],
+    totalAmount: 1100000,
+    status: "DELIVERED",
+    createdAt: "2026-06-18T10:20:00Z"
+  },
+  {
+    id: "order_014",
+    userId: "user_001",
+    brandId: "brand_015",
+    items: [
+      {
+        productId: "product_015",
+        quantity: 1,
+        price: 5200000,
+        size: "M",
+        color: "Black"
+      }
+    ],
+    totalAmount: 5200000,
+    status: "SHIPPED",
+    createdAt: "2026-06-23T11:45:00Z"
+  },
+  {
+    id: "order_015",
+    userId: "user_001",
+    brandId: "brand_016",
+    items: [
+      {
+        productId: "product_016",
+        quantity: 1,
+        price: 1250000,
+        size: "XL",
+        color: "Silver"
+      }
+    ],
+    totalAmount: 1250000,
+    status: "DELIVERED",
+    createdAt: "2026-06-08T14:10:00Z"
+  },
+  {
+    id: "order_016",
+    userId: "user_001",
+    brandId: "brand_017",
+    items: [
+      {
+        productId: "product_017",
+        quantity: 1,
+        price: 650000,
+        size: "S",
+        color: "Pink"
+      }
+    ],
+    totalAmount: 650000,
+    status: "PENDING",
+    createdAt: "2026-06-25T15:30:00Z"
+  },
+  {
+    id: "order_017",
+    userId: "user_001",
+    brandId: "brand_018",
+    items: [
+      {
+        productId: "product_018",
+        quantity: 3,
+        price: 350000,
+        size: "L",
+        color: "Black"
+      }
+    ],
+    totalAmount: 1050000,
+    status: "DELIVERED",
+    createdAt: "2026-06-12T16:00:00Z"
+  },
+  {
+    id: "order_018",
+    userId: "user_001",
+    brandId: "brand_019",
+    items: [
+      {
+        productId: "product_019",
+        quantity: 1,
+        price: 950000,
+        size: "M",
+        color: "Cream"
+      }
+    ],
+    totalAmount: 950000,
+    status: "DELIVERED",
+    createdAt: "2026-06-05T09:15:00Z"
+  },
+  {
+    id: "order_019",
+    userId: "user_001",
+    brandId: "brand_020",
+    items: [
+      {
+        productId: "product_020",
+        quantity: 2,
+        price: 350000,
+        size: "S",
+        color: "Neon Pink"
+      }
+    ],
+    totalAmount: 700000,
+    status: "SHIPPED",
+    createdAt: "2026-06-22T12:40:00Z"
+  },
+  {
+    id: "order_020",
+    userId: "user_001",
+    brandId: "brand_021",
+    items: [
+      {
+        productId: "product_021",
+        quantity: 1,
+        price: 890000,
+        size: "M",
+        color: "Navy"
+      }
+    ],
+    totalAmount: 890000,
+    status: "PENDING",
+    createdAt: "2026-06-25T11:20:00Z"
+  },
+  {
+    id: "order_021",
+    userId: "user_001",
+    brandId: "brand_022",
+    items: [
+      {
+        productId: "product_022",
+        quantity: 1,
+        price: 950000,
+        size: "L",
+        color: "Khaki"
+      }
+    ],
+    totalAmount: 950000,
+    status: "DELIVERED",
+    createdAt: "2026-06-15T13:00:00Z"
+  }
+];
+
+export const mockReturnRequests = [
+  {
+    id: "after_sales_001",
+    orderId: "order_001",
+    brandId: "brand_001",
+    userId: "user_001",
+    productId: "product_001",
+    type: "SIZE_EXCHANGE",
+    reason: "The selected size is too small.",
+    preferredResolution: "Exchange from size M to size L",
+    status: "UNDER_REVIEW",
+    priority: "NORMAL",
+    createdAt: "2026-06-24T14:30:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-24T14:30:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-24T16:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_002",
+    orderId: "order_003",
+    brandId: "brand_003",
+    userId: "user_001",
+    productId: "product_005",
+    type: "DEFECTIVE",
+    reason: "There is a small tear near the seam.",
+    preferredResolution: "Replacement",
+    status: "SUBMITTED",
+    priority: "HIGH",
+    createdAt: "2026-06-24T09:10:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-24T09:10:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_003",
+    orderId: "order_005",
+    brandId: "brand_005",
+    userId: "user_001",
+    productId: "product_007",
+    type: "RETURN",
+    reason: "The color does not match the photos.",
+    preferredResolution: "Refund to original payment method",
+    status: "APPROVED",
+    priority: "NORMAL",
+    createdAt: "2026-06-10T11:00:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-10T11:00:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-11T09:30:00Z"
+      },
+      {
+        status: "APPROVED",
+        timestamp: "2026-06-12T14:20:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_004",
+    orderId: "order_007",
+    brandId: "brand_007",
+    userId: "user_001",
+    productId: "product_009",
+    type: "SIZE_EXCHANGE",
+    reason: "Ordered M but it feels too loose.",
+    preferredResolution: "Exchange for size S",
+    status: "REJECTED",
+    priority: "LOW",
+    createdAt: "2026-06-18T16:45:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-18T16:45:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-19T10:00:00Z"
+      },
+      {
+        status: "REJECTED",
+        timestamp: "2026-06-19T11:30:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_005",
+    orderId: "order_008",
+    brandId: "brand_008",
+    userId: "user_001",
+    productId: "product_010",
+    type: "OTHER",
+    reason: "Changed my mind.",
+    preferredResolution: "Store credit",
+    status: "RESOLVED",
+    priority: "NORMAL",
+    createdAt: "2026-06-05T08:20:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-05T08:20:00Z"
+      },
+      {
+        status: "APPROVED",
+        timestamp: "2026-06-06T09:00:00Z"
+      },
+      {
+        status: "RESOLVED",
+        timestamp: "2026-06-10T15:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_006",
+    orderId: "order_011",
+    brandId: "brand_001",
+    userId: "user_001",
+    productId: "product_002",
+    type: "DEFECTIVE",
+    reason: "Zipper is broken upon arrival.",
+    preferredResolution: "Refund",
+    status: "UNDER_REVIEW",
+    priority: "HIGH",
+    createdAt: "2026-06-23T14:15:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-23T14:15:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-24T09:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_007",
+    orderId: "order_001",
+    brandId: "brand_001",
+    userId: "user_001",
+    productId: "product_001",
+    type: "RETURN",
+    reason: "Arrived too late for the event I bought it for.",
+    preferredResolution: "Refund to original payment method",
+    status: "SUBMITTED",
+    priority: "NORMAL",
+    createdAt: "2026-06-24T18:00:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-24T18:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_008",
+    orderId: "order_003",
+    brandId: "brand_003",
+    userId: "user_001",
+    productId: "product_005",
+    type: "SIZE_EXCHANGE",
+    reason: "Need a larger size for a looser fit.",
+    preferredResolution: "Exchange for size L",
+    status: "APPROVED",
+    priority: "NORMAL",
+    createdAt: "2026-06-08T10:30:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-08T10:30:00Z"
+      },
+      {
+        status: "APPROVED",
+        timestamp: "2026-06-09T14:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_009",
+    orderId: "order_005",
+    brandId: "brand_005",
+    userId: "user_001",
+    productId: "product_007",
+    type: "OTHER",
+    reason: "Allergic reaction to the fabric treatment.",
+    preferredResolution: "Refund",
+    status: "UNDER_REVIEW",
+    priority: "HIGH",
+    createdAt: "2026-06-20T11:45:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-20T11:45:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-21T09:10:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_010",
+    orderId: "order_007",
+    brandId: "brand_007",
+    userId: "user_001",
+    productId: "product_009",
+    type: "DEFECTIVE",
+    reason: "Color faded significantly after first wash following instructions.",
+    preferredResolution: "Replacement",
+    status: "RESOLVED",
+    priority: "NORMAL",
+    createdAt: "2026-06-20T08:00:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-20T08:00:00Z"
+      },
+      {
+        status: "APPROVED",
+        timestamp: "2026-06-21T10:00:00Z"
+      },
+      {
+        status: "RESOLVED",
+        timestamp: "2026-06-23T16:30:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_011",
+    orderId: "order_008",
+    brandId: "brand_008",
+    userId: "user_001",
+    productId: "product_010",
+    type: "SIZE_EXCHANGE",
+    reason: "Sleeves are too short.",
+    preferredResolution: "Exchange for size M",
+    status: "SUBMITTED",
+    priority: "NORMAL",
+    createdAt: "2026-06-24T20:15:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-24T20:15:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_012",
+    orderId: "order_013",
+    brandId: "brand_014",
+    userId: "user_001",
+    productId: "product_014",
+    type: "SIZE_EXCHANGE",
+    reason: "Shirt is a bit tight around the shoulders.",
+    preferredResolution: "Exchange for size L",
+    status: "SUBMITTED",
+    priority: "NORMAL",
+    createdAt: "2026-06-20T14:30:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-20T14:30:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_013",
+    orderId: "order_015",
+    brandId: "brand_016",
+    userId: "user_001",
+    productId: "product_016",
+    type: "DEFECTIVE",
+    reason: "Reflective material is peeling off.",
+    preferredResolution: "Replacement",
+    status: "UNDER_REVIEW",
+    priority: "HIGH",
+    createdAt: "2026-06-15T09:10:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-15T09:10:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-16T10:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_014",
+    orderId: "order_017",
+    brandId: "brand_018",
+    userId: "user_001",
+    productId: "product_018",
+    type: "RETURN",
+    reason: "Not the style I expected.",
+    preferredResolution: "Refund to original payment method",
+    status: "APPROVED",
+    priority: "NORMAL",
+    createdAt: "2026-06-14T11:00:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-14T11:00:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-15T09:30:00Z"
+      },
+      {
+        status: "APPROVED",
+        timestamp: "2026-06-16T14:20:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_015",
+    orderId: "order_018",
+    brandId: "brand_019",
+    userId: "user_001",
+    productId: "product_019",
+    type: "SIZE_EXCHANGE",
+    reason: "Sweater is way too large, even for an oversized fit.",
+    preferredResolution: "Exchange for size S",
+    status: "REJECTED",
+    priority: "LOW",
+    createdAt: "2026-06-10T16:45:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-10T16:45:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-11T10:00:00Z"
+      },
+      {
+        status: "REJECTED",
+        timestamp: "2026-06-12T11:30:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_016",
+    orderId: "order_021",
+    brandId: "brand_022",
+    userId: "user_001",
+    productId: "product_022",
+    type: "OTHER",
+    reason: "Found a better alternative elsewhere.",
+    preferredResolution: "Store credit",
+    status: "RESOLVED",
+    priority: "NORMAL",
+    createdAt: "2026-06-18T08:20:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-18T08:20:00Z"
+      },
+      {
+        status: "APPROVED",
+        timestamp: "2026-06-19T09:00:00Z"
+      },
+      {
+        status: "RESOLVED",
+        timestamp: "2026-06-22T15:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_017",
+    orderId: "order_013",
+    brandId: "brand_014",
+    userId: "user_001",
+    productId: "product_014",
+    type: "DEFECTIVE",
+    reason: "Button fell off immediately.",
+    preferredResolution: "Replacement",
+    status: "UNDER_REVIEW",
+    priority: "HIGH",
+    createdAt: "2026-06-22T14:15:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-22T14:15:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-23T09:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_018",
+    orderId: "order_015",
+    brandId: "brand_016",
+    userId: "user_001",
+    productId: "product_016",
+    type: "RETURN",
+    reason: "Too shiny for my taste.",
+    preferredResolution: "Refund to original payment method",
+    status: "SUBMITTED",
+    priority: "NORMAL",
+    createdAt: "2026-06-25T18:00:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-25T18:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_019",
+    orderId: "order_017",
+    brandId: "brand_018",
+    userId: "user_001",
+    productId: "product_018",
+    type: "SIZE_EXCHANGE",
+    reason: "Shrank after first wash.",
+    preferredResolution: "Exchange for size XL",
+    status: "APPROVED",
+    priority: "NORMAL",
+    createdAt: "2026-06-18T10:30:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-18T10:30:00Z"
+      },
+      {
+        status: "APPROVED",
+        timestamp: "2026-06-19T14:00:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_020",
+    orderId: "order_018",
+    brandId: "brand_019",
+    userId: "user_001",
+    productId: "product_019",
+    type: "OTHER",
+    reason: "Itchy fabric.",
+    preferredResolution: "Refund",
+    status: "UNDER_REVIEW",
+    priority: "HIGH",
+    createdAt: "2026-06-12T11:45:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-12T11:45:00Z"
+      },
+      {
+        status: "UNDER_REVIEW",
+        timestamp: "2026-06-13T09:10:00Z"
+      }
+    ]
+  },
+  {
+    id: "after_sales_021",
+    orderId: "order_021",
+    brandId: "brand_022",
+    userId: "user_001",
+    productId: "product_022",
+    type: "DEFECTIVE",
+    reason: "Zipper on convertible leg is stuck.",
+    preferredResolution: "Replacement",
+    status: "RESOLVED",
+    priority: "NORMAL",
+    createdAt: "2026-06-20T08:00:00Z",
+    timeline: [
+      {
+        status: "SUBMITTED",
+        timestamp: "2026-06-20T08:00:00Z"
+      },
+      {
+        status: "APPROVED",
+        timestamp: "2026-06-21T10:00:00Z"
+      },
+      {
+        status: "RESOLVED",
+        timestamp: "2026-06-24T16:30:00Z"
+      }
+    ]
+  }
+];

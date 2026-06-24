@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { WardrobeItemStatus, WardrobeItemRes as WardrobeItem } from "@/features/wardrobe/types";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
+import Image from "next/image";
 
 // Helper to normalize color to HEX
 const COLORS = [
@@ -153,8 +154,7 @@ export function WardrobeItemDetailClient({ itemId, initialItem }: WardrobeItemDe
               </div>
             )}
             
-            <img 
-              src={applyCloudinaryTrim(item.imageUrl)} 
+            <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={applyCloudinaryTrim(item.imageUrl)} 
               alt={itemName}
               className="w-full h-full object-contain drop-shadow-sm" 
             />
