@@ -72,7 +72,7 @@ export function DashboardClient() {
           </div>
           <div className="p-4">
             <h3 className="font-title-lg text-base text-ethos-primary truncate font-semibold">Minimalist Silk Blouse</h3>
-            <p className="font-body-sm text-sm text-ethos-on-surface-variant mt-1">Acne Studios • Size S</p>
+            <p className="font-body-sm text-sm text-ethos-on-surface-variant mt-1">Acne Studios</p>
           </div>
         </div>
 
