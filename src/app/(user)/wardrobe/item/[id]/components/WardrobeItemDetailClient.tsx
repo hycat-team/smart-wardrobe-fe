@@ -186,12 +186,16 @@ export function WardrobeItemDetailClient({ itemId, initialItem }: WardrobeItemDe
                 <span>{item.brand || categoryName || "ACNE STUDIOS"}</span>
                 <span className="w-1 h-1 rounded-full bg-[#D9D9D9]" />
                 <div className="flex items-center gap-2">
-                  <span className="w-[12px] h-[12px] rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: getColorHex(item.color) }} />
+                  <div
+              className="w-[14px] h-[14px] rounded-full border border-black/10 shadow-sm"
+              style={{ backgroundColor: item.colorHex }}
+              title={item.color || "Màu sắc"}
+            />
                   <span>{item.color || "No Color"}</span>
                 </div>
                 <span className="w-1 h-1 rounded-full bg-[#D9D9D9]" />
-                <span>Size {item.size || "S"}</span>
-                <span className="w-1 h-1 rounded-full bg-[#D9D9D9]" />
+                {/* <span>Size {item.size || "S"}</span> */}
+                {/* <span className="w-1 h-1 rounded-full bg-[#D9D9D9]" /> */}
                 <span>Added {new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</span>
               </div>
             </div>
@@ -201,30 +205,30 @@ export function WardrobeItemDetailClient({ itemId, initialItem }: WardrobeItemDe
             {/* AI Metadata Minimalist List */}
             <div className="flex flex-col gap-6 pt-10 border-t border-black/10">
               <h3 className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#111] flex items-center gap-2">
-                <Sparkles className="size-3.5" /> Garment Metadata
+                <Sparkles className="size-3.5" /> Dữ liệu trang phục
               </h3>
               
               <div className="flex flex-col gap-4 font-['IBM_Plex_Mono'] text-[12px] tracking-[0.05em]">
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                  <span className="text-[#888] uppercase">Material</span>
+                  <span className="text-[#888] uppercase">Vải</span>
                   <span className="col-span-2 sm:col-span-3 text-[#111]">{item.material || "—"}</span>
                 </div>
                 <div className="w-full h-[1px] bg-black/5" />
                 
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                  <span className="text-[#888] uppercase">Fit</span>
+                  <span className="text-[#888] uppercase">Kiểu dáng</span>
                   <span className="col-span-2 sm:col-span-3 text-[#111]">{item.fit || "—"}</span>
                 </div>
                 <div className="w-full h-[1px] bg-black/5" />
                 
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                  <span className="text-[#888] uppercase">Pattern</span>
+                  <span className="text-[#888] uppercase">Họa tiết</span>
                   <span className="col-span-2 sm:col-span-3 text-[#111]">{item.pattern || "—"}</span>
                 </div>
                 <div className="w-full h-[1px] bg-black/5" />
                 
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                  <span className="text-[#888] uppercase">Season</span>
+                  <span className="text-[#888] uppercase">Thời tiết</span>
                   <span className="col-span-2 sm:col-span-3 text-[#111]">{item.seasonality || "—"}</span>
                 </div>
               </div>
@@ -232,8 +236,8 @@ export function WardrobeItemDetailClient({ itemId, initialItem }: WardrobeItemDe
 
             {/* Tags / Style */}
             {item.style && (
-              <div className="pt-8 flex flex-col gap-4">
-                <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#888]">Style Tags</p>
+              <div className="pt-4 flex flex-col gap-4">
+                <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#888]">Phong cách</p>
                 <div className="flex flex-wrap gap-2">
                   {item.style.split(',').map((styleTag: string) => (
                     <span 

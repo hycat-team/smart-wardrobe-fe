@@ -6,7 +6,7 @@ import { WardrobeItemDetailClient } from "./components/WardrobeItemDetailClient"
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const item = await serverFetch<WardrobeItem>(`/wardrobe-items/${id}`);
-  
+  console.log(item)
   if (!item) {
     return {
       title: "Không tìm thấy trang phục | Smart Wardrobe",

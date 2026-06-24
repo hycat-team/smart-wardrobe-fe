@@ -101,7 +101,7 @@ export function LoginClient() {
         </div>
       </form>
 
-      <div className="mt-8">
+      {/* <div className="mt-8">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-200"></div>
@@ -124,7 +124,7 @@ export function LoginClient() {
             <span className="sr-only">Sign in with Apple</span>
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

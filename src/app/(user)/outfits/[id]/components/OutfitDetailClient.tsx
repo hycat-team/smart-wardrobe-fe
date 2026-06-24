@@ -85,6 +85,7 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
   const { data, isLoading: isLoadingWardrobe } = useMyWardrobe();
   const realItems = data ? data.items : [];
   const { data: outfit, isLoading: isLoadingOutfit } = useOutfitDetail(outfitId, initialOutfit);
+  console.log(outfit)
   const updateOutfitMutation = useUpdateOutfit();
 
   // Populate data when outfit is loaded

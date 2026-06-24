@@ -2,15 +2,16 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { PostRes } from '../types';
-import { ImageOff, Heart, MessageSquare, Trash2, Loader2 } from 'lucide-react';
+import { ImageOff, Heart, MessageSquare, Trash2, Loader2, MessageCircle, Share, Share2 } from 'lucide-react';
 import gsap from 'gsap';
 import { useLikePost, useDeletePost } from '../queries/community.queries';
 import { useProfile } from '@/features/profile/queries/profile.queries';
 import { PostCommentsModal } from './PostCommentsModal';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { getUserAvatar } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-
+import { toast } from 'sonner';
 interface PostCardProps {
   post: PostRes;
 }
@@ -51,6 +52,29 @@ export const PostCard = ({ post }: PostCardProps) => {
     likePost({ postPublicID: post.publicId, isLiked: newIsLiked });
   };
 
+  const handleDelete = () => {
+    deletePost(post.publicId);
+  };
+
+  const handleShare = async () => {
+    try {
+      const shareUrl = post.sharePath ? `${window.location.origin}${post.sharePath}` : `${window.location.origin}/community/posts/${post.publicId}`;
+      
+      if (navigator.share) {
+        await navigator.share({
+          title: post.title || 'Bài viết trên Atelier Curators',
+          text: 'Xem bài viết này trên Atelier Curators',
+          url: shareUrl,
+        });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Đã sao chép liên kết bài viết');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
   const mediaUrl = post.media && post.media.length > 0
     ? post.media[0].mediaUrl
     : post.items && post.items.length > 0
@@ -61,15 +85,43 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   return (
     <>
-      <article className="w-full flex flex-col bg-white border border-[#E5E5E5] shadow-sm">
+      <article className="w-full flex flex-col bg-white border border-black/5 rounded-2xl shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
+        {/* Header Section */}
+        <div className="p-5 flex items-center justify-between border-b border-black/5 bg-[#FAFAFA]/50">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 ring-2 ring-white shadow-sm rounded-full bg-white relative overflow-hidden flex-shrink-0">
+              <Image src={getUserAvatar(post as any)} alt={post.username || 'Avatar'} fill className="object-cover" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-sm text-[#111] font-['IBM_Plex_Mono'] leading-tight hover:underline">
+                {post.username || 'ATELIER CURATORS'}
+              </span>
+              {/* <span className="text-[10px] font-medium text-[#A3A3A3] uppercase tracking-widest mt-0.5">
+                USER
+              </span> */}
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono']">
+              {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+            </div>
+            {isMounted && profile?.username && profile.username === post.username && (
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="text-[#A3A3A3] hover:text-[#D03027] transition-colors p-1"
+                title="Delete Post"
+              >
+                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Media Section */}
         {hasMedia && mediaUrl && (
-          <div className="relative w-full aspect-[4/5] sm:aspect-auto sm:h-[600px] bg-gray-50 overflow-hidden">
-            {/* Editorial Tag */}
-            <div className="absolute top-4 left-4 z-10 bg-white px-3 py-1">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]">Editorial</span>
-            </div>
-
+          <div className="relative w-full aspect-[4/5] bg-[#F5F2EE] overflow-hidden">
             {!isImageLoaded && !hasImageError && (
               <Skeleton className="absolute inset-0 w-full h-full rounded-none bg-gray-100" />
             )}
@@ -81,13 +133,13 @@ export const PostCard = ({ post }: PostCardProps) => {
             ) : (
               <Image
                 src={mediaUrl}
-                alt={post.title || 'Editorial image'}
+                alt={post.title || 'Post image'}
                 fill
                 sizes="(max-width: 768px) 100vw, 800px"
                 onLoad={() => setIsImageLoaded(true)}
                 onError={() => setHasImageError(true)}
                 className={cn(
-                  "object-contain transition-opacity duration-700",
+                  "object-cover group-hover:scale-105 transition-transform duration-1000 ease-out",
                   isImageLoaded ? "opacity-100" : "opacity-0"
                 )}
               />
@@ -96,75 +148,47 @@ export const PostCard = ({ post }: PostCardProps) => {
         )}
 
         {/* Content Section */}
-        <div className="p-5 md:p-6 flex flex-col">
-          {/* Header row: Avatar + Username + Delete Button */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-full bg-[#E5E5E5] overflow-hidden relative border border-[#1A1A1A]/10 flex-shrink-0">
-                {post.avatarUrl ? (
-                  <Image src={post.avatarUrl} alt={post.username} fill className="object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[#888888] font-bold text-[10px] uppercase bg-[#F3F0EA]">
-                    {(post.username || 'A')[0]}
-                  </div>
-                )}
-              </div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A]">
-                {post.username || 'ATELIER CURATORS'}
-              </span>
-            </div>
-            
-            {isMounted && profile?.username && profile.username === post.username && (
-              <button
-                onClick={() => deletePost(post.publicId)}
-                disabled={isDeleting}
-                className="text-[#A3A3A3] hover:text-[#D03027] transition-colors p-1"
-                title="Delete Post"
-              >
-                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-              </button>
-            )}
-          </div>
-
-          {/* Title & Content */}
-          <h2 className="font-serif text-2xl md:text-3xl text-[#1A1A1A] leading-[1.2] tracking-tight mb-2">
-            {post.title || `The Editorial Feature #${post.publicId.slice(0, 4)}`}
-          </h2>
-
-          <p className="text-[#666666] text-sm leading-relaxed mb-6 line-clamp-3">
-            {post.content}
-          </p>
-
-          {/* Footer Section */}
-          <div className="border-t border-[#E5E5E5] pt-4 flex items-center justify-between mt-auto">
-            <div className="flex items-center gap-5 text-[#888888]">
+        <div className="p-6 flex flex-col gap-5 bg-white">
+          {/* Action Buttons */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
               <button
                 onClick={handleLike}
-                className="flex items-center gap-1.5 hover:text-[#1A1A1A] transition-colors outline-none group"
+                className="text-[#111] hover:scale-110 transition-all outline-none"
               >
                 <Heart
                   ref={heartIconRef}
-                  className={cn("w-4 h-4 transition-colors", post.isLiked ? "fill-[#D03027] text-[#D03027]" : "group-hover:text-[#D03027]")}
-                  strokeWidth={2}
+                  className={cn("w-6 h-6 transition-colors hover:text-[#A3A3A3]", post.isLiked ? "fill-[#D03027] text-[#D03027] hover:text-[#D03027]" : "")}
+                  strokeWidth={1.5}
                 />
-                <span className="text-[11px] font-medium">
-                  {post.likeCount}
-                </span>
               </button>
               <button
                 onClick={() => setIsCommentsOpen(true)}
-                className="flex items-center gap-1.5 hover:text-[#1A1A1A] transition-colors outline-none"
+                className="text-[#111] hover:text-[#A3A3A3] hover:scale-110 transition-all outline-none"
               >
-                <MessageSquare className="w-4 h-4" strokeWidth={2} />
-                <span className="text-[11px] font-medium">
-                  {post.commentCount}
-                </span>
+                <MessageCircle className="w-6 h-6" strokeWidth={1.5} />
+              </button>
+              <button
+                onClick={handleShare}
+                className="text-[#111] hover:text-[#A3A3A3] hover:scale-110 transition-all outline-none"
+              >
+                <Share2 className="w-6 h-6" strokeWidth={1.5} />
               </button>
             </div>
-            
-            <span className="text-[10px] uppercase tracking-widest text-[#A3A3A3]">
-              {new Date(post.createdAt).toLocaleDateString('vi-VN')}
-            </span>
+          </div>
+
+          {/* Title & Content */}
+          <div className="text-sm text-[#111] leading-relaxed">
+            {/* {post.title && (
+              <span className="font-bold font-['IBM_Plex_Mono'] mr-3 block mb-1">{post.title}</span>
+            )} */}
+            <span className="font-bold font-['IBM_Plex_Mono'] mr-3">{post.username || 'ATELIER CURATORS'}</span>
+            <span className="text-[#666]">{post.content}</span>
+          </div>
+
+          {/* Footer Metrics */}
+          <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono']">
+            {post.likeCount.toLocaleString()} lượt thích • {post.commentCount} bình luận
           </div>
         </div>
       </article>
