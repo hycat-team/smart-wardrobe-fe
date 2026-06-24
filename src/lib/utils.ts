@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getUserAvatar(user: UserRes | null | undefined): string {
-  if (!user) return "";
+  if (!user) return "/images-male.png";
   if (user.avatarUrl) return user.avatarUrl;
   
   if (user.gender === Gender.Female) {

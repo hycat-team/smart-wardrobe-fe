@@ -4,15 +4,17 @@ import React, { useState } from 'react';
 import { mockProducts, mockBrands } from '@/lib/mock-data/b2b';
 import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
 import { Button } from '@/components/ui/button';
-import { Heart, Share2, Sparkles, ShoppingBag } from 'lucide-react';
+import { Heart, Share2, Sparkles, ShoppingBag, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface ProductDetailClientProps {
   productId: string;
 }
 
 export default function ProductDetailClient({ productId }: ProductDetailClientProps) {
+  const router = useRouter();
   const product = mockProducts.find(p => p.id === productId);
   const brand = mockBrands.find(b => b.id === product?.brandId);
   const addToCart = useB2BDemoStore(state => state.addToCart);
@@ -52,6 +54,14 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
   return (
     <div className="flex-1 bg-white text-black min-h-screen pb-24">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <button 
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-sm font-medium text-black/60 hover:text-black mb-8 group transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span>Quay lại</span>
+        </button>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           
           {/* Left Column: Images */}
