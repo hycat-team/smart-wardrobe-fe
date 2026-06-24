@@ -18,6 +18,7 @@ This document is auto-generated from `swagger.json` to provide comprehensive det
     - `id` (string)
     - `name` (string)
     - `slug` (string)
+    - `sortOrder` (integer)
 
 ---
 
@@ -35,6 +36,7 @@ Thông tin danh mục cần tạo
     **Properties**:
     - `name` (string) **(Required)**
     - `slug` (string) **(Required)**
+    - `sortOrder` (integer)
 
 **Responses**:
 
@@ -44,6 +46,7 @@ Thông tin danh mục cần tạo
     - `id` (string)
     - `name` (string)
     - `slug` (string)
+    - `sortOrder` (integer)
 
 ---
 
@@ -67,6 +70,7 @@ Thông tin danh mục cần tạo
     - `id` (string)
     - `name` (string)
     - `slug` (string)
+    - `sortOrder` (integer)
 
 ---
 
@@ -90,6 +94,7 @@ Thông tin danh mục cần cập nhật
     **Properties**:
     - `name` (string) **(Required)**
     - `slug` (string) **(Required)**
+    - `sortOrder` (integer)
 
 **Responses**:
 
@@ -99,6 +104,7 @@ Thông tin danh mục cần cập nhật
     - `id` (string)
     - `name` (string)
     - `slug` (string)
+    - `sortOrder` (integer)
 
 ---
 
@@ -954,6 +960,7 @@ Mật khẩu mới và mật khẩu xác nhận
     - `id` (string)
     - `name` (string)
     - `slug` (string)
+    - `sortOrder` (integer)
 
 ---
 
@@ -3216,6 +3223,7 @@ Danh sách sản phẩm xin mua
 | `id` | string | No |  |
 | `name` | string | No |  |
 | `slug` | string | No |  |
+| `sortOrder` | integer | No |  |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtochatmessageres"></a>`ChatMessageRes`
 
@@ -3249,6 +3257,7 @@ Danh sách sản phẩm xin mua
 | --- | --- | --- | --- |
 | `name` | string | Yes |  |
 | `slug` | string | Yes |  |
+| `sortOrder` | integer | No |  |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtocreatechatsessionreq"></a>`CreateChatSessionReq`
 
@@ -3383,6 +3392,7 @@ Danh sách sản phẩm xin mua
 | --- | --- | --- | --- |
 | `name` | string | Yes |  |
 | `slug` | string | Yes |  |
+| `sortOrder` | integer | No |  |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtoupdatechatsessionreq"></a>`UpdateChatSessionReq`
 
