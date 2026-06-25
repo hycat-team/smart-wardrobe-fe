@@ -155,8 +155,8 @@ export function BrandPostsClient() {
         </Button>
       </div>
 
-      <div className="bg-white border border-black/10">
-        <Table>
+      <div className="bg-white border border-black/10 overflow-x-auto">
+        <Table className="min-w-[700px]">
           <TableHeader>
             <TableRow className="border-black/10 hover:bg-transparent">
               <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">Bài viết</TableHead>
@@ -180,18 +180,18 @@ export function BrandPostsClient() {
                         </div>
                       )}
                     </div>
-                    <p className="text-sm font-medium line-clamp-3 max-w-md">{post.caption}</p>
+                    <p className="text-sm font-medium line-clamp-3 min-w-[200px] max-w-md">{post.caption}</p>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">
                   <span className="px-2 py-1 bg-ink/5 text-ink text-[10px] font-bold uppercase tracking-widest">
                     {post.type}
                   </span>
                 </TableCell>
-                <TableCell className="text-sm text-black/70 font-mono">
+                <TableCell className="text-sm text-black/70 font-mono whitespace-nowrap">
                   {formatDate(post.createdAt)}
                 </TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">
                   <div className="flex gap-4 text-sm font-mono text-black/70">
                     <span>❤️ {post.likeCount}</span>
                     <span>💬 {post.commentCount}</span>
@@ -200,7 +200,7 @@ export function BrandPostsClient() {
                 <TableCell className="text-right">
                   <button 
                     onClick={() => handleOpenDialog(post)}
-                    className="text-sm font-bold underline decoration-1 underline-offset-2 text-black/50 hover:text-black flex items-center gap-1 justify-end w-full"
+                    className="text-sm font-bold underline decoration-1 underline-offset-2 text-black/50 hover:text-black flex items-center gap-1 justify-end w-full whitespace-nowrap"
                   >
                     <Pencil className="size-3" /> Sửa
                   </button>
@@ -212,7 +212,7 @@ export function BrandPostsClient() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white rounded-none border border-black/10">
+        <DialogContent className="w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-none border border-black/10">
           <DialogHeader>
             <DialogTitle className="font-['Playfair_Display'] text-2xl uppercase font-medium">
               {editingId ? "Sửa bài viết" : "Viết bài mới"}
@@ -230,7 +230,7 @@ export function BrandPostsClient() {
                     <div className="size-10 rounded-full bg-white flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-sm">
                       <UploadCloud className="size-4 text-ink" />
                     </div>
-                    <p className="text-[10px] font-mono uppercase tracking-widest font-bold">Upload Ảnh Bài Viết</p>
+                    <p className="text-[10px] font-mono uppercase tracking-widest font-bold">Upload Ảnh</p>
                   </>
                 )}
               </label>

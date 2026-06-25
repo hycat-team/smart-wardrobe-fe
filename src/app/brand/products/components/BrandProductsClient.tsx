@@ -144,8 +144,8 @@ export function BrandProductsClient() {
         </Button>
       </div>
 
-      <div className="bg-white border border-black/10">
-        <Table>
+      <div className="bg-white border border-black/10 overflow-x-auto">
+        <Table className="min-w-[600px]">
           <TableHeader>
             <TableRow className="border-black/10 hover:bg-transparent">
               <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">Sản phẩm</TableHead>
@@ -169,20 +169,20 @@ export function BrandProductsClient() {
                         </div>
                       )}
                     </div>
-                    <span className="font-bold text-sm">{product.name}</span>
+                    <span className="font-bold text-sm min-w-[120px] line-clamp-2">{product.name}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm font-mono">{product.sku}</TableCell>
-                <TableCell className="text-sm font-bold font-mono text-[#A0522D]">{product.price.toLocaleString()}đ</TableCell>
+                <TableCell className="text-sm font-mono whitespace-nowrap">{product.sku}</TableCell>
+                <TableCell className="text-sm font-bold font-mono text-[#A0522D] whitespace-nowrap">{product.price.toLocaleString()}đ</TableCell>
                 <TableCell>
-                  <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-widest">
+                  <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
                     In Stock
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <button 
                     onClick={() => handleOpenDialog(product)}
-                    className="text-sm font-bold underline decoration-1 underline-offset-2 text-black/50 hover:text-black flex items-center gap-1 justify-end w-full"
+                    className="text-sm font-bold underline decoration-1 underline-offset-2 text-black/50 hover:text-black flex items-center gap-1 justify-end w-full whitespace-nowrap"
                   >
                     <Pencil className="size-3" /> Sửa
                   </button>
@@ -194,7 +194,7 @@ export function BrandProductsClient() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white rounded-none border border-black/10">
+        <DialogContent className="w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-none border border-black/10">
           <DialogHeader>
             <DialogTitle className="font-['Playfair_Display'] text-2xl uppercase font-medium">
               {editingId ? "Sửa sản phẩm" : "Thêm sản phẩm"}
@@ -212,7 +212,7 @@ export function BrandProductsClient() {
                     <div className="size-10 rounded-full bg-white flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-sm">
                       <UploadCloud className="size-4 text-ink" />
                     </div>
-                    <p className="text-[10px] font-mono uppercase tracking-widest font-bold">Upload Ảnh Sản Phẩm</p>
+                    <p className="text-[10px] font-mono uppercase tracking-widest font-bold">Upload Ảnh</p>
                   </>
                 )}
               </label>
@@ -222,12 +222,12 @@ export function BrandProductsClient() {
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Ví dụ: Áo Sơ Mi Dáng Rộng"
+                  placeholder="Ví dụ: Áo Sơ Mi"
                   className="rounded-none border-ink/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-ink"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Mã SKU</label>
                   <Input
