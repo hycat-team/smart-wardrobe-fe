@@ -113,11 +113,11 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
             <div className="flex items-center gap-4 mb-8">
               {product.discountPrice ? (
                 <>
-                  <span className="text-2xl font-bold text-red-600">{product.discountPrice.toLocaleString()}đ</span>
-                  <span className="text-lg text-black/40 line-through">{product.price.toLocaleString()}đ</span>
+                  <span className="text-2xl font-bold text-red-600">{product.discountPrice.toLocaleString('vi-VN')}đ</span>
+                  <span className="text-lg text-black/40 line-through">{product.price.toLocaleString('vi-VN')}đ</span>
                 </>
               ) : (
-                <span className="text-2xl font-bold">{product.price.toLocaleString()}đ</span>
+                <span className="text-2xl font-bold">{product.price.toLocaleString('vi-VN')}đ</span>
               )}
             </div>
 

@@ -296,7 +296,7 @@ export const CommunityList = ({
             <span>Đang tải...</span>
           </div>
         )}
-        {!hasNextPage && allPosts.length > 0 && (
+        {/* {!hasNextPage && allPosts.length > 0 && (
           <p className="text-xs text-black/40 font-bold uppercase tracking-widest">
             Bạn đã xem hết bài viết.
           </p>
@@ -308,7 +308,7 @@ export const CommunityList = ({
               Hãy trở thành người đầu tiên chia sẻ phong cách với cộng đồng.
             </p>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

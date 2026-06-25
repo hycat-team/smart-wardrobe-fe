@@ -4,7 +4,7 @@ import React, { useState, useRef, useMemo } from 'react';
 import { useB2BDemoStore, CartItem } from '@/lib/mock-data/b2b/store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CheckCircle2, ChevronLeft, CreditCard, Banknote, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, CreditCard, Banknote, ShieldCheck, Package, Truck, Calendar, MapPin, Receipt } from 'lucide-react';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -20,6 +20,10 @@ export default function CheckoutClient() {
   const [voucherCode, setVoucherCode] = useState('');
   const [appliedVoucher, setAppliedVoucher] = useState<{code: string, discount: number} | null>(null);
   const [voucherError, setVoucherError] = useState('');
+  
+  // State for success page receipt
+  const [purchasedItems, setPurchasedItems] = useState<CartItem[]>([]);
+  const [purchasedTotal, setPurchasedTotal] = useState(0);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
@@ -79,6 +83,10 @@ export default function CheckoutClient() {
 
   const handleCheckout = () => {
     setIsProcessing(true);
+    // Save current cart data before checkout clears it
+    setPurchasedItems([...selectedItems]);
+    setPurchasedTotal(finalAmount);
+
     // Simulate network delay
     setTimeout(() => {
       const newOrderId = checkout();
@@ -89,33 +97,123 @@ export default function CheckoutClient() {
   };
 
   if (isSuccess) {
-    return (
-      <div className="flex-1 bg-[#FAFAFA] text-[#111] min-h-[80vh] flex flex-col items-center justify-center p-4 animate-in fade-in duration-1000">
-        <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-8 border border-green-100 shadow-sm">
-          <CheckCircle2 className="w-12 h-12 text-green-600" strokeWidth={1.5} />
-        </div>
-        <h1 className="text-4xl md:text-5xl font-['Playfair_Display'] font-medium tracking-tight mb-4 text-center">
-          Đặt hàng thành công!
-        </h1>
-        <p className="text-[#666] mb-8 text-center max-w-[400px] font-['IBM_Plex_Mono'] text-sm leading-relaxed">
-          Cảm ơn bạn đã mua sắm. Đơn hàng của bạn đã được ghi nhận và đang được xử lý.
-        </p>
-        <div className="bg-white px-8 py-4 border border-black/10 mb-10 inline-flex flex-col items-center shadow-sm">
-          <span className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono'] mb-1">Mã đơn hàng</span>
-          <span className="text-lg font-medium text-[#111] font-['IBM_Plex_Mono'] tracking-wider">{orderId}</span>
-        </div>
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-[500px]">
-          <Link href="/profile/purchases" className="flex-1">
-            <Button className="w-full rounded-none bg-[#111] hover:bg-black text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest h-14 transition-transform active:scale-[0.98]">
-              Xem đơn hàng
-            </Button>
-          </Link>
-          <Link href="/community" className="flex-1">
-            <Button variant="outline" className="w-full rounded-none border-black/20 hover:bg-black/5 text-[#111] font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest h-14 transition-colors">
-              Tiếp tục khám phá
-            </Button>
-          </Link>
+    return (
+      <div className="flex-1 bg-[#F5F2EE] text-[#111] min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4 py-20">
+        {/* Subtle noise/pattern overlay could go here */}
+        <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#111 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}></div>
+
+        <div className="max-w-[500px] w-full relative z-10 animate-in fade-in slide-in-from-bottom-10 duration-1000 fill-mode-both">
+          {/* Success Checkmark */}
+          <div className="flex justify-center mb-8">
+            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center border border-black/10 shadow-lg relative group">
+              <div className="absolute inset-0 bg-green-500 rounded-full scale-0 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-20"></div>
+              <CheckCircle2 className="w-10 h-10 text-green-600 animate-[bounce_1s_ease-in-out]" strokeWidth={1.5} />
+            </div>
+          </div>
+
+          {/* Header */}
+          <div className="text-center mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both">
+            <h1 className="text-4xl md:text-5xl font-['Playfair_Display'] font-medium tracking-tight mb-4">
+              Tuyệt vời!
+            </h1>
+            <p className="text-[#666] font-['IBM_Plex_Mono'] text-sm leading-relaxed px-4">
+              Đơn hàng của bạn đã được xác nhận. Chúng tôi đang chuẩn bị những món đồ tuyệt vời nhất dành riêng cho bạn.
+            </p>
+          </div>
+
+          {/* Receipt Card */}
+          <div className="bg-white border border-black/10 shadow-2xl p-8 relative animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500 fill-mode-both">
+            {/* Receipt Jagged Edge Effect (Top & Bottom) */}
+            <div className="absolute -top-1 left-0 w-full h-2 bg-[radial-gradient(circle,transparent,transparent_50%,#fff_50%,#fff_100%)] bg-[length:10px_10px] bg-repeat-x"></div>
+            <div className="absolute -bottom-1 left-0 w-full h-2 bg-[radial-gradient(circle,transparent,transparent_50%,#fff_50%,#fff_100%)] bg-[length:10px_10px] bg-repeat-x rotate-180"></div>
+
+            <div className="flex items-center justify-between border-b border-black/10 pb-6 mb-6">
+              <div className="flex items-center gap-3">
+                <Receipt className="w-5 h-5 text-[#A3A3A3]" />
+                <span className="font-['IBM_Plex_Mono'] text-xs font-bold uppercase tracking-widest text-[#111]">Biên lai</span>
+              </div>
+              <span className="font-['IBM_Plex_Mono'] text-[10px] text-[#666]">{formattedDate}</span>
+            </div>
+
+            <div className="space-y-6 mb-8">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono']">Mã đơn hàng</span>
+                <span className="text-lg font-medium text-[#111] font-['IBM_Plex_Mono'] tracking-wider">{orderId}</span>
+              </div>
+              
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono']">Tổng thanh toán</span>
+                <span className="text-2xl font-['Playfair_Display'] font-bold text-[#111]">{purchasedTotal.toLocaleString('vi-VN')}đ</span>
+              </div>
+
+              {/* Overlapping Thumbnails */}
+              {purchasedItems.length > 0 && (
+                <div className="flex flex-col gap-2 pt-4 border-t border-black/5">
+                  <span className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono']">Sản phẩm ({purchasedItems.length})</span>
+                  <div className="flex items-center">
+                    {purchasedItems.slice(0, 4).map((item, i) => (
+                      <div key={i} className="w-12 h-12 rounded-full border-2 border-white overflow-hidden bg-[#F5F2EE] -ml-3 first:ml-0 shadow-sm relative z-[4] hover:z-10 transition-transform hover:scale-110">
+                        <img src={item.imageUrl} alt="item" className="w-full h-full object-cover mix-blend-multiply" />
+                      </div>
+                    ))}
+                    {purchasedItems.length > 4 && (
+                      <div className="w-12 h-12 rounded-full border-2 border-white bg-[#111] text-white flex items-center justify-center -ml-3 relative z-0 shadow-sm font-['IBM_Plex_Mono'] text-[10px]">
+                        +{purchasedItems.length - 4}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Order Tracker */}
+            <div className="bg-[#FAFAFA] -mx-8 px-8 py-6 border-y border-black/5">
+              <div className="flex items-center justify-between relative">
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-px bg-black/10 z-0"></div>
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1/3 h-px bg-black z-0"></div>
+                
+                <div className="flex flex-col items-center gap-2 relative z-10 bg-[#FAFAFA] px-2">
+                  <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center shadow-md">
+                    <CheckCircle2 className="w-3 h-3" />
+                  </div>
+                  <span className="text-[9px] font-['IBM_Plex_Mono'] uppercase tracking-widest font-bold">Xác nhận</span>
+                </div>
+                <div className="flex flex-col items-center gap-2 relative z-10 bg-[#FAFAFA] px-2 opacity-40">
+                  <div className="w-6 h-6 rounded-full bg-white border border-black/20 flex items-center justify-center">
+                    <Package className="w-3 h-3" />
+                  </div>
+                  <span className="text-[9px] font-['IBM_Plex_Mono'] uppercase tracking-widest">Xử lý</span>
+                </div>
+                <div className="flex flex-col items-center gap-2 relative z-10 bg-[#FAFAFA] px-2 opacity-40">
+                  <div className="w-6 h-6 rounded-full bg-white border border-black/20 flex items-center justify-center">
+                    <Truck className="w-3 h-3" />
+                  </div>
+                  <span className="text-[9px] font-['IBM_Plex_Mono'] uppercase tracking-widest">Giao hàng</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-700 fill-mode-both">
+            <Link href="/profile/purchases" className="flex-1">
+              <Button className="w-full rounded-none bg-[#111] hover:bg-black text-white font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest h-14 transition-all hover:shadow-[0_0_20px_rgba(0,0,0,0.3)] active:scale-[0.98]">
+                Xem đơn hàng
+              </Button>
+            </Link>
+            <Link href="/community" className="flex-1">
+              <Button variant="outline" className="w-full rounded-none border-black/20 bg-transparent hover:bg-black/5 text-[#111] font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-widest h-14 transition-colors">
+                Tiếp tục khám phá
+              </Button>
+            </Link>
+          </div>
+          
+          <p className="text-center mt-8 text-[#A3A3A3] text-[10px] font-['IBM_Plex_Mono'] animate-in fade-in duration-700 delay-1000 fill-mode-both">
+            Cần hỗ trợ? <Link href="/contact" className="underline hover:text-[#111]">Liên hệ với chúng tôi</Link>
+          </p>
         </div>
       </div>
     );

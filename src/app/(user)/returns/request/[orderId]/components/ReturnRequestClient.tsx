@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
 import { mockProducts } from '@/lib/mock-data/b2b';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, UploadCloud } from 'lucide-react';
+import { ChevronLeft, UploadCloud, X } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -19,6 +19,7 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
   const searchParams = useSearchParams();
   const productId = searchParams.get('productId');
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { orders, submitReturnRequest } = useB2BDemoStore();
   const order = orders.find(o => o.id === orderId);
@@ -28,6 +29,7 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
   const [type, setType] = useState('SIZE_EXCHANGE');
   const [reason, setReason] = useState('');
   const [preferredResolution, setPreferredResolution] = useState('');
+  const [images, setImages] = useState<string[]>([]);
 
   if (!order || !orderItem || !product) {
     return (
@@ -36,6 +38,36 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
       </div>
     );
   }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // Convert all selected files to base64
+    Array.from(files).forEach(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`Ảnh ${file.name} vượt quá 5MB`);
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setImages(prev => [...prev, event.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +84,8 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
       type,
       reason,
       preferredResolution,
-      priority: 'NORMAL'
+      priority: 'NORMAL',
+      images
     });
 
     toast.success('Gửi yêu cầu thành công');
@@ -124,11 +157,39 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
 
           <div className="flex flex-col gap-4">
             <label className="font-bold text-sm uppercase tracking-widest">Hình ảnh minh hoạ (Tùy chọn)</label>
-            <div className="border-2 border-dashed border-black/20 p-8 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-[#FAFAFA] hover:border-black/40 transition-all">
+            <input 
+              type="file" 
+              accept="image/*" 
+              multiple 
+              className="hidden" 
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+            />
+            <div 
+              className="border-2 border-dashed border-black/20 p-8 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-[#FAFAFA] hover:border-black/40 transition-all"
+              onClick={() => fileInputRef.current?.click()}
+            >
               <UploadCloud className="w-8 h-8 text-black/40" />
               <span className="text-sm font-bold text-black/60">Kéo thả hoặc click để tải ảnh lên</span>
               <span className="text-xs text-black/40">Hỗ trợ JPG, PNG (Tối đa 5MB)</span>
             </div>
+            
+            {images.length > 0 && (
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-4 mt-4">
+                {images.map((img, idx) => (
+                  <div key={idx} className="relative aspect-square border border-black/10 group">
+                    <img src={img} alt="Uploaded preview" className="w-full h-full object-cover" />
+                    <button 
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="absolute top-1 right-1 bg-black text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <Button type="submit" className="w-full h-14 rounded-none bg-black hover:bg-black/90 text-white font-bold uppercase tracking-widest mt-4">
