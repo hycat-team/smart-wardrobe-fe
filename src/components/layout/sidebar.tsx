@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,6 +57,20 @@ export function Sidebar() {
   const { cart, setCartOpen } = useB2BDemoStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  // Load from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("closy_sidebar_collapsed");
+    if (saved === "true") {
+      setIsCollapsed(true);
+    }
+  }, []);
+
+  const handleToggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem("closy_sidebar_collapsed", String(newState));
+  };
+
   const handleLogout = () => {
     clearAuthStore();
     logoutMutation.mutate();
@@ -70,11 +84,12 @@ export function Sidebar() {
       
       {/* Collapse Toggle Button */}
       <button 
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={handleToggleCollapse}
         className="absolute -right-3 top-8 bg-background border border-border/60 rounded-full p-1 z-50 text-muted-foreground hover:text-foreground transition-colors"
       >
         {isCollapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
       </button>
+
 
       {/* Editorial Logo */}
       <div className={cn("mb-6 flex flex-col transition-all", isCollapsed ? "items-center" : "pl-1")}>
@@ -89,7 +104,7 @@ export function Sidebar() {
             "font-['Playfair_Display'] font-light tracking-tighter text-primary transition-all",
             isCollapsed ? "text-2xl" : "text-4xl"
           )}>
-            {isCollapsed ? <img src="/favicon.ico"></img> : <><span className="font-['Playfair_Display']"> Closy </span><span className="text-[#D9C5B2]">.</span></>}
+            {isCollapsed ? <img src="/favicon.ico" width={50} height={50}></img> : <><span className="font-['Playfair_Display']"> Closy </span><span className="text-[#D9C5B2]">.</span></>}
           </span>
         </Link>
       </div>
@@ -212,7 +227,7 @@ export function Sidebar() {
           if (isCollapsed) {
             return (
               <Tooltip key={item.path}>
-                <TooltipTrigger asChild>
+                <TooltipTrigger>
                   {content}
                 </TooltipTrigger>
                 <TooltipContent side="right" sideOffset={12} className="font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest">
@@ -230,7 +245,7 @@ export function Sidebar() {
       <div className="mb-4 mt-2">
         {isCollapsed ? (
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger>
               <button
                 onClick={() => setCartOpen(true)}
                 className="group flex items-center justify-center w-full p-3 rounded-xl transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -279,7 +294,7 @@ export function Sidebar() {
 
           {isCollapsed ? (
              <Tooltip>
-               <TooltipTrigger asChild>
+               <TooltipTrigger>
                  <Link href="/pricing">
                    <Sparkles className="size-5 text-foreground/80 group-hover:text-[#D9C5B2] transition-colors" />
                  </Link>

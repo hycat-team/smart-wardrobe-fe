@@ -12,6 +12,11 @@ import { useCreateOutfit } from "@/features/outfits/queries/outfits.queries";
 import { toast } from "sonner";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import * as htmlToImage from "html-to-image";
+import { Switch } from "@/components/ui/switch";
+import { useGhostCloset } from "@/features/ghost-closet/hooks/useGhostCloset";
+import { WardrobeImpactPanel } from "@/features/ghost-closet/components/WardrobeImpactPanel";
+import { MOCK_GHOST_ITEM } from "@/features/ghost-closet/mock/ghostClosetMock";
+import { GhostItem } from "@/features/ghost-closet/types";
 
 import { OCCASIONS, STYLES, SEASONS, WEATHERS, COLOR_TONES, occasionMap } from "@/features/ai-stylist/components/AIQuickOptions";
 
@@ -30,6 +35,10 @@ function AIStylistContent() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
+
+  const { ghostClosetEnabled, toggleGhostCloset, saveItem, joinWaitlist, hideBrand, logGhostAction } = useGhostCloset();
+  const [activeGhostItem, setActiveGhostItem] = useState<GhostItem | null>(null);
+  const [isImpactPanelOpen, setIsImpactPanelOpen] = useState(false);
 
   const [alternativeIndices, setAlternativeIndices] = useState<Record<string, number>>({});
 
@@ -72,6 +81,40 @@ function AIStylistContent() {
         styleTarget: selectedStyle ? selectedStyle.toLowerCase() : "",
       });
       
+      // Inject ghost item if enabled
+      if (ghostClosetEnabled && res.items.length > 0) {
+        let primaryGhost: any = MOCK_GHOST_ITEM;
+        let altGhosts: any[] = [];
+        try {
+          const reportsStr = localStorage.getItem("digital_sample_lab_reports");
+          if (reportsStr) {
+             const reports = JSON.parse(reportsStr);
+             if (reports && reports.length > 0) {
+                const mappedGhosts = [...reports].reverse().map(r => ({
+                   ...MOCK_GHOST_ITEM,
+                   id: r.id,
+                   brandName: "My Brand",
+                   imageUrl: r.imageUrl || MOCK_GHOST_ITEM.imageUrl,
+                   color: r.variants?.[0]?.name || "Mặc định",
+                   colorHex: r.variants?.[0]?.color || "#000",
+                   price: parseInt(r.price) || 0,
+                }));
+                primaryGhost = mappedGhosts[0];
+                altGhosts = mappedGhosts.slice(1);
+             }
+          }
+        } catch (e) {
+           console.error("Failed to load custom ghost item", e);
+        }
+
+        const ghostAsAIItem = {
+          role: `Món đồ mới`,
+          primary: primaryGhost,
+          alternatives: altGhosts,
+        };
+        res.items.splice(1, 0, ghostAsAIItem);
+      }
+
       setOutfitData(res);
       
       // Initialize selected items from the main items
@@ -81,6 +124,10 @@ function AIStylistContent() {
         imageUrl: item.primary.imageUrl,
         category: item.primary.category,
         _role: item.role,
+        isGhost: (item.primary as any).isGhost,
+        brandName: (item.primary as any).brandName,
+        wardrobeImpact: (item.primary as any).wardrobeImpact,
+        price: item.primary.price,
         x: Math.random() * 100 + 50,
         y: Math.random() * 100 + 50,
         scale: 100,
@@ -252,6 +299,22 @@ function AIStylistContent() {
                   hasAlternativesCheck={(role) => {
                     const outfitItem = outfitData.items.find(i => i.role === role);
                     return !!(outfitItem && outfitItem.alternatives && outfitItem.alternatives.length > 0);
+                  }}
+                  onGhostItemClick={(item) => {
+                    if (outfitData) {
+                      const outfitItem = outfitData.items.find(i => i.role === item._role);
+                      if (outfitItem) {
+                        const allOptions = [outfitItem.primary, ...(outfitItem.alternatives || [])];
+                        const realGhostItem = allOptions.find(i => i.id === item.clothingItemId);
+                        if (realGhostItem) {
+                          setActiveGhostItem(realGhostItem as any);
+                          setIsImpactPanelOpen(true);
+                          return;
+                        }
+                      }
+                    }
+                    setActiveGhostItem(item as any);
+                    setIsImpactPanelOpen(true);
                   }}
                   emptyState={
                     <div className="text-center p-12">
@@ -471,6 +534,14 @@ function AIStylistContent() {
                   maxLength={1000}
                 />
               </div>
+              
+              <div className="flex items-center justify-between border border-[#E5E5E5] bg-[#F9F9F9] p-4 mt-2">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A]">Mix with Local Brands</p>
+                  <p className="text-[9px] text-[#A3A3A3] mt-1 tracking-widest uppercase">Thử đồ mới từ brand địa phương</p>
+                </div>
+                <Switch checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} />
+              </div>
 
             </div>
 
@@ -487,6 +558,54 @@ function AIStylistContent() {
           </div>
         </div>
       </div>
+      
+      <WardrobeImpactPanel
+        isOpen={isImpactPanelOpen}
+        onClose={() => setIsImpactPanelOpen(false)}
+        item={activeGhostItem}
+        onKeep={() => {
+           if (activeGhostItem) logGhostAction(activeGhostItem.id, 'keep');
+           setIsImpactPanelOpen(false);
+        }}
+        onSwap={() => {
+           if (activeGhostItem) {
+             const canvasItem = selectedItems.find(x => x.clothingItemId === activeGhostItem.id);
+             if (canvasItem) handleSwap(canvasItem._role);
+             logGhostAction(activeGhostItem.id, 'swap');
+             setIsImpactPanelOpen(false);
+           }
+        }}
+        onSave={() => {
+          if (activeGhostItem) {
+             saveItem(activeGhostItem.id);
+             logGhostAction(activeGhostItem.id, 'save');
+             toast.success("Đã lưu vào danh sách yêu thích!");
+          }
+        }}
+        onWaitlist={() => {
+          if (activeGhostItem) {
+             joinWaitlist(activeGhostItem.id);
+             logGhostAction(activeGhostItem.id, 'waitlist');
+             toast.success("Đã đăng ký Waitlist thành công!");
+          }
+        }}
+        onHideBrand={() => {
+          if (activeGhostItem) {
+             hideBrand(activeGhostItem.brandId);
+             setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeGhostItem.id));
+             setIsImpactPanelOpen(false);
+             toast.success("Sẽ không đề xuất brand này nữa.");
+          }
+        }}
+        onNotMyStyle={() => {
+          if (activeGhostItem) {
+             logGhostAction(activeGhostItem.id, 'notMyStyle');
+             setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeGhostItem.id));
+             setIsImpactPanelOpen(false);
+             toast.success("Đã ghi nhận, sẽ cải thiện đề xuất.");
+          }
+        }}
+      />
     </div>
   );
 }

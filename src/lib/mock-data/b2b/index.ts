@@ -294,7 +294,7 @@ export const mockProducts = [
     name: "Luna Structured Blazer",
     sku: "MORI-BLZ-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1550639524-a6f58345a278?w=600&h=800&fit=crop",
+      // "https://images.unsplash.com/photo-1550639524-a6f58345a278?w=600&h=800&fit=crop",
       "https://images.unsplash.com/photo-1544441893-675973e31985?w=600&h=800&fit=crop"
     ],
     price: 1290000,

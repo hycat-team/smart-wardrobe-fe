@@ -52,7 +52,7 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeController>
             <AuthProvider>
-              <TooltipProvider delayDuration={0}>
+              <TooltipProvider>
                 <Suspense fallback={null}>
                   {children}
                 </Suspense>

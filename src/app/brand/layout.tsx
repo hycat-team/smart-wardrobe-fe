@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Package, LayoutDashboard, MessageSquareText, Settings } from 'lucide-react';
+import { Package, LayoutDashboard, MessageSquareText, Settings, NotebookTabsIcon, Sparkles } from 'lucide-react';
 
 export default function BrandLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,12 +17,21 @@ export default function BrandLayout({ children }: { children: React.ReactNode })
           <Link href="/brand/products" className="flex items-center gap-3 px-4 py-3 rounded-sm hover:bg-black/5 font-bold text-sm transition-colors">
             <Package className="w-5 h-5" /> Sản phẩm
           </Link>
+          <Link href="/brand/posts" className="flex items-center gap-3 px-4 py-3 rounded-sm hover:bg-black/5 font-bold text-sm transition-colors">
+            <MessageSquareText className="w-5 h-5" /> Bài viết
+          </Link>
           <Link href="/brand/customer-care" className="flex items-center gap-3 px-4 py-3 rounded-sm hover:bg-black/5 font-bold text-sm transition-colors">
             <MessageSquareText className="w-5 h-5" /> Chăm sóc khách hàng
           </Link>
+           <Link href="/brand/digital-sample-lab/report" className="flex items-center gap-3 px-4 py-3 rounded-sm hover:bg-black/5 font-bold text-sm transition-colors ">
+            <NotebookTabsIcon className="w-5 h-5" /> Báo cáo thử mẫu
+          </Link>
+          {/* <Link href="/brand/digital-sample-lab" className="flex items-center gap-3 px-4 py-3 rounded-sm hover:bg-black/5 font-bold text-sm transition-colors">
+            <Sparkles className="w-5 h-5" /> Digital Sample Lab
+          </Link> */}
         </nav>
         <div className="p-4 border-t border-black/10">
-          <Link href="/community" className="flex items-center gap-3 px-4 py-3 rounded-sm hover:bg-black/5 font-bold text-sm transition-colors text-black/50">
+          <Link href="/brand/community" className="flex items-center gap-3 px-4 py-3 rounded-sm hover:bg-black/5 font-bold text-sm transition-colors text-black/50">
             <Settings className="w-5 h-5" /> Về trang Shopper
           </Link>
         </div>

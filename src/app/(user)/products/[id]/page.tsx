@@ -26,7 +26,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const product = mockProducts.find(p => p.id === id);
 
-  if (!product) {
+  if (!product && !id.startsWith("prod_custom_")) {
     notFound();
   }
 

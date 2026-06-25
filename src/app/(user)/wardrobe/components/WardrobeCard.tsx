@@ -128,10 +128,10 @@ export function WardrobeCard({
             <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#666] mt-2 truncate">
               {(item as any).brand || (typeof item.category === 'object' ? (item.category as any)?.name : item.category) || "ACNE STUDIOS"}
             </p>
-            <div className="font-['IBM_Plex_Mono'] text-[11px] text-[#888] mt-auto pt-2">
+            {/* <div className="font-['IBM_Plex_Mono'] text-[11px] text-[#888] mt-auto pt-2">
               <span>Size {(item as any).size || "S"}</span>
               {item.color && <span> • {item.color}</span>}
-            </div>
+            </div> */}
           </>
         )}
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { mockProducts, mockBrands } from '@/lib/mock-data/b2b';
 import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
 import { Button } from '@/components/ui/button';
@@ -15,8 +15,26 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ productId }: ProductDetailClientProps) {
   const router = useRouter();
-  const product = mockProducts.find(p => p.id === productId);
-  const brand = mockBrands.find(b => b.id === product?.brandId);
+  
+  const [product, setProduct] = useState<any>(mockProducts.find(p => p.id === productId));
+  const [brand, setBrand] = useState<any>(mockBrands.find(b => b.id === product?.brandId));
+
+  useEffect(() => {
+    if (!product) {
+      try {
+        const stored = localStorage.getItem("brand_custom_products");
+        if (stored) {
+          const customProducts = JSON.parse(stored);
+          const customProduct = customProducts.find((p: any) => p.id === productId);
+          if (customProduct) {
+            setProduct(customProduct);
+            setBrand(mockBrands.find(b => b.id === customProduct.brandId));
+          }
+        }
+      } catch (e) {}
+    }
+  }, [productId, product]);
+
   const addToCart = useB2BDemoStore(state => state.addToCart);
 
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -76,7 +94,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
             </div>
             {product.imageUrls.length > 1 && (
               <div className="grid grid-cols-2 gap-4">
-                {product.imageUrls.slice(1).map((url, idx) => (
+                {product.imageUrls.slice(1).map((url: string, idx: number) => (
                   <div key={idx} className="aspect-[3/4] bg-[#F5F2EE] overflow-hidden rounded-sm">
                     <img src={url} alt={`${product.name} view ${idx + 2}`} className="w-full h-full object-cover" />
                   </div>
@@ -113,15 +131,15 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
             <div className="flex flex-col gap-4 mb-8">
               <span className="font-bold text-sm uppercase tracking-widest">Màu sắc</span>
               <div className="flex flex-wrap gap-3">
-                {product.colors.map(color => (
+                {(product.colors || ['Mặc định']).map((color: string) => (
                   <button 
                     key={color}
                     onClick={() => setSelectedColor(color)}
-                    className={`px-4 py-2 border text-sm font-bold transition-all ${
-                      selectedColor === color 
+                    className={`h-12 px-6 border font-bold text-sm uppercase tracking-widest transition-colors
+                      ${selectedColor === color 
                         ? 'border-black bg-black text-white' 
-                        : 'border-black/20 text-black hover:border-black/50'
-                    }`}
+                        : 'border-black/20 text-black/70 hover:border-black'}
+                    `}
                   >
                     {color}
                   </button>
@@ -130,17 +148,17 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
             </div>
 
             {/* Sizes */}
-            <div className="flex flex-col gap-4 mb-10">
+            <div className="space-y-4 mb-10">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-sm uppercase tracking-widest">Kích cỡ</span>
-                <button className="text-xs text-black/50 underline decoration-1 underline-offset-2">Size Guide</button>
+                <button className="text-xs font-bold underline decoration-1 underline-offset-2 text-black/50 hover:text-black">Hướng dẫn chọn size</button>
               </div>
               <div className="flex flex-wrap gap-3">
-                {product.sizes.map(size => (
+                {(product.sizes || ['Freesize']).map((size: string) => (
                   <button 
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-12 flex items-center justify-center border text-sm font-bold transition-all ${
+                    className={`w-16 h-16 flex items-center justify-center border text-sm font-bold transition-all ${
                       selectedSize === size 
                         ? 'border-black bg-black text-white' 
                         : 'border-black/20 text-black hover:border-black/50'

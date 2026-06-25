@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { mockBrands, mockBrandPosts, mockProducts } from '@/lib/mock-data/b2b';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -14,8 +14,42 @@ interface BrandProfileClientProps {
 
 export default function BrandProfileClient({ brandId }: BrandProfileClientProps) {
   const brand = mockBrands.find(b => b.id === brandId);
-  const brandPosts = mockBrandPosts.filter(p => p.brandId === brandId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  const products = mockProducts.filter(p => p.brandId === brandId);
+  
+  const [brandPosts, setBrandPosts] = useState(mockBrandPosts.filter(p => p.brandId === brandId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+  const [products, setProducts] = useState(mockProducts.filter(p => p.brandId === brandId));
+  
+  // Follow button state
+  const [isFollowing, setIsFollowing] = useState(brand?.isFollowing || false);
+
+  useEffect(() => {
+    // Load custom products
+    try {
+      const stored = localStorage.getItem("brand_custom_products");
+      if (stored) {
+        const customProducts = JSON.parse(stored);
+        const defaultProducts = mockProducts.filter(p => p.brandId === brandId);
+        const overriddenIds = customProducts.map((p: any) => p.id);
+        const filteredDefaults = defaultProducts.filter(p => !overriddenIds.includes(p.id));
+        setProducts([...customProducts.filter((p: any) => p.brandId === brandId), ...filteredDefaults]);
+      }
+    } catch(e) {}
+    
+    // Load custom posts
+    try {
+      const stored = localStorage.getItem("brand_custom_posts");
+      if (stored) {
+        const customPosts = JSON.parse(stored);
+        const defaultPosts = mockBrandPosts.filter(p => p.brandId === brandId);
+        const overriddenIds = customPosts.map((p: any) => p.id);
+        const filteredDefaults = defaultPosts.filter(p => !overriddenIds.includes(p.id));
+        
+        setBrandPosts(
+          [...customPosts.filter((p: any) => p.brandId === brandId), ...filteredDefaults]
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        );
+      }
+    } catch(e) {}
+  }, [brandId]);
 
   if (!brand) return null;
 
@@ -49,7 +83,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
           <div className="flex-1 flex flex-col gap-4 pb-2">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3">
-                <h1 className="text-4xl sm:text-5xl font-['Playfair_Display'] font-medium text-white lg:text-[#111] tracking-tight">{brand.name}</h1>
+                <h1 className="text-4xl sm:text-5xl font-['Playfair_Display'] font-medium text-white lg:text-[#111] tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">{brand.name}</h1>
                 {brand.isVerified && <BadgeCheck className="w-8 h-8 text-blue-500 bg-white rounded-full p-0.5" />}
               </div>
               <p className="text-white/90 lg:text-[#666] font-['IBM_Plex_Mono'] text-sm sm:text-base max-w-[800px] leading-relaxed">
@@ -73,7 +107,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 pb-2 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row items-center gap-4 pb-2 w-full lg:w-auto lg:shrink-0">
             <div className="flex items-center gap-8 px-8 py-3 bg-[#FAFAFA] rounded-full border border-black/5 shadow-sm w-full sm:w-auto justify-center">
               <div className="flex flex-col items-center">
                 <span className="font-bold text-[#111] text-lg font-['IBM_Plex_Mono']">{brand.followerCount.toLocaleString()}</span>
@@ -86,8 +120,14 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
               </div>
             </div>
             <div className="flex gap-3 w-full sm:w-auto">
-              <Button variant={brand.isFollowing ? "outline" : "default"} className="flex-1 sm:flex-none rounded-full font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest px-8 h-12 shadow-sm border-black/20">
-                {brand.isFollowing ? 'Đang theo dõi' : 'Theo dõi'}
+              <Button 
+                variant={isFollowing ? "outline" : "default"} 
+                onClick={() => setIsFollowing(!isFollowing)}
+                className={`flex-1 sm:flex-none min-w-[180px] rounded-full font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest px-8 h-12 shadow-sm transition-colors ${
+                  isFollowing ? 'border-black/20 text-black/70 hover:bg-black/5 hover:text-black' : 'bg-black text-white hover:bg-black/90'
+                }`}
+              >
+                {isFollowing ? 'Đang theo dõi' : 'Theo dõi'}
               </Button>
               <Button variant="default" className="flex-1 sm:flex-none rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B5952F] hover:opacity-90 text-white font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest px-8 h-12 shadow-md border-0">
                 Membership

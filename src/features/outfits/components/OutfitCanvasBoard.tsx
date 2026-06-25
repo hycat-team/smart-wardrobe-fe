@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ZoomIn, ZoomOut, MoveUp, X, RefreshCcw, AlertCircle } from "lucide-react";
 import { CanvasItem } from "@/features/outfits/hooks/useOutfitCanvas";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
+import { GhostItemBadge } from "@/features/ghost-closet/components/GhostItemBadge";
 
 export interface OutfitCanvasBoardProps {
   canvasRef: React.RefObject<HTMLDivElement | null>;
@@ -14,6 +15,7 @@ export interface OutfitCanvasBoardProps {
   onSwap?: (role: string) => void;
   emptyState?: React.ReactNode;
   hasAlternativesCheck?: (role: string) => boolean;
+  onGhostItemClick?: (item: CanvasItem) => void;
 }
 
 export function OutfitCanvasBoard({
@@ -26,6 +28,7 @@ export function OutfitCanvasBoard({
   onSwap,
   emptyState,
   hasAlternativesCheck,
+  onGhostItemClick,
 }: OutfitCanvasBoardProps) {
   return (
     <div className="flex-1 bg-[#F9F9F9] border border-[#E5E5E5] relative overflow-hidden flex items-center justify-center">
@@ -95,6 +98,20 @@ export function OutfitCanvasBoard({
                       </>
                     )}
 
+                    {item.isGhost && onGhostItemClick && (
+                      <>
+                        <div className="w-px h-4 bg-[#E5E5E5]" />
+                        <button 
+                          type="button" 
+                          onClick={(e) => { e.stopPropagation(); onGhostItemClick(item); }}
+                          className="hover:bg-[#A0522D] hover:text-white text-[#A0522D] transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold px-3 py-2"
+                          title="Xem Wardrobe Impact"
+                        >
+                          IMPACT
+                        </button>
+                      </>
+                    )}
+
                     <div className="w-px h-4 bg-[#E5E5E5]" />
                     <button
                       type="button"
@@ -108,18 +125,19 @@ export function OutfitCanvasBoard({
 
                   {/* Image */}
                   <div 
-                    className="pointer-events-none drop-shadow-xl ring-1 ring-transparent group-hover:ring-black/10 transition-all rounded-sm"
+                    className="pointer-events-none drop-shadow-xl ring-1 ring-transparent group-hover:ring-black/10 transition-all rounded-sm relative"
                     style={{ 
                       width: `${item.scale * 2.2}px`, 
                       height: "auto",
                     }}
                   >
                     <img 
-                      src={applyCloudinaryTrim(item.imageUrl)} 
+                      src={item.isGhost ? item.imageUrl : applyCloudinaryTrim(item.imageUrl)} 
                       alt="Outfit Item" 
                       className="w-full h-auto object-contain filter drop-shadow-md" 
                       draggable={false}
                     />
+                    {item.isGhost && <GhostItemBadge brandName={item.brandName || 'Local Brand'} />}
                   </div>
                   
                   {/* Role Label for AI Stylist */}
