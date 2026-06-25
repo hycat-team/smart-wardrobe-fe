@@ -74,41 +74,41 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
 
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Brand Header */}
-        <div className="relative -mt-24 sm:-mt-32 mb-12 flex flex-col lg:flex-row gap-8 lg:items-end">
-          <Avatar className="w-40 h-40 sm:w-48 sm:h-48 shadow-xl rounded-full overflow-hidden border-4 border-white/50">
+        <div className="relative -mt-24 sm:-mt-32 mb-12 flex flex-col lg:flex-row items-center lg:items-end gap-6 lg:gap-8">
+          <Avatar className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 shadow-xl rounded-full overflow-hidden border-4 border-white z-10 shrink-0">
             <AvatarImage src={brand.logoUrl} className="object-cover" />
             <AvatarFallback className="bg-[#111] text-white text-4xl font-['Playfair_Display']">{brand.name[0]}</AvatarFallback>
           </Avatar>
           
-          <div className="flex-1 flex flex-col gap-4 pb-2">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                <h1 className="text-4xl sm:text-5xl font-['Playfair_Display'] font-medium text-white lg:text-[#111] tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">{brand.name}</h1>
-                {brand.isVerified && <BadgeCheck className="w-8 h-8 text-blue-500 bg-white rounded-full p-0.5" />}
+          <div className="flex-1 flex flex-col items-center lg:items-start gap-4 pb-2 text-center lg:text-left w-full mt-2 lg:mt-0">
+            <div className="flex flex-col gap-2 w-full">
+              <div className="flex items-center justify-center lg:justify-start gap-3">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-['Playfair_Display'] font-medium text-[#111] tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">{brand.name}</h1>
+                {brand.isVerified && <BadgeCheck className="w-6 h-6 lg:w-8 lg:h-8 text-blue-500 bg-white rounded-full p-0.5" />}
               </div>
-              <p className="text-white/90 lg:text-[#666] font-['IBM_Plex_Mono'] text-sm sm:text-base max-w-[800px] leading-relaxed">
+              <p className="text-[#666] font-['IBM_Plex_Mono'] text-sm sm:text-base max-w-[800px] leading-relaxed mx-auto lg:mx-0">
                 {brand.description}
               </p>
             </div>
             
-            <div className="flex flex-wrap items-center gap-6 mt-4 text-sm font-['IBM_Plex_Mono']">
-              <div className="flex items-center gap-2 text-white/90 lg:text-[#666]">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 lg:gap-6 mt-2 text-xs sm:text-sm font-['IBM_Plex_Mono'] w-full">
+              <div className="flex items-center gap-2 text-[#666]">
                 <MapPin className="w-4 h-4" />
                 <span>TP. Hồ Chí Minh</span>
               </div>
-              <div className="flex items-center gap-2 text-white/90 lg:text-[#666] hover:text-[#111] transition-colors cursor-pointer">
+              <div className="flex items-center gap-2 text-[#666] hover:text-[#111] transition-colors cursor-pointer">
                 <LinkIcon className="w-4 h-4" />
                 <span>{brand.name.toLowerCase().replace(/\s/g, '')}.vn</span>
               </div>
-              <div className="flex items-center gap-2 text-white/90 lg:text-[#666] hover:text-[#111] transition-colors cursor-pointer">
+              <div className="flex items-center gap-2 text-[#666] hover:text-[#111] transition-colors cursor-pointer">
                 <Camera className="w-4 h-4" />
                 <span>@{brand.name.toLowerCase().replace(/\s/g, '')}</span>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 pb-2 w-full lg:w-auto lg:shrink-0">
-            <div className="flex items-center gap-8 px-8 py-3 bg-[#FAFAFA] rounded-full border border-black/5 shadow-sm w-full sm:w-auto justify-center">
+          <div className="flex flex-col sm:flex-row items-center gap-4 pb-2 w-full lg:w-auto shrink-0 mt-4 lg:mt-0">
+            <div className="flex items-center justify-center gap-8 px-6 lg:px-8 py-3 bg-[#FAFAFA] rounded-full border border-black/5 shadow-sm w-full sm:w-auto">
               <div className="flex flex-col items-center">
                 <span className="font-bold text-[#111] text-lg font-['IBM_Plex_Mono']">{brand.followerCount.toLocaleString()}</span>
                 <span className="text-[#A3A3A3] text-[10px] uppercase tracking-widest">Followers</span>
@@ -123,13 +123,13 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
               <Button 
                 variant={isFollowing ? "outline" : "default"} 
                 onClick={() => setIsFollowing(!isFollowing)}
-                className={`flex-1 sm:flex-none min-w-[180px] rounded-full font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest px-8 h-12 shadow-sm transition-colors ${
+                className={`flex-1 sm:flex-none min-w-[140px] rounded-full font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest px-6 lg:px-8 h-12 shadow-sm transition-colors ${
                   isFollowing ? 'border-black/20 text-black/70 hover:bg-black/5 hover:text-black' : 'bg-black text-white hover:bg-black/90'
                 }`}
               >
                 {isFollowing ? 'Đang theo dõi' : 'Theo dõi'}
               </Button>
-              <Button variant="default" className="flex-1 sm:flex-none rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B5952F] hover:opacity-90 text-white font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest px-8 h-12 shadow-md border-0">
+              <Button variant="default" className="flex-1 sm:flex-none rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B5952F] hover:opacity-90 text-white font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest px-6 lg:px-8 h-12 shadow-md border-0">
                 Membership
               </Button>
             </div>
@@ -156,7 +156,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
 
         {/* Tabs */}
         <Tabs defaultValue="shop" className="w-full">
-          <TabsList variant="line" className="w-full justify-start h-auto p-0 border-b border-black/10 mb-12 gap-8">
+          <TabsList variant="line" className="w-full justify-start h-auto p-0 border-b border-black/10 mb-8 lg:mb-12 gap-6 lg:gap-8 overflow-x-auto flex-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <TabsTrigger 
               value="shop" 
               className="px-0 pb-4 pt-2 font-['IBM_Plex_Mono'] text-sm font-bold uppercase tracking-widest text-[#A3A3A3] data-[state=active]:text-[#111] bg-transparent data-[state=active]:bg-transparent"
