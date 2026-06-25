@@ -86,7 +86,7 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
       preferredResolution,
       priority: 'NORMAL',
       images
-    });
+    } as any);
 
     toast.success('Gửi yêu cầu thành công');
     router.push('/profile/purchases');

@@ -159,7 +159,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
           <div className="flex flex-col gap-4">
             <h3 className="font-['Playfair_Display'] text-2xl font-medium text-[#111] border-b border-black/10 pb-4">Phong cách</h3>
             <div className="flex flex-wrap gap-2">
-              {brand.styles.map(style => (
+              {brand.styles?.map((style: string) => (
                 <span key={style} className="px-4 py-2 bg-[#FAFAFA] border border-black/5 rounded-full text-xs font-medium uppercase tracking-widest text-[#111] font-['IBM_Plex_Mono'] hover:bg-black hover:text-white transition-colors cursor-pointer">
                   {style}
                 </span>
