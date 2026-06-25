@@ -1,0 +1,208 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import { UploadCloud, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { mockBrands } from "@/lib/mock-data/b2b";
+
+export function BrandProfileSettingsClient() {
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    story: "",
+    logoUrl: "",
+    coverUrl: "",
+    location: "TP. Hồ Chí Minh",
+    website: "",
+    instagram: "",
+  });
+
+  useEffect(() => {
+    // Load default from mock or local storage
+    const defaultBrand = mockBrands.find(b => b.id === "brand_001") || mockBrands[0];
+    
+    try {
+      const stored = localStorage.getItem("custom_brand_profile");
+      if (stored) {
+        const customProfile = JSON.parse(stored);
+        setFormData({
+          name: customProfile.name || defaultBrand.name,
+          description: customProfile.description || defaultBrand.description,
+          story: customProfile.story || defaultBrand.story,
+          logoUrl: customProfile.logoUrl || defaultBrand.logoUrl,
+          coverUrl: customProfile.coverUrl || defaultBrand.coverUrl || "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&q=80",
+          location: customProfile.location || "TP. Hồ Chí Minh",
+          website: customProfile.website || `${defaultBrand.name.toLowerCase().replace(/\s/g, '')}.vn`,
+          instagram: customProfile.instagram || `@${defaultBrand.name.toLowerCase().replace(/\s/g, '')}`,
+        });
+        return;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    setFormData({
+      name: defaultBrand.name,
+      description: defaultBrand.description,
+      story: defaultBrand.story,
+      logoUrl: defaultBrand.logoUrl,
+      coverUrl: defaultBrand.coverUrl || "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&q=80",
+      location: "TP. Hồ Chí Minh",
+      website: `${defaultBrand.name.toLowerCase().replace(/\s/g, '')}.vn`,
+      instagram: `@${defaultBrand.name.toLowerCase().replace(/\s/g, '')}`,
+    });
+  }, []);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, fieldName: 'logoUrl' | 'coverUrl') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, [fieldName]: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = () => {
+    setIsSaving(true);
+    try {
+      localStorage.setItem("custom_brand_profile", JSON.stringify(formData));
+      setTimeout(() => {
+        setIsSaving(false);
+      }, 600);
+    } catch (e) {
+      console.error("Error saving profile", e);
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-black/10 max-w-4xl">
+      <div className="p-6 md:p-8 space-y-10">
+        
+        {/* Hình ảnh */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-bold border-b border-black/10 pb-4">Hình ảnh thương hiệu</h2>
+          <div className="flex flex-col md:flex-row gap-8">
+            <div className="space-y-3 shrink-0">
+              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Ảnh đại diện (Logo)</label>
+              <label className="block w-32 h-32 rounded-full bg-[#F4F1EE] border border-dashed border-black/20 flex flex-col items-center justify-center text-black/40 cursor-pointer hover:bg-black/5 transition-colors group relative overflow-hidden shrink-0 mx-auto md:mx-0">
+                <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'logoUrl')} />
+                {formData.logoUrl ? (
+                  <img src={formData.logoUrl} alt="Logo" className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <UploadCloud className="size-6" />
+                )}
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold">
+                  Thay đổi
+                </div>
+              </label>
+            </div>
+            
+            <div className="space-y-3 w-full flex-1">
+              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Ảnh bìa (Cover)</label>
+              <label className="block w-full h-32 bg-[#F4F1EE] border border-dashed border-black/20 flex flex-col items-center justify-center text-black/40 cursor-pointer hover:bg-black/5 transition-colors group relative overflow-hidden">
+                <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'coverUrl')} />
+                {formData.coverUrl ? (
+                  <img src={formData.coverUrl} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <div className="flex flex-col items-center gap-2">
+                    <UploadCloud className="size-6" />
+                    <span className="text-[10px] font-mono uppercase tracking-widest">Tải lên ảnh bìa</span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold">
+                  Thay đổi
+                </div>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        {/* Thông tin cơ bản */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-bold border-b border-black/10 pb-4">Thông tin cơ bản</h2>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Tên thương hiệu</label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                className="rounded-none border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-black font-medium"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Mô tả ngắn (Description)</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                className="w-full min-h-[80px] p-3 text-sm rounded-none border border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-black resize-none"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Câu chuyện thương hiệu (Story)</label>
+              <textarea
+                value={formData.story}
+                onChange={(e) => setFormData(prev => ({ ...prev, story: e.target.value }))}
+                className="w-full min-h-[160px] p-3 text-sm rounded-none border border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-black resize-none"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Liên kết */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-bold border-b border-black/10 pb-4">Liên kết & Liên hệ</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Vị trí</label>
+              <Input
+                value={formData.location}
+                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                className="rounded-none border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-black font-mono text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Website</label>
+              <Input
+                value={formData.website}
+                onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                className="rounded-none border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-black font-mono text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Instagram</label>
+              <Input
+                value={formData.instagram}
+                onChange={(e) => setFormData(prev => ({ ...prev, instagram: e.target.value }))}
+                className="rounded-none border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-black font-mono text-sm"
+              />
+            </div>
+          </div>
+        </section>
+
+        <div className="pt-4 flex justify-end">
+          <Button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-black hover:bg-black/90 text-white rounded-none uppercase font-mono tracking-widest text-[11px] px-8 h-12 flex items-center gap-2 transition-all w-full md:w-auto"
+          >
+            {isSaving ? (
+              <>
+                <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                Đang lưu...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-4 h-4" />
+                Lưu thay đổi
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

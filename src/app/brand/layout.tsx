@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Package, LayoutDashboard, MessageSquareText, Settings, NotebookTabsIcon, Menu, X } from 'lucide-react';
+import { Package, LayoutDashboard, MessageSquareText, Settings, NotebookTabsIcon, Menu, X, Store } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function BrandLayout({ children }: { children: React.ReactNode }) {
@@ -29,6 +29,9 @@ export default function BrandLayout({ children }: { children: React.ReactNode })
       </Link>
       <Link href="/brand/digital-sample-lab/report" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/brand/digital-sample-lab/report')}>
         <NotebookTabsIcon className="w-5 h-5" /> Báo cáo thử mẫu
+      </Link>
+      <Link href="/brand/profile" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/brand/profile')}>
+        <Store className="w-5 h-5" /> Hồ sơ thương hiệu
       </Link>
     </>
   );

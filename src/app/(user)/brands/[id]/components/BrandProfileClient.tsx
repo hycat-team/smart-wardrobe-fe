@@ -13,15 +13,28 @@ interface BrandProfileClientProps {
 }
 
 export default function BrandProfileClient({ brandId }: BrandProfileClientProps) {
-  const brand = mockBrands.find(b => b.id === brandId);
+  const baseBrand = mockBrands.find(b => b.id === brandId);
+  const [displayBrand, setDisplayBrand] = useState<any>(baseBrand);
   
   const [brandPosts, setBrandPosts] = useState(mockBrandPosts.filter(p => p.brandId === brandId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
   const [products, setProducts] = useState(mockProducts.filter(p => p.brandId === brandId));
   
   // Follow button state
-  const [isFollowing, setIsFollowing] = useState(brand?.isFollowing || false);
+  const [isFollowing, setIsFollowing] = useState(baseBrand?.isFollowing || false);
 
   useEffect(() => {
+    // Load custom brand profile
+    try {
+      const storedProfile = localStorage.getItem("custom_brand_profile");
+      if (storedProfile && baseBrand) {
+        const customProfile = JSON.parse(storedProfile);
+        setDisplayBrand({
+          ...baseBrand,
+          ...customProfile,
+        });
+      }
+    } catch (e) {}
+
     // Load custom products
     try {
       const stored = localStorage.getItem("brand_custom_products");
@@ -49,9 +62,10 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
         );
       }
     } catch(e) {}
-  }, [brandId]);
+  }, [brandId, baseBrand]);
 
-  if (!brand) return null;
+  if (!displayBrand) return null;
+  const brand = displayBrand;
 
   return (
     <div className="flex-1 bg-white pb-20">
