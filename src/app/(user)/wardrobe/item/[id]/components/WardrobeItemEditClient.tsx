@@ -89,7 +89,7 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col pt-8 lg:pt-12">
 
         {/* Left Column: Image Preview */}
-        <div className="md:col-span-5 flex flex-col gap-4">
+        {/* <div className="md:col-span-5 flex flex-col gap-4">
           <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-sm border border-cream-dark/50 bg-cream-dark/20">
             <Image
               src={item.imageUrl}
@@ -102,7 +102,7 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
           <p className="text-[10px] font-mono text-ink-muted text-center uppercase tracking-widest">
             Ảnh trang phục không thể thay đổi
           </p>
-        </div>
+        </div> */}
 
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
 

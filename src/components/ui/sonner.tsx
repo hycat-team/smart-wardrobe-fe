@@ -1,11 +1,17 @@
-"use client"
+﻿"use client";
 
-import { useTheme } from "next-themes"
-import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { useTheme } from "next-themes";
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  Loader2Icon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
+import { Toaster as Sonner, type ToasterProps } from "sonner";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme = "system" } = useTheme();
 
   return (
     <Sonner
@@ -21,19 +27,20 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-white group-[.toaster]:text-[#1A1A1A] group-[.toaster]:border group-[.toaster]:border-[#1A1A1A] group-[.toaster]:shadow-sm group-[.toaster]:rounded-none font-sans px-5 py-4 w-full flex gap-3",
-          title: "text-[12px] font-bold uppercase tracking-widest leading-none mt-0.5",
-          description: "group-[.toast]:text-[#666666] text-[13px] font-medium leading-relaxed mt-1",
+            "group toast group-[.toaster]:flex group-[.toaster]:w-full group-[.toaster]:gap-3 group-[.toaster]:rounded-2xl group-[.toaster]:border group-[.toaster]:border-border group-[.toaster]:bg-card group-[.toaster]:px-5 group-[.toaster]:py-4 group-[.toaster]:font-sans group-[.toaster]:text-card-foreground group-[.toaster]:shadow-md",
+          title:
+            "mt-0.5 text-[12px] font-semibold uppercase leading-none tracking-widest text-foreground",
+          description:
+            "mt-1 text-[13px] font-medium leading-relaxed text-muted-foreground",
           actionButton:
-            "group-[.toast]:bg-[#1A1A1A] group-[.toast]:text-white text-[10px] font-bold uppercase tracking-widest rounded-none border-none px-4 py-2",
+            "rounded-full border-none bg-primary px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90",
           cancelButton:
-            "group-[.toast]:bg-transparent group-[.toast]:text-[#1A1A1A] text-[10px] font-bold uppercase tracking-widest rounded-none border border-[#1A1A1A] px-4 py-2",
+            "rounded-full border border-border bg-background px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-foreground hover:bg-muted",
         },
       }}
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
-
+export { Toaster };

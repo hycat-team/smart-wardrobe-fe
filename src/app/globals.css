@@ -18,6 +18,8 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
@@ -67,8 +69,10 @@
   --muted: #f3f4f6;
   --muted-foreground: #6b7280;
   --accent: #d9c5b2;
+  --accent-soft: #f4eee8;
+  --accent-hover: #cdb39d;
   --accent-foreground: #111111;
-  --destructive: #111111;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: #e5e7eb;
   --input: #e5e7eb;
@@ -101,6 +105,8 @@
   --color-ink-subtle: #9ca3af;
   --color-terracotta: #d9c5b2;
   --color-terracotta-light: #f4eee8;
+  --color-accent-soft: #f4eee8;
+  --color-accent-hover: #cdb39d;
   --color-sage: #6b7280;
   --color-sage-light: #f3f4f6;
   --color-gold: #d9c5b2;
@@ -148,8 +154,10 @@
   --muted: #2a2a2a;
   --muted-foreground: #d1d5db;
   --accent: #d9c5b2;
+  --accent-soft: #2a2a2a;
+  --accent-hover: #cdb39d;
   --accent-foreground: #111111;
-  --destructive: #ffffff;
+  --destructive: #f87171;
   --destructive-foreground: #111111;
   --border: #3f3f46;
   --input: #3f3f46;
@@ -206,7 +214,7 @@
 
 @layer utilities {
   .soft-surface {
-    @apply rounded-2xl border border-border bg-card shadow-sm shadow-gray-200/60;
+    @apply rounded-2xl border border-border bg-card shadow-sm;
   }
 
   .image-frame {

@@ -9,13 +9,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "rounded-full bg-primary text-primary-foreground shadow-sm shadow-gray-300/40 hover:bg-primary/90 hover:shadow-md",
+          "rounded-full bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md",
         outline:
-          "rounded-full border-border bg-background text-foreground hover:border-accent hover:bg-accent/20 hover:text-foreground aria-expanded:bg-accent/20 aria-expanded:text-foreground",
+          "rounded-full border-border bg-background text-foreground hover:border-accent-hover hover:bg-accent-soft hover:text-foreground aria-expanded:bg-accent-soft aria-expanded:text-foreground",
         secondary:
-          "rounded-full bg-secondary text-secondary-foreground hover:bg-accent/35 aria-expanded:bg-accent/35 aria-expanded:text-secondary-foreground",
+          "rounded-full bg-secondary text-secondary-foreground hover:bg-accent-hover aria-expanded:bg-accent-hover aria-expanded:text-secondary-foreground",
         ghost:
-          "rounded-full text-foreground hover:bg-accent/25 hover:text-foreground aria-expanded:bg-accent/25 aria-expanded:text-foreground",
+          "rounded-full text-foreground hover:bg-accent-soft hover:text-foreground aria-expanded:bg-accent-soft aria-expanded:text-foreground",
         destructive:
           "rounded-full bg-primary text-primary-foreground hover:bg-primary/85 focus-visible:border-primary focus-visible:ring-primary/20",
         link: "rounded-none px-0 text-primary underline-offset-4 hover:underline",
