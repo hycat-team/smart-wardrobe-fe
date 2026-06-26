@@ -28,7 +28,7 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
     const cleanBaseUrl = BACKEND_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
     const url = `${cleanBaseUrl}${endpoint}`;
     console.log(`[serverFetch] Fetching: ${url}`);
-    
+
     const res = await fetch(url, {
       ...options,
       headers,

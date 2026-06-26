@@ -1,9 +1,9 @@
 /**
  * Tệp kiểm thử (Unit Test) cho luồng tự động Refresh Token trong Axios.
- * 
+ *
  * Lưu ý: Để chạy tệp test này, bạn cần cài đặt các thư viện sau:
  * npm install -D jest @types/jest ts-jest axios-mock-adapter @testing-library/react
- * 
+ *
  * Lệnh chạy: npx jest src/lib/axios.test.ts
  */
 
@@ -32,7 +32,7 @@ describe('Axios Interceptor - Auto Refresh Token Flow', () => {
   beforeAll(() => {
     // Khởi tạo mock cho instance api
     mock = new MockAdapter(api);
-    
+
     // Mock trực tiếp axios.post vì interceptor gọi axios.post('/api/auth/refresh-token')
     jest.spyOn(axios, 'post');
   });
@@ -79,7 +79,7 @@ describe('Axios Interceptor - Auto Refresh Token Flow', () => {
     mock.onGet('/me/profile').replyOnce(401, { message: 'Unauthorized' }).onGet('/me/profile').reply(200, { data: 'Req 2' });
 
     // Cố tình làm API refresh-token chậm một chút để các request dồn vào failedQueue
-    (axios.post as jest.Mock).mockImplementationOnce(() => 
+    (axios.post as jest.Mock).mockImplementationOnce(() =>
       new Promise(resolve => setTimeout(() => resolve({ status: 200, data: { accessToken: 'new-token' } }), 100))
     );
 
@@ -111,7 +111,7 @@ describe('Axios Interceptor - Auto Refresh Token Flow', () => {
 
     // Kiểm tra đã gọi toast thông báo lỗi
     expect(toast.error).toHaveBeenCalledWith('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-    
+
     // Kiểm tra đã set timeout để chuyển hướng (dùng fakeTimers nếu muốn test chi tiết hơn)
     jest.useFakeTimers();
     jest.advanceTimersByTime(1000);

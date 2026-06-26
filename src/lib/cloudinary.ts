@@ -21,7 +21,7 @@ export async function uploadToCloudinary({
 }: CloudinaryUploadParams): Promise<CloudinaryUploadResponse> {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
   const formData = new FormData();
-  
+
   // Set a default filename for blobs if not provided
   if (file instanceof File) {
     formData.append("file", file);
@@ -57,16 +57,16 @@ export async function uploadToCloudinary({
 export function applyCloudinaryBackgroundRemoval(url: string): string {
   if (!url || !url.includes("cloudinary.com")) return url;
   let newUrl = url;
-  
+
   // Đổi đuôi file thành .png để giữ nền trong suốt
   newUrl = newUrl.replace(/\.[^/.]+$/, ".png");
-  
+
   if (newUrl.includes("/upload/")) {
     // Bắt buộc dùng f_png thay vì f_auto để đảm bảo Cloudinary trả về định dạng hỗ trợ trong suốt
     // Thêm e_trim:10 để tự động cắt bỏ khoảng trắng và shadow thừa. Lưu ý: e_background_removal phải đứng riêng rẽ bằng dấu /
     return newUrl.replace("/upload/", "/upload/e_background_removal/e_trim:10,f_png,q_auto/");
   }
-  
+
   return newUrl;
 }
 
@@ -76,7 +76,7 @@ export function applyCloudinaryBackgroundRemoval(url: string): string {
  */
 export function applyCloudinaryTrim(url: string | undefined): string {
   if (!url) return "";
-  
+
   // Nếu là URL nội bộ, giữ nguyên
   if (url.startsWith("/")) return url;
 

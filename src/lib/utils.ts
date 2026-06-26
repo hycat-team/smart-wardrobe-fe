@@ -10,11 +10,11 @@ export function cn(...inputs: ClassValue[]) {
 export function getUserAvatar(user: UserRes | null | undefined): string {
   if (!user) return "/images-male.png";
   if (user.avatarUrl) return user.avatarUrl;
-  
+
   if (user.gender === Gender.Female) {
     return "/images-female.png";
   }
-  
+
   // Default for Male, Other or Unknown
   return "/images-male.png";
 }

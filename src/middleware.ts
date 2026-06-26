@@ -8,7 +8,7 @@ function parseJwt(token: string) {
   try {
     const base64Url = token.split('.')[1];
     if (!base64Url) return null;
-    
+
     let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     while (base64.length % 4) {
       base64 += '=';
@@ -31,9 +31,9 @@ function parseJwt(token: string) {
 function isTokenExpired(token: string) {
   const payload = parseJwt(token);
   if (!payload || !payload.exp) return true;
-  
+
   const currentTime = Math.floor(Date.now() / 1000);
-  return payload.exp <= currentTime + 10; 
+  return payload.exp <= currentTime + 10;
 }
 
 export async function middleware(request: NextRequest) {
@@ -99,7 +99,7 @@ export async function middleware(request: NextRequest) {
 
         if (newAccessToken) {
           accessToken = newAccessToken; // Cập nhật token hiện tại
-          
+
           // Ghi đè header Cookie để Server Components (page.tsx) đằng sau nhận token mới
           const updatedCookies = request.cookies.getAll().map(c => {
              if (c.name === 'accessToken') return `accessToken=${newAccessToken}`;
@@ -130,14 +130,14 @@ export async function middleware(request: NextRequest) {
   if (isRefreshFailed) {
     // Nếu là API Proxy Request (Client đang gọi)
     if (pathname.startsWith('/api/v1/')) {
-      const errorRes = new NextResponse(JSON.stringify({ message: 'Session expired', detail: '4011' }), { 
+      const errorRes = new NextResponse(JSON.stringify({ message: 'Session expired', detail: '4011' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
       });
       errorRes.cookies.delete('accessToken');
       errorRes.cookies.delete('refreshToken');
       return errorRes;
-    } 
+    }
     // Nếu là Page Request
     else {
       // Không tự động redirect ở middleware để tránh ảnh hưởng các trang public (landing page).
@@ -165,7 +165,7 @@ export async function middleware(request: NextRequest) {
       maxAge: 60 * 60 * 24, // 1 day
     });
   }
-  
+
   if (newRefreshToken) {
     finalResponse.cookies.set('refreshToken', newRefreshToken, {
       httpOnly: true,

@@ -102,11 +102,11 @@ export const useB2BDemoStore = create<B2BDemoState>((set) => ({
       if (selectedItems.length === 0) return state;
 
       orderId = `order_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // Group items by brand for orders if needed, but for now just create one order or multiple
       // We will create one order per brand for simplicity, but here we just keep the original logic for one order
       // However, we just remove the selected items from the cart.
-      
+
       const newOrder = {
         id: orderId,
         userId: "user_001",
