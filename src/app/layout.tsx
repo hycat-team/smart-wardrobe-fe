@@ -9,7 +9,7 @@ import { AuthProvider } from "@/components/providers/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const beVietnamPro = Be_Vietnam_Pro({
-  variable: "--font-sans",
+  variable: "--font-be-vietnam-pro",
   subsets: ["vietnamese", "latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
   display: "swap",

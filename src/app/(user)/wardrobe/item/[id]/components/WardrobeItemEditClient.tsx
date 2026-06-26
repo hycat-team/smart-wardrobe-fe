@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -6,12 +6,15 @@ import { useForm } from "react-hook-form";
 import {
   useWardrobeItemDetail,
   useUpdateWardrobeItem,
-  useCategories
+  useCategories,
 } from "@/features/wardrobe/queries/wardrobe.queries";
-import { ArrowLeft, Save, Loader2, AlertCircle } from "lucide-react";
-import { UpdateWardrobeItemReq, WardrobeItemRes as WardrobeItem } from "@/features/wardrobe/types";
+import { AlertCircle, Loader2, Save } from "lucide-react";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
-import { UpdateWardrobeItemReq, WardrobeItemRes as WardrobeItem, WardrobeItemStatus } from "@/features/wardrobe/types";
+import {
+  UpdateWardrobeItemReq,
+  WardrobeItemRes as WardrobeItem,
+  WardrobeItemStatus,
+} from "@/features/wardrobe/types";
 import Image from "next/image";
 
 interface WardrobeItemEditClientProps {
@@ -19,10 +22,17 @@ interface WardrobeItemEditClientProps {
   initialItem?: WardrobeItem;
 }
 
-export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEditClientProps) {
+export function WardrobeItemEditClient({
+  itemId,
+  initialItem,
+}: WardrobeItemEditClientProps) {
   const router = useRouter();
 
-  const { data: item, isLoading, error } = useWardrobeItemDetail(itemId, initialItem);
+  const {
+    data: item,
+    isLoading,
+    error,
+  } = useWardrobeItemDetail(itemId, initialItem);
   const { mutate: updateItem, isPending } = useUpdateWardrobeItem();
   const { data: categories = [] } = useCategories();
 
@@ -36,7 +46,7 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
       seasonality: "",
       style: "",
       price: undefined,
-    }
+    },
   });
 
   // Populate form when data is loaded
@@ -59,7 +69,9 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
         <Loader2 className="size-8 animate-spin text-[#111]" />
-        <p className="text-sm font-['IBM_Plex_Mono'] text-[#666] animate-pulse">Đang tải thông tin trang phục...</p>
+        <p className="text-sm font-['IBM_Plex_Mono'] text-[#666] animate-pulse">
+          Äang táº£i thÃ´ng tin trang phá»¥c...
+        </p>
       </div>
     );
   }
@@ -68,26 +80,33 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4 text-center max-w-md mx-auto">
         <AlertCircle className="size-12 text-red-500/80" />
-        <h2 className="text-xl font-['Playfair_Display'] font-medium text-[#111]">Không tìm thấy trang phục</h2>
-        <button onClick={() => router.push("/wardrobe")} className="mt-4 border border-[#E5E5E5] px-6 py-3 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest text-[#666] hover:bg-[#F8F7F5] transition-colors">
-          QUAY LẠI TỦ ĐỒ
+        <h2 className="text-xl font-['Playfair_Display'] font-medium text-[#111]">
+          KhÃ´ng tÃ¬m tháº¥y trang phá»¥c
+        </h2>
+        <button
+          onClick={() => router.push("/wardrobe")}
+          className="mt-4 border border-[#E5E5E5] px-6 py-3 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest text-[#666] hover:bg-[#F8F7F5] transition-colors"
+        >
+          QUAY Láº I Tá»¦ Äá»’
         </button>
       </div>
     );
   }
 
   const onSubmit = (data: UpdateWardrobeItemReq) => {
-    updateItem({ id: itemId, data }, {
-      onSuccess: () => {
-        router.push(`/wardrobe/item/${itemId}`);
-      }
-    });
+    updateItem(
+      { id: itemId, data },
+      {
+        onSuccess: () => {
+          router.push(`/wardrobe/item/${itemId}`);
+        },
+      },
+    );
   };
 
   return (
     <div className="flex-1 min-h-screen bg-white text-[#111] pb-24 md:pb-12">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col pt-8 lg:pt-12">
-
         {/* Left Column: Image Preview */}
         {/* <div className="md:col-span-5 flex flex-col gap-4">
           <div className="relative rounded-3xl overflow-hidden aspect-[4/5] shadow-sm border border-cream-dark/50 bg-cream-dark/20">
@@ -100,12 +119,14 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
             />
           </div>
           <p className="text-[10px] font-mono text-ink-muted text-center uppercase tracking-widest">
-            Ảnh trang phục không thể thay đổi
+            áº¢nh trang phá»¥c khÃ´ng thá»ƒ thay Ä‘á»•i
           </p>
         </div> */}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
-
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start"
+        >
           {/* Left Column: Minimal Image Area */}
           <div className="lg:col-span-5 relative w-full aspect-[3/4] bg-[#F7F6F4] p-8 md:p-12 transition-all duration-700">
             <img
@@ -123,29 +144,34 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
           {/* Right Column: Editorial Form Area */}
           <div className="lg:col-span-7 flex flex-col gap-10 md:gap-16 pt-4 lg:pt-8">
             <h1 className="text-4xl md:text-5xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1]">
-              Chỉnh sửa thông tin
+              Chá»‰nh sá»­a thÃ´ng tin
             </h1>
 
             <div className="flex flex-col gap-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
                 {/* Category */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">Danh mục</label>
+                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">
+                    Danh má»¥c
+                  </label>
                   <select
                     {...register("categoryId")}
                     className="w-full h-12 border-b border-black/10 bg-transparent focus:border-black outline-none font-['IBM_Plex_Mono'] text-[12px] text-[#111] transition-colors appearance-none rounded-none"
                   >
-                    <option value="">-- Chọn danh mục --</option>
-                    {categories.map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    <option value="">-- Chá»n danh má»¥c --</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 {/* Price */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">Giá tiền (VNĐ)</label>
+                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">
+                    GiÃ¡ tiá»n (VNÄ)
+                  </label>
                   <input
                     type="number"
                     {...register("price", { valueAsNumber: true })}
@@ -156,17 +182,21 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
 
                 {/* Color */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">Màu sắc</label>
+                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">
+                    MÃ u sáº¯c
+                  </label>
                   <input
                     {...register("color")}
                     className="w-full h-12 border-b border-black/10 bg-transparent focus:border-black outline-none font-['IBM_Plex_Mono'] text-[12px] text-[#111] transition-colors rounded-none"
-                    placeholder="VD: Trắng"
+                    placeholder="VD: Tráº¯ng"
                   />
                 </div>
 
                 {/* Material */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">Chất liệu</label>
+                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">
+                    Cháº¥t liá»‡u
+                  </label>
                   <input
                     {...register("material")}
                     className="w-full h-12 border-b border-black/10 bg-transparent focus:border-black outline-none font-['IBM_Plex_Mono'] text-[12px] text-[#111] transition-colors rounded-none"
@@ -176,7 +206,9 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
 
                 {/* Fit */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">Kiểu dáng (Fit)</label>
+                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">
+                    Kiá»ƒu dÃ¡ng (Fit)
+                  </label>
                   <input
                     {...register("fit")}
                     className="w-full h-12 border-b border-black/10 bg-transparent focus:border-black outline-none font-['IBM_Plex_Mono'] text-[12px] text-[#111] transition-colors rounded-none"
@@ -186,17 +218,21 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
 
                 {/* Pattern */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">Họa tiết</label>
+                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">
+                    Há»a tiáº¿t
+                  </label>
                   <input
                     {...register("pattern")}
                     className="w-full h-12 border-b border-black/10 bg-transparent focus:border-black outline-none font-['IBM_Plex_Mono'] text-[12px] text-[#111] transition-colors rounded-none"
-                    placeholder="VD: Trơn"
+                    placeholder="VD: TrÆ¡n"
                   />
                 </div>
 
                 {/* Seasonality */}
                 <div className="flex flex-col gap-2">
-                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">Mùa (Seasonality)</label>
+                  <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">
+                    MÃ¹a (Seasonality)
+                  </label>
                   <input
                     {...register("seasonality")}
                     className="w-full h-12 border-b border-black/10 bg-transparent focus:border-black outline-none font-['IBM_Plex_Mono'] text-[12px] text-[#111] transition-colors rounded-none"
@@ -207,15 +243,18 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
 
               {/* Style */}
               <div className="flex flex-col gap-2 mt-4">
-                <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">Phong cách (Style Tags)</label>
+                <label className="font-['IBM_Plex_Mono'] text-[11px] font-medium uppercase tracking-[0.12em] text-[#888]">
+                  Phong cÃ¡ch (Style Tags)
+                </label>
                 <input
                   {...register("style")}
                   className="w-full h-12 border-b border-black/10 bg-transparent focus:border-black outline-none font-['IBM_Plex_Mono'] text-[12px] text-[#111] transition-colors rounded-none"
                   placeholder="VD: Casual, Minimalist"
                 />
-                <p className="text-[10px] font-['IBM_Plex_Mono'] text-[#888] uppercase tracking-widest mt-1">Ngăn cách các thẻ bằng dấu phẩy (,)</p>
+                <p className="text-[10px] font-['IBM_Plex_Mono'] text-[#888] uppercase tracking-widest mt-1">
+                  NgÄƒn cÃ¡ch cÃ¡c tháº» báº±ng dáº¥u pháº©y (,)
+                </p>
               </div>
-
             </div>
 
             {/* Actions */}
@@ -225,18 +264,21 @@ export function WardrobeItemEditClient({ itemId, initialItem }: WardrobeItemEdit
                 onClick={() => router.push(`/wardrobe/item/${itemId}`)}
                 className="flex-1 py-4 border border-[#E5E5E5] text-[#666] font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:bg-[#F8F7F5] transition-colors outline-none"
               >
-                HỦY
+                Há»¦Y
               </button>
               <button
                 type="submit"
                 disabled={isPending}
                 className="flex-1 py-4 bg-[#111] text-white font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:bg-black/90 transition-colors flex items-center justify-center gap-2 outline-none disabled:bg-[#111]/50"
               >
-                {isPending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-                LƯU THAY ĐỔI
+                {isPending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Save className="size-4" />
+                )}
+                LÆ¯U THAY Äá»”I
               </button>
             </div>
-
           </div>
         </form>
       </div>
