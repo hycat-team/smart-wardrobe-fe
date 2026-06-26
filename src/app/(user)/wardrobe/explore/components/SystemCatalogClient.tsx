@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useSystemCatalogItems, useInitClosetFromCatalog } from "@/features/wardrobe/queries/wardrobe.queries";
+import { useSystemCatalogItems, useInitClosetFromCatalog, useCategories } from "@/features/wardrobe/queries/wardrobe.queries";
 import { WardrobeItemRes } from "@/features/wardrobe/types";
 import { Loader2, Plus, ArrowLeft, Search } from "lucide-react";
 import { WardrobeCard } from "../../components/WardrobeCard";
@@ -21,26 +21,22 @@ import {
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 
-const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
-
-const CATEGORY_SLUG_MAP: Record<string, string> = {
-  "Áo": "ao",
-  "Quần": "quan",
-  "Váy": "vay",
-  "Giày": "giay",
-  "Phụ kiện": "phu-kien",
-  "Áo khoác": "ao-khoac",
-  "Mũ": "mu",
-  "Khác": "other"
-};
-
 export function SystemCatalogClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   
   const categoryParam = searchParams.get("category") || "Tất cả";
-  const slugToFetch = categoryParam === "Tất cả" ? undefined : CATEGORY_SLUG_MAP[categoryParam] || categoryParam;
+
+  // Fetch dynamic categories
+  const { data: categoriesData = [] } = useCategories();
+
+  const categories = [
+    { name: "Tất cả", slug: "Tất cả" },
+    ...categoriesData.map(c => ({ name: c.name, slug: c.slug }))
+  ];
+
+  const slugToFetch = categoryParam === "Tất cả" ? undefined : categoryParam;
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
   const containerRef = useRef<HTMLDivElement>(null);
   const actionBarRef = useRef<HTMLDivElement>(null);
@@ -217,13 +213,13 @@ export function SystemCatalogClient() {
         {/* Filters Row */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mt-4">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
-            {CATEGORIES.map((cat) => {
-              const isActive = categoryParam === cat;
-              const label = cat === "Tất cả" ? "Tất cả" : cat;
+            {categories.map((cat) => {
+              const isActive = categoryParam === cat.slug;
+              const label = cat.name;
               return (
                 <button
-                  key={cat}
-                  onClick={() => updateParams({ category: cat === "Tất cả" ? null : cat, page: "1" })}
+                  key={cat.slug}
+                  onClick={() => updateParams({ category: cat.slug === "Tất cả" ? null : cat.slug, page: "1" })}
                   className={cn(
                     "relative pb-2 px-1 text-[11px] font-mono uppercase tracking-[0.2em] transition-colors group",
                     isActive ? "text-[#111] font-bold" : "text-[#888] hover:text-[#111] font-medium"

@@ -9,6 +9,8 @@ import { GhostItem } from "../types";
 import { Check, ArrowDown, ArrowUp, X, BookmarkPlus, ShoppingBag, EyeOff, ThumbsDown } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useB2BDemoStore } from "@/lib/mock-data/b2b/store";
+import { toast } from "sonner";
 
 interface WardrobeImpactPanelProps {
   isOpen: boolean;
@@ -35,6 +37,8 @@ export function WardrobeImpactPanel({
 }: WardrobeImpactPanelProps) {
   if (!item) return null;
 
+  const addToCart = useB2BDemoStore((state) => state.addToCart);
+
   const formatPrice = (price?: number) => {
     if (price === undefined) return 'Đang cập nhật';
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -53,9 +57,9 @@ export function WardrobeImpactPanel({
               className="object-cover"
             />
             <div className="absolute top-4 left-4 bg-[#A0522D] text-white text-[10px] font-mono uppercase tracking-widest px-3 py-1">
-              Ghost Item
+              Món đồ đề xuất
             </div>
-            <button 
+            <button
               onClick={onClose}
               className="absolute top-4 right-4 bg-black/20 text-white p-2 hover:bg-black/40 transition-colors backdrop-blur-sm"
             >
@@ -76,9 +80,9 @@ export function WardrobeImpactPanel({
             {/* Wardrobe Impact */}
             <div className="space-y-4">
               <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-2 border-b border-ink/10">
-                Wardrobe Impact
+                Giá trị tủ đồ
               </h3>
-              
+
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <Check className="size-4 text-[#A0522D] mt-0.5 shrink-0" />
@@ -87,7 +91,7 @@ export function WardrobeImpactPanel({
                     <p className="text-[11px] font-mono uppercase tracking-widest text-ink-muted mt-0.5">Bạn đang sở hữu</p>
                   </div>
                 </li>
-                
+
                 <li className="flex items-start gap-3">
                   <Check className="size-4 text-[#A0522D] mt-0.5 shrink-0" />
                   <div>
@@ -128,8 +132,8 @@ export function WardrobeImpactPanel({
                   <span className="text-sm font-medium">{item.wardrobeImpact.colorCompatibilityScore}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-ink/10">
-                  <div 
-                    className="h-full bg-[#A0522D] transition-all duration-1000" 
+                  <div
+                    className="h-full bg-[#A0522D] transition-all duration-1000"
                     style={{ width: `${item.wardrobeImpact.colorCompatibilityScore}%` }}
                   />
                 </div>
@@ -141,13 +145,13 @@ export function WardrobeImpactPanel({
         {/* Action Bar */}
         <div className="p-6 border-t border-ink/10 bg-cream/90 backdrop-blur-md shrink-0 space-y-3">
           <div className="flex gap-3">
-            <Button 
+            <Button
               onClick={onKeep}
               className="flex-1 rounded-none bg-ink text-cream hover:bg-ink/80 text-xs font-mono tracking-widest uppercase h-12"
             >
               Giữ trong Outfit
             </Button>
-            <Button 
+            <Button
               onClick={onSwap}
               variant="outline"
               className="flex-1 rounded-none border-ink text-ink hover:bg-ink hover:text-cream text-xs font-mono tracking-widest uppercase h-12"
@@ -155,12 +159,32 @@ export function WardrobeImpactPanel({
               Đổi món khác
             </Button>
           </div>
-          
+
           <div className="flex gap-2 justify-between">
             <Button onClick={onSave} variant="ghost" size="sm" className="flex-1 rounded-none text-[10px] font-mono uppercase tracking-widest text-ink-muted hover:text-ink hover:bg-ink/5">
               <BookmarkPlus className="size-3.5 mr-1.5" /> Lưu
             </Button>
-            <Button onClick={onWaitlist} variant="ghost" size="sm" className="flex-1 rounded-none text-[10px] font-mono uppercase tracking-widest text-ink-muted hover:text-ink hover:bg-ink/5">
+            <Button
+              onClick={() => {
+                addToCart({
+                  productId: item.id,
+                  name: `${item.category?.name || "Sản phẩm"} ${item.color || ""}`.trim(),
+                  price: item.price || 0,
+                  quantity: 1,
+                  size: "M",
+                  color: item.color || "Nâu",
+                  imageUrl: item.imageUrl || "",
+                  brandId: item.brandId || "unknown",
+                  brandName: item.brandName || "Local Brand",
+                  selected: true
+                });
+                toast.success(`Đã thêm ${item.category?.name || "sản phẩm"} vào giỏ hàng thành công!`);
+                onWaitlist();
+              }}
+              variant="ghost"
+              size="sm"
+              className="flex-1 rounded-none text-[10px] font-mono uppercase tracking-widest text-ink-muted hover:text-ink hover:bg-ink/5"
+            >
               <ShoppingBag className="size-3.5 mr-1.5" /> Waitlist
             </Button>
           </div>
@@ -169,9 +193,9 @@ export function WardrobeImpactPanel({
             <Button onClick={onNotMyStyle} variant="ghost" size="sm" className="flex-1 rounded-none text-[10px] font-mono uppercase tracking-widest text-red-500/70 hover:text-red-600 hover:bg-red-50">
               <ThumbsDown className="size-3.5 mr-1.5" /> Không hợp gu
             </Button>
-            <Button onClick={onHideBrand} variant="ghost" size="sm" className="flex-1 rounded-none text-[10px] font-mono uppercase tracking-widest text-red-500/70 hover:text-red-600 hover:bg-red-50">
+            {/* <Button onClick={onHideBrand} variant="ghost" size="sm" className="flex-1 rounded-none text-[10px] font-mono uppercase tracking-widest text-red-500/70 hover:text-red-600 hover:bg-red-50">
               <EyeOff className="size-3.5 mr-1.5" /> Ẩn Brand
-            </Button>
+            </Button> */}
           </div>
         </div>
       </SheetContent>

@@ -45,24 +45,11 @@ import {
   PaginationLink,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { useMyWardrobe, useBulkDeleteWardrobeItems } from "@/features/wardrobe/queries/wardrobe.queries";
+import { useMyWardrobe, useBulkDeleteWardrobeItems, useCategories } from "@/features/wardrobe/queries/wardrobe.queries";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
 import { WardrobeCard } from "./WardrobeCard";
 import { toast } from "sonner";
-
-const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
-
-const CATEGORY_SLUG_MAP: Record<string, string> = {
-  "Áo": "ao",
-  "Quần": "quan",
-  "Váy": "vay",
-  "Giày": "giay",
-  "Phụ kiện": "phu-kien",
-  "Áo khoác": "ao-khoac",
-  "Mũ": "mu",
-  "Khác": "other"
-};
 
 const COLORS = [
   { name: "Trắng", value: "white", hex: "#FFFFFF" },
@@ -127,8 +114,16 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
 
+  // Fetch dynamic categories
+  const { data: categoriesData = [] } = useCategories();
+
+  const categories = [
+    { name: "Tất cả", slug: "Tất cả" },
+    ...categoriesData.map(c => ({ name: c.name, slug: c.slug }))
+  ];
+
   // Map category param to backend slug
-  const slugToFetch = categoryParam === "Tất cả" ? undefined : CATEGORY_SLUG_MAP[categoryParam] || categoryParam;
+  const slugToFetch = categoryParam === "Tất cả" ? undefined : categoryParam;
 
   // Load real wardrobe items
   const {
@@ -219,7 +214,8 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   // Filter & Sort Logic
   const filteredItems = realItems.filter((item: any) => {
     const itemCatName = item.category?.name || "";
-    const matchesCategory = categoryParam === "Tất cả" || itemCatName === categoryParam;
+    const itemCatSlug = item.category?.slug || "";
+    const matchesCategory = categoryParam === "Tất cả" || itemCatSlug === categoryParam;
 
     const matchesColor = !colorParam || getColorValue(item.color || "") === colorParam;
 
@@ -353,7 +349,7 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   return (
     <>
       {/* Sticky Top Action Bar */}
-      <div 
+      <div
         className={cn(
           "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-[#F4F1EE]/80 dark:bg-[#111]/80 backdrop-blur-xl border-b border-ink/10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           isScrolled ? "translate-y-0 shadow-sm opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
@@ -371,227 +367,228 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
       <div className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans selection:bg-ink selection:text-cream" ref={containerRef}>
         {/* High-end Editorial Header */}
-      <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-ink/10 pb-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-4 max-w-2xl">
-            {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
+        <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-ink/10 pb-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-4 max-w-2xl">
+              {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
               Wardrobe
             </h1> */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1] uppercase">
-              Wardrobe
-            </h1>
-            <p className="text-sm text-ink-muted font-mono uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-ink/20 pl-4">
-              Bộ sưu tập của bạn.
-              {realItems.length > 0 ? ` Đang lưu trữ ${realItems.length} món đồ.` : " Hãy bắt đầu thêm đồ."}
-            </p>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1] uppercase">
+                Wardrobe
+              </h1>
+              <p className="text-sm text-ink-muted font-mono uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-ink/20 pl-4">
+                Bộ sưu tập của bạn.
+                {realItems.length > 0 ? ` Đang lưu trữ ${realItems.length} món đồ.` : " Hãy bắt đầu thêm đồ."}
+              </p>
+            </div>
+
+            {renderActions()}
           </div>
 
-          {renderActions()}
+          {/* Categories / Tabs - Magazine Index Style */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
+            <div className="flex flex-wrap gap-x-8 gap-y-4">
+              {categories.map((cat, idx) => {
+                const label = cat.name;
+                const isActive = categoryParam === cat.slug;
+                return (
+                  <button
+                    key={cat.slug}
+                    onClick={() => handleCategoryChange(cat.slug)}
+                    className={cn(
+                      "text-xs font-mono uppercase tracking-[0.2em] relative transition-colors group pb-2",
+                      isActive
+                        ? "text-ink font-bold"
+                        : "text-ink-muted hover:text-ink"
+                    )}
+                  >
+                    {label}
+                    <span className={cn(
+                      "absolute bottom-0 left-0 h-[2px] bg-ink transition-all duration-300",
+                      isActive ? "w-full" : "w-0 group-hover:w-full"
+                    )} />
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center gap-4 border border-ink/20 px-4 py-2">
+              <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-muted">Sắp xếp</span>
+              <Select value={sortParam} onValueChange={(value) => handleSortChange(value as string)}>
+                <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-xs font-mono uppercase tracking-widest text-ink font-bold w-auto">
+                  <SelectValue placeholder="Mới nhất" />
+                </SelectTrigger>
+                <SelectContent alignItemWithTrigger={false} align="end" sideOffset={4}>
+                  <SelectItem value="Mới nhất" className="font-mono text-xs uppercase tracking-widest font-bold">Mới nhất</SelectItem>
+                  <SelectItem value="Cũ nhất" className="font-mono text-xs uppercase tracking-widest font-bold">Cũ nhất</SelectItem>
+                  <SelectItem value="Tên" className="font-mono text-xs uppercase tracking-widest font-bold">Theo tên</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
-        {/* Categories / Tabs - Magazine Index Style */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
-          <div className="flex flex-wrap gap-x-8 gap-y-4">
-            {CATEGORIES.map((cat, idx) => {
-              const label = cat;
+        {/* Grid Content */}
+        {isLoadingItems ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="flex flex-col h-full bg-[#F8F7F5] border border-black/5">
+                <Skeleton className="relative aspect-[4/5] bg-muted/60 p-3 md:p-6 overflow-hidden flex-shrink-0 rounded-none" />
+                <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-3/4 rounded-none bg-muted/60" />
+                    <Skeleton className="h-3 w-1/2 rounded-none bg-muted/60 mt-2" />
+                  </div>
+                  <Skeleton className="h-3 w-1/3 rounded-none bg-muted/60" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : sortedItems.length > 0 ? (
+          <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", isFetching && "opacity-60 blur-[1px]")}>
+            {sortedItems.map((item: any) => {
+              const isProcessing = item.status === WardrobeItemStatus.Processing;
+              const isFailed = item.status === WardrobeItemStatus.Failed;
+              const isLocked = item.isLocked;
+
+              const handleCardClick = () => {
+                if (isSelectMode) {
+                  if (selectedIds.includes(item.id)) {
+                    setSelectedIds(selectedIds.filter(id => id !== item.id));
+                  } else {
+                    setSelectedIds([...selectedIds, item.id]);
+                  }
+                  return;
+                }
+                if (isLocked) {
+                  toast.error("Trang phục bị khóa do vượt quá hạn ngạch. Vui lòng nâng cấp gói cước!");
+                  return;
+                }
+                if (isProcessing) {
+                  if (isFetching) return; // Prevent concurrent fetches
+
+                  if (spamClickCount.current >= 5) {
+                    toast.error("Bạn thao tác quá nhanh, vui lòng chờ trong giây lát!");
+                    return;
+                  }
+
+                  spamClickCount.current += 1;
+                  if (spamClickTimeout.current) clearTimeout(spamClickTimeout.current);
+                  spamClickTimeout.current = setTimeout(() => {
+                    spamClickCount.current = 0;
+                  }, 10000); // Reset limit after 10 seconds
+
+                  toast.promise(refetch(), {
+                    loading: 'Đang làm mới dữ liệu từ AI...',
+                    success: 'Đã cập nhật kết quả mới nhất!',
+                    error: 'Lỗi khi tải dữ liệu',
+                  });
+                  return;
+                }
+                router.push(`/wardrobe/item/${item.id}`);
+              };
+
               return (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={cn(
-                    "text-xs font-mono uppercase tracking-[0.2em] relative transition-colors group pb-2",
-                    categoryParam === cat
-                      ? "text-ink font-bold"
-                      : "text-ink-muted hover:text-ink"
-                  )}
-                >
-                  {label}
-                  <span className={cn(
-                    "absolute bottom-0 left-0 h-[2px] bg-ink transition-all duration-300",
-                    categoryParam === cat ? "w-full" : "w-0 group-hover:w-full"
-                  )} />
-                </button>
+                <div key={item.id} className="wardrobe-card">
+                  <WardrobeCard
+                    item={item}
+                    isLocked={isLocked}
+                    isProcessing={isProcessing}
+                    isSelectMode={isSelectMode}
+                    isSelected={selectedIds.includes(item.id)}
+                    onClick={handleCardClick}
+                    getWardrobeItemName={getWardrobeItemName}
+                  />
+                </div>
               );
             })}
           </div>
-
-          <div className="flex items-center gap-4 border border-ink/20 px-4 py-2">
-            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-muted">Sắp xếp</span>
-            <Select value={sortParam} onValueChange={(value) => handleSortChange(value as string)}>
-              <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-xs font-mono uppercase tracking-widest text-ink font-bold w-auto">
-                <SelectValue placeholder="Mới nhất" />
-              </SelectTrigger>
-              <SelectContent alignItemWithTrigger={false} align="end" sideOffset={4}>
-                <SelectItem value="Mới nhất" className="font-mono text-xs uppercase tracking-widest font-bold">Mới nhất</SelectItem>
-                <SelectItem value="Cũ nhất" className="font-mono text-xs uppercase tracking-widest font-bold">Cũ nhất</SelectItem>
-                <SelectItem value="Tên" className="font-mono text-xs uppercase tracking-widest font-bold">Theo tên</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-
-      {/* Grid Content */}
-      {isLoadingItems ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="flex flex-col h-full bg-[#F8F7F5] border border-black/5">
-              <Skeleton className="relative aspect-[4/5] bg-muted/60 p-3 md:p-6 overflow-hidden flex-shrink-0 rounded-none" />
-              <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-3/4 rounded-none bg-muted/60" />
-                  <Skeleton className="h-3 w-1/2 rounded-none bg-muted/60 mt-2" />
-                </div>
-                <Skeleton className="h-3 w-1/3 rounded-none bg-muted/60" />
-              </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
+            <div className="size-24 bg-[#e0dcd5] flex items-center justify-center text-ink/40">
+              <Tag className="size-10 stroke-1" />
             </div>
-          ))}
-        </div>
-      ) : sortedItems.length > 0 ? (
-        <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", isFetching && "opacity-60 blur-[1px]")}>
-          {sortedItems.map((item: any) => {
-            const isProcessing = item.status === WardrobeItemStatus.Processing;
-            const isFailed = item.status === WardrobeItemStatus.Failed;
-            const isLocked = item.isLocked;
+            <div className="space-y-4">
+              <h3 className="font-heading text-4xl text-ink uppercase tracking-tight">Trống</h3>
+              <p className="text-xs font-mono uppercase tracking-widest text-ink-muted leading-relaxed">
+                Tủ đồ của bạn đang trống. Hãy bắt đầu số hóa các món đồ thực tế của bạn để tạo ra những bộ phối đồ mới.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/wardrobe/upload")}
+              className="rounded-none border-ink text-ink hover:bg-ink hover:text-cream text-xs font-mono tracking-[0.2em] uppercase h-14 px-8 mt-4"
+            >
+              Thêm đồ
+            </Button>
+          </div>
+        )}
 
-            const handleCardClick = () => {
-              if (isSelectMode) {
-                if (selectedIds.includes(item.id)) {
-                  setSelectedIds(selectedIds.filter(id => id !== item.id));
-                } else {
-                  setSelectedIds([...selectedIds, item.id]);
-                }
-                return;
-              }
-              if (isLocked) {
-                toast.error("Trang phục bị khóa do vượt quá hạn ngạch. Vui lòng nâng cấp gói cước!");
-                return;
-              }
-              if (isProcessing) {
-                if (isFetching) return; // Prevent concurrent fetches
-
-                if (spamClickCount.current >= 5) {
-                  toast.error("Bạn thao tác quá nhanh, vui lòng chờ trong giây lát!");
-                  return;
-                }
-
-                spamClickCount.current += 1;
-                if (spamClickTimeout.current) clearTimeout(spamClickTimeout.current);
-                spamClickTimeout.current = setTimeout(() => {
-                  spamClickCount.current = 0;
-                }, 10000); // Reset limit after 10 seconds
-
-                toast.promise(refetch(), {
-                  loading: 'Đang làm mới dữ liệu từ AI...',
-                  success: 'Đã cập nhật kết quả mới nhất!',
-                  error: 'Lỗi khi tải dữ liệu',
-                });
-                return;
-              }
-              router.push(`/wardrobe/item/${item.id}`);
-            };
-
-            return (
-              <div key={item.id} className="wardrobe-card">
-                <WardrobeCard
-                  item={item}
-                  isLocked={isLocked}
-                  isProcessing={isProcessing}
-                  isSelectMode={isSelectMode}
-                  isSelected={selectedIds.includes(item.id)}
-                  onClick={handleCardClick}
-                  getWardrobeItemName={getWardrobeItemName}
+        {metadata && metadata.totalPages > 1 && (
+          <Pagination className="mt-16 pb-12 border-t border-ink/10 pt-16">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (pageParam > 1) updateParams({ page: (pageParam - 1).toString() });
+                  }}
+                  className={pageParam <= 1 ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:text-terracotta transition-colors"}
+                  text="TRƯỚC"
                 />
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
-          <div className="size-24 bg-[#e0dcd5] flex items-center justify-center text-ink/40">
-            <Tag className="size-10 stroke-1" />
-          </div>
-          <div className="space-y-4">
-            <h3 className="font-heading text-4xl text-ink uppercase tracking-tight">Trống</h3>
-            <p className="text-xs font-mono uppercase tracking-widest text-ink-muted leading-relaxed">
-              Tủ đồ của bạn đang trống. Hãy bắt đầu số hóa các món đồ thực tế của bạn để tạo ra những bộ phối đồ mới.
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => router.push("/wardrobe/upload")}
-            className="rounded-none border-ink text-ink hover:bg-ink hover:text-cream text-xs font-mono tracking-[0.2em] uppercase h-14 px-8 mt-4"
-          >
-            Thêm đồ
-          </Button>
-        </div>
-      )}
+              </PaginationItem>
 
-      {metadata && metadata.totalPages > 1 && (
-        <Pagination className="mt-16 pb-12 border-t border-ink/10 pt-16">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (pageParam > 1) updateParams({ page: (pageParam - 1).toString() });
-                }}
-                className={pageParam <= 1 ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:text-terracotta transition-colors"}
-                text="TRƯỚC"
-              />
-            </PaginationItem>
+              {[...Array(metadata.totalPages)].map((_, i) => {
+                const pageNum = i + 1;
+                if (
+                  pageNum === 1 ||
+                  pageNum === metadata.totalPages ||
+                  (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)
+                ) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        href="#"
+                        isActive={pageParam === pageNum}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          updateParams({ page: pageNum.toString() });
+                        }}
+                        className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest rounded-none border-ink/10"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
 
-            {[...Array(metadata.totalPages)].map((_, i) => {
-              const pageNum = i + 1;
-              if (
-                pageNum === 1 ||
-                pageNum === metadata.totalPages ||
-                (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)
-              ) {
-                return (
-                  <PaginationItem key={pageNum}>
-                    <PaginationLink
-                      href="#"
-                      isActive={pageParam === pageNum}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        updateParams({ page: pageNum.toString() });
-                      }}
-                      className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest rounded-none border-ink/10"
-                    >
-                      {pageNum}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              }
+                if (pageNum === pageParam - 2 || pageNum === pageParam + 2) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
 
-              if (pageNum === pageParam - 2 || pageNum === pageParam + 2) {
-                return (
-                  <PaginationItem key={pageNum}>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-              }
+                return null;
+              })}
 
-              return null;
-            })}
-
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (pageParam < metadata.totalPages) updateParams({ page: (pageParam + 1).toString() });
-                }}
-                className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:text-terracotta transition-colors"}
-                text="SAU"
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
-    </div>
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (pageParam < metadata.totalPages) updateParams({ page: (pageParam + 1).toString() });
+                  }}
+                  className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:text-terracotta transition-colors"}
+                  text="SAU"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
+      </div>
     </>
   );
 }

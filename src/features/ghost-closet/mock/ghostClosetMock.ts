@@ -8,8 +8,8 @@ export const MOCK_GHOST_ITEM: GhostItem = {
   brandId: "mori-studio",
   imageUrl: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1000&auto=format&fit=crop",
   category: { id: "cat-outerwear", name: "Áo khoác", slug: "ao-khoac" },
-  color: "Đen",
-  colorHex: "#1A1A1A",
+  color: "Nâu",
+  colorHex: "#C67C33",
   style: "Minimal",
   price: 950000,
   status: 0,
@@ -17,9 +17,9 @@ export const MOCK_GHOST_ITEM: GhostItem = {
   wardrobeImpact: {
     compatibleItemCount: 11,
     newOutfitsUnlocked: 16,
-    suitableOccasions: ["Work", "Meeting", "Date"],
+    suitableOccasions: ["Công sở", "Hẹn hò", "Dạo phố"],
     redundancyRisk: "low",
-    wardrobeGapFilled: "Outerwear",
+    wardrobeGapFilled: "Áo khoác",
     colorCompatibilityScore: 88,
   },
 };

@@ -33,8 +33,8 @@ export function OutfitCanvasBoard({
   return (
     <div className="flex-1 bg-[#F9F9F9] border border-[#E5E5E5] relative overflow-hidden flex items-center justify-center">
       {/* CANVAS REF TARGET FOR HTML-TO-IMAGE */}
-      <div 
-        ref={canvasRef} 
+      <div
+        ref={canvasRef}
         className="absolute inset-0 w-full h-full bg-transparent flex items-center justify-center"
       >
         {selectedItems.length > 0 ? (
@@ -42,7 +42,7 @@ export function OutfitCanvasBoard({
             const hasAlternatives = item._role && hasAlternativesCheck ? hasAlternativesCheck(item._role) : false;
 
             return (
-              <motion.div 
+              <motion.div
                 layout
                 key={item._role || item.id}
                 drag
@@ -57,8 +57,8 @@ export function OutfitCanvasBoard({
                 <div className="relative">
                   {/* Controls (Hidden during capture) */}
                   <div className="canvas-item-controls opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border border-[#1A1A1A] text-[#1A1A1A] flex items-center gap-0 shadow-sm z-50 whitespace-nowrap">
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={(e) => { e.stopPropagation(); updateScale(item.id, item.scale - 10); }}
                       className="hover:bg-[#1A1A1A] hover:text-white transition-colors p-2"
                       title="Thu nhỏ"
@@ -66,8 +66,8 @@ export function OutfitCanvasBoard({
                       <ZoomOut className="size-3.5" />
                     </button>
                     <div className="w-px h-4 bg-[#E5E5E5]" />
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={(e) => { e.stopPropagation(); updateScale(item.id, item.scale + 10); }}
                       className="hover:bg-[#1A1A1A] hover:text-white transition-colors p-2"
                       title="Phóng to"
@@ -75,20 +75,20 @@ export function OutfitCanvasBoard({
                       <ZoomIn className="size-3.5" />
                     </button>
                     <div className="w-px h-4 bg-[#E5E5E5]" />
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={(e) => { e.stopPropagation(); bringToFront(item.id); }}
                       className="hover:bg-[#1A1A1A] hover:text-white transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold px-3 py-2"
                       title="Đưa lên trên"
                     >
                       <MoveUp className="size-3" /> LÊN TRÊN
                     </button>
-                    
+
                     {onSwap && hasAlternatives && (
                       <>
                         <div className="w-px h-4 bg-[#E5E5E5]" />
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           onClick={(e) => { e.stopPropagation(); onSwap(item._role!); }}
                           className="hover:bg-[#1A1A1A] hover:text-white transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold px-3 py-2"
                           title="Thay thế"
@@ -101,13 +101,16 @@ export function OutfitCanvasBoard({
                     {item.isGhost && onGhostItemClick && (
                       <>
                         <div className="w-px h-4 bg-[#E5E5E5]" />
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           onClick={(e) => { e.stopPropagation(); onGhostItemClick(item); }}
                           className="hover:bg-[#A0522D] hover:text-white text-[#A0522D] transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold px-3 py-2"
                           title="Xem Wardrobe Impact"
                         >
-                          IMPACT
+                          {/* IMPACT tiếng viêt:  Xem thêm*/}
+                          {/* IMPACT tiếng viêt:  */}
+                          Xem thêm
+                          {/*  */}
                         </button>
                       </>
                     )}
@@ -124,22 +127,22 @@ export function OutfitCanvasBoard({
                   </div>
 
                   {/* Image */}
-                  <div 
+                  <div
                     className="pointer-events-none drop-shadow-xl ring-1 ring-transparent group-hover:ring-black/10 transition-all rounded-sm relative"
-                    style={{ 
-                      width: `${item.scale * 2.2}px`, 
+                    style={{
+                      width: `${item.scale * 2.2}px`,
                       height: "auto",
                     }}
                   >
-                    <img 
-                      src={item.isGhost ? item.imageUrl : applyCloudinaryTrim(item.imageUrl)} 
-                      alt="Outfit Item" 
-                      className="w-full h-auto object-contain filter drop-shadow-md" 
+                    <img
+                      src={item.isGhost ? item.imageUrl : applyCloudinaryTrim(item.imageUrl)}
+                      alt="Outfit Item"
+                      className="w-full h-auto object-contain filter drop-shadow-md"
                       draggable={false}
                     />
                     {item.isGhost && <GhostItemBadge brandName={item.brandName || 'Local Brand'} />}
                   </div>
-                  
+
                   {/* Role Label for AI Stylist */}
                   {item._role && (
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white border border-[#E5E5E5] px-2 py-0.5">

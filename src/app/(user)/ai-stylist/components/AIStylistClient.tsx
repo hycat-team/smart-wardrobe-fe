@@ -18,7 +18,7 @@ import { WardrobeImpactPanel } from "@/features/ghost-closet/components/Wardrobe
 import { MOCK_GHOST_ITEM } from "@/features/ghost-closet/mock/ghostClosetMock";
 import { GhostItem } from "@/features/ghost-closet/types";
 
-import { OCCASIONS, STYLES, SEASONS, WEATHERS, COLOR_TONES, occasionMap } from "@/features/ai-stylist/components/AIQuickOptions";
+import { OCCASIONS, COLOR_TONES, occasionMap } from "@/features/ai-stylist/components/AIQuickOptions";
 
 function AIStylistContent() {
   const searchParams = useSearchParams();
@@ -26,9 +26,6 @@ function AIStylistContent() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const [selectedOccasion, setSelectedOccasion] = useState<string>("");
-  const [selectedStyle, setSelectedStyle] = useState<string>("");
-  const [selectedSeason, setSelectedSeason] = useState<string>("");
-  const [selectedWeather, setSelectedWeather] = useState<string>("");
   const [selectedColorTone, setSelectedColorTone] = useState<string>("");
   const [detailsInput, setDetailsInput] = useState("");
 
@@ -77,10 +74,8 @@ function AIStylistContent() {
         colorTone: selectedColorTone ? selectedColorTone.toLowerCase() : "",
         details: safeDetails,
         occasion: occasionMap[selectedOccasion] || selectedOccasion.trim(),
-        season: selectedSeason ? selectedSeason.toLowerCase() : "",
-        styleTarget: selectedStyle ? selectedStyle.toLowerCase() : "",
       });
-      
+
       // Inject ghost item if enabled
       if (ghostClosetEnabled && res.items.length > 0) {
         let primaryGhost: any = MOCK_GHOST_ITEM;
@@ -88,23 +83,23 @@ function AIStylistContent() {
         try {
           const reportsStr = localStorage.getItem("digital_sample_lab_reports");
           if (reportsStr) {
-             const reports = JSON.parse(reportsStr);
-             if (reports && reports.length > 0) {
-                const mappedGhosts = [...reports].reverse().map(r => ({
-                   ...MOCK_GHOST_ITEM,
-                   id: r.id,
-                   brandName: "My Brand",
-                   imageUrl: r.imageUrl || MOCK_GHOST_ITEM.imageUrl,
-                   color: r.variants?.[0]?.name || "Mặc định",
-                   colorHex: r.variants?.[0]?.color || "#000",
-                   price: parseInt(r.price) || 0,
-                }));
-                primaryGhost = mappedGhosts[0];
-                altGhosts = mappedGhosts.slice(1);
-             }
+            const reports = JSON.parse(reportsStr);
+            if (reports && reports.length > 0) {
+              const mappedGhosts = [...reports].reverse().map(r => ({
+                ...MOCK_GHOST_ITEM,
+                id: r.id,
+                brandName: "My Brand",
+                imageUrl: r.imageUrl || MOCK_GHOST_ITEM.imageUrl,
+                color: r.variants?.[0]?.name || "Mặc định",
+                colorHex: r.variants?.[0]?.color || "#000",
+                price: parseInt(r.price) || 0,
+              }));
+              primaryGhost = mappedGhosts[0];
+              altGhosts = mappedGhosts.slice(1);
+            }
           }
         } catch (e) {
-           console.error("Failed to load custom ghost item", e);
+          console.error("Failed to load custom ghost item", e);
         }
 
         const ghostAsAIItem = {
@@ -116,7 +111,7 @@ function AIStylistContent() {
       }
 
       setOutfitData(res);
-      
+
       // Initialize selected items from the main items
       const initialItems = res.items.map(item => ({
         id: crypto.randomUUID(),
@@ -146,29 +141,29 @@ function AIStylistContent() {
 
   const handleSwap = (role: string) => {
     if (!outfitData) return;
-    
+
     // Find the item by role
     const outfitItem = outfitData.items.find(i => i.role === role);
-    
+
     if (!outfitItem || !outfitItem.alternatives || outfitItem.alternatives.length === 0) {
       toast.error("Không có lựa chọn thay thế cho món đồ này");
       return;
     }
 
     const currentIndex = alternativeIndices[outfitItem.role] || 0;
-    
+
     // The items array to cycle through: [mainItem, ...alternatives]
     const allOptions = [outfitItem.primary, ...outfitItem.alternatives];
-    
+
     // Calculate next index
     const nextIndex = (currentIndex + 1) % allOptions.length;
-    
+
     // Update the state
     setAlternativeIndices(prev => ({
       ...prev,
       [outfitItem.role]: nextIndex
     }));
-    
+
     const nextItem = allOptions[nextIndex];
 
     // Replace the item in the canvas
@@ -193,11 +188,11 @@ function AIStylistContent() {
 
   const handleSaveOutfit = async () => {
     if (!outfitData || selectedItems.length === 0 || !canvasRef.current) return;
-    
+
     try {
       setIsSaving(true);
       toast.loading("Đang tạo ảnh preview...", { id: "save_outfit" });
-      
+
       const elementsToHide = canvasRef.current.querySelectorAll('.action-button');
       elementsToHide.forEach(el => (el as HTMLElement).style.display = 'none');
 
@@ -215,7 +210,7 @@ function AIStylistContent() {
       }
 
       toast.loading("Đang lưu hình ảnh...", { id: "save_outfit" });
-      
+
       const signatureResult = await wardrobeApi.getUploadSignature();
       const uploadResData = await uploadToCloudinary({
         file: blob,
@@ -255,14 +250,14 @@ function AIStylistContent() {
 
 
 
-  const hasSelectedOptions = !!(selectedOccasion || selectedStyle || selectedSeason || selectedWeather || selectedColorTone || detailsInput.trim());
+  const hasSelectedOptions = !!(selectedOccasion || selectedColorTone || detailsInput.trim());
 
   return (
     <div className="min-h-full flex flex-col pt-4 md:pt-8 bg-white max-w-[1600px] w-full mx-auto pb-10">
       <div className="flex flex-col h-full gap-6">
-        
+
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-[#E5E5E5] pb-6">
+        {/* <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-[#E5E5E5] pb-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-[#1A1A1A] uppercase flex items-center gap-3 mb-2">
               <Sparkles className="w-8 h-8" strokeWidth={1.5} />
@@ -272,7 +267,7 @@ function AIStylistContent() {
               CẤU HÌNH SỞ THÍCH CỦA BẠN ĐỂ KHÁM PHÁ BỘ PHỐI ĐỒ HÔM NAY
             </p>
           </div>
-        </div>
+        </div> */}
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-1 items-start">
@@ -362,7 +357,7 @@ function AIStylistContent() {
 
           {/* Right Column: Configuration Form (Span 4) */}
           <div className="lg:col-span-4 h-auto lg:h-[800px] border border-[#E5E5E5] bg-white flex flex-col relative shadow-sm overflow-hidden">
-            
+
             {/* Form Header */}
             <div className="p-5 border-b border-[#E5E5E5] bg-[#F9F9F9] flex items-center gap-3">
               <SlidersHorizontal className="w-4 h-4 text-[#1A1A1A]" />
@@ -370,14 +365,14 @@ function AIStylistContent() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 md:p-6 space-y-6">
-              
+
               <div className="group flex flex-col gap-2 border-b border-[#E5E5E5] pb-4 focus-within:border-[#1A1A1A] transition-colors">
                 <label className="text-[10px] text-[#A3A3A3] font-bold uppercase tracking-widest group-focus-within:text-[#1A1A1A] transition-colors">
                   DỊP (OCCASION)
                 </label>
-                <input 
-                  type="text" 
-                  placeholder="Bạn muốn phối đồ cho dịp nào?" 
+                <input
+                  type="text"
+                  placeholder="Bạn muốn phối đồ cho dịp nào?"
                   value={selectedOccasion}
                   onChange={(e) => setSelectedOccasion(e.target.value)}
                   disabled={isGenerating}
@@ -386,7 +381,7 @@ function AIStylistContent() {
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   <span className="text-[9px] text-[#A3A3A3] uppercase tracking-widest mr-1 self-center">Gợi ý:</span>
                   {OCCASIONS.map(occ => (
-                    <button 
+                    <button
                       key={occ}
                       onClick={() => setSelectedOccasion(occ)}
                       disabled={isGenerating}
@@ -403,101 +398,11 @@ function AIStylistContent() {
 
               <div className="group flex flex-col gap-2 border-b border-[#E5E5E5] pb-4 focus-within:border-[#1A1A1A] transition-colors">
                 <label className="text-[10px] text-[#A3A3A3] font-bold uppercase tracking-widest group-focus-within:text-[#1A1A1A] transition-colors">
-                  PHONG CÁCH (STYLE)
-                </label>
-                <input 
-                  type="text" 
-                  placeholder="Phong cách bạn đang hướng tới?" 
-                  value={selectedStyle}
-                  onChange={(e) => setSelectedStyle(e.target.value)}
-                  disabled={isGenerating}
-                  className="w-full bg-transparent outline-none text-[15px] font-medium text-[#1A1A1A] placeholder:text-[#D4D4D4] placeholder:font-normal"
-                />
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  <span className="text-[9px] text-[#A3A3A3] uppercase tracking-widest mr-1 self-center">Gợi ý:</span>
-                  {STYLES.map(style => (
-                    <button 
-                      key={style}
-                      onClick={() => setSelectedStyle(style)}
-                      disabled={isGenerating}
-                      className={cn(
-                        "px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border rounded-sm",
-                        selectedStyle === style ? "bg-black text-white border-black" : "bg-[#F9F9F9] text-[#666] border-transparent hover:bg-[#E5E5E5] hover:text-[#1A1A1A]"
-                      )}
-                    >
-                      {style}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="group flex flex-col gap-2 border-b border-[#E5E5E5] pb-4 focus-within:border-[#1A1A1A] transition-colors">
-                <label className="text-[10px] text-[#A3A3A3] font-bold uppercase tracking-widest group-focus-within:text-[#1A1A1A] transition-colors">
-                  MÙA (SEASON)
-                </label>
-                <input 
-                  type="text" 
-                  placeholder="Mùa hiện tại hoặc sắp tới?" 
-                  value={selectedSeason}
-                  onChange={(e) => setSelectedSeason(e.target.value)}
-                  disabled={isGenerating}
-                  className="w-full bg-transparent outline-none text-[15px] font-medium text-[#1A1A1A] placeholder:text-[#D4D4D4] placeholder:font-normal"
-                />
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  <span className="text-[9px] text-[#A3A3A3] uppercase tracking-widest mr-1 self-center">Gợi ý:</span>
-                  {SEASONS.map(s => (
-                    <button 
-                      key={s}
-                      onClick={() => setSelectedSeason(s)}
-                      disabled={isGenerating}
-                      className={cn(
-                        "px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border rounded-sm",
-                        selectedSeason === s ? "bg-black text-white border-black" : "bg-[#F9F9F9] text-[#666] border-transparent hover:bg-[#E5E5E5] hover:text-[#1A1A1A]"
-                      )}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="group flex flex-col gap-2 border-b border-[#E5E5E5] pb-4 focus-within:border-[#1A1A1A] transition-colors">
-                <label className="text-[10px] text-[#A3A3A3] font-bold uppercase tracking-widest group-focus-within:text-[#1A1A1A] transition-colors">
-                  THỜI TIẾT (WEATHER)
-                </label>
-                <input 
-                  type="text" 
-                  placeholder="Thời tiết hôm nay thế nào?" 
-                  value={selectedWeather}
-                  onChange={(e) => setSelectedWeather(e.target.value)}
-                  disabled={isGenerating}
-                  className="w-full bg-transparent outline-none text-[15px] font-medium text-[#1A1A1A] placeholder:text-[#D4D4D4] placeholder:font-normal"
-                />
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  <span className="text-[9px] text-[#A3A3A3] uppercase tracking-widest mr-1 self-center">Gợi ý:</span>
-                  {WEATHERS.map(w => (
-                    <button 
-                      key={w}
-                      onClick={() => setSelectedWeather(w)}
-                      disabled={isGenerating}
-                      className={cn(
-                        "px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border rounded-sm",
-                        selectedWeather === w ? "bg-black text-white border-black" : "bg-[#F9F9F9] text-[#666] border-transparent hover:bg-[#E5E5E5] hover:text-[#1A1A1A]"
-                      )}
-                    >
-                      {w}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="group flex flex-col gap-2 border-b border-[#E5E5E5] pb-4 focus-within:border-[#1A1A1A] transition-colors">
-                <label className="text-[10px] text-[#A3A3A3] font-bold uppercase tracking-widest group-focus-within:text-[#1A1A1A] transition-colors">
                   TÔNG MÀU (COLOR TONE)
                 </label>
-                <input 
-                  type="text" 
-                  placeholder="Màu sắc chủ đạo bạn thích?" 
+                <input
+                  type="text"
+                  placeholder="Màu sắc chủ đạo bạn thích?"
                   value={selectedColorTone}
                   onChange={(e) => setSelectedColorTone(e.target.value)}
                   disabled={isGenerating}
@@ -506,7 +411,7 @@ function AIStylistContent() {
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   <span className="text-[9px] text-[#A3A3A3] uppercase tracking-widest mr-1 self-center">Gợi ý:</span>
                   {COLOR_TONES.map(c => (
-                    <button 
+                    <button
                       key={c}
                       onClick={() => setSelectedColorTone(c)}
                       disabled={isGenerating}
@@ -534,10 +439,10 @@ function AIStylistContent() {
                   maxLength={1000}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between border border-[#E5E5E5] bg-[#F9F9F9] p-4 mt-2">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A]">Mix with Local Brands</p>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A]">Kết hợp với đồ của các cử hàng</p>
                   <p className="text-[9px] text-[#A3A3A3] mt-1 tracking-widest uppercase">Thử đồ mới từ brand địa phương</p>
                 </div>
                 <Switch checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} />
@@ -558,51 +463,51 @@ function AIStylistContent() {
           </div>
         </div>
       </div>
-      
+
       <WardrobeImpactPanel
         isOpen={isImpactPanelOpen}
         onClose={() => setIsImpactPanelOpen(false)}
         item={activeGhostItem}
         onKeep={() => {
-           if (activeGhostItem) logGhostAction(activeGhostItem.id, 'keep');
-           setIsImpactPanelOpen(false);
+          if (activeGhostItem) logGhostAction(activeGhostItem.id, 'keep');
+          setIsImpactPanelOpen(false);
         }}
         onSwap={() => {
-           if (activeGhostItem) {
-             const canvasItem = selectedItems.find(x => x.clothingItemId === activeGhostItem.id);
-             if (canvasItem) handleSwap(canvasItem._role);
-             logGhostAction(activeGhostItem.id, 'swap');
-             setIsImpactPanelOpen(false);
-           }
+          if (activeGhostItem) {
+            const canvasItem = selectedItems.find(x => x.clothingItemId === activeGhostItem.id);
+            if (canvasItem) handleSwap(canvasItem._role);
+            logGhostAction(activeGhostItem.id, 'swap');
+            setIsImpactPanelOpen(false);
+          }
         }}
         onSave={() => {
           if (activeGhostItem) {
-             saveItem(activeGhostItem.id);
-             logGhostAction(activeGhostItem.id, 'save');
-             toast.success("Đã lưu vào danh sách yêu thích!");
+            saveItem(activeGhostItem.id);
+            logGhostAction(activeGhostItem.id, 'save');
+            toast.success("Đã lưu vào danh sách yêu thích!");
           }
         }}
         onWaitlist={() => {
           if (activeGhostItem) {
-             joinWaitlist(activeGhostItem.id);
-             logGhostAction(activeGhostItem.id, 'waitlist');
-             toast.success("Đã đăng ký Waitlist thành công!");
+            joinWaitlist(activeGhostItem.id);
+            logGhostAction(activeGhostItem.id, 'waitlist');
+            toast.success("Đã đăng ký Waitlist thành công!");
           }
         }}
         onHideBrand={() => {
           if (activeGhostItem) {
-             hideBrand(activeGhostItem.brandId);
-             setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeGhostItem.id));
-             setIsImpactPanelOpen(false);
-             toast.success("Sẽ không đề xuất brand này nữa.");
+            hideBrand(activeGhostItem.brandId);
+            setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeGhostItem.id));
+            setIsImpactPanelOpen(false);
+            toast.success("Sẽ không đề xuất brand này nữa.");
           }
         }}
         onNotMyStyle={() => {
           if (activeGhostItem) {
-             logGhostAction(activeGhostItem.id, 'notMyStyle');
-             setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeGhostItem.id));
-             setIsImpactPanelOpen(false);
-             toast.success("Đã ghi nhận, sẽ cải thiện đề xuất.");
+            logGhostAction(activeGhostItem.id, 'notMyStyle');
+            setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeGhostItem.id));
+            setIsImpactPanelOpen(false);
+            toast.success("Đã ghi nhận, sẽ cải thiện đề xuất.");
           }
         }}
       />
