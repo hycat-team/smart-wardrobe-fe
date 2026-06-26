@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const TARGET_AUDIENCES = ["Tất cả", "Nam", "Nữ", "Unisex", "Gen Z", "Office Worker"];
 
@@ -188,7 +189,7 @@ export function NewTrendClient() {
                 <div className="grid grid-cols-3 gap-2">
                   {images.map((img, i) => (
                     <div key={i} className="aspect-square rounded-lg overflow-hidden relative group border border-border">
-                      <img src={img} alt={`Upload ${i}`} className="w-full h-full object-cover" />
+                      <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={img} alt={`Upload ${i}`} className="w-full h-full object-cover" />
                       <button 
                         type="button"
                         onClick={() => removeImage(i)}

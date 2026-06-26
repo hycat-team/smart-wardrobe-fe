@@ -132,8 +132,7 @@ export const CreatePostModal = () => {
               <div className="grid grid-cols-3 gap-2 mt-4">
                 {images.map((file, index) => (
                   <div key={index} className="relative aspect-square rounded-md overflow-hidden bg-muted">
-                    <Image 
-                      src={URL.createObjectURL(file)} 
+                    <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={URL.createObjectURL(file)} 
                       alt="preview" 
                       className="w-full h-full object-cover" 
                     />

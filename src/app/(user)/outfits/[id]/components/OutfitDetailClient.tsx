@@ -22,6 +22,7 @@ import { uploadToCloudinary, applyCloudinaryTrim } from "@/lib/cloudinary";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
+
 gsap.registerPlugin(useGSAP);
 
 const OCCASIONS = ["Casual", "Workwear", "Summer", "Party", "Formal", "Sporty"];

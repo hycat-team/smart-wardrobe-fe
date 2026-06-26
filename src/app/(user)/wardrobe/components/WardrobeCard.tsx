@@ -39,6 +39,8 @@ export function WardrobeCard({
       {/* Image Area - 75% Visual Weight */}
       <div className="relative aspect-[4/5] bg-[#F7F6F4] p-3 md:p-6 overflow-hidden flex-shrink-0">
         <Image
+          fill
+          sizes="(max-width: 768px) 50vw, 33vw"
           alt={getWardrobeItemName(item)}
           className={cn(
             "w-full h-full object-contain drop-shadow-sm transition-transform duration-250",
@@ -46,7 +48,7 @@ export function WardrobeCard({
             isProcessing && "blur-md opacity-60"
           )}
           src={applyCloudinaryTrim(item.imageUrl || undefined)}
-        fill
+        
         />
         {isProcessing && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
@@ -126,10 +128,10 @@ export function WardrobeCard({
             <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#666] mt-2 truncate">
               {(item as any).brand || (typeof item.category === 'object' ? (item.category as any)?.name : item.category) || "ACNE STUDIOS"}
             </p>
-            <div className="font-['IBM_Plex_Mono'] text-[11px] text-[#888] mt-auto pt-2">
+            {/* <div className="font-['IBM_Plex_Mono'] text-[11px] text-[#888] mt-auto pt-2">
               <span>Size {(item as any).size || "S"}</span>
               {item.color && <span> • {item.color}</span>}
-            </div>
+            </div> */}
           </>
         )}
       </div>

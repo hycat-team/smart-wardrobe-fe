@@ -12,6 +12,8 @@ import { uploadToCloudinary, applyCloudinaryBackgroundRemoval } from "@/lib/clou
 
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import Image from "next/image";
 
 gsap.registerPlugin(useGSAP);
 
@@ -33,7 +35,7 @@ export function UploadClient() {
   });
 
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
-  
+
   const defaultCategoryId = useMemo(() => {
     const otherCat = categories.find(c => c.name.toLowerCase() === 'khác' || c.name.toLowerCase() === 'other');
     return otherCat ? otherCat.id : (categories.length > 0 ? categories[0].id : "");
@@ -184,8 +186,8 @@ export function UploadClient() {
 
       {/* Editorial Header */}
       <div className="flex flex-col gap-6 border-b border-black/10 pb-8 gsap-header">
-        <Link 
-          href="/wardrobe" 
+        <Link
+          href="/wardrobe"
           className="inline-flex items-center gap-2 text-[11px] font-['IBM_Plex_Mono'] uppercase tracking-[0.12em] text-[#666] hover:text-[#111] transition-colors w-fit"
         >
           <ArrowLeft className="size-3.5" /> Trở về tủ đồ
@@ -210,9 +212,9 @@ export function UploadClient() {
             </div>
 
             {isLoadingCategories ? (
-               <div className="w-full aspect-[16/9] md:aspect-[21/9] border border-dashed border-black/20 flex flex-col items-center justify-center">
-                 <Loader2 className="animate-spin size-6 text-[#111]" />
-               </div>
+              <div className="w-full aspect-[16/9] md:aspect-[21/9] border border-dashed border-black/20 flex flex-col items-center justify-center">
+                <Loader2 className="animate-spin size-6 text-[#111]" />
+              </div>
             ) : (
               <div
                 onClick={() => fileInputRef.current?.click()}
@@ -272,7 +274,7 @@ export function UploadClient() {
 
                   {/* Image Area - 75% Visual Weight */}
                   <div className="relative aspect-[4/5] bg-[#F7F6F4] p-[16px] overflow-hidden flex-shrink-0">
-                    <img src={item.preview} alt="Preview" className="w-full h-full object-contain drop-shadow-sm" />
+                    <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={item.preview} alt="Preview" className="w-full h-full object-contain drop-shadow-sm" />
 
                     {/* Uploading Overlay */}
                     {isUploading && uploadState.current === idx + 1 && uploadState.status === 'uploading' && (
@@ -313,7 +315,7 @@ export function UploadClient() {
 
           <div className="md:col-span-5 flex flex-col h-full space-y-10 sticky top-24 pt-2">
             <div className="space-y-6">
-              
+
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-['Playfair_Display'] tracking-[0.02em] text-[#111] leading-[1.1] uppercase">
                 Sẵn sàng <br /><span className="text-[#666] italic lowercase tracking-normal">trích xuất</span>
               </h2>

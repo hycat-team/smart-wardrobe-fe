@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { X, Save } from "lucide-react";
 import { useUpdateSystemWardrobeItem } from "@/features/admin/queries/admin.queries";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface ItemEditDrawerProps {
   item: any;
@@ -74,7 +75,7 @@ export function ItemEditDrawer({ item, isOpen, onClose }: ItemEditDrawerProps) {
               
               <div className="flex gap-4 mb-8">
                 <div className="size-24 border border-gray-300 bg-gray-50">
-                  {item.imageUrl && <img src={item.imageUrl} alt="" className="w-full h-full object-cover mix-blend-multiply opacity-80" />}
+                  {item.imageUrl && <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={item.imageUrl} alt="" className="w-full h-full object-cover mix-blend-multiply opacity-80" />}
                 </div>
                 <div className="flex flex-col justify-center gap-1">
                   <span className="font-mono text-[10px] text-gray-500 uppercase tracking-widest">ID: {item.id}</span>

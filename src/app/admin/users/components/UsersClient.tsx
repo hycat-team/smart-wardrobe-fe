@@ -32,6 +32,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { useAdminUsers, useUpdateUserStatus } from "@/features/admin/queries/admin.queries";
+import Image from "next/image";
 
 export function UsersClient() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -104,7 +105,7 @@ export function UsersClient() {
                     <div className="flex items-center gap-4">
                       <div className="size-10 bg-black/5 flex items-center justify-center font-['Playfair_Display'] text-lg text-[#111] overflow-hidden shrink-0">
                         {user.avatarUrl ? (
-                          <img src={user.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                          <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={user.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
                         ) : (
                           displayName.charAt(0).toUpperCase()
                         )}
@@ -225,7 +226,7 @@ export function UsersClient() {
               <div className="p-8 border-b border-black/10 flex flex-col items-center gap-6">
                 <div className="size-24 bg-black/5 flex items-center justify-center font-['Playfair_Display'] text-3xl text-[#111]">
                   {selectedUser.avatarUrl ? (
-                    <img src={selectedUser.avatarUrl} alt={selectedUser.username} className="w-full h-full object-cover" />
+                    <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={selectedUser.avatarUrl} alt={selectedUser.username} className="w-full h-full object-cover" />
                   ) : (
                     (selectedUser.firstName?.[0] || selectedUser.username?.[0] || 'U').toUpperCase()
                   )}

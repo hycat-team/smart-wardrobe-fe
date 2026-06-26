@@ -1,0 +1,51 @@
+'use client';
+
+import React from 'react';
+import { usePostDetail } from '@/features/community/queries/community.queries';
+import { PostRes } from '@/features/community/types';
+import { PostCard } from '@/features/community/components/PostCard';
+import { Loader2, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+interface PostDetailClientProps {
+  postPublicId: string;
+  initialData: PostRes;
+}
+
+export default function PostDetailClient({ postPublicId, initialData }: PostDetailClientProps) {
+  const router = useRouter();
+  const { data: post, isLoading } = usePostDetail(postPublicId, initialData);
+
+  if (isLoading && !post) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="size-10 text-[#111] animate-spin" />
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-sm text-[#111] font-mono">Không tìm thấy bài viết.</p>
+        <button onClick={() => router.push('/community')} className="text-xs uppercase tracking-widest border-b border-black/20 pb-0.5 hover:border-black transition-colors">
+          Quay lại cộng đồng
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto py-8 px-4">
+      <button 
+        onClick={() => router.push('/community')}
+        className="flex items-center gap-2 text-sm text-[#666] hover:text-[#111] transition-colors mb-6 font-mono group outline-none"
+      >
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+        QUAY LẠI CỘNG ĐỒNG
+      </button>
+      
+      <PostCard post={post} />
+    </div>
+  );
+}

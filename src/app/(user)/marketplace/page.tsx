@@ -1,4 +1,5 @@
 import { Heart, Search, SlidersHorizontal, Tag } from "lucide-react";
+import Image from "next/image";
 
 const MARKETPLACE_ITEMS = [
   {
@@ -103,8 +104,7 @@ export default function Marketplace() {
             
             {/* Image Area */}
             <div className="relative w-full overflow-hidden bg-[#e0dcd5] aspect-[3/4] flex-shrink-0">
-              <img 
-                alt={item.name} 
+              <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" alt={item.name} 
                 className="w-full h-full object-cover mix-blend-multiply opacity-90 transition-all duration-700 group-hover:opacity-100 group-hover:scale-[1.02]" 
                 src={item.img} 
               />

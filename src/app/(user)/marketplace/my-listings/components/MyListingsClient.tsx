@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 
 const MY_LISTINGS = [
   {
@@ -95,7 +96,7 @@ export function MyListingsClient() {
             <div key={item.id} className={cn("p-4 flex items-center gap-4 transition-colors hover:bg-cream-dark/10", item.status === "sold" && "opacity-60")}>
               {/* Item Image */}
               <div className="size-16 md:size-20 rounded-xl overflow-hidden bg-cream-dark shrink-0 relative">
-                <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={item.img} alt={item.name} className="w-full h-full object-cover" />
                 {item.status === "sold" && (
                   <div className="absolute inset-0 bg-ink/50 flex items-center justify-center">
                     <span className="text-[10px] font-bold text-white uppercase tracking-widest">Đã bán</span>

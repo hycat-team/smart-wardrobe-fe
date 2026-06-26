@@ -14,7 +14,9 @@ import { useCreatePost } from '../queries/community.queries';
 import { communityApi } from '../api/community.api';
 import { toast } from 'sonner';
 import { uploadToCloudinary } from '@/lib/cloudinary';
-
+import Image from 'next/image';
+import { useAuthStore } from '@/store/useAuthStore';
+import { getUserAvatar } from '@/lib/utils';
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
@@ -44,6 +46,7 @@ export const CommunityList = ({
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutate: createPost, isPending } = useCreatePost();
+  const user = useAuthStore((state) => state.user);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -182,8 +185,8 @@ export const CommunityList = ({
       <form onSubmit={handleSubmit} className="w-full border border-[#E5E5E5] bg-white p-5 flex flex-col gap-4 shadow-sm">
         <div className="flex items-start gap-4">
           <Avatar className="w-10 h-10 ring-1 ring-black/5 shrink-0">
-            <AvatarImage src="" />
-            <AvatarFallback className="bg-black text-white font-medium text-sm">GH</AvatarFallback>
+            <AvatarImage src={getUserAvatar(user)} className="object-cover" />
+            <AvatarFallback className="bg-black text-white font-medium text-sm">{user?.name ? user.name[0].toUpperCase() : 'U'}</AvatarFallback>
           </Avatar>
           <div className="flex-1 flex flex-col gap-2">
             <input 
@@ -208,8 +211,7 @@ export const CommunityList = ({
           <div className="flex gap-2 mt-2 overflow-x-auto pb-2">
             {images.map((file, index) => (
               <div key={index} className="relative w-24 h-24 shrink-0 rounded-none bg-gray-100 border border-[#E5E5E5]">
-                <img 
-                  src={URL.createObjectURL(file)} 
+                <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={URL.createObjectURL(file)} 
                   alt="preview" 
                   className="w-full h-full object-cover" 
                 />
@@ -294,7 +296,7 @@ export const CommunityList = ({
             <span>Đang tải...</span>
           </div>
         )}
-        {!hasNextPage && allPosts.length > 0 && (
+        {/* {!hasNextPage && allPosts.length > 0 && (
           <p className="text-xs text-black/40 font-bold uppercase tracking-widest">
             Bạn đã xem hết bài viết.
           </p>
@@ -306,7 +308,7 @@ export const CommunityList = ({
               Hãy trở thành người đầu tiên chia sẻ phong cách với cộng đồng.
             </p>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

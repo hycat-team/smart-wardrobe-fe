@@ -1,0 +1,206 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { UploadCloud, Plus, X, Sparkles, SlidersHorizontal, Image as ImageIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+export function DigitalSampleLabClient() {
+  const router = useRouter();
+  const [productName, setProductName] = useState("");
+  const [concept, setConcept] = useState("");
+  const [variants, setVariants] = useState([{ name: "Black", color: "#1A1A1A" }]);
+  const [price, setPrice] = useState("950000");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addVariant = () => {
+    if (variants.length < 3) {
+      setVariants([...variants, { name: "", color: "#FFFFFF" }]);
+    }
+  };
+
+  const removeVariant = (index: number) => {
+    setVariants(variants.filter((_, i) => i !== index));
+  };
+
+  const updateVariant = (index: number, field: string, value: string) => {
+    const newVariants = [...variants];
+    newVariants[index] = { ...newVariants[index], [field]: value };
+    setVariants(newVariants);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    const newSampleId = `sample-${Date.now()}`;
+    try {
+      const existingStr = localStorage.getItem("digital_sample_lab_reports");
+      const existing = existingStr ? JSON.parse(existingStr) : [];
+      
+      const newReport = {
+        id: newSampleId,
+        productName,
+        concept,
+        variants,
+        price,
+        imageUrl,
+        createdAt: new Date().toISOString()
+      };
+      
+      existing.push(newReport);
+      localStorage.setItem("digital_sample_lab_reports", JSON.stringify(existing));
+    } catch (e) {
+      console.error(e);
+    }
+    
+    // Giả lập tạo sample test
+    setTimeout(() => {
+      setIsSubmitting(false);
+      router.push(`/brand/digital-sample-lab/report/${newSampleId}`);
+    }, 1500);
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto py-12 px-6">
+      <div className="mb-10">
+        <h1 className="text-4xl font-['Playfair_Display'] uppercase font-medium text-ink mb-2">Digital Sample Lab</h1>
+        <p className="text-sm font-mono tracking-widest uppercase text-ink-muted border-l-2 border-[#A0522D] pl-3">
+          Thử nghiệm thiết kế trên tủ đồ thực tế trước khi sản xuất
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-1 space-y-4">
+          <label className="aspect-[4/5] bg-[#F4F1EE] border border-dashed border-ink/20 flex flex-col items-center justify-center text-ink-muted cursor-pointer hover:bg-ink/5 transition-colors group relative overflow-hidden block w-full">
+            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+            {imageUrl ? (
+              <img src={imageUrl} alt="Uploaded Sample" className="absolute inset-0 w-full h-full object-cover" />
+            ) : (
+              <>
+                <div className="size-12 rounded-full bg-white flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                  <UploadCloud className="size-5 text-ink" />
+                </div>
+                <p className="text-[11px] font-mono uppercase tracking-widest font-bold">Upload Bản Vẽ / 3D Render</p>
+                <p className="text-[10px] mt-2">PNG, JPG up to 10MB</p>
+              </>
+            )}
+          </label>
+        </div>
+
+        <div className="md:col-span-2">
+          <form onSubmit={handleSubmit} className="space-y-8 bg-white p-8 border border-ink/10 shadow-sm">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Tên Sản Phẩm</label>
+                <input
+                  required
+                  type="text"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder="VD: Minimal Structured Blazer"
+                  className="w-full bg-[#F4F1EE]/50 border border-ink/10 p-3 text-sm focus:outline-none focus:border-ink transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Product Concept</label>
+                <textarea
+                  required
+                  value={concept}
+                  onChange={(e) => setConcept(e.target.value)}
+                  placeholder="Mô tả ý tưởng, phom dáng, chất liệu dự kiến..."
+                  className="w-full bg-[#F4F1EE]/50 border border-ink/10 p-3 text-sm min-h-[100px] resize-none focus:outline-none focus:border-ink transition-colors"
+                />
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Variants (Màu sắc / Kiểu dáng)</label>
+                  {variants.length < 3 && (
+                    <button type="button" onClick={addVariant} className="text-[10px] font-mono uppercase tracking-widest text-[#A0522D] hover:underline flex items-center gap-1">
+                      <Plus className="size-3" /> Thêm Variant
+                    </button>
+                  )}
+                </div>
+                
+                <div className="space-y-3">
+                  {variants.map((v, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-[#F4F1EE]/50 border border-ink/10 p-2 pr-3">
+                      <div className="size-8 border border-ink/10 overflow-hidden relative shrink-0">
+                        <input
+                          type="color"
+                          value={v.color}
+                          onChange={(e) => updateVariant(i, "color", e.target.value)}
+                          className="absolute -top-2 -left-2 w-12 h-12 cursor-pointer"
+                        />
+                      </div>
+                      <input
+                        required
+                        type="text"
+                        value={v.name}
+                        onChange={(e) => updateVariant(i, "name", e.target.value)}
+                        placeholder="Tên variant (VD: Đen)"
+                        className="flex-1 bg-transparent border-none p-2 text-sm focus:outline-none"
+                      />
+                      {variants.length > 1 && (
+                        <button type="button" onClick={() => removeVariant(i)} className="text-ink-muted hover:text-red-500 transition-colors">
+                          <X className="size-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Mức giá dự kiến (VNĐ)</label>
+                <input
+                  required
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="w-full bg-[#F4F1EE]/50 border border-ink/10 p-3 text-sm font-mono focus:outline-none focus:border-ink transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-ink/10">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-14 bg-ink text-cream hover:bg-ink/90 font-mono text-[11px] uppercase tracking-widest rounded-none"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="size-4 border-2 border-cream/30 border-t-cream rounded-full animate-spin" />
+                    Đang thiết lập thử nghiệm...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="size-4" /> Khởi Tạo Digital Sample Test
+                  </div>
+                )}
+              </Button>
+              <p className="text-center text-[10px] text-ink-muted mt-4">
+                Mẫu số này sẽ được tạm thời thêm vào tủ đồ của các user phù hợp để đánh giá Wardrobe Impact.
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
