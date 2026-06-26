@@ -10,7 +10,7 @@ export const useLogin = () => {
     mutationFn: authApi.login,
     onSuccess: async (res) => {
       queryClient.invalidateQueries({ queryKey: ['authStatus'] });
-      
+
       let isAdmin = false;
       try {
         const profile = await queryClient.fetchQuery({ queryKey: PROFILE_QUERY_KEY, queryFn: profileApi.getProfile });
@@ -20,10 +20,10 @@ export const useLogin = () => {
       } catch (error) {
         console.error('Failed to fetch profile during login', error);
       }
-      
+
       queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
       toast.success(res?.message || 'Đăng nhập thành công');
-      
+
       if (res) {
         (res as any).isAdmin = isAdmin;
       }

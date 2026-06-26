@@ -32,7 +32,7 @@ export const useChatMessages = (contextID: string, enabled: boolean = true) => {
 export const useArchiveChatSession = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ sessionId, title }: { sessionId: string; title?: string }) => 
+    mutationFn: ({ sessionId, title }: { sessionId: string; title?: string }) =>
       aiApi.archiveChatSession(sessionId, title ? { title } : undefined),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: aiKeys.chatSessions() });

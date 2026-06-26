@@ -45,7 +45,7 @@ export interface UserRes {
   roleSlug: string;
   bodyProfile?: UserBodyProfileRes;
   subscription?: UserSubscriptionRes;
-  
+
   // UI backwards compatibility fields
   name?: string;
   avatarUrl?: string;

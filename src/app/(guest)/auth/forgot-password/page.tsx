@@ -1,11 +1,1 @@
-import { Metadata } from "next";
-import { ForgotPasswordClient } from "./components/ForgotPasswordClient";
-
-export const metadata: Metadata = {
-  title: "Khôi Phục Mật Khẩu | Closy",
-  description: "Khôi phục lại mật khẩu truy cập tủ đồ thông minh Closy của bạn",
-};
-
-export default function ForgotPasswordPage() {
-  return <ForgotPasswordClient />;
-}
+import { Metadata } from "next"; import { ForgotPasswordClient } from "./components/ForgotPasswordClient"; export const metadata: Metadata = { title: "Khôi Phục Mật Khẩu | Closy", description: "Khôi phục lại mật khẩu truy cập tủ đồ thông minh Closy của bạn", }; export default function ForgotPasswordPage() { return <ForgotPasswordClient />; } 

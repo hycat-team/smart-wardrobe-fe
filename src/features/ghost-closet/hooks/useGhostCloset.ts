@@ -53,7 +53,7 @@ export function useGhostCloset() {
     if (typeof window === 'undefined') return;
     const statsStr = localStorage.getItem('closy_ghost_analytics');
     const stats = statsStr ? JSON.parse(statsStr) : {};
-    
+
     if (!stats[sampleId]) {
       stats[sampleId] = { save: 0, waitlist: 0, notMyStyle: 0, swap: 0, keep: 0 };
     }

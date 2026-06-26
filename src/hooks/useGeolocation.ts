@@ -26,7 +26,7 @@ export function useGeolocation() {
       // Dùng ipapi.co miễn phí để lấy vị trí tương đối
       const response = await fetch('https://ipapi.co/json/');
       if (!response.ok) throw new Error('Không thể lấy vị trí qua IP');
-      
+
       const data = await response.json();
       setLocation({
         latitude: data.latitude,

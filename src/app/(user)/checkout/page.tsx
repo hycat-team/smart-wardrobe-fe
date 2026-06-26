@@ -1,11 +1,1 @@
-import { Metadata } from 'next';
-import CheckoutClient from './components/CheckoutClient';
-
-export const metadata: Metadata = {
-  title: 'Thanh toán | Smart Wardrobe',
-  description: 'Thanh toán đơn hàng',
-};
-
-export default function CheckoutPage() {
-  return <CheckoutClient />;
-}
+import { Metadata } from 'next'; import CheckoutClient from './components/CheckoutClient'; export const metadata: Metadata = { title: 'Thanh toán | Smart Wardrobe', description: 'Thanh toán đơn hàng', }; export default function CheckoutPage() { return <CheckoutClient />; } 

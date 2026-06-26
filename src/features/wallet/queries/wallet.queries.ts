@@ -24,7 +24,7 @@ export const useWalletStatements = () => {
 
 export const useTopUpWallet = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (data: WalletTopUpReq) => walletApi.createTopUpRequest(data),
     onSuccess: () => {

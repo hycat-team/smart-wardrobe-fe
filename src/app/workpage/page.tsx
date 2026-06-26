@@ -1,5 +1,1 @@
-import { redirect } from 'next/navigation';
-
-export default function WorkpageRedirect() {
-  redirect('/brand/dashboard');
-}
+import { redirect } from 'next/navigation'; export default function WorkpageRedirect() { redirect('/brand/dashboard'); } 

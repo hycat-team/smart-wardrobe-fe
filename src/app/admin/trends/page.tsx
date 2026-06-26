@@ -1,11 +1,1 @@
-import { Metadata } from "next";
-import { TrendsClient } from "./components/TrendsClient";
-
-export const metadata: Metadata = {
-  title: "Quản lý Xu hướng | Smart Wardrobe",
-  description: "Quản lý danh sách xu hướng thời trang.",
-};
-
-export default function TrendsPage() {
-  return <TrendsClient />;
-}
+import { Metadata } from "next"; import { TrendsClient } from "./components/TrendsClient"; export const metadata: Metadata = { title: "Quản lý Xu hướng | Smart Wardrobe", description: "Quản lý danh sách xu hướng thời trang.", }; export default function TrendsPage() { return <TrendsClient />; } 

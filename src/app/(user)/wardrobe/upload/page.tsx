@@ -1,11 +1,1 @@
-import { Metadata } from "next";
-import { UploadClient } from "./components/UploadClient";
-
-export const metadata: Metadata = {
-  title: "Thêm trang phục | Smart Wardrobe",
-  description: "Tải ảnh lên và thêm trang phục mới vào tủ đồ của bạn bằng AI.",
-};
-
-export default function UploadPage() {
-  return <UploadClient />;
-}
+import { Metadata } from "next"; import { UploadClient } from "./components/UploadClient"; export const metadata: Metadata = { title: "Thêm trang phục | Smart Wardrobe", description: "Tải ảnh lên và thêm trang phục mới vào tủ đồ của bạn bằng AI.", }; export default function UploadPage() { return <UploadClient />; } 

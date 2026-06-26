@@ -1,11 +1,1 @@
-import { Metadata } from "next";
-import { ReportListClient } from "./components/ReportListClient";
-
-export const metadata: Metadata = {
-  title: "My Sample Reports | Closy for Brands",
-  description: "Danh sách báo cáo Digital Sample Lab",
-};
-
-export default function ReportListPage() {
-  return <ReportListClient />;
-}
+import { Metadata } from "next"; import { ReportListClient } from "./components/ReportListClient"; export const metadata: Metadata = { title: "My Sample Reports | Closy for Brands", description: "Danh sách báo cáo Digital Sample Lab", }; export default function ReportListPage() { return <ReportListClient />; } 

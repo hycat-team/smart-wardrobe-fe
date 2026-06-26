@@ -158,7 +158,7 @@ export const useDeletePost = () => {
 export const useDeleteComment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postPublicID, commentID }: { postPublicID: string, commentID: string }) => 
+    mutationFn: ({ postPublicID, commentID }: { postPublicID: string, commentID: string }) =>
       communityApi.deleteComment(postPublicID, commentID),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
@@ -174,7 +174,7 @@ export const useDeleteComment = () => {
 export const useUpdateComment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postPublicID, commentID, content }: { postPublicID: string, commentID: string, content: string }) => 
+    mutationFn: ({ postPublicID, commentID, content }: { postPublicID: string, commentID: string, content: string }) =>
       communityApi.updateComment(postPublicID, commentID, { content }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });

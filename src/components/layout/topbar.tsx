@@ -1,62 +1,8 @@
-"use client";
-
-import Link from "next/link";
-import { Sparkles, UserCircle } from "lucide-react";
-import { cn, getUserAvatar } from "@/lib/utils";
+"use client"; import Link from "next/link";
+import { Search, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuthStore } from "@/store/useAuthStore";
-
-export function Topbar() {
-  const user = useAuthStore((state) => state.user);
-  const isPremium = user?.isPremium;
-
-  return (
-    <>
-      {/* Mobile Topbar */}
-      <header className="md:hidden h-16 border-b border-border flex items-center justify-between px-4 sticky top-0 bg-background/80 backdrop-blur-md z-40">
-        <Link href="/" className={cn("text-xl font-heading font-bold text-ink", isPremium && "tracking-[2px]")}>
-          {isPremium ? "S W" : "SW"}
-        </Link>
-        <div className="flex items-center gap-3">
-          {!isPremium && (
-            <div className="px-3 py-1 bg-secondary rounded-full text-xs font-medium flex items-center gap-1 text-ink border border-border/50">
-              <Sparkles className="size-3 text-primary" /> 2/3 AI
-            </div>
-          )}
-          <Link href="/settings">
-            <Avatar className="size-8 cursor-pointer">
-              <AvatarImage src={getUserAvatar(user)} alt={user?.username} className="object-cover" />
-              <AvatarFallback>{user?.firstName?.charAt(0) || user?.username?.charAt(0) || 'U'}</AvatarFallback>
-            </Avatar>
-          </Link>
-        </div>
-      </header>
-
-      {/* Desktop Topbar */}
-      <div className="hidden md:flex h-16 border-b border-border items-center justify-between px-8 sticky top-0 bg-background/80 backdrop-blur-md z-30">
-        <div className="flex-1 flex items-center max-w-md relative group">
-          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <svg className="size-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          </div>
-          <input 
-            type="text" 
-            className={cn(
-              "w-full text-sm border-transparent focus:border-primary focus:ring-1 focus:ring-primary rounded-full pl-10 pr-4 py-2 transition-all outline-none",
-              isPremium ? "bg-muted" : "bg-secondary"
-            )}
-            placeholder="Tìm kiếm outfit, tags..."
-          />
-        </div>
-        
-        <div className="flex items-center gap-4">
-            {!isPremium && (
-              <div className="px-3 py-1.5 bg-secondary rounded-full text-xs font-medium flex items-center gap-1.5 text-ink shadow-sm border border-border/50 hover:border-primary/50 transition-colors cursor-pointer">
-                <Sparkles className="size-3.5 text-primary fill-primary/20" /> 
-                <span>2/3 AI Quota</span>
-              </div>
-            )}
-        </div>
-      </div>
-    </>
-  );
-}
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { getUserAvatar } from "@/lib/utils";
+import { useAuthStore } from "@/store/useAuthStore"; export function Topbar() { const user = useAuthStore((state) => state.user); const isPremium = user?.isPremium; return ( <> <header className="md:hidden sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border/70 bg-background/88 px-4 backdrop-blur-md"> <Link href="/" className="text-lg font-semibold tracking-normal text-foreground"> Smart Wardrobe </Link> <div className="flex items-center gap-3"> {!isPremium && ( <Badge variant="outline" className="h-7 gap-1.5 px-2.5 text-[11px] font-semibold"> <Sparkles className="size-3 text-primary" /> 2/3 AI </Badge> )} <Link href="/settings" aria-label="Open settings"> <Avatar className="size-9"> <AvatarImage src={getUserAvatar(user)} alt={user?.username} className="object-cover" /> <AvatarFallback>{user?.firstName?.charAt(0) || user?.username?.charAt(0) || "U"}</AvatarFallback> </Avatar> </Link> </div> </header> <div className="hidden md:flex sticky top-0 z-30 h-16 items-center justify-between border-b border-border/70 bg-background/84 px-8 backdrop-blur-md"> <div className="relative flex w-full max-w-md items-center"> <Search className="pointer-events-none absolute left-3 size-4 text-muted-foreground" /> <Input type="text" className="pl-9 pr-4" placeholder="Tìm kiếm outfit, tags..." /> </div> <div className="flex items-center gap-4 pl-6"> {!isPremium && ( <Badge variant="outline" className="h-8 gap-2 rounded-full px-3.5 text-[11px] font-semibold shadow-sm"> <Sparkles className="size-3.5 text-primary" /> 2/3 AI Quota </Badge> )} </div> </div> </> );
+} 
