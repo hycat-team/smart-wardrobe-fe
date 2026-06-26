@@ -7,6 +7,7 @@
 ## 1. Bối cảnh hiện tại (Codebase Analysis)
 
 ### Tech Stack
+
 - **Framework**: Next.js App Router (TypeScript)
 - **Styling**: Tailwind CSS + shadcn/ui components
 - **State**: Zustand (`useAuthStore`, etc.)
@@ -15,15 +16,17 @@
 - **UI Components**: shadcn/ui, HeroUI, Lucide icons
 
 ### Các module đang có
-| Route | Mô tả |
-|---|---|
-| `/wardrobe` | Tủ đồ thật — grid items, filter, sort, bulk delete, pagination |
-| `/outfits` | Lookbook — danh sách outfits đã tạo |
-| `/ai-stylist` | AI phối đồ — chọn occasion/style/season → gọi API → canvas board |
-| `/marketplace` | Marketplace mua bán |
-| `/community` | Community posts |
+
+| Route          | Mô tả                                                            |
+| -------------- | ---------------------------------------------------------------- |
+| `/wardrobe`    | Tủ đồ thật — grid items, filter, sort, bulk delete, pagination   |
+| `/outfits`     | Lookbook — danh sách outfits đã tạo                              |
+| `/ai-stylist`  | AI phối đồ — chọn occasion/style/season → gọi API → canvas board |
+| `/marketplace` | Marketplace mua bán                                              |
+| `/community`   | Community posts                                                  |
 
 ### Kiến trúc hiện tại liên quan
+
 ```
 src/features/wardrobe/types/index.ts
   WardrobeItemRes { id, category, color, imageUrl, style, material, ... }
@@ -42,9 +45,11 @@ src/app/(user)/ai-stylist/components/AIStylistClient.tsx
 ## 2. Feature Overview
 
 ### B2C — Closy Ghost Closet (Tủ đồ thử trước)
+
 Trong quá trình AI phối đồ, Closy **tạm đưa một sản phẩm local brand** (Ghost Item) vào outfit như thể user đang sở hữu nó, và đo lường **Wardrobe Impact** của sản phẩm đó trên toàn bộ tủ đồ.
 
 ### B2B — Closy Digital Sample Lab (Phòng thử mẫu số)
+
 Brand **upload digital sample** (sản phẩm chưa sản xuất / đang cân nhắc), Closy chạy thử nghiệm trên wardrobe ẩn danh, trả về **Wardrobe Fit Report** tổng hợp.
 
 ---
@@ -54,20 +59,26 @@ Brand **upload digital sample** (sản phẩm chưa sản xuất / đang cân nh
 ### B2C Screens
 
 #### Screen 1 — Ghost Closet Toggle (trong AI Stylist)
+
 **Route**: `/ai-stylist` — thêm toggle mới
+
 - Toggle **"Mix with Local Brands"** trong panel options của AIStylistClient
 - Khi bật: flag `ghostClosetEnabled = true` truyền vào request hoặc mock
 - Lưu preference vào `localStorage`
 
 #### Screen 2 — AI Outfit với Ghost Item
+
 **Route**: `/ai-stylist` — kết quả phối đồ sau khi bật toggle
+
 - Outfit result hiển thị items như bình thường
 - Một item trong outfit có badge đặc biệt `[GHOST]` — là sản phẩm brand
 - Ghost Item có overlay khác biệt: viền nét đứt, nhãn brand name, shimmer effect
 - Dữ liệu mock: inject 1 GhostItem vào `AIOutfitRecommendationRes.items`
 
 #### Screen 3 — Wardrobe Impact Detail
+
 **Route**: `/ai-stylist/ghost-impact/[itemId]` (new)
+
 - Sheet/Modal hoặc page riêng mở khi user click vào Ghost Item
 - Hiển thị các metrics:
   - **Works with N items** (compatible owned items)
@@ -79,7 +90,9 @@ Brand **upload digital sample** (sản phẩm chưa sản xuất / đang cân nh
 - CTA: Keep in outfit / Swap out / See more outfits / Save product / Hide brand / Not my style / Join waitlist / Buy
 
 #### Screen 4 — Save / Swap / Join Waitlist Actions
+
 **Route**: trong Screen 3, action bar ở bottom
+
 - **Keep**: dismiss panel, item vẫn ở trong outfit
 - **Save product**: toast + lưu vào `savedGhostItems[]` (localStorage mock)
 - **Join waitlist**: toast xác nhận + badge "On Waitlist" trên item
@@ -92,7 +105,9 @@ Brand **upload digital sample** (sản phẩm chưa sản xuất / đang cân nh
 ### B2B Screens
 
 #### Screen 5 — Upload Digital Sample
+
 **Route**: `/brands/digital-sample-lab` (new)
+
 - Form upload cho brand:
   - Product name & concept
   - Image upload (mock, dùng placeholder)
@@ -103,7 +118,9 @@ Brand **upload digital sample** (sản phẩm chưa sản xuất / đang cân nh
 - Submit → navigate to Screen 6 với mock data
 
 #### Screen 6 — Wardrobe Fit Report
+
 **Route**: `/brands/digital-sample-lab/report/[sampleId]` (new)
+
 - Dashboard cho brand xem kết quả:
   - **Overview stats**: Users exposed, Qualified wardrobes, Kept rate, Swap rate, Save/Waitlist rate
   - **Outfit Performance**: Median new outfits unlocked, Median compatible owned items
@@ -120,6 +137,7 @@ Brand **upload digital sample** (sản phẩm chưa sản xuất / đang cân nh
 ## 4. New Data Types & Mock Data
 
 ### Ghost Item Type (extend từ WardrobeItemRes)
+
 ```typescript
 // src/features/ghost-closet/types/index.ts
 
@@ -133,16 +151,17 @@ export interface GhostItem extends WardrobeItemRes {
 }
 
 export interface WardrobeImpact {
-  compatibleItemCount: number;        // "Works with 11 items"
-  newOutfitsUnlocked: number;         // "Unlocks 16 new outfit combinations"
-  suitableOccasions: string[];        // ["Work", "Meeting", "Date"]
-  redundancyRisk: 'low' | 'medium' | 'high';
-  wardrobeGapFilled?: string;         // "Fills your Outerwear gap"
-  colorCompatibilityScore: number;    // 0-100
+  compatibleItemCount: number; // "Works with 11 items"
+  newOutfitsUnlocked: number; // "Unlocks 16 new outfit combinations"
+  suitableOccasions: string[]; // ["Work", "Meeting", "Date"]
+  redundancyRisk: "low" | "medium" | "high";
+  wardrobeGapFilled?: string; // "Fills your Outerwear gap"
+  colorCompatibilityScore: number; // 0-100
 }
 ```
 
 ### Digital Sample Type
+
 ```typescript
 // src/features/ghost-closet/types/index.ts
 
@@ -152,17 +171,17 @@ export interface DigitalSample {
   concept: string;
   imageUrl: string;
   variants: SampleVariant[];
-  targetGender: 'female' | 'male' | 'unisex';
+  targetGender: "female" | "male" | "unisex";
   targetStyleTags: string[];
   priceMin: number;
   priceMax: number;
-  status: 'pending' | 'running' | 'completed';
+  status: "pending" | "running" | "completed";
   createdAt: string;
 }
 
 export interface SampleVariant {
   id: string;
-  name: string;         // "Black", "Beige"
+  name: string; // "Black", "Beige"
   imageUrl: string;
 }
 
@@ -170,15 +189,15 @@ export interface WardrobeFitReport {
   sampleId: string;
   usersExposed: number;
   qualifiedWardrobes: number;
-  keptRate: number;           // 0-1
+  keptRate: number; // 0-1
   swappedRate: number;
   savedOrWaitlistRate: number;
   medianNewOutfits: number;
   medianCompatibleItems: number;
   bestPerformingColor: string;
   bestOccasions: string[];
-  topCompatibleItems: string[];   // ["White shirts", "Neutral trousers"]
-  wardrobePenetration: number;    // 0-1
+  topCompatibleItems: string[]; // ["White shirts", "Neutral trousers"]
+  wardrobePenetration: number; // 0-1
   incrementalOutfitValue: number;
   variantComparison: VariantComparisonData[];
   opportunityCohorts: CohortData[];
@@ -186,6 +205,7 @@ export interface WardrobeFitReport {
 ```
 
 ### Mock Data File
+
 ```typescript
 // src/features/ghost-closet/mock/ghostClosetMock.ts
 
@@ -278,6 +298,7 @@ src/
 ## 6. Modification Plan — AIStylistClient.tsx
 
 ### 6.1 Thêm Ghost Closet Toggle
+
 - Thêm state: `const [ghostClosetEnabled, setGhostClosetEnabled] = useState(false);`
 - Trong panel options, thêm toggle UI sau các bộ lọc hiện tại:
   ```tsx
@@ -291,6 +312,7 @@ src/
   ```
 
 ### 6.2 Inject Ghost Item vào Outfit Result
+
 - Sau khi `handleGenerate()` thành công và `ghostClosetEnabled = true`:
   ```typescript
   if (ghostClosetEnabled && res.items.length > 0) {
@@ -304,6 +326,7 @@ src/
   ```
 
 ### 6.3 Hiển thị Ghost Item khác biệt trong OutfitCanvasBoard
+
 - Check `item.primary.isGhost` → render `<GhostItemBadge>` overlay
 - Click vào Ghost Item → open `<WardrobeImpactPanel>` as Sheet
 
@@ -312,6 +335,7 @@ src/
 ## 7. Component Design Notes
 
 ### GhostItemBadge
+
 ```tsx
 // Overlay trên card của ghost item
 <div className="absolute inset-0 border-2 border-dashed border-[#A0522D]/60 pointer-events-none" />
@@ -321,6 +345,7 @@ src/
 ```
 
 ### WardrobeImpactPanel (Sheet from right)
+
 ```
 ┌─────────────────────────────┐
 │ GHOST ITEM                  │
@@ -344,11 +369,13 @@ src/
 ```
 
 ### Digital Sample Lab — Upload Form
+
 - Dùng `react-hook-form` + `zod` validation (đã có trong project)
 - Image preview với mock placeholder
 - Multi-variant color picker
 
 ### Wardrobe Fit Report Dashboard
+
 - Dùng **Recharts** (đã dùng trong project?) hoặc mock chart dạng CSS bar/donut
 - Grid layout 2 cột: stats bên trái, charts bên phải
 - Color: cream/ink palette giống toàn app
@@ -357,12 +384,12 @@ src/
 
 ## 8. Navigation & Entry Points
 
-| Từ đâu | Đến đâu | Cách |
-|---|---|---|
-| `/ai-stylist` (existing) | Ghost Closet toggle | Thêm trực tiếp vào panel |
-| Ghost Item card | WardrobeImpactPanel | onClick → open Sheet |
-| Sidebar / nav | `/brands/digital-sample-lab` | Thêm nav item (ẩn với user thường, hiện với brand role) |
-| Upload form submit | `/brands/digital-sample-lab/report/mock-001` | `router.push()` với mock sampleId |
+| Từ đâu                   | Đến đâu                                      | Cách                                                    |
+| ------------------------ | -------------------------------------------- | ------------------------------------------------------- |
+| `/ai-stylist` (existing) | Ghost Closet toggle                          | Thêm trực tiếp vào panel                                |
+| Ghost Item card          | WardrobeImpactPanel                          | onClick → open Sheet                                    |
+| Sidebar / nav            | `/brands/digital-sample-lab`                 | Thêm nav item (ẩn với user thường, hiện với brand role) |
+| Upload form submit       | `/brands/digital-sample-lab/report/mock-001` | `router.push()` với mock sampleId                       |
 
 ---
 
@@ -380,6 +407,7 @@ src/
 ## 10. Verification
 
 ### Manual Testing Checklist
+
 - [ ] Toggle "Mix with Local Brands" hiển thị đúng trong AI Stylist panel
 - [ ] Sau khi generate outfit với toggle ON → có 1 Ghost Item trong kết quả
 - [ ] Ghost Item có visual badge khác biệt (border dashed, brand label)
@@ -390,9 +418,11 @@ src/
 - [ ] Report page hiển thị đủ: stats, charts, variant comparison, cohorts
 
 ### Build Check
+
 ```bash
 npm run build
 ```
+
 Không có TypeScript errors hay missing module errors.
 
 ---

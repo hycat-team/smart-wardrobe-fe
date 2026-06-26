@@ -154,7 +154,6 @@
 
 <!-- /code_chunk_output -->
 
-
 ## Mục đích tài liệu
 
 Tài liệu này mô tả phạm vi prototype B2B/B2B2C mới của Closy và cách phần này kết nối trực tiếp với hệ thống B2C hiện tại.
@@ -2060,14 +2059,14 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "user_001",
-    "name": "Linh Nguyen",
-    "avatarUrl": "/mock/users/linh.jpg",
-    "closyPlan": "PREMIUM",
-    "preferredStyles": ["Minimal", "Elegant"],
-    "preferredColors": ["Black", "Beige"],
-    "followedBrandIds": ["brand_001"],
-    "membershipBrandIds": ["brand_001"]
+  "id": "user_001",
+  "name": "Linh Nguyen",
+  "avatarUrl": "/mock/users/linh.jpg",
+  "closyPlan": "PREMIUM",
+  "preferredStyles": ["Minimal", "Elegant"],
+  "preferredColors": ["Black", "Beige"],
+  "followedBrandIds": ["brand_001"],
+  "membershipBrandIds": ["brand_001"]
 }
 ```
 
@@ -2075,17 +2074,17 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "brand_001",
-    "name": "Mori Studio",
-    "logoUrl": "/mock/brands/mori-logo.png",
-    "coverUrl": "/mock/brands/mori-cover.jpg",
-    "description": "Minimal everyday wear for modern women.",
-    "story": "A local fashion brand focused on versatile and timeless pieces.",
-    "styles": ["Minimal", "Elegant"],
-    "isVerified": true,
-    "followerCount": 12450,
-    "memberCount": 582,
-    "isFollowing": true
+  "id": "brand_001",
+  "name": "Mori Studio",
+  "logoUrl": "/mock/brands/mori-logo.png",
+  "coverUrl": "/mock/brands/mori-cover.jpg",
+  "description": "Minimal everyday wear for modern women.",
+  "story": "A local fashion brand focused on versatile and timeless pieces.",
+  "styles": ["Minimal", "Elegant"],
+  "isVerified": true,
+  "followerCount": 12450,
+  "memberCount": 582,
+  "isFollowing": true
 }
 ```
 
@@ -2093,25 +2092,22 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "product_001",
-    "brandId": "brand_001",
-    "name": "Luna Structured Blazer",
-    "sku": "MORI-BLZ-001",
-    "imageUrls": [
-        "/mock/products/blazer-front.jpg",
-        "/mock/products/blazer-back.jpg"
-    ],
-    "price": 1290000,
-    "discountPrice": 1090000,
-    "category": "Outerwear",
-    "subcategory": "Blazer",
-    "colors": ["Black"],
-    "styles": ["Minimal", "Elegant", "Workwear"],
-    "occasions": ["Work", "Meeting", "Date"],
-    "sizes": ["S", "M", "L"],
-    "stockStatus": "IN_STOCK",
-    "collectionId": "collection_001",
-    "isSaved": false
+  "id": "product_001",
+  "brandId": "brand_001",
+  "name": "Luna Structured Blazer",
+  "sku": "MORI-BLZ-001",
+  "imageUrls": ["/mock/products/blazer-front.jpg", "/mock/products/blazer-back.jpg"],
+  "price": 1290000,
+  "discountPrice": 1090000,
+  "category": "Outerwear",
+  "subcategory": "Blazer",
+  "colors": ["Black"],
+  "styles": ["Minimal", "Elegant", "Workwear"],
+  "occasions": ["Work", "Meeting", "Date"],
+  "sizes": ["S", "M", "L"],
+  "stockStatus": "IN_STOCK",
+  "collectionId": "collection_001",
+  "isSaved": false
 }
 ```
 
@@ -2119,13 +2115,13 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "wardrobe_item_001",
-    "userId": "user_001",
-    "name": "White Basic Shirt",
-    "imageUrl": "/mock/wardrobe/white-shirt.jpg",
-    "category": "Top",
-    "color": "White",
-    "styles": ["Minimal", "Workwear"]
+  "id": "wardrobe_item_001",
+  "userId": "user_001",
+  "name": "White Basic Shirt",
+  "imageUrl": "/mock/wardrobe/white-shirt.jpg",
+  "category": "Top",
+  "color": "White",
+  "styles": ["Minimal", "Workwear"]
 }
 ```
 
@@ -2133,25 +2129,25 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "outfit_001",
-    "title": "Minimal Office Look",
-    "occasion": "Work",
-    "style": "Minimal",
-    "explanation": "The structured blazer works well with the clean white shirt and neutral trousers.",
-    "items": [
-        {
-            "sourceType": "BRAND_PRODUCT",
-            "sourceId": "product_001"
-        },
-        {
-            "sourceType": "WARDROBE_ITEM",
-            "sourceId": "wardrobe_item_001"
-        },
-        {
-            "sourceType": "WARDROBE_ITEM",
-            "sourceId": "wardrobe_item_002"
-        }
-    ]
+  "id": "outfit_001",
+  "title": "Minimal Office Look",
+  "occasion": "Work",
+  "style": "Minimal",
+  "explanation": "The structured blazer works well with the clean white shirt and neutral trousers.",
+  "items": [
+    {
+      "sourceType": "BRAND_PRODUCT",
+      "sourceId": "product_001"
+    },
+    {
+      "sourceType": "WARDROBE_ITEM",
+      "sourceId": "wardrobe_item_001"
+    },
+    {
+      "sourceType": "WARDROBE_ITEM",
+      "sourceId": "wardrobe_item_002"
+    }
+  ]
 }
 ```
 
@@ -2159,16 +2155,16 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "post_001",
-    "brandId": "brand_001",
-    "type": "LOOKBOOK",
-    "caption": "Three ways to style our Luna Structured Blazer.",
-    "mediaUrls": ["/mock/posts/mori-lookbook.jpg"],
-    "taggedProductIds": ["product_001"],
-    "visibility": "PUBLIC",
-    "likeCount": 1260,
-    "commentCount": 84,
-    "saveCount": 342
+  "id": "post_001",
+  "brandId": "brand_001",
+  "type": "LOOKBOOK",
+  "caption": "Three ways to style our Luna Structured Blazer.",
+  "mediaUrls": ["/mock/posts/mori-lookbook.jpg"],
+  "taggedProductIds": ["product_001"],
+  "visibility": "PUBLIC",
+  "likeCount": 1260,
+  "commentCount": 84,
+  "saveCount": 342
 }
 ```
 
@@ -2176,18 +2172,18 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "membership_001",
-    "brandId": "brand_001",
-    "name": "Mori Circle",
-    "monthlyPrice": 79000,
-    "badge": "MORI_MEMBER",
-    "benefits": [
-        "48-hour early access",
-        "10% member discount",
-        "Member-only styling content",
-        "Limited collection access"
-    ],
-    "isActive": true
+  "id": "membership_001",
+  "brandId": "brand_001",
+  "name": "Mori Circle",
+  "monthlyPrice": 79000,
+  "badge": "MORI_MEMBER",
+  "benefits": [
+    "48-hour early access",
+    "10% member discount",
+    "Member-only styling content",
+    "Limited collection access"
+  ],
+  "isActive": true
 }
 ```
 
@@ -2195,22 +2191,22 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "segment_001",
-    "brandId": "brand_001",
-    "name": "Minimal Style Followers",
-    "estimatedSize": 2840,
-    "conditions": [
-        {
-            "field": "preferredStyle",
-            "operator": "CONTAINS",
-            "value": "Minimal"
-        },
-        {
-            "field": "relationship",
-            "operator": "EQUALS",
-            "value": "FOLLOWER"
-        }
-    ]
+  "id": "segment_001",
+  "brandId": "brand_001",
+  "name": "Minimal Style Followers",
+  "estimatedSize": 2840,
+  "conditions": [
+    {
+      "field": "preferredStyle",
+      "operator": "CONTAINS",
+      "value": "Minimal"
+    },
+    {
+      "field": "relationship",
+      "operator": "EQUALS",
+      "value": "FOLLOWER"
+    }
+  ]
 }
 ```
 
@@ -2218,17 +2214,17 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "campaign_001",
-    "brandId": "brand_001",
-    "name": "Luna Blazer Restock",
-    "type": "RESTOCK",
-    "segmentId": "segment_001",
-    "title": "Luna Blazer is back",
-    "message": "Your saved blazer is available again. Members receive early access.",
-    "ctaLabel": "View Product",
-    "ctaTarget": "/brands/mori-studio/products/luna-blazer",
-    "status": "SCHEDULED",
-    "scheduledAt": "2026-06-27T09:00:00+07:00"
+  "id": "campaign_001",
+  "brandId": "brand_001",
+  "name": "Luna Blazer Restock",
+  "type": "RESTOCK",
+  "segmentId": "segment_001",
+  "title": "Luna Blazer is back",
+  "message": "Your saved blazer is available again. Members receive early access.",
+  "ctaLabel": "View Product",
+  "ctaTarget": "/brands/mori-studio/products/luna-blazer",
+  "status": "SCHEDULED",
+  "scheduledAt": "2026-06-27T09:00:00+07:00"
 }
 ```
 
@@ -2236,27 +2232,27 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "after_sales_001",
-    "orderId": "order_001",
-    "brandId": "brand_001",
-    "userId": "user_001",
-    "productId": "product_001",
-    "type": "SIZE_EXCHANGE",
-    "reason": "The selected size is too small.",
-    "preferredResolution": "Exchange from size S to size M",
-    "status": "UNDER_REVIEW",
-    "priority": "NORMAL",
-    "createdAt": "2026-06-24T14:30:00+07:00",
-    "timeline": [
-        {
-            "status": "SUBMITTED",
-            "timestamp": "2026-06-24T14:30:00+07:00"
-        },
-        {
-            "status": "UNDER_REVIEW",
-            "timestamp": "2026-06-24T16:00:00+07:00"
-        }
-    ]
+  "id": "after_sales_001",
+  "orderId": "order_001",
+  "brandId": "brand_001",
+  "userId": "user_001",
+  "productId": "product_001",
+  "type": "SIZE_EXCHANGE",
+  "reason": "The selected size is too small.",
+  "preferredResolution": "Exchange from size S to size M",
+  "status": "UNDER_REVIEW",
+  "priority": "NORMAL",
+  "createdAt": "2026-06-24T14:30:00+07:00",
+  "timeline": [
+    {
+      "status": "SUBMITTED",
+      "timestamp": "2026-06-24T14:30:00+07:00"
+    },
+    {
+      "status": "UNDER_REVIEW",
+      "timestamp": "2026-06-24T16:00:00+07:00"
+    }
+  ]
 }
 ```
 
@@ -2264,14 +2260,14 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "care_guide_001",
-    "productId": "product_001",
-    "washing": "Dry clean recommended.",
-    "drying": "Do not tumble dry.",
-    "ironing": "Use low heat with a protective cloth.",
-    "storage": "Store on a structured hanger.",
-    "warranty": "Manufacturing defects are supported within 30 days.",
-    "repairAvailable": true
+  "id": "care_guide_001",
+  "productId": "product_001",
+  "washing": "Dry clean recommended.",
+  "drying": "Do not tumble dry.",
+  "ironing": "Use low heat with a protective cloth.",
+  "storage": "Store on a structured hanger.",
+  "warranty": "Manufacturing defects are supported within 30 days.",
+  "repairAvailable": true
 }
 ```
 
@@ -2279,15 +2275,15 @@ Frontend cần chuẩn bị mock data cho các entity sau.
 
 ```json
 {
-    "id": "feedback_001",
-    "orderId": "order_001",
-    "productId": "product_001",
-    "fitScore": 4,
-    "materialScore": 5,
-    "colorAccuracyScore": 5,
-    "overallScore": 4,
-    "wouldRecommend": true,
-    "comment": "Good material and easy to style with my wardrobe."
+  "id": "feedback_001",
+  "orderId": "order_001",
+  "productId": "product_001",
+  "fitScore": 4,
+  "materialScore": 5,
+  "colorAccuracyScore": 5,
+  "overallScore": 4,
+  "wouldRecommend": true,
+  "comment": "Good material and easy to style with my wardrobe."
 }
 ```
 

@@ -1,1 +1,9 @@
-import { Metadata } from "next"; import { PreferencesClient } from "./components/PreferencesClient"; export const metadata: Metadata = { title: "Sở thích cá nhân | Closy", description: "Thiết lập sở thích cá nhân của bạn.", }; export default function PreferencesPage() { return <PreferencesClient />; } 
+import { Metadata } from "next";
+import { PreferencesClient } from "./components/PreferencesClient";
+export const metadata: Metadata = {
+  title: "Sở thích cá nhân | Closy",
+  description: "Thiết lập sở thích cá nhân của bạn.",
+};
+export default function PreferencesPage() {
+  return <PreferencesClient />;
+}

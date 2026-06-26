@@ -1,20 +1,33 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
-import { communityApi } from '../api/community.api';
-import { toast } from 'sonner';
-import { PostRes, CreatePostReq } from '../types';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+  keepPreviousData,
+} from "@tanstack/react-query";
+import { communityApi } from "../api/community.api";
+import { toast } from "sonner";
+import { PostRes, CreatePostReq } from "../types";
 
 export const COMMUNITY_QUERY_KEYS = {
-  all: ['community'] as const,
-  feed: (filters?: Record<string, unknown>) => [...COMMUNITY_QUERY_KEYS.all, 'feed', filters] as const,
-  detail: (id: string) => [...COMMUNITY_QUERY_KEYS.all, 'detail', id] as const,
-  comments: (id: string) => [...COMMUNITY_QUERY_KEYS.all, 'comments', id] as const,
-  replies: (postId: string, commentId: string) => [...COMMUNITY_QUERY_KEYS.comments(postId), 'replies', commentId] as const,
+  all: ["community"] as const,
+  feed: (filters?: Record<string, unknown>) =>
+    [...COMMUNITY_QUERY_KEYS.all, "feed", filters] as const,
+  detail: (id: string) => [...COMMUNITY_QUERY_KEYS.all, "detail", id] as const,
+  comments: (id: string) => [...COMMUNITY_QUERY_KEYS.all, "comments", id] as const,
+  replies: (postId: string, commentId: string) =>
+    [...COMMUNITY_QUERY_KEYS.comments(postId), "replies", commentId] as const,
 };
 
-export const useInfiniteCommunity = (filters?: { sort?: string; username?: string; postType?: string }) => {
+export const useInfiniteCommunity = (filters?: {
+  sort?: string;
+  username?: string;
+  postType?: string;
+}) => {
   return useInfiniteQuery({
     queryKey: COMMUNITY_QUERY_KEYS.feed(filters),
-    queryFn: ({ pageParam = 1 }) => communityApi.getCommunityPosts({ ...filters, page: pageParam as number, limit: 10 }),
+    queryFn: ({ pageParam = 1 }) =>
+      communityApi.getCommunityPosts({ ...filters, page: pageParam as number, limit: 10 }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       if (lastPage.metadata.page < lastPage.metadata.totalPages) return lastPage.metadata.page + 1;
@@ -41,7 +54,11 @@ export const usePostComments = (postPublicID: string) => {
   });
 };
 
-export const useCommentReplies = (postPublicID: string, commentID: string, enabled: boolean = true) => {
+export const useCommentReplies = (
+  postPublicID: string,
+  commentID: string,
+  enabled: boolean = true
+) => {
   return useQuery({
     queryKey: COMMUNITY_QUERY_KEYS.replies(postPublicID, commentID),
     queryFn: () => communityApi.getCommentReplies(postPublicID, commentID),
@@ -96,13 +113,15 @@ export const useLikePost = () => {
       return { previousDetail };
     },
     onError: (_err, _variables, _context: unknown) => {
-      toast.error('Có lỗi xảy ra khi cập nhật lượt thích.');
+      toast.error("Có lỗi xảy ra khi cập nhật lượt thích.");
       // Revert if error
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.all });
     },
     onSettled: (data, error, variables) => {
       // Invalidate to make sure we have true data
-      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
+      queryClient.invalidateQueries({
+        queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID),
+      });
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.feed() });
     },
   });
@@ -111,17 +130,28 @@ export const useLikePost = () => {
 export const useAddComment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postPublicID, content, parentCommentId }: { postPublicID: string; content: string; parentCommentId?: string }) =>
-      communityApi.addComment(postPublicID, { content, parentCommentId }),
+    mutationFn: ({
+      postPublicID,
+      content,
+      parentCommentId,
+    }: {
+      postPublicID: string;
+      content: string;
+      parentCommentId?: string;
+    }) => communityApi.addComment(postPublicID, { content, parentCommentId }),
     onSuccess: (res, variables) => {
-      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
-      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
+      queryClient.invalidateQueries({
+        queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID),
+      });
+      queryClient.invalidateQueries({
+        queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID),
+      });
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.feed() });
-      toast.success('Đã gửi bình luận!');
+      toast.success("Đã gửi bình luận!");
     },
     onError: () => {
-      toast.error('Có lỗi xảy ra khi gửi bình luận.');
-    }
+      toast.error("Có lỗi xảy ra khi gửi bình luận.");
+    },
   });
 };
 
@@ -131,12 +161,12 @@ export const useCreatePost = () => {
     mutationFn: (data: CreatePostReq) => communityApi.createPost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.all });
-      queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
-      toast.success('Đã tạo bài viết thành công!');
+      queryClient.invalidateQueries({ queryKey: ["admin-posts"] });
+      toast.success("Đã tạo bài viết thành công!");
     },
     onError: () => {
-      toast.error('Có lỗi xảy ra khi tạo bài viết.');
-    }
+      toast.error("Có lỗi xảy ra khi tạo bài viết.");
+    },
   });
 };
 
@@ -146,43 +176,58 @@ export const useDeletePost = () => {
     mutationFn: (postPublicID: string) => communityApi.deletePost(postPublicID),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.feed() });
-      queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
-      toast.success('Đã xoá bài viết.');
+      queryClient.invalidateQueries({ queryKey: ["admin-posts"] });
+      toast.success("Đã xoá bài viết.");
     },
     onError: () => {
-      toast.error('Có lỗi xảy ra khi xoá bài viết.');
-    }
+      toast.error("Có lỗi xảy ra khi xoá bài viết.");
+    },
   });
 };
 
 export const useDeleteComment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postPublicID, commentID }: { postPublicID: string, commentID: string }) =>
+    mutationFn: ({ postPublicID, commentID }: { postPublicID: string; commentID: string }) =>
       communityApi.deleteComment(postPublicID, commentID),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
-      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
-      toast.success('Đã xoá bình luận.');
+      queryClient.invalidateQueries({
+        queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID),
+      });
+      queryClient.invalidateQueries({
+        queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID),
+      });
+      toast.success("Đã xoá bình luận.");
     },
     onError: () => {
-      toast.error('Có lỗi xảy ra khi xoá bình luận.');
-    }
+      toast.error("Có lỗi xảy ra khi xoá bình luận.");
+    },
   });
 };
 
 export const useUpdateComment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ postPublicID, commentID, content }: { postPublicID: string, commentID: string, content: string }) =>
-      communityApi.updateComment(postPublicID, commentID, { content }),
+    mutationFn: ({
+      postPublicID,
+      commentID,
+      content,
+    }: {
+      postPublicID: string;
+      commentID: string;
+      content: string;
+    }) => communityApi.updateComment(postPublicID, commentID, { content }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
-      queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
-      toast.success('Đã cập nhật bình luận.');
+      queryClient.invalidateQueries({
+        queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID),
+      });
+      queryClient.invalidateQueries({
+        queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID),
+      });
+      toast.success("Đã cập nhật bình luận.");
     },
     onError: () => {
-      toast.error('Có lỗi xảy ra khi cập nhật bình luận.');
-    }
+      toast.error("Có lỗi xảy ra khi cập nhật bình luận.");
+    },
   });
 };

@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import { outfitsApi } from '../api/outfits.api';
-import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { outfitsApi } from "../api/outfits.api";
+import { toast } from "sonner";
 
 export const OUTFIT_QUERY_KEYS = {
-  all: ['outfits'] as const,
-  lists: () => [...OUTFIT_QUERY_KEYS.all, 'list'] as const,
-  detail: (id: string) => [...OUTFIT_QUERY_KEYS.all, 'detail', id] as const,
+  all: ["outfits"] as const,
+  lists: () => [...OUTFIT_QUERY_KEYS.all, "list"] as const,
+  detail: (id: string) => [...OUTFIT_QUERY_KEYS.all, "detail", id] as const,
 };
 
 export const useMyOutfits = (page: number = 1) => {
@@ -30,7 +30,7 @@ export const useCreateOutfit = () => {
     mutationFn: outfitsApi.createOutfit,
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.lists() });
-      toast.success(res?.message || 'Lưu bộ phối đồ thành công!');
+      toast.success(res?.message || "Lưu bộ phối đồ thành công!");
     },
   });
 };
@@ -42,7 +42,7 @@ export const useUpdateOutfit = () => {
     onSuccess: (res, variables) => {
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.lists() });
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.detail(variables.id) });
-      toast.success(res?.message || 'Cập nhật bộ phối đồ thành công!');
+      toast.success(res?.message || "Cập nhật bộ phối đồ thành công!");
     },
   });
 };
@@ -53,7 +53,7 @@ export const useDeleteOutfit = () => {
     mutationFn: outfitsApi.deleteOutfit,
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.lists() });
-      toast.success(res?.message || 'Đã xóa bộ phối đồ!');
+      toast.success(res?.message || "Đã xóa bộ phối đồ!");
     },
   });
 };

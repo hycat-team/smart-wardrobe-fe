@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { walletApi } from '../api/wallet.api';
-import { WalletTopUpReq } from '../types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { walletApi } from "../api/wallet.api";
+import { WalletTopUpReq } from "../types";
 
 export const walletKeys = {
-  all: ['wallet'] as const,
-  balance: () => [...walletKeys.all, 'balance'] as const,
-  statements: () => [...walletKeys.all, 'statements'] as const,
+  all: ["wallet"] as const,
+  balance: () => [...walletKeys.all, "balance"] as const,
+  statements: () => [...walletKeys.all, "statements"] as const,
 };
 
 export const useWalletBalance = () => {

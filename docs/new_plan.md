@@ -243,9 +243,9 @@ Closy tổng hợp tín hiệu và gửi lại brand.
 
 Cặp feature nên được mô tả như sau:
 
-Phía	Feature	Giá trị đặc biệt
-B2C	Closy Ghost Closet	Cho user thử một sản phẩm như thể nó đã nằm trong wardrobe và đo sản phẩm cải thiện toàn bộ tủ đồ thế nào
-B2B	Closy Digital Sample Lab	Cho brand thử sản phẩm hoặc thiết kế chưa ra mắt trên các wardrobe thật đã ẩn danh trước khi sản xuất
+Phía Feature Giá trị đặc biệt
+B2C Closy Ghost Closet Cho user thử một sản phẩm như thể nó đã nằm trong wardrobe và đo sản phẩm cải thiện toàn bộ tủ đồ thế nào
+B2B Closy Digital Sample Lab Cho brand thử sản phẩm hoặc thiết kế chưa ra mắt trên các wardrobe thật đã ẩn danh trước khi sản xuất
 
 Tên chung:
 

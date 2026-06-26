@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { mockOrders, mockReturnRequests } from './index';
+import { create } from "zustand";
+import { mockOrders, mockReturnRequests } from "./index";
 
 export type CartItem = {
   productId: string;
@@ -28,7 +28,9 @@ type B2BDemoState = {
   clearCart: () => void;
   checkout: () => string; // returns orderId
   setCartOpen: (isOpen: boolean) => void;
-  submitReturnRequest: (request: Omit<typeof mockReturnRequests[0], 'id' | 'status' | 'createdAt' | 'timeline'>) => void;
+  submitReturnRequest: (
+    request: Omit<(typeof mockReturnRequests)[0], "id" | "status" | "createdAt" | "timeline">
+  ) => void;
   updateReturnRequestStatus: (requestId: string, status: string) => void;
 };
 
@@ -66,9 +68,7 @@ export const useB2BDemoStore = create<B2BDemoState>((set) => ({
   updateQuantity: (productId, size, color, quantity) =>
     set((state) => ({
       cart: state.cart.map((i) =>
-        i.productId === productId && i.size === size && i.color === color
-          ? { ...i, quantity }
-          : i
+        i.productId === productId && i.size === size && i.color === color ? { ...i, quantity } : i
       ),
     })),
 
@@ -83,9 +83,7 @@ export const useB2BDemoStore = create<B2BDemoState>((set) => ({
 
   toggleBrandSelection: (brandId, isSelected) =>
     set((state) => ({
-      cart: state.cart.map((i) =>
-        i.brandId === brandId ? { ...i, selected: isSelected } : i
-      ),
+      cart: state.cart.map((i) => (i.brandId === brandId ? { ...i, selected: isSelected } : i)),
     })),
 
   toggleAllSelection: (isSelected) =>
@@ -98,7 +96,7 @@ export const useB2BDemoStore = create<B2BDemoState>((set) => ({
   checkout: () => {
     let orderId = "";
     set((state) => {
-      const selectedItems = state.cart.filter(item => item.selected);
+      const selectedItems = state.cart.filter((item) => item.selected);
       if (selectedItems.length === 0) return state;
 
       orderId = `order_${Math.random().toString(36).substr(2, 9)}`;
@@ -111,7 +109,7 @@ export const useB2BDemoStore = create<B2BDemoState>((set) => ({
         id: orderId,
         userId: "user_001",
         brandId: selectedItems[0].brandId, // assuming single brand checkout for simplicity in mock
-        items: selectedItems.map(item => ({
+        items: selectedItems.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
           price: item.price,
@@ -125,7 +123,7 @@ export const useB2BDemoStore = create<B2BDemoState>((set) => ({
 
       return {
         orders: [newOrder, ...state.orders],
-        cart: state.cart.filter(item => !item.selected),
+        cart: state.cart.filter((item) => !item.selected),
         isCartOpen: false,
       };
     });
@@ -162,10 +160,7 @@ export const useB2BDemoStore = create<B2BDemoState>((set) => ({
           return {
             ...req,
             status,
-            timeline: [
-              ...req.timeline,
-              { status, timestamp: new Date().toISOString() },
-            ],
+            timeline: [...req.timeline, { status, timestamp: new Date().toISOString() }],
           };
         }
         return req;

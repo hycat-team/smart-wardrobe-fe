@@ -10,175 +10,404 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
  * Handles mobile vs desktop layouts and respects prefers-reduced-motion.
  */
 export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>) {
-  useGSAP(() => {
-    // Check reduced motion preference
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) {
-      // Show all content statically
-      gsap.set(".hero-content, .hero-cta, .copy-1, .copy-2, .copy-3, .copy-4", { opacity: 1, y: 0 });
-      gsap.set(".cloth-card", { opacity: 1, scale: 1 });
-      return;
-    }
-
-    const isMobile = window.innerWidth < 768;
-    const scrollDistance = isMobile ? 8000 : 12000;
-
-    // ── Background Parallax & Color Shift ──
-    const tlBg = gsap.timeline({
-      scrollTrigger: {
-        trigger: ".scrolly-container",
-        start: "top top",
-        end: `+=${scrollDistance}`,
-        scrub: true,
+  useGSAP(
+    () => {
+      // Check reduced motion preference
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (prefersReducedMotion) {
+        // Show all content statically
+        gsap.set(".hero-content, .hero-cta, .copy-1, .copy-2, .copy-3, .copy-4", {
+          opacity: 1,
+          y: 0,
+        });
+        gsap.set(".cloth-card", { opacity: 1, scale: 1 });
+        return;
       }
-    });
 
-    tlBg.to(".bg-gradient-layer", { backgroundColor: "#EDE8E3", duration: 1 })
-      .to(".bg-gradient-layer", { backgroundColor: "#F0E8DC", duration: 1 })
-      .to(".bg-gradient-layer", { backgroundColor: "#EBE5DE", duration: 1 })
-      .to(".bg-gradient-layer", { backgroundColor: "#E8E4DF", duration: 1 });
+      const isMobile = window.innerWidth < 768;
+      const scrollDistance = isMobile ? 8000 : 12000;
 
-    // Ambient Blobs Parallax (desktop only for performance)
-    if (!isMobile) {
-      gsap.to(".ambient-blob-1", {
-        y: 300,
-        scrollTrigger: { trigger: ".scrolly-container", start: "top top", end: `+=${scrollDistance}`, scrub: 0.3 }
+      // ── Background Parallax & Color Shift ──
+      const tlBg = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".scrolly-container",
+          start: "top top",
+          end: `+=${scrollDistance}`,
+          scrub: true,
+        },
       });
-      gsap.to(".ambient-blob-2", {
-        y: 400,
-        scrollTrigger: { trigger: ".scrolly-container", start: "top top", end: `+=${scrollDistance}`, scrub: 0.5 }
-      });
-      gsap.to(".ambient-blob-3", {
-        x: 100, y: 350,
-        scrollTrigger: { trigger: ".scrolly-container", start: "top top", end: `+=${scrollDistance}`, scrub: 0.4 }
-      });
-    }
 
-    // ── Main Scrollytelling Timeline ──
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: ".scrolly-container",
-        start: "top top",
-        end: `+=${scrollDistance}`,
-        scrub: 1,
-        pin: true,
-      }
-    });
+      tlBg
+        .to(".bg-gradient-layer", { backgroundColor: "#EDE8E3", duration: 1 })
+        .to(".bg-gradient-layer", { backgroundColor: "#F0E8DC", duration: 1 })
+        .to(".bg-gradient-layer", { backgroundColor: "#EBE5DE", duration: 1 })
+        .to(".bg-gradient-layer", { backgroundColor: "#E8E4DF", duration: 1 });
 
-    // ── SCENE 0 → SCENE 1: Digital Wardrobe ──
-    tl.to(".hero-content", { opacity: 0, x: isMobile ? 0 : -50, y: isMobile ? -30 : 0, duration: 1 })
-      .to(".hero-cta", { opacity: 0, y: 50, duration: 1 }, "<");
-
-    tl.add("wardrobe-scan");
-
-    if (isMobile) {
-      // Mobile: wardrobe stays centered, just scales down
-      tl.to(".wardrobe-container", { scale: 0.45, opacity: 0.8, y: "-20vh", duration: 2, ease: "power2.inOut" }, "wardrobe-scan")
-        .fromTo(".scan-line", { y: 0, opacity: 0 }, { y: 300, opacity: 1, duration: 1.5, ease: "power1.inOut" }, "wardrobe-scan")
-        .to(".wardrobe-frame-2", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=0.55")
-        .to(".wardrobe-frame-3", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=1")
-        .to(".scan-line", { opacity: 0, duration: 0.2 })
-        // Cards fly out in a tighter grid
-        .fromTo(".cloth-card",
-          { scale: 0, opacity: 0, x: "0vw", y: "0vh", rotation: 0 },
-          {
-            scale: 1, opacity: 1,
-            stagger: 0.08,
-            x: (i: number) => `${(i % 2) * 25 - 12}vw`,
-            y: (i: number) => `${Math.floor(i / 2) * 18 + 5}vh`,
-            rotation: (i: number) => (i % 2 === 0 ? 3 : -3),
-            duration: 1.2,
-            ease: "back.out(1.2)"
+      // Ambient Blobs Parallax (desktop only for performance)
+      if (!isMobile) {
+        gsap.to(".ambient-blob-1", {
+          y: 300,
+          scrollTrigger: {
+            trigger: ".scrolly-container",
+            start: "top top",
+            end: `+=${scrollDistance}`,
+            scrub: 0.3,
           },
-          "<0.3"
+        });
+        gsap.to(".ambient-blob-2", {
+          y: 400,
+          scrollTrigger: {
+            trigger: ".scrolly-container",
+            start: "top top",
+            end: `+=${scrollDistance}`,
+            scrub: 0.5,
+          },
+        });
+        gsap.to(".ambient-blob-3", {
+          x: 100,
+          y: 350,
+          scrollTrigger: {
+            trigger: ".scrolly-container",
+            start: "top top",
+            end: `+=${scrollDistance}`,
+            scrub: 0.4,
+          },
+        });
+      }
+
+      // ── Main Scrollytelling Timeline ──
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".scrolly-container",
+          start: "top top",
+          end: `+=${scrollDistance}`,
+          scrub: 1,
+          pin: true,
+        },
+      });
+
+      // ── SCENE 0 → SCENE 1: Digital Wardrobe ──
+      tl.to(".hero-content", {
+        opacity: 0,
+        x: isMobile ? 0 : -50,
+        y: isMobile ? -30 : 0,
+        duration: 1,
+      }).to(".hero-cta", { opacity: 0, y: 50, duration: 1 }, "<");
+
+      tl.add("wardrobe-scan");
+
+      if (isMobile) {
+        // Mobile: wardrobe stays centered, just scales down
+        tl.to(
+          ".wardrobe-container",
+          { scale: 0.45, opacity: 0.8, y: "-20vh", duration: 2, ease: "power2.inOut" },
+          "wardrobe-scan"
         )
-        .fromTo(".copy-1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, "<");
-    } else {
-      // Desktop: original layout
-      tl.to(".wardrobe-container", { x: "-45vw", scale: 0.65, opacity: 0.85, duration: 2, ease: "power2.inOut" }, "wardrobe-scan")
-        .fromTo(".scan-line", { y: 0, opacity: 0 }, { y: 600, opacity: 1, duration: 1.5, ease: "power1.inOut" }, "wardrobe-scan")
-        .to(".wardrobe-frame-2", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=0.55")
-        .to(".wardrobe-frame-3", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=1")
-        .to(".scan-line", { opacity: 0, duration: 0.2 })
-        .fromTo(".cloth-card",
-          { scale: 0, opacity: 0, x: "-25vw", y: "0vh", rotation: 0 },
+          .fromTo(
+            ".scan-line",
+            { y: 0, opacity: 0 },
+            { y: 300, opacity: 1, duration: 1.5, ease: "power1.inOut" },
+            "wardrobe-scan"
+          )
+          .to(".wardrobe-frame-2", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=0.55")
+          .to(".wardrobe-frame-3", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=1")
+          .to(".scan-line", { opacity: 0, duration: 0.2 })
+          // Cards fly out in a tighter grid
+          .fromTo(
+            ".cloth-card",
+            { scale: 0, opacity: 0, x: "0vw", y: "0vh", rotation: 0 },
+            {
+              scale: 1,
+              opacity: 1,
+              stagger: 0.08,
+              x: (i: number) => `${(i % 2) * 25 - 12}vw`,
+              y: (i: number) => `${Math.floor(i / 2) * 18 + 5}vh`,
+              rotation: (i: number) => (i % 2 === 0 ? 3 : -3),
+              duration: 1.2,
+              ease: "back.out(1.2)",
+            },
+            "<0.3"
+          )
+          .fromTo(".copy-1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, "<");
+      } else {
+        // Desktop: original layout
+        tl.to(
+          ".wardrobe-container",
+          { x: "-45vw", scale: 0.65, opacity: 0.85, duration: 2, ease: "power2.inOut" },
+          "wardrobe-scan"
+        )
+          .fromTo(
+            ".scan-line",
+            { y: 0, opacity: 0 },
+            { y: 600, opacity: 1, duration: 1.5, ease: "power1.inOut" },
+            "wardrobe-scan"
+          )
+          .to(".wardrobe-frame-2", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=0.55")
+          .to(".wardrobe-frame-3", { opacity: 1, duration: 0.1 }, "wardrobe-scan+=1")
+          .to(".scan-line", { opacity: 0, duration: 0.2 })
+          .fromTo(
+            ".cloth-card",
+            { scale: 0, opacity: 0, x: "-25vw", y: "0vh", rotation: 0 },
+            {
+              scale: 1,
+              opacity: 1,
+              stagger: 0.1,
+              x: (i: number) => `${(i % 3) * 12}vw`,
+              y: (i: number) => `${Math.floor(i / 3) * 22}vh`,
+              rotation: (i: number) => (i % 2 === 0 ? 5 : -5),
+              duration: 1.5,
+              ease: "back.out(1.2)",
+            },
+            "<0.3"
+          )
+          .fromTo(".copy-1", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 }, "<");
+      }
+
+      // ── SCENE 2: AI Recommendation ──
+      const outfitX = isMobile ? "0vw" : "8vw";
+
+      tl.to(".copy-1", { opacity: 0, y: -50, duration: 0.5 })
+        .to(".cloth-card:not(.outfit-item)", { scale: 0, opacity: 0, stagger: 0.05, duration: 0.5 })
+        .to(".wardrobe-container", { opacity: isMobile ? 0 : 0.85, duration: 1 }, "<")
+        .to(
+          ".outfit-top",
           {
-            scale: 1, opacity: 1,
-            stagger: 0.1,
-            x: (i: number) => `${(i % 3) * 12}vw`,
-            y: (i: number) => `${Math.floor(i / 3) * 22}vh`,
-            rotation: (i: number) => (i % 2 === 0 ? 5 : -5),
+            x: outfitX,
+            y: isMobile ? "8vh" : "-18vh",
+            rotation: isMobile ? -2 : 0,
+            scale: isMobile ? 0.85 : 1.2,
             duration: 1.5,
-            ease: "back.out(1.2)"
+            ease: "power3.inOut",
+            zIndex: 30,
           },
+          "<"
+        )
+        .to(
+          ".outfit-bottom",
+          {
+            x: isMobile ? "-10vw" : outfitX,
+            y: isMobile ? "18vh" : "2vh",
+            rotation: isMobile ? 2 : 0,
+            scale: isMobile ? 0.85 : 1.2,
+            duration: 1.5,
+            ease: "power3.inOut",
+            zIndex: 20,
+          },
+          "<"
+        )
+        .to(
+          ".outfit-shoes",
+          {
+            x: isMobile ? "-45vw" : outfitX,
+            y: isMobile ? "-20vh" : "18vh",
+            rotation: isMobile ? -5 : 0,
+            scale: isMobile ? 0.75 : 1.1,
+            duration: 1.5,
+            ease: "power3.inOut",
+            zIndex: 10,
+          },
+          "<"
+        )
+        .to(
+          ".outfit-acc",
+          {
+            x: isMobile ? "10vw" : "22vw",
+            y: isMobile ? "15vh" : "5vh",
+            rotation: 15,
+            scale: isMobile ? 0.7 : 1,
+            duration: 1.5,
+            ease: "power3.inOut",
+            zIndex: 40,
+          },
+          "<"
+        )
+        .fromTo(
+          ".magic-glow",
+          { opacity: 0, scale: 0, x: "0vw" },
+          { opacity: 1, scale: 1.5, x: outfitX, duration: 1 },
+          "<0.5"
+        )
+        .fromTo(
+          ".outfit-ai-core",
+          { scale: 0, opacity: 0, x: outfitX, y: "-2vh" },
+          {
+            scale: 1,
+            opacity: 1,
+            x: isMobile ? "-20vw" : outfitX,
+            y: isMobile ? "7vh" : "-2vh",
+            duration: 1,
+            ease: "back.out(1.5)",
+          },
+          "<0.2"
+        )
+        .fromTo(".copy-2", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 }, "<");
+
+      // ── SCENE 3: AI Chatbot ──
+      tl.to(".copy-2", { opacity: 0, y: -50, duration: 0.5 })
+        .to(".outfit-group", { opacity: 0, scale: 0.5, duration: 1 }, "<")
+        .to(".wardrobe-container", { opacity: 0, duration: 1 }, "<")
+        .fromTo(
+          ".chat-interface",
+          { opacity: 0, x: "40vw", y: isMobile ? "20vh" : "5vh", scale: 0.9 },
+          {
+            opacity: 1,
+            x: isMobile ? "0vw" : "12vw",
+            y: isMobile ? "12vh" : "-5vh",
+            scale: 1,
+            duration: 1.5,
+            ease: "back.out(1)",
+          },
+          "<"
+        )
+        .fromTo(
+          ".chat-bubble-1",
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.5 },
+          "+=0.2"
+        )
+        .fromTo(
+          ".chat-bubble-2",
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.5 },
+          "+=0.2"
+        );
+
+      // Floating context — show fewer on mobile
+      if (!isMobile) {
+        tl.fromTo(
+          ".chat-float-1",
+          { opacity: 0, x: 40, y: 20, scale: 0.8 },
+          { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" },
           "<0.3"
         )
-        .fromTo(".copy-1", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 }, "<");
-    }
+          .fromTo(
+            ".chat-float-2",
+            { opacity: 0, x: -30, y: 30, scale: 0.8 },
+            { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" },
+            "<0.2"
+          )
+          .fromTo(
+            ".chat-float-3",
+            { opacity: 0, y: -30, scale: 0.8 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" },
+            "<0.2"
+          )
+          .fromTo(
+            ".chat-float-4",
+            { opacity: 0, x: 20, y: -20, scale: 0.8 },
+            { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" },
+            "<0.2"
+          );
+      } else {
+        // Mobile: show match score and weather
+        tl.fromTo(
+          ".chat-float-4",
+          { opacity: 0, y: 20, scale: 0.8 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" },
+          "<0.3"
+        ).fromTo(
+          ".chat-float-1",
+          { opacity: 0, x: 20, y: 10, scale: 0.8 },
+          { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" },
+          "<0.2"
+        );
+      }
 
-    // ── SCENE 2: AI Recommendation ──
-    const outfitX = isMobile ? "0vw" : "8vw";
+      tl.fromTo(
+        ".chat-bubble-3",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5 },
+        "+=0.1"
+      ).fromTo(".copy-3", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 }, "<");
 
-    tl.to(".copy-1", { opacity: 0, y: -50, duration: 0.5 })
-      .to(".cloth-card:not(.outfit-item)", { scale: 0, opacity: 0, stagger: 0.05, duration: 0.5 })
-      .to(".wardrobe-container", { opacity: isMobile ? 0 : 0.85, duration: 1 }, "<")
-      .to(".outfit-top", { x: outfitX, y: isMobile ? "8vh" : "-18vh", rotation: isMobile ? -2 : 0, scale: isMobile ? 0.85 : 1.2, duration: 1.5, ease: "power3.inOut", zIndex: 30 }, "<")
-      .to(".outfit-bottom", { x: isMobile ? "-10vw" : outfitX, y: isMobile ? "18vh" : "2vh", rotation: isMobile ? 2 : 0, scale: isMobile ? 0.85 : 1.2, duration: 1.5, ease: "power3.inOut", zIndex: 20 }, "<")
-      .to(".outfit-shoes", { x: isMobile ? "-45vw" : outfitX, y: isMobile ? "-20vh" : "18vh", rotation: isMobile ? -5 : 0, scale: isMobile ? 0.75 : 1.1, duration: 1.5, ease: "power3.inOut", zIndex: 10 }, "<")
-      .to(".outfit-acc", { x: isMobile ? "10vw" : "22vw", y: isMobile ? "15vh" : "5vh", rotation: 15, scale: isMobile ? 0.7 : 1, duration: 1.5, ease: "power3.inOut", zIndex: 40 }, "<")
-      .fromTo(".magic-glow", { opacity: 0, scale: 0, x: "0vw" }, { opacity: 1, scale: 1.5, x: outfitX, duration: 1 }, "<0.5")
-      .fromTo(".outfit-ai-core", { scale: 0, opacity: 0, x: outfitX, y: "-2vh" }, { scale: 1, opacity: 1, x: isMobile ? "-20vw" : outfitX, y: isMobile ? "7vh" : "-2vh", duration: 1, ease: "back.out(1.5)" }, "<0.2")
-      .fromTo(".copy-2", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 }, "<");
+      // ── SCENE 4: Community Feed ──
+      tl.to(".copy-3", { opacity: 0, y: -50, duration: 0.5 })
+        .to(".chat-interface", { opacity: 0, x: "40vw", duration: 1 }, "<")
+        .to(
+          ".chat-float-1, .chat-float-2, .chat-float-3, .chat-float-4",
+          { opacity: 0, scale: 0.5, duration: 0.5 },
+          "<"
+        );
 
-    // ── SCENE 3: AI Chatbot ──
-    tl.to(".copy-2", { opacity: 0, y: -50, duration: 0.5 })
-      .to(".outfit-group", { opacity: 0, scale: 0.5, duration: 1 }, "<")
-      .to(".wardrobe-container", { opacity: 0, duration: 1 }, "<")
-      .fromTo(".chat-interface",
-        { opacity: 0, x: "40vw", y: isMobile ? "20vh" : "5vh", scale: 0.9 },
-        { opacity: 1, x: isMobile ? "0vw" : "12vw", y: isMobile ? "12vh" : "-5vh", scale: 1, duration: 1.5, ease: "back.out(1)" }, "<")
-      .fromTo(".chat-bubble-1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "+=0.2")
-      .fromTo(".chat-bubble-2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "+=0.2");
+      if (isMobile) {
+        tl.fromTo(
+          ".feed-card-1",
+          { x: "30vw", y: "0vh", opacity: 0, rotation: 10, scale: 0.8 },
+          {
+            x: "-12vw",
+            y: "2vh",
+            opacity: 1,
+            rotation: -6,
+            scale: 0.85,
+            duration: 1.5,
+            ease: "power2.out",
+            zIndex: 10,
+          },
+          "<0.2"
+        )
+          .fromTo(
+            ".feed-card-2",
+            { x: "30vw", y: "0vh", opacity: 0, rotation: -10, scale: 0.8 },
+            {
+              x: "15vw",
+              y: "15vh",
+              opacity: 1,
+              rotation: 6,
+              scale: 0.85,
+              duration: 1.5,
+              ease: "power2.out",
+              zIndex: 20,
+            },
+            "<0.2"
+          )
+          .fromTo(
+            ".feed-card-3",
+            { x: "30vw", y: "0vh", opacity: 0, rotation: 15, scale: 0.8 },
+            {
+              x: "-5vw",
+              y: "30vh",
+              opacity: 1,
+              rotation: -2,
+              scale: 0.85,
+              duration: 1.5,
+              ease: "power2.out",
+              zIndex: 30,
+            },
+            "<0.2"
+          );
+      } else {
+        tl.fromTo(
+          ".feed-card-1",
+          { x: "30vw", y: "0vh", opacity: 0, rotation: 10 },
+          { x: "-5vw", y: "-8vh", opacity: 1, rotation: -3, duration: 1.5, ease: "power2.out" },
+          "<0.2"
+        )
+          .fromTo(
+            ".feed-card-2",
+            { x: "30vw", y: "0vh", opacity: 0, rotation: -10 },
+            { x: "12vw", y: "-15vh", opacity: 1, rotation: 5, duration: 1.5, ease: "power2.out" },
+            "<0.2"
+          )
+          .fromTo(
+            ".feed-card-3",
+            { x: "30vw", y: "0vh", opacity: 0, rotation: 15 },
+            { x: "5vw", y: "12vh", opacity: 1, rotation: -2, duration: 1.5, ease: "power2.out" },
+            "<0.2"
+          );
+      }
 
-    // Floating context — show fewer on mobile
-    if (!isMobile) {
-      tl.fromTo(".chat-float-1", { opacity: 0, x: 40, y: 20, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.3")
-        .fromTo(".chat-float-2", { opacity: 0, x: -30, y: 30, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.2")
-        .fromTo(".chat-float-3", { opacity: 0, y: -30, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.2")
-        .fromTo(".chat-float-4", { opacity: 0, x: 20, y: -20, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.2");
-    } else {
-      // Mobile: show match score and weather
-      tl.fromTo(".chat-float-4", { opacity: 0, y: 20, scale: 0.8 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.3")
-        .fromTo(".chat-float-1", { opacity: 0, x: 20, y: 10, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.8, ease: "back.out(1.2)" }, "<0.2");
-    }
+      tl.fromTo(
+        ".like-bubble",
+        { y: "5vh", opacity: 0, scale: 0 },
+        { y: "-15vh", opacity: 1, scale: 1.5, stagger: 0.15, duration: 1.5, ease: "power1.out" },
+        "<0.5"
+      ).fromTo(".copy-4", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 }, "<");
 
-    tl.fromTo(".chat-bubble-3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "+=0.1")
-      .fromTo(".copy-3", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 }, "<");
-
-    // ── SCENE 4: Community Feed ──
-    tl.to(".copy-3", { opacity: 0, y: -50, duration: 0.5 })
-      .to(".chat-interface", { opacity: 0, x: "40vw", duration: 1 }, "<")
-      .to(".chat-float-1, .chat-float-2, .chat-float-3, .chat-float-4", { opacity: 0, scale: 0.5, duration: 0.5 }, "<");
-
-    if (isMobile) {
-      tl.fromTo(".feed-card-1", { x: "30vw", y: "0vh", opacity: 0, rotation: 10, scale: 0.8 }, { x: "-12vw", y: "2vh", opacity: 1, rotation: -6, scale: 0.85, duration: 1.5, ease: "power2.out", zIndex: 10 }, "<0.2")
-        .fromTo(".feed-card-2", { x: "30vw", y: "0vh", opacity: 0, rotation: -10, scale: 0.8 }, { x: "15vw", y: "15vh", opacity: 1, rotation: 6, scale: 0.85, duration: 1.5, ease: "power2.out", zIndex: 20 }, "<0.2")
-        .fromTo(".feed-card-3", { x: "30vw", y: "0vh", opacity: 0, rotation: 15, scale: 0.8 }, { x: "-5vw", y: "30vh", opacity: 1, rotation: -2, scale: 0.85, duration: 1.5, ease: "power2.out", zIndex: 30 }, "<0.2");
-    } else {
-      tl.fromTo(".feed-card-1", { x: "30vw", y: "0vh", opacity: 0, rotation: 10 }, { x: "-5vw", y: "-8vh", opacity: 1, rotation: -3, duration: 1.5, ease: "power2.out" }, "<0.2")
-        .fromTo(".feed-card-2", { x: "30vw", y: "0vh", opacity: 0, rotation: -10 }, { x: "12vw", y: "-15vh", opacity: 1, rotation: 5, duration: 1.5, ease: "power2.out" }, "<0.2")
-        .fromTo(".feed-card-3", { x: "30vw", y: "0vh", opacity: 0, rotation: 15 }, { x: "5vw", y: "12vh", opacity: 1, rotation: -2, duration: 1.5, ease: "power2.out" }, "<0.2");
-    }
-
-    tl.fromTo(".like-bubble",
-      { y: "5vh", opacity: 0, scale: 0 },
-      { y: "-15vh", opacity: 1, scale: 1.5, stagger: 0.15, duration: 1.5, ease: "power1.out" }, "<0.5")
-      .fromTo(".copy-4", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1 }, "<");
-
-    // ── Static Section Animations ──
-    animateStaticSections(isMobile);
-
-  }, { scope: containerRef });
+      // ── Static Section Animations ──
+      animateStaticSections(isMobile);
+    },
+    { scope: containerRef }
+  );
 }
 
 /**
@@ -187,12 +416,13 @@ export function useScrollytelling(containerRef: RefObject<HTMLDivElement | null>
 function animateStaticSections(isMobile: boolean) {
   // Social Proof Counters
   const counters = gsap.utils.toArray<HTMLElement>(".metric-number");
-  counters.forEach(counter => {
+  counters.forEach((counter) => {
     const targetStr = counter.getAttribute("data-target") || "0";
     const targetVal = parseFloat(targetStr.replace(/,/g, ""));
     const suffix = counter.getAttribute("data-suffix") || "";
 
-    gsap.fromTo(counter,
+    gsap.fromTo(
+      counter,
       { textContent: 0 },
       {
         textContent: targetVal,
@@ -200,43 +430,86 @@ function animateStaticSections(isMobile: boolean) {
         ease: "power1.out",
         snap: { textContent: 1 },
         onUpdate: function () {
-          counter.innerHTML = Math.round(Number(this.targets()[0].textContent)).toLocaleString("en-US") + suffix;
+          counter.innerHTML =
+            Math.round(Number(this.targets()[0].textContent)).toLocaleString("en-US") + suffix;
         },
         scrollTrigger: {
           trigger: ".social-proof-section",
           start: "top 80%",
-        }
+        },
       }
     );
   });
 
   // Before / After Reveal
-  gsap.fromTo(".before-card",
+  gsap.fromTo(
+    ".before-card",
     { x: isMobile ? -30 : -60, opacity: 0 },
-    { x: 0, opacity: 1, duration: 0.8, scrollTrigger: { trigger: ".before-after-section", start: "top 75%" } }
+    {
+      x: 0,
+      opacity: 1,
+      duration: 0.8,
+      scrollTrigger: { trigger: ".before-after-section", start: "top 75%" },
+    }
   );
-  gsap.fromTo(".after-card",
+  gsap.fromTo(
+    ".after-card",
     { x: isMobile ? 30 : 60, opacity: 0 },
-    { x: 0, opacity: 1, duration: 0.8, scrollTrigger: { trigger: ".before-after-section", start: "top 75%" } }
+    {
+      x: 0,
+      opacity: 1,
+      duration: 0.8,
+      scrollTrigger: { trigger: ".before-after-section", start: "top 75%" },
+    }
   );
-  gsap.fromTo(".before-item",
+  gsap.fromTo(
+    ".before-item",
     { y: 20, opacity: 0 },
-    { y: 0, opacity: 1, stagger: 0.15, duration: 0.6, scrollTrigger: { trigger: ".before-card", start: "top 85%" } }
+    {
+      y: 0,
+      opacity: 1,
+      stagger: 0.15,
+      duration: 0.6,
+      scrollTrigger: { trigger: ".before-card", start: "top 85%" },
+    }
   );
-  gsap.fromTo(".after-item",
+  gsap.fromTo(
+    ".after-item",
     { y: 20, opacity: 0 },
-    { y: 0, opacity: 1, stagger: 0.15, duration: 0.6, scrollTrigger: { trigger: ".after-card", start: "top 85%" } }
+    {
+      y: 0,
+      opacity: 1,
+      stagger: 0.15,
+      duration: 0.6,
+      scrollTrigger: { trigger: ".after-card", start: "top 85%" },
+    }
   );
 
   // Testimonials section animation removed as it's handled internally by StaggerTestimonials
 
   // Final CTA
-  gsap.fromTo(".cta-heading-line",
+  gsap.fromTo(
+    ".cta-heading-line",
     { y: 40, opacity: 0 },
-    { y: 0, opacity: 1, stagger: 0.3, duration: 1, ease: "power2.out", scrollTrigger: { trigger: ".final-cta-section", start: "top 60%" } }
+    {
+      y: 0,
+      opacity: 1,
+      stagger: 0.3,
+      duration: 1,
+      ease: "power2.out",
+      scrollTrigger: { trigger: ".final-cta-section", start: "top 60%" },
+    }
   );
-  gsap.fromTo(".cta-button",
+  gsap.fromTo(
+    ".cta-button",
     { scale: 0.8, opacity: 0 },
-    { scale: 1, opacity: 1, duration: 0.8, ease: "back.out(1.5)", delay: 0.6, scrollTrigger: { trigger: ".final-cta-section", start: "top 60%" } }
+    {
+      scale: 1,
+      opacity: 1,
+      duration: 0.8,
+      ease: "back.out(1.5)",
+      delay: 0.6,
+      scrollTrigger: { trigger: ".final-cta-section", start: "top 60%" },
+    }
   );
 }

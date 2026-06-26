@@ -71,14 +71,18 @@ export function useOutfitCanvas() {
       (x) => x.category?.name === "Áo" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe
     );
     const bottoms = realItems.filter(
-      (x) => x.category?.name === "Quần" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe
+      (x) =>
+        x.category?.name === "Quần" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe
     );
     const shoes = realItems.filter(
-      (x) => x.category?.name === "Giày" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe
+      (x) =>
+        x.category?.name === "Giày" && !x.isLocked && x.status === WardrobeItemStatus.InWardrobe
     );
 
     if (tops.length === 0 || bottoms.length === 0) {
-      toast.error("Không đủ quần áo trong tủ đồ để thực hiện AI match! Cần có ít nhất 1 Áo và 1 Quần.");
+      toast.error(
+        "Không đủ quần áo trong tủ đồ để thực hiện AI match! Cần có ít nhất 1 Áo và 1 Quần."
+      );
       return;
     }
 

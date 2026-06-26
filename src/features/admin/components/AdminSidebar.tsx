@@ -1,11 +1,150 @@
-'use client'; import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+"use client";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UsersIcon, MessageSquareIcon, GridIcon, LayoutDashboardIcon, LogOutIcon, TrendingUp, Sparkles, ChevronRight, ShieldAlert,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useLogout } from '@/features/auth/queries/auth.queries'; const navItems = [ { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboardIcon }, { href: '/admin/users', label: 'Người dùng', icon: UsersIcon }, { href: '/admin/moderation', label: 'Kiểm duyệt', icon: MessageSquareIcon }, { href: '/admin/wardrobe', label: 'Trang phục', icon: GridIcon }, { href: '/admin/category', label: 'Danh mục', icon: GridIcon }, { href: '/admin/trends', label: 'Xu hướng', icon: TrendingUp },
-]; export function AdminSidebar() { const pathname = usePathname(); const router = useRouter(); const user = useAuthStore((state) => state.user); const clearAuthStore = useAuthStore((state) => state.logout); const logoutMutation = useLogout(); const handleLogout = () => { clearAuthStore(); logoutMutation.mutate(); router.push('/'); }; return ( <aside className="hidden md:flex flex-col w-[280px] border-r border-black/10 h-dvh sticky top-0 bg-[#F8F7F5] z-40 px-6 py-6 shrink-0 text-[#111]"> {/* Chỉnh sửaorial Logo */} <div className="mb-8 flex flex-col pl-1"> <div className="flex items-center gap-1.5 mb-1.5"> <ShieldAlert className="size-3 text-[#111]" /> <span className="text-[9px] font-sans font-bold text-[#111]">System Admin</span> </div> <Link href="/admin/dashboard" className="flex items-center group w-fit"> <span className="font-sans text-4xl font-medium tracking-tighter text-[#111]"> Closy<span className="text-[#A3A3A3]">.</span> </span> </Link> </div> {/* Elegant User Profile with Dropdown */} <DropdownMenu> <DropdownMenuTrigger asChild> <div className="flex items-center gap-4 mb-8 p-3 bg-white border border-black/5 hover:border-black/20 transition-all cursor-pointer group outline-none shadow-sm"> <div className="flex flex-col flex-1 min-w-0 pl-1"> <span className="font-sans text-lg font-medium text-[#111] truncate"> {user?.name || "Administrator"} </span> {/* <span className="text-[10px] font-sans font-bold text-[#666] mt-1"> Access Level 1 </span> */} </div> <ChevronRight className="size-4 text-[#A3A3A3] group-hover:text-[#111] transition-colors" /> </div> </DropdownMenuTrigger> <DropdownMenuContent align="end" className="w-[240px] rounded-xl border border-black/10 bg-white p-2 shadow-xl"> <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-[#F8F7F5] focus:bg-[#F8F7F5]"> <Link href="/" className="flex items-center gap-3 w-full text-[#111]"> <Sparkles className="size-4" /> <span className="font-sans text-[11px] font-medium">Về trang User</span> </Link> </DropdownMenuItem> <DropdownMenuSeparator className="my-1 bg-black/5" /> <DropdownMenuItem onClick={handleLogout} className="rounded-xl px-3 py-2.5 cursor-pointer text-[#111] hover:bg-black hover:text-white focus:bg-black focus:text-white transition-colors" > <div className="flex items-center gap-3 w-full"> <LogOutIcon className="size-4" /> <span className="font-sans text-[11px] font-medium">Đăng xuất</span> </div> </DropdownMenuItem> </DropdownMenuContent> </DropdownMenu> {/* Main Navigation (Minimalist List) */} <nav className="flex-1 flex flex-col gap-1 overflow-y-auto custom-scrollbar"> {navItems.map((item) => { const isActive = pathname === item.href || pathname.startsWith(item.href + '/'); const Icon = item.icon; return ( <Link key={item.href} href={item.href} className={cn( "group flex items-center gap-4 px-4 py-3 transition-all relative overflow-hidden", isActive ? "text-[#111] bg-white border border-black/5 shadow-sm" : "text-[#666] hover:text-[#111] hover:bg-white/50 border border-transparent" )} > {/* Active Indicator Line */} {isActive && ( <span className="absolute left-0 top-0 w-[2px] h-full bg-[#111]" /> )} <Icon className={cn( "size-[18px] transition-transform duration-300 group-hover:scale-110", isActive ? "text-[#111]" : "text-[#A3A3A3] group-hover:text-[#111]" )} strokeWidth={isActive ? 2 : 1.5} /> <span className={cn( "font-sans text-[11px] ", isActive ? "font-bold" : "font-medium" )}> {item.label} </span> </Link> ); })} </nav> </aside> );
-} 
+import {
+  UsersIcon,
+  MessageSquareIcon,
+  GridIcon,
+  LayoutDashboardIcon,
+  LogOutIcon,
+  TrendingUp,
+  Sparkles,
+  ChevronRight,
+  ShieldAlert,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useLogout } from "@/features/auth/queries/auth.queries";
+const navItems = [
+  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboardIcon },
+  { href: "/admin/users", label: "Người dùng", icon: UsersIcon },
+  { href: "/admin/moderation", label: "Kiểm duyệt", icon: MessageSquareIcon },
+  { href: "/admin/wardrobe", label: "Trang phục", icon: GridIcon },
+  { href: "/admin/category", label: "Danh mục", icon: GridIcon },
+  { href: "/admin/trends", label: "Xu hướng", icon: TrendingUp },
+];
+export function AdminSidebar() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const clearAuthStore = useAuthStore((state) => state.logout);
+  const logoutMutation = useLogout();
+  const handleLogout = () => {
+    clearAuthStore();
+    logoutMutation.mutate();
+    router.push("/");
+  };
+  return (
+    <aside className="hidden md:flex flex-col w-[280px] border-r border-black/10 h-dvh sticky top-0 bg-[#F8F7F5] z-40 px-6 py-6 shrink-0 text-[#111]">
+      {" "}
+      {/* Chỉnh sửaorial Logo */}{" "}
+      <div className="mb-8 flex flex-col pl-1">
+        {" "}
+        <div className="flex items-center gap-1.5 mb-1.5">
+          {" "}
+          <ShieldAlert className="size-3 text-[#111]" />{" "}
+          <span className="text-[9px] font-sans font-bold text-[#111]">System Admin</span>{" "}
+        </div>{" "}
+        <Link href="/admin/dashboard" className="flex items-center group w-fit">
+          {" "}
+          <span className="font-sans text-4xl font-medium tracking-tighter text-[#111]">
+            {" "}
+            Closy<span className="text-[#A3A3A3]">.</span>{" "}
+          </span>{" "}
+        </Link>{" "}
+      </div>{" "}
+      {/* Elegant User Profile with Dropdown */}{" "}
+      <DropdownMenu>
+        {" "}
+        <DropdownMenuTrigger asChild>
+          {" "}
+          <div className="flex items-center gap-4 mb-8 p-3 bg-white border border-black/5 hover:border-black/20 transition-all cursor-pointer group outline-none shadow-sm">
+            {" "}
+            <div className="flex flex-col flex-1 min-w-0 pl-1">
+              {" "}
+              <span className="font-sans text-lg font-medium text-[#111] truncate">
+                {" "}
+                {user?.name || "Administrator"}{" "}
+              </span>{" "}
+              {/* <span className="text-[10px] font-sans font-bold text-[#666] mt-1"> Access Level 1 </span> */}{" "}
+            </div>{" "}
+            <ChevronRight className="size-4 text-[#A3A3A3] group-hover:text-[#111] transition-colors" />{" "}
+          </div>{" "}
+        </DropdownMenuTrigger>{" "}
+        <DropdownMenuContent
+          align="end"
+          className="w-[240px] rounded-xl border border-black/10 bg-white p-2 shadow-xl"
+        >
+          {" "}
+          <DropdownMenuItem
+            asChild
+            className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-[#F8F7F5] focus:bg-[#F8F7F5]"
+          >
+            {" "}
+            <Link href="/" className="flex items-center gap-3 w-full text-[#111]">
+              {" "}
+              <Sparkles className="size-4" />{" "}
+              <span className="font-sans text-[11px] font-medium">Về trang User</span>{" "}
+            </Link>{" "}
+          </DropdownMenuItem>{" "}
+          <DropdownMenuSeparator className="my-1 bg-black/5" />{" "}
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="rounded-xl px-3 py-2.5 cursor-pointer text-[#111] hover:bg-black hover:text-white focus:bg-black focus:text-white transition-colors"
+          >
+            {" "}
+            <div className="flex items-center gap-3 w-full">
+              {" "}
+              <LogOutIcon className="size-4" />{" "}
+              <span className="font-sans text-[11px] font-medium">Đăng xuất</span>{" "}
+            </div>{" "}
+          </DropdownMenuItem>{" "}
+        </DropdownMenuContent>{" "}
+      </DropdownMenu>{" "}
+      {/* Main Navigation (Minimalist List) */}{" "}
+      <nav className="flex-1 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
+        {" "}
+        {navItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "group flex items-center gap-4 px-4 py-3 transition-all relative overflow-hidden",
+                isActive
+                  ? "text-[#111] bg-white border border-black/5 shadow-sm"
+                  : "text-[#666] hover:text-[#111] hover:bg-white/50 border border-transparent"
+              )}
+            >
+              {" "}
+              {/* Active Indicator Line */}{" "}
+              {isActive && <span className="absolute left-0 top-0 w-[2px] h-full bg-[#111]" />}{" "}
+              <Icon
+                className={cn(
+                  "size-[18px] transition-transform duration-300 group-hover:scale-110",
+                  isActive ? "text-[#111]" : "text-[#A3A3A3] group-hover:text-[#111]"
+                )}
+                strokeWidth={isActive ? 2 : 1.5}
+              />{" "}
+              <span
+                className={cn("font-sans text-[11px] ", isActive ? "font-bold" : "font-medium")}
+              >
+                {" "}
+                {item.label}{" "}
+              </span>{" "}
+            </Link>
+          );
+        })}{" "}
+      </nav>{" "}
+    </aside>
+  );
+}

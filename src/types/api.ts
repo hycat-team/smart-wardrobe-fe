@@ -4,7 +4,7 @@
  */
 export interface APIResponse<T = unknown> {
   message?: string; // Thông báo từ hệ thống (có thể không có)
-  data?: T;         // Dữ liệu nghiệp vụ trả về (Object, Array, String... tùy API)
+  data?: T; // Dữ liệu nghiệp vụ trả về (Object, Array, String... tùy API)
 }
 
 /**
@@ -17,11 +17,11 @@ export interface ValidationErrorItem {
 }
 
 export interface ErrorResponse {
-  status: number;   // Mã HTTP Status Code (ví dụ: 400, 401, 403, 429...)
-  title?: string;   // Tên nhóm lỗi ngắn gọn (ví dụ: "Bad Request", "Conflict")
+  status: number; // Mã HTTP Status Code (ví dụ: 400, 401, 403, 429...)
+  title?: string; // Tên nhóm lỗi ngắn gọn (ví dụ: "Bad Request", "Conflict")
   message?: string; // Nội dung lỗi từ backend trả về
-  detail?: string;  // Tương thích ngược với các API cũ dùng detail
-  Detail?: string;  // Tương thích với các lỗi trả về có chữ hoa
+  detail?: string; // Tương thích ngược với các API cũ dùng detail
+  Detail?: string; // Tương thích với các lỗi trả về có chữ hoa
   errors?: ValidationErrorItem[]; // Mảng lỗi chi tiết nếu là validation error
 }
 

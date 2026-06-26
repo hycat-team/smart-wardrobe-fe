@@ -1,17 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { subscriptionApi } from '../api/subscription.api';
-import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { subscriptionApi } from "../api/subscription.api";
+import { toast } from "sonner";
 
 export const useDailyQuota = () => {
   return useQuery({
-    queryKey: ['subscription', 'daily-quota'],
+    queryKey: ["subscription", "daily-quota"],
     queryFn: () => subscriptionApi.getDailyQuota(),
   });
 };
 
 export const useMySubscription = () => {
   return useQuery({
-    queryKey: ['subscription', 'me'],
+    queryKey: ["subscription", "me"],
     queryFn: () => subscriptionApi.getMySubscription(),
   });
 };
@@ -30,9 +30,11 @@ export const useToggleAutoRenew = () => {
       return subscriptionApi.toggleAutoRenew(!currentStatus);
     },
     onSuccess: (res) => {
-      toast.success(res?.message || (res?.data ? 'Đã bật tự động gia hạn' : 'Đã tắt tự động gia hạn'));
+      toast.success(
+        res?.message || (res?.data ? "Đã bật tự động gia hạn" : "Đã tắt tự động gia hạn")
+      );
       // Invalidate the subscription query to refresh data
-      queryClient.invalidateQueries({ queryKey: ['subscription', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ["subscription", "me"] });
     },
   });
 };

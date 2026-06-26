@@ -1,4 +1,4 @@
-import { WardrobeItemRes } from '@/features/wardrobe/types';
+import { WardrobeItemRes } from "@/features/wardrobe/types";
 
 export interface AIOutfitRecommendationReq {
   occasion?: string;
@@ -25,7 +25,7 @@ export interface AIOutfitRecommendationRes {
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'ai';
+  role: "user" | "ai";
   content: string;
   timestamp: number;
 }
@@ -47,7 +47,7 @@ export interface ChatSessionRes {
   updatedAt: string;
 }
 
-export type MessageSender = 'USER' | 'SYSTEM' | 'ASSISTANT';
+export type MessageSender = "USER" | "SYSTEM" | "ASSISTANT";
 
 export interface ChatMessageRes {
   id: string;

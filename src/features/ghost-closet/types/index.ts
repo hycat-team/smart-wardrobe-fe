@@ -1,10 +1,10 @@
-import { WardrobeItemRes } from '@/features/wardrobe/types';
+import { WardrobeItemRes } from "@/features/wardrobe/types";
 
 export interface WardrobeImpact {
   compatibleItemCount: number;
   newOutfitsUnlocked: number;
   suitableOccasions: string[];
-  redundancyRisk: 'low' | 'medium' | 'high';
+  redundancyRisk: "low" | "medium" | "high";
   wardrobeGapFilled?: string;
   colorCompatibilityScore: number;
 }
@@ -29,11 +29,11 @@ export interface DigitalSample {
   concept: string;
   imageUrl: string;
   variants: SampleVariant[];
-  targetGender: 'female' | 'male' | 'unisex';
+  targetGender: "female" | "male" | "unisex";
   targetStyleTags: string[];
   priceMin: number;
   priceMax: number;
-  status: 'pending' | 'running' | 'completed';
+  status: "pending" | "running" | "completed";
   createdAt: string;
 }
 

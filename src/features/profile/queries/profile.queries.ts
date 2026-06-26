@@ -1,11 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { profileApi } from '../api/profile.api';
-import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { profileApi } from "../api/profile.api";
+import { toast } from "sonner";
 
+import { UserRes } from "../types";
 
-import { UserRes } from '../types';
-
-export const PROFILE_QUERY_KEY = ['me'];
+export const PROFILE_QUERY_KEY = ["me"];
 
 export const useProfile = (initialData?: UserRes) => {
   return useQuery({
@@ -23,7 +22,7 @@ export const useUpdateProfile = () => {
     onSuccess: (res) => {
       // Cập nhật cache ngay lập tức
       queryClient.setQueryData(PROFILE_QUERY_KEY, res);
-      toast.success(res?.message || 'Cập nhật thông tin cá nhân thành công');
+      toast.success(res?.message || "Cập nhật thông tin cá nhân thành công");
     },
   });
 };
@@ -32,7 +31,7 @@ export const useChangePassword = () => {
   return useMutation({
     mutationFn: profileApi.changePassword,
     onSuccess: (res) => {
-      toast.success(res?.message || 'Đổi mật khẩu thành công');
+      toast.success(res?.message || "Đổi mật khẩu thành công");
     },
   });
 };

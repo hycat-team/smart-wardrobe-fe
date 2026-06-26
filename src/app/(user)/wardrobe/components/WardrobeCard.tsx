@@ -1,1 +1,150 @@
-import { Check, Heart, Plus } from "lucide-react"; import { cn } from "@/lib/utils"; import { WardrobeItemRes as WardrobeItem } from "@/features/wardrobe/types"; import { applyCloudinaryTrim } from "@/lib/cloudinary"; import Image from "next/image"; interface WardrobeCardProps { item: WardrobeItem; isLocked: boolean; isProcessing: boolean; isSelectMode: boolean; isSelected: boolean; onClick: () => void; getWardrobeItemName: (item: WardrobeItem) => string; hideDetails?: boolean; hideTitle?: boolean; } export function WardrobeCard({ item, isLocked, isProcessing, isSelectMode, isSelected, onClick, getWardrobeItemName, hideDetails = false, hideTitle = false, }: WardrobeCardProps) { return ( <div onClick={onClick} className={cn( "group flex flex-col h-full cursor-pointer relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out", isSelectMode && isSelected && "border-2 border-[#111] shadow-none hover:translate-y-0", isLocked && "opacity-75" )} > {/* Image Area - 75% Visual Weight */} <div className="relative aspect-[4/5] bg-[#F7F6F4] p-3 md:p-6 overflow-hidden flex-shrink-0"> <Image fill sizes="(max-width: 768px) 50vw, 33vw" alt={getWardrobeItemName(item)} className={cn( "w-full h-full object-contain drop-shadow-sm transition-transform duration-250", !isProcessing && "group-hover:scale-[1.02]", isProcessing && "blur-md opacity-60" )} src={applyCloudinaryTrim(item.imageUrl || undefined)} /> {isProcessing && ( <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none"> <div className="size-8 border-2 border-black/20 border-t-black rounded-full animate-spin mb-3"></div> <span className="font-sans text-[10px] font-bold text-black bg-white/90 px-3 py-1.5 shadow-sm ">AI ĐANG XỬ LÝ</span> </div> )} {/* Top-Left Selection State */} {isSelectMode && ( <div className="absolute top-4 left-4 z-20"> {isSelected ? ( <div className="bg-[#111] text-white flex items-center justify-center size-5 shadow-sm"> <Check className="size-3.5" /> </div> ) : ( <div className="bg-white text-[#111] flex items-center justify-center size-5 opacity-0 group-hover:opacity-100 shadow-sm border border-black/10 transition-all duration-200"> <Plus className="size-3.5" /> </div> )} </div> )} {/* Top-Right Color Indicator */} {item.colorHex && ( <div className="absolute top-4 right-4 z-10 transition-opacity duration-300 group-hover:opacity-0"> <div className="w-[14px] h-[14px] rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: item.colorHex }} title={item.color || "Màu sắc"} /> </div> )} {/* Hover Actions (Only outside select mode) */} {!isSelectMode && !isLocked && !isProcessing && ( <> <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"> <button className="text-black/40 hover:text-black transition-colors" title="Save / Favorite"> <Heart className="size-5" /> </button> </div> <div className="absolute inset-0 bg-white/92 opacity-0 group-hover:opacity-100 transition-opacity duration-250 flex flex-col items-center justify-end pb-8 pointer-events-none"> <div className="flex flex-col items-center gap-2 mb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 delay-75"> <span className="font-sans text-[9px] text-[#666]"> Worn 14 Times </span> <span className="font-sans text-[9px] text-[#666]"> Matches 32 Items </span> </div> <div className="text-black font-sans text-[11px] border-b border-black pb-0.5"> View Details </div> </div> </> )} </div> {/* Information Area - 25% Visual Weight */} <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow bg-white border-t border-black/5"> <div> {!hideTitle && ( <h3 className="font-sans text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2"> {getWardrobeItemName(item)} </h3> )} {item.style && ( <p className="font-sans text-[10px] text-[#888] mt-1.5 truncate"> {item.style} </p> )} </div> {!hideDetails && ( <> <p className="font-sans text-[11px] text-[#666] mt-2 truncate"> {(item as any).brand || (typeof item.category === 'object' ? (item.category as any)?.name : item.category) || "ACNE STUDIOS"} </p> {/* <div className="font-sans text-[11px] text-[#888] mt-auto pt-2"> <span>Size {(item as any).size || "S"}</span> {item.color && <span> • {item.color}</span>} </div> */} </> )} </div> </div> ); } 
+import { Check, Heart, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { WardrobeItemRes as WardrobeItem } from "@/features/wardrobe/types";
+import { applyCloudinaryTrim } from "@/lib/cloudinary";
+import Image from "next/image";
+interface WardrobeCardProps {
+  item: WardrobeItem;
+  isLocked: boolean;
+  isProcessing: boolean;
+  isSelectMode: boolean;
+  isSelected: boolean;
+  onClick: () => void;
+  getWardrobeItemName: (item: WardrobeItem) => string;
+  hideDetails?: boolean;
+  hideTitle?: boolean;
+}
+export function WardrobeCard({
+  item,
+  isLocked,
+  isProcessing,
+  isSelectMode,
+  isSelected,
+  onClick,
+  getWardrobeItemName,
+  hideDetails = false,
+  hideTitle = false,
+}: WardrobeCardProps) {
+  return (
+    <div
+      onClick={onClick}
+      className={cn(
+        "group flex flex-col h-full cursor-pointer relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out",
+        isSelectMode && isSelected && "border-2 border-[#111] shadow-none hover:translate-y-0",
+        isLocked && "opacity-75"
+      )}
+    >
+      {" "}
+      {/* Image Area - 75% Visual Weight */}{" "}
+      <div className="relative aspect-[4/5] bg-[#F7F6F4] p-3 md:p-6 overflow-hidden flex-shrink-0">
+        {" "}
+        <Image
+          fill
+          sizes="(max-width: 768px) 50vw, 33vw"
+          alt={getWardrobeItemName(item)}
+          className={cn(
+            "w-full h-full object-contain drop-shadow-sm transition-transform duration-250",
+            !isProcessing && "group-hover:scale-[1.02]",
+            isProcessing && "blur-md opacity-60"
+          )}
+          src={applyCloudinaryTrim(item.imageUrl || undefined)}
+        />{" "}
+        {isProcessing && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
+            {" "}
+            <div className="size-8 border-2 border-black/20 border-t-black rounded-full animate-spin mb-3"></div>{" "}
+            <span className="font-sans text-[10px] font-bold text-black bg-white/90 px-3 py-1.5 shadow-sm ">
+              AI ĐANG XỬ LÝ
+            </span>{" "}
+          </div>
+        )}{" "}
+        {/* Top-Left Selection State */}{" "}
+        {isSelectMode && (
+          <div className="absolute top-4 left-4 z-20">
+            {" "}
+            {isSelected ? (
+              <div className="bg-[#111] text-white flex items-center justify-center size-5 shadow-sm">
+                {" "}
+                <Check className="size-3.5" />{" "}
+              </div>
+            ) : (
+              <div className="bg-white text-[#111] flex items-center justify-center size-5 opacity-0 group-hover:opacity-100 shadow-sm border border-black/10 transition-all duration-200">
+                {" "}
+                <Plus className="size-3.5" />{" "}
+              </div>
+            )}{" "}
+          </div>
+        )}{" "}
+        {/* Top-Right Color Indicator */}{" "}
+        {item.colorHex && (
+          <div className="absolute top-4 right-4 z-10 transition-opacity duration-300 group-hover:opacity-0">
+            {" "}
+            <div
+              className="w-[14px] h-[14px] rounded-full border border-black/10 shadow-sm"
+              style={{ backgroundColor: item.colorHex }}
+              title={item.color || "Màu sắc"}
+            />{" "}
+          </div>
+        )}{" "}
+        {/* Hover Actions (Only outside select mode) */}{" "}
+        {!isSelectMode && !isLocked && !isProcessing && (
+          <>
+            {" "}
+            <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              {" "}
+              <button
+                className="text-black/40 hover:text-black transition-colors"
+                title="Save / Favorite"
+              >
+                {" "}
+                <Heart className="size-5" />{" "}
+              </button>{" "}
+            </div>{" "}
+            <div className="absolute inset-0 bg-white/92 opacity-0 group-hover:opacity-100 transition-opacity duration-250 flex flex-col items-center justify-end pb-8 pointer-events-none">
+              {" "}
+              <div className="flex flex-col items-center gap-2 mb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 delay-75">
+                {" "}
+                <span className="font-sans text-[9px] text-[#666]"> Worn 14 Times </span>{" "}
+                <span className="font-sans text-[9px] text-[#666]"> Matches 32 Items </span>{" "}
+              </div>{" "}
+              <div className="text-black font-sans text-[11px] border-b border-black pb-0.5">
+                {" "}
+                View Details{" "}
+              </div>{" "}
+            </div>{" "}
+          </>
+        )}{" "}
+      </div>{" "}
+      {/* Information Area - 25% Visual Weight */}{" "}
+      <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow bg-white border-t border-black/5">
+        {" "}
+        <div>
+          {" "}
+          {!hideTitle && (
+            <h3 className="font-sans text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
+              {" "}
+              {getWardrobeItemName(item)}{" "}
+            </h3>
+          )}{" "}
+          {item.style && (
+            <p className="font-sans text-[10px] text-[#888] mt-1.5 truncate"> {item.style} </p>
+          )}{" "}
+        </div>{" "}
+        {!hideDetails && (
+          <>
+            {" "}
+            <p className="font-sans text-[11px] text-[#666] mt-2 truncate">
+              {" "}
+              {(item as any).brand ||
+                (typeof item.category === "object"
+                  ? (item.category as any)?.name
+                  : item.category) ||
+                "ACNE STUDIOS"}{" "}
+            </p>{" "}
+            {/* <div className="font-sans text-[11px] text-[#888] mt-auto pt-2"> <span>Size {(item as any).size || "S"}</span> {item.color && <span> • {item.color}</span>} </div> */}{" "}
+          </>
+        )}{" "}
+      </div>{" "}
+    </div>
+  );
+}

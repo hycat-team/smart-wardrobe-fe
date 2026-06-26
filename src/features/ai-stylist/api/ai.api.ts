@@ -1,18 +1,29 @@
-import api from '@/lib/axios';
-import { APIResponse } from '@/types/api';
-import { AIOutfitRecommendationReq, AIOutfitRecommendationRes, CreateChatSessionReq, ChatSessionRes } from '../types';
+import api from "@/lib/axios";
+import { APIResponse } from "@/types/api";
+import {
+  AIOutfitRecommendationReq,
+  AIOutfitRecommendationRes,
+  CreateChatSessionReq,
+  ChatSessionRes,
+} from "../types";
 
 export const aiApi = {
-  getOutfitRecommendation: async (data: AIOutfitRecommendationReq): Promise<AIOutfitRecommendationRes> => {
+  getOutfitRecommendation: async (
+    data: AIOutfitRecommendationReq
+  ): Promise<AIOutfitRecommendationRes> => {
     // AI processing can take a while, increase timeout to 60 seconds
-    const res = await api.post<APIResponse<AIOutfitRecommendationRes>>('/ai/outfit-recommendations', data, {
-      timeout: 200000,
-    });
+    const res = await api.post<APIResponse<AIOutfitRecommendationRes>>(
+      "/ai/outfit-recommendations",
+      data,
+      {
+        timeout: 200000,
+      }
+    );
     return res.data.data!;
   },
 
   createChatSession: async (data: CreateChatSessionReq): Promise<ChatSessionRes> => {
-    const res = await api.post<APIResponse<ChatSessionRes>>('/ai/chat/sessions', data);
+    const res = await api.post<APIResponse<ChatSessionRes>>("/ai/chat/sessions", data);
     return res.data.data!;
   },
 
@@ -20,14 +31,18 @@ export const aiApi = {
     await api.patch<APIResponse<null>>(`/ai/chat/sessions/${contextID}/archive`, data);
   },
 
-
   getChatSessions: async (): Promise<ChatSessionRes[]> => {
-    const res = await api.get<APIResponse<ChatSessionRes[]>>('/ai/chat/sessions');
+    const res = await api.get<APIResponse<ChatSessionRes[]>>("/ai/chat/sessions");
     return res.data.data!;
   },
 
-  getChatMessages: async (contextID: string, params?: { page?: number; limit?: number }): Promise<import('@/types/api').PaginationResult<import('../types').ChatMessageRes>> => {
-    const res = await api.get<APIResponse<import('@/types/api').PaginationResult<import('../types').ChatMessageRes>>>(`/ai/chat/sessions/${contextID}/messages`, { params });
+  getChatMessages: async (
+    contextID: string,
+    params?: { page?: number; limit?: number }
+  ): Promise<import("@/types/api").PaginationResult<import("../types").ChatMessageRes>> => {
+    const res = await api.get<
+      APIResponse<import("@/types/api").PaginationResult<import("../types").ChatMessageRes>>
+    >(`/ai/chat/sessions/${contextID}/messages`, { params });
     return res.data.data!;
   },
 
@@ -41,55 +56,59 @@ export const aiApi = {
   ) => {
     try {
       const response = await fetch(`/api/v1/ai/chat/sessions/${contextID}/messages/stream`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'text/event-stream',
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ content: message }),
         signal,
       });
 
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({}));
-        const errorMessage = errBody.message || errBody.detail || errBody.title || `HTTP ${response.status} ${response.statusText}`;
+        const errorMessage =
+          errBody.message ||
+          errBody.detail ||
+          errBody.title ||
+          `HTTP ${response.status} ${response.statusText}`;
         throw new Error(`[Status: ${response.status}] ${errorMessage}`);
       }
 
       const reader = response.body?.getReader();
-      if (!reader) throw new Error('No readable stream available');
+      if (!reader) throw new Error("No readable stream available");
 
       const decoder = new TextDecoder();
-      let buffer = '';
-      let currentEvent = '';
+      let buffer = "";
+      let currentEvent = "";
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
           const trimmed = line.trim();
-          if (trimmed === '') continue;
+          if (trimmed === "") continue;
 
-          if (trimmed.startsWith('event:')) {
-            currentEvent = trimmed.replace('event:', '').trim();
-          } else if (trimmed.startsWith('data:')) {
-            const rawData = trimmed.replace('data:', '').trim();
-            let textChunk = '';
+          if (trimmed.startsWith("event:")) {
+            currentEvent = trimmed.replace("event:", "").trim();
+          } else if (trimmed.startsWith("data:")) {
+            const rawData = trimmed.replace("data:", "").trim();
+            let textChunk = "";
             try {
               textChunk = JSON.parse(rawData);
             } catch {
               textChunk = rawData;
             }
 
-            if (currentEvent === 'chunk') {
+            if (currentEvent === "chunk") {
               onChunk(textChunk);
-            } else if (currentEvent === 'done') {
+            } else if (currentEvent === "done") {
               onDone(textChunk);
               break;
             }
@@ -97,10 +116,10 @@ export const aiApi = {
         }
       }
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (error instanceof Error && error.name === "AbortError") {
         // Ignored, user canceled
       } else {
-        onError(error instanceof Error ? error : new Error('Unknown error'));
+        onError(error instanceof Error ? error : new Error("Unknown error"));
       }
     }
   },

@@ -1,13 +1,14 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { UserRes } from '@/features/profile/types';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { UserRes } from "@/features/profile/types";
 
 const MOCK_USERS = {
   free: {
     id: "u1",
     name: "Lê Cẩm Lan",
     username: "lan_style",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100",
+    avatar:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100",
     isPremium: false,
     joinDate: "01/01/2026",
   },
@@ -39,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ user: null, isAuthenticated: false }),
     }),
     {
-      name: 'auth-storage', // Tên key lưu trong localStorage
+      name: "auth-storage", // Tên key lưu trong localStorage
     }
   )
 );

@@ -1,1 +1,9 @@
-import { Metadata } from "next"; import { LoginClient } from "./components/LoginClient"; export const metadata: Metadata = { title: "Đăng nhập | Closy", description: "Đăng nhập vào hệ thống Closy.", }; export default function LoginPage() { return <LoginClient />; } 
+import { Metadata } from "next";
+import { LoginClient } from "./components/LoginClient";
+export const metadata: Metadata = {
+  title: "Đăng nhập | Closy",
+  description: "Đăng nhập vào hệ thống Closy.",
+};
+export default function LoginPage() {
+  return <LoginClient />;
+}

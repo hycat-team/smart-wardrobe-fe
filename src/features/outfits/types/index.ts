@@ -1,4 +1,4 @@
-import { WardrobeItemRes } from '../../wardrobe/types';
+import { WardrobeItemRes } from "../../wardrobe/types";
 
 export interface SaveOutfitItemReq {
   wardrobeItemId: string;

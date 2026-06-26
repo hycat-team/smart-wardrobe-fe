@@ -18,6 +18,8 @@ export function getWardrobeItemName(item: any) {
 }
 
 export function getColorHex(colorName: string): string {
-  const c = COLORS.find(x => x.name.toLowerCase() === colorName.toLowerCase() || x.value === colorName.toLowerCase());
+  const c = COLORS.find(
+    (x) => x.name.toLowerCase() === colorName.toLowerCase() || x.value === colorName.toLowerCase()
+  );
   return c ? c.hex : "#CCCCCC";
 }

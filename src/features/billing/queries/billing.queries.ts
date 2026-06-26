@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { billingApi } from '../api/billing.api';
-import { toast } from 'sonner';
-import { DirectPurchaseReq, TopUpReq } from '../types';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { billingApi } from "../api/billing.api";
+import { toast } from "sonner";
+import { DirectPurchaseReq, TopUpReq } from "../types";
 
 export const useTopupMutation = () => {
   return useMutation({
@@ -29,17 +29,16 @@ export const usePurchaseDirectMutation = () => {
   });
 };
 
-
 export const usePurchaseWithWalletMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: DirectPurchaseReq) => billingApi.purchasePlanWithWallet(data),
     onSuccess: (res) => {
-      toast.success(res?.message || 'Thanh toán bằng ví nội bộ thành công!');
+      toast.success(res?.message || "Thanh toán bằng ví nội bộ thành công!");
       // Refresh wallet balance and subscription status
-      queryClient.invalidateQueries({ queryKey: ['wallet', 'balance'] });
-      queryClient.invalidateQueries({ queryKey: ['subscription', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ["wallet", "balance"] });
+      queryClient.invalidateQueries({ queryKey: ["subscription", "me"] });
     },
   });
 };

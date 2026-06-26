@@ -1,1 +1,9 @@
-import { Metadata } from "next"; import { DashboardClient } from "./components/DashboardClient"; export const metadata: Metadata = { title: "Bảng điều khiển | Smart Wardrobe", description: "Tổng quan về tủ đồ và hoạt động của bạn.", }; export default function DashboardPage() { return <DashboardClient />; } 
+import { Metadata } from "next";
+import { DashboardClient } from "./components/DashboardClient";
+export const metadata: Metadata = {
+  title: "Bảng điều khiển | Smart Wardrobe",
+  description: "Tổng quan về tủ đồ và hoạt động của bạn.",
+};
+export default function DashboardPage() {
+  return <DashboardClient />;
+}

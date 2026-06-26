@@ -1,4 +1,4 @@
-import { Gender } from '@/common/enum';
+import { Gender } from "@/common/enum";
 
 export interface LoginReq {
   loginName: string; // username or email

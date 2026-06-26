@@ -284,7 +284,7 @@ export const mockBrands = [
     followerCount: 15400,
     memberCount: 960,
     isFollowing: true,
-  }
+  },
 ];
 
 export const mockProducts = [
@@ -295,7 +295,7 @@ export const mockProducts = [
     sku: "MORI-BLZ-001",
     imageUrls: [
       // "https://images.unsplash.com/photo-1550639524-a6f58345a278?w=600&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1544441893-675973e31985?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1544441893-675973e31985?w=600&h=800&fit=crop",
     ],
     price: 1290000,
     discountPrice: 1090000,
@@ -308,7 +308,8 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_001",
     isSaved: false,
-    description: "A perfectly tailored blazer for your everyday power look. Made with premium wool-blend fabric."
+    description:
+      "A perfectly tailored blazer for your everyday power look. Made with premium wool-blend fabric.",
   },
   {
     id: "product_002",
@@ -316,7 +317,7 @@ export const mockProducts = [
     name: "Silk Slip Dress",
     sku: "MORI-DRS-002",
     imageUrls: [
-      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600&h=800&fit=crop",
     ],
     price: 850000,
     discountPrice: null,
@@ -329,16 +330,14 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_001",
     isSaved: true,
-    description: "100% mulberry silk slip dress that drapes beautifully."
+    description: "100% mulberry silk slip dress that drapes beautifully.",
   },
   {
     id: "product_003",
     brandId: "brand_002",
     name: "Oversized Utility Jacket",
     sku: "DARK-JKT-001",
-    imageUrls: [
-      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&h=800&fit=crop"
-    ],
+    imageUrls: ["https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&h=800&fit=crop"],
     price: 1850000,
     discountPrice: null,
     category: "Outerwear",
@@ -350,7 +349,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_002",
     isSaved: false,
-    description: "Heavy duty oversized jacket with multiple functional pockets."
+    description: "Heavy duty oversized jacket with multiple functional pockets.",
   },
   {
     id: "product_004",
@@ -358,7 +357,7 @@ export const mockProducts = [
     name: "Asymmetric Maxi Skirt",
     sku: "DARK-SKT-002",
     imageUrls: [
-      "https://images.unsplash.com/photo-1583496661160-c5dcb4c69c21?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1583496661160-c5dcb4c69c21?w=600&h=800&fit=crop",
     ],
     price: 950000,
     discountPrice: 750000,
@@ -371,7 +370,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_002",
     isSaved: true,
-    description: "Flowing asymmetric skirt with raw edge details."
+    description: "Flowing asymmetric skirt with raw edge details.",
   },
   {
     id: "product_005",
@@ -379,7 +378,7 @@ export const mockProducts = [
     name: "Linen Crop Top",
     sku: "LUMI-TOP-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&h=800&fit=crop",
     ],
     price: 450000,
     discountPrice: null,
@@ -392,7 +391,7 @@ export const mockProducts = [
     stockStatus: "LOW_STOCK",
     collectionId: "collection_003",
     isSaved: false,
-    description: "Breathable linen blend crop top perfect for summer days."
+    description: "Breathable linen blend crop top perfect for summer days.",
   },
   {
     id: "product_006",
@@ -400,7 +399,7 @@ export const mockProducts = [
     name: "Tech Cargo Pants",
     sku: "URB-PNT-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&h=800&fit=crop",
     ],
     price: 1150000,
     discountPrice: 990000,
@@ -413,7 +412,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_004",
     isSaved: true,
-    description: "Water-resistant cargo pants with magnetic closures."
+    description: "Water-resistant cargo pants with magnetic closures.",
   },
   {
     id: "product_007",
@@ -421,7 +420,7 @@ export const mockProducts = [
     name: "Classic Silk Shirt",
     sku: "SILK-SHT-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=600&h=800&fit=crop",
     ],
     price: 1500000,
     discountPrice: null,
@@ -434,7 +433,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_005",
     isSaved: false,
-    description: "Luxurious silk shirt with mother-of-pearl buttons."
+    description: "Luxurious silk shirt with mother-of-pearl buttons.",
   },
   {
     id: "product_008",
@@ -442,7 +441,7 @@ export const mockProducts = [
     name: "Y2K Flared Jeans",
     sku: "NEO-JNS-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&h=800&fit=crop",
     ],
     price: 890000,
     discountPrice: 690000,
@@ -455,7 +454,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_006",
     isSaved: true,
-    description: "Low-rise flared jeans that bring back the 2000s vibe."
+    description: "Low-rise flared jeans that bring back the 2000s vibe.",
   },
   {
     id: "product_009",
@@ -463,7 +462,7 @@ export const mockProducts = [
     name: "Organic Cotton Tee",
     sku: "ERTH-TEE-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop",
     ],
     price: 350000,
     discountPrice: null,
@@ -476,16 +475,14 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_007",
     isSaved: false,
-    description: "The perfect everyday tee made from 100% GOTS certified organic cotton."
+    description: "The perfect everyday tee made from 100% GOTS certified organic cotton.",
   },
   {
     id: "product_010",
     brandId: "brand_008",
     name: "Matte Leather Trench",
     sku: "NOIR-TRN-001",
-    imageUrls: [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"
-    ],
+    imageUrls: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"],
     price: 3200000,
     discountPrice: 2800000,
     category: "Outerwear",
@@ -497,7 +494,7 @@ export const mockProducts = [
     stockStatus: "LOW_STOCK",
     collectionId: "collection_008",
     isSaved: true,
-    description: "Statement leather trench coat with a unique matte finish."
+    description: "Statement leather trench coat with a unique matte finish.",
   },
   {
     id: "product_011",
@@ -505,7 +502,7 @@ export const mockProducts = [
     name: "Seamless Active Leggings",
     sku: "BOLD-LEG-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&h=800&fit=crop",
     ],
     price: 650000,
     discountPrice: null,
@@ -518,7 +515,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_010",
     isSaved: false,
-    description: "High-waisted seamless leggings designed for both performance and comfort."
+    description: "High-waisted seamless leggings designed for both performance and comfort.",
   },
   {
     id: "product_012",
@@ -526,7 +523,7 @@ export const mockProducts = [
     name: "Selvedge Denim Jacket",
     sku: "RAW-JKT-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=600&h=800&fit=crop",
     ],
     price: 1650000,
     discountPrice: 1450000,
@@ -539,16 +536,14 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_012",
     isSaved: true,
-    description: "Classic Type III jacket made from 14oz Japanese selvedge denim."
+    description: "Classic Type III jacket made from 14oz Japanese selvedge denim.",
   },
   {
     id: "product_013",
     brandId: "brand_013",
     name: "Arctic Parka",
     sku: "ARCT-PRK-001",
-    imageUrls: [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"
-    ],
+    imageUrls: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"],
     price: 4500000,
     discountPrice: 3900000,
     category: "Outerwear",
@@ -560,7 +555,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_013",
     isSaved: true,
-    description: "Heavy-duty parka built for extreme cold."
+    description: "Heavy-duty parka built for extreme cold.",
   },
   {
     id: "product_014",
@@ -568,7 +563,7 @@ export const mockProducts = [
     name: "Linen Beach Shirt",
     sku: "SUM-SHT-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&h=800&fit=crop",
     ],
     price: 550000,
     discountPrice: null,
@@ -581,16 +576,14 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_014",
     isSaved: false,
-    description: "Lightweight linen shirt perfect for beach days."
+    description: "Lightweight linen shirt perfect for beach days.",
   },
   {
     id: "product_015",
     brandId: "brand_015",
     name: "Classic Biker Jacket",
     sku: "LTHR-JKT-001",
-    imageUrls: [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"
-    ],
+    imageUrls: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop"],
     price: 5800000,
     discountPrice: 5200000,
     category: "Outerwear",
@@ -602,16 +595,14 @@ export const mockProducts = [
     stockStatus: "LOW_STOCK",
     collectionId: "collection_015",
     isSaved: true,
-    description: "Genuine full-grain leather biker jacket."
+    description: "Genuine full-grain leather biker jacket.",
   },
   {
     id: "product_016",
     brandId: "brand_016",
     name: "Reflective Windbreaker",
     sku: "FUT-WND-001",
-    imageUrls: [
-      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&h=800&fit=crop"
-    ],
+    imageUrls: ["https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&h=800&fit=crop"],
     price: 1250000,
     discountPrice: null,
     category: "Outerwear",
@@ -623,7 +614,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_016",
     isSaved: false,
-    description: "High-visibility reflective windbreaker."
+    description: "High-visibility reflective windbreaker.",
   },
   {
     id: "product_017",
@@ -631,7 +622,7 @@ export const mockProducts = [
     name: "Floral Midi Dress",
     sku: "BLSM-DRS-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600&h=800&fit=crop",
     ],
     price: 790000,
     discountPrice: 650000,
@@ -644,7 +635,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_017",
     isSaved: true,
-    description: "Flowy midi dress with an exclusive floral print."
+    description: "Flowy midi dress with an exclusive floral print.",
   },
   {
     id: "product_018",
@@ -652,7 +643,7 @@ export const mockProducts = [
     name: "Graphic Skate Tee",
     sku: "CONC-TEE-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop",
     ],
     price: 350000,
     discountPrice: null,
@@ -665,7 +656,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_018",
     isSaved: false,
-    description: "Heavyweight cotton tee with custom graphics."
+    description: "Heavyweight cotton tee with custom graphics.",
   },
   {
     id: "product_019",
@@ -673,7 +664,7 @@ export const mockProducts = [
     name: "Chunky Cable Knit Sweater",
     sku: "KNIT-SWT-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=600&h=800&fit=crop",
     ],
     price: 950000,
     discountPrice: null,
@@ -686,7 +677,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_019",
     isSaved: true,
-    description: "Hand-knit chunky sweater for ultimate warmth."
+    description: "Hand-knit chunky sweater for ultimate warmth.",
   },
   {
     id: "product_020",
@@ -694,7 +685,7 @@ export const mockProducts = [
     name: "Neon Mesh Top",
     sku: "NEON-TOP-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=600&h=800&fit=crop",
     ],
     price: 450000,
     discountPrice: 350000,
@@ -707,7 +698,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_020",
     isSaved: false,
-    description: "Breathable mesh top perfect for layering at festivals."
+    description: "Breathable mesh top perfect for layering at festivals.",
   },
   {
     id: "product_021",
@@ -715,7 +706,7 @@ export const mockProducts = [
     name: "Tailored Trousers",
     sku: "OFFC-TRS-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1591369822096-11400ee26f10?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1591369822096-11400ee26f10?w=600&h=800&fit=crop",
     ],
     price: 890000,
     discountPrice: null,
@@ -728,7 +719,7 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_021",
     isSaved: true,
-    description: "High-waisted tailored trousers for a sharp office look."
+    description: "High-waisted tailored trousers for a sharp office look.",
   },
   {
     id: "product_022",
@@ -736,7 +727,7 @@ export const mockProducts = [
     name: "Convertible Travel Pants",
     sku: "NMD-PNT-001",
     imageUrls: [
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&h=800&fit=crop"
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&h=800&fit=crop",
     ],
     price: 1100000,
     discountPrice: 950000,
@@ -749,8 +740,8 @@ export const mockProducts = [
     stockStatus: "IN_STOCK",
     collectionId: "collection_022",
     isSaved: false,
-    description: "Quick-dry pants that convert into shorts."
-  }
+    description: "Quick-dry pants that convert into shorts.",
+  },
 ];
 
 export const mockBrandPosts = [
@@ -772,26 +763,30 @@ export const mockBrandPosts = [
     brandId: "brand_002",
     type: "ANNOUNCEMENT",
     caption: "The Midnight Collection drops this Friday. Member early access starts in 24 hours.",
-    mediaUrls: ["https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_003"],
     visibility: "PUBLIC",
     likeCount: 890,
     commentCount: 120,
     saveCount: 50,
-    createdAt: "2026-06-22T15:30:00Z"
+    createdAt: "2026-06-22T15:30:00Z",
   },
   {
     id: "post_003",
     brandId: "brand_003",
     type: "LIFESTYLE",
     caption: "Catching the golden hour in our new Linen Crop Top.",
-    mediaUrls: ["https://images.unsplash.com/photo-1523450001312-faa4e2e37f0f?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1523450001312-faa4e2e37f0f?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_005"],
     visibility: "PUBLIC",
     likeCount: 540,
     commentCount: 32,
     saveCount: 110,
-    createdAt: "2026-06-23T17:45:00Z"
+    createdAt: "2026-06-23T17:45:00Z",
   },
   {
     id: "post_004",
@@ -804,59 +799,67 @@ export const mockBrandPosts = [
     likeCount: 2100,
     commentCount: 156,
     saveCount: 420,
-    createdAt: "2026-06-24T09:15:00Z"
+    createdAt: "2026-06-24T09:15:00Z",
   },
   {
     id: "post_005",
     brandId: "brand_005",
     type: "LOOKBOOK",
     caption: "Elegance is an attitude. Featuring the Classic Silk Shirt.",
-    mediaUrls: ["https://images.unsplash.com/photo-1492447166138-50c3889fccb1?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1492447166138-50c3889fccb1?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_007"],
     visibility: "PUBLIC",
     likeCount: 3200,
     commentCount: 210,
     saveCount: 890,
-    createdAt: "2026-06-19T20:00:00Z"
+    createdAt: "2026-06-19T20:00:00Z",
   },
   {
     id: "post_006",
     brandId: "brand_006",
     type: "ANNOUNCEMENT",
     caption: "Y2K is back! Our new denim line is now live.",
-    mediaUrls: ["https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_008"],
     visibility: "PUBLIC",
     likeCount: 1540,
     commentCount: 98,
     saveCount: 230,
-    createdAt: "2026-06-21T12:00:00Z"
+    createdAt: "2026-06-21T12:00:00Z",
   },
   {
     id: "post_007",
     brandId: "brand_007",
     type: "LIFESTYLE",
     caption: "A day in nature with our 100% Organic Cotton Tee.",
-    mediaUrls: ["https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_009"],
     visibility: "PUBLIC",
     likeCount: 4500,
     commentCount: 310,
     saveCount: 670,
-    createdAt: "2026-06-18T10:30:00Z"
+    createdAt: "2026-06-18T10:30:00Z",
   },
   {
     id: "post_009",
     brandId: "brand_010",
     type: "LIFESTYLE",
     caption: "Move without limits. Seamless Active Leggings.",
-    mediaUrls: ["https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_011"],
     visibility: "PUBLIC",
     likeCount: 3600,
     commentCount: 280,
     saveCount: 450,
-    createdAt: "2026-06-22T08:45:00Z"
+    createdAt: "2026-06-22T08:45:00Z",
   },
   {
     id: "post_010",
@@ -869,20 +872,22 @@ export const mockBrandPosts = [
     likeCount: 1900,
     commentCount: 110,
     saveCount: 320,
-    createdAt: "2026-06-23T14:20:00Z"
+    createdAt: "2026-06-23T14:20:00Z",
   },
   {
     id: "post_011",
     brandId: "brand_001",
     type: "ANNOUNCEMENT",
     caption: "Restock alert! The Silk Slip Dress is back in all sizes.",
-    mediaUrls: ["https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_002"],
     visibility: "PUBLIC",
     likeCount: 2340,
     commentCount: 190,
     saveCount: 480,
-    createdAt: "2026-06-24T11:00:00Z"
+    createdAt: "2026-06-24T11:00:00Z",
   },
 
   {
@@ -896,20 +901,22 @@ export const mockBrandPosts = [
     likeCount: 4100,
     commentCount: 300,
     saveCount: 850,
-    createdAt: "2026-06-20T10:00:00Z"
+    createdAt: "2026-06-20T10:00:00Z",
   },
   {
     id: "post_014",
     brandId: "brand_014",
     type: "LIFESTYLE",
     caption: "Beach days are better in Linen.",
-    mediaUrls: ["https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_014"],
     visibility: "PUBLIC",
     likeCount: 2900,
     commentCount: 150,
     saveCount: 430,
-    createdAt: "2026-06-21T14:30:00Z"
+    createdAt: "2026-06-21T14:30:00Z",
   },
   {
     id: "post_015",
@@ -922,7 +929,7 @@ export const mockBrandPosts = [
     likeCount: 5200,
     commentCount: 410,
     saveCount: 1200,
-    createdAt: "2026-06-22T09:15:00Z"
+    createdAt: "2026-06-22T09:15:00Z",
   },
   {
     id: "post_016",
@@ -935,59 +942,67 @@ export const mockBrandPosts = [
     likeCount: 3800,
     commentCount: 270,
     saveCount: 610,
-    createdAt: "2026-06-23T11:00:00Z"
+    createdAt: "2026-06-23T11:00:00Z",
   },
   {
     id: "post_017",
     brandId: "brand_017",
     type: "LIFESTYLE",
     caption: "Spring feels. The Floral Midi Dress in action.",
-    mediaUrls: ["https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_017"],
     visibility: "PUBLIC",
     likeCount: 2600,
     commentCount: 180,
     saveCount: 390,
-    createdAt: "2026-06-19T16:20:00Z"
+    createdAt: "2026-06-19T16:20:00Z",
   },
   {
     id: "post_018",
     brandId: "brand_018",
     type: "BEHIND_THE_SCENES",
     caption: "Designing the new Graphic Skate Tee.",
-    mediaUrls: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_018"],
     visibility: "PUBLIC",
     likeCount: 1700,
     commentCount: 95,
     saveCount: 210,
-    createdAt: "2026-06-21T13:45:00Z"
+    createdAt: "2026-06-21T13:45:00Z",
   },
   {
     id: "post_019",
     brandId: "brand_019",
     type: "LOOKBOOK",
     caption: "Stay cozy all season long with our Chunky Knits.",
-    mediaUrls: ["https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_019"],
     visibility: "PUBLIC",
     likeCount: 3400,
     commentCount: 220,
     saveCount: 580,
-    createdAt: "2026-06-20T18:30:00Z"
+    createdAt: "2026-06-20T18:30:00Z",
   },
   {
     id: "post_020",
     brandId: "brand_020",
     type: "LIFESTYLE",
     caption: "Festival ready. Neon Mesh Top.",
-    mediaUrls: ["https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1503342394128-c104d54dba01?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_020"],
     visibility: "PUBLIC",
     likeCount: 2100,
     commentCount: 140,
     saveCount: 350,
-    createdAt: "2026-06-22T21:15:00Z"
+    createdAt: "2026-06-22T21:15:00Z",
   },
 
   {
@@ -995,14 +1010,16 @@ export const mockBrandPosts = [
     brandId: "brand_022",
     type: "ANNOUNCEMENT",
     caption: "New arrival: Convertible Travel Pants. Your perfect travel companion.",
-    mediaUrls: ["https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&h=800&fit=crop"],
+    mediaUrls: [
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&h=800&fit=crop",
+    ],
     taggedProductIds: ["product_022"],
     visibility: "PUBLIC",
     likeCount: 3100,
     commentCount: 205,
     saveCount: 470,
-    createdAt: "2026-06-24T10:30:00Z"
-  }
+    createdAt: "2026-06-24T10:30:00Z",
+  },
 ];
 
 export const mockOrders = [
@@ -1016,12 +1033,12 @@ export const mockOrders = [
         quantity: 1,
         price: 1090000,
         size: "M",
-        color: "Black"
-      }
+        color: "Black",
+      },
     ],
     totalAmount: 1090000,
     status: "DELIVERED",
-    createdAt: "2026-06-10T14:30:00Z"
+    createdAt: "2026-06-10T14:30:00Z",
   },
   {
     id: "order_002",
@@ -1033,12 +1050,12 @@ export const mockOrders = [
         quantity: 1,
         price: 1850000,
         size: "L",
-        color: "Charcoal"
-      }
+        color: "Charcoal",
+      },
     ],
     totalAmount: 1850000,
     status: "PENDING",
-    createdAt: "2026-06-22T09:15:00Z"
+    createdAt: "2026-06-22T09:15:00Z",
   },
   {
     id: "order_003",
@@ -1050,12 +1067,12 @@ export const mockOrders = [
         quantity: 2,
         price: 450000,
         size: "S",
-        color: "White"
-      }
+        color: "White",
+      },
     ],
     totalAmount: 900000,
     status: "DELIVERED",
-    createdAt: "2026-06-05T11:20:00Z"
+    createdAt: "2026-06-05T11:20:00Z",
   },
   {
     id: "order_004",
@@ -1067,12 +1084,12 @@ export const mockOrders = [
         quantity: 1,
         price: 990000,
         size: "M",
-        color: "Olive"
-      }
+        color: "Olive",
+      },
     ],
     totalAmount: 990000,
     status: "SHIPPED",
-    createdAt: "2026-06-20T16:45:00Z"
+    createdAt: "2026-06-20T16:45:00Z",
   },
   {
     id: "order_005",
@@ -1084,12 +1101,12 @@ export const mockOrders = [
         quantity: 1,
         price: 1500000,
         size: "M",
-        color: "Emerald"
-      }
+        color: "Emerald",
+      },
     ],
     totalAmount: 1500000,
     status: "DELIVERED",
-    createdAt: "2026-05-28T14:10:00Z"
+    createdAt: "2026-05-28T14:10:00Z",
   },
   {
     id: "order_006",
@@ -1101,12 +1118,12 @@ export const mockOrders = [
         quantity: 1,
         price: 690000,
         size: "28",
-        color: "Light Wash"
-      }
+        color: "Light Wash",
+      },
     ],
     totalAmount: 690000,
     status: "PENDING",
-    createdAt: "2026-06-23T18:30:00Z"
+    createdAt: "2026-06-23T18:30:00Z",
   },
   {
     id: "order_007",
@@ -1118,12 +1135,12 @@ export const mockOrders = [
         quantity: 3,
         price: 350000,
         size: "M",
-        color: "Sage"
-      }
+        color: "Sage",
+      },
     ],
     totalAmount: 1050000,
     status: "DELIVERED",
-    createdAt: "2026-06-15T10:00:00Z"
+    createdAt: "2026-06-15T10:00:00Z",
   },
   {
     id: "order_008",
@@ -1135,12 +1152,12 @@ export const mockOrders = [
         quantity: 1,
         price: 2800000,
         size: "S",
-        color: "Black"
-      }
+        color: "Black",
+      },
     ],
     totalAmount: 2800000,
     status: "DELIVERED",
-    createdAt: "2026-06-01T20:15:00Z"
+    createdAt: "2026-06-01T20:15:00Z",
   },
   {
     id: "order_009",
@@ -1152,12 +1169,12 @@ export const mockOrders = [
         quantity: 2,
         price: 650000,
         size: "M",
-        color: "Burgundy"
-      }
+        color: "Burgundy",
+      },
     ],
     totalAmount: 1300000,
     status: "SHIPPED",
-    createdAt: "2026-06-19T13:40:00Z"
+    createdAt: "2026-06-19T13:40:00Z",
   },
   {
     id: "order_010",
@@ -1169,12 +1186,12 @@ export const mockOrders = [
         quantity: 1,
         price: 1450000,
         size: "L",
-        color: "Indigo"
-      }
+        color: "Indigo",
+      },
     ],
     totalAmount: 1450000,
     status: "PENDING",
-    createdAt: "2026-06-24T08:20:00Z"
+    createdAt: "2026-06-24T08:20:00Z",
   },
   {
     id: "order_011",
@@ -1186,12 +1203,12 @@ export const mockOrders = [
         quantity: 1,
         price: 850000,
         size: "S",
-        color: "Champagne"
-      }
+        color: "Champagne",
+      },
     ],
     totalAmount: 850000,
     status: "DELIVERED",
-    createdAt: "2026-06-12T15:00:00Z"
+    createdAt: "2026-06-12T15:00:00Z",
   },
   {
     id: "order_012",
@@ -1203,12 +1220,12 @@ export const mockOrders = [
         quantity: 1,
         price: 3900000,
         size: "L",
-        color: "Navy"
-      }
+        color: "Navy",
+      },
     ],
     totalAmount: 3900000,
     status: "PENDING",
-    createdAt: "2026-06-25T09:00:00Z"
+    createdAt: "2026-06-25T09:00:00Z",
   },
   {
     id: "order_013",
@@ -1220,12 +1237,12 @@ export const mockOrders = [
         quantity: 2,
         price: 550000,
         size: "M",
-        color: "White"
-      }
+        color: "White",
+      },
     ],
     totalAmount: 1100000,
     status: "DELIVERED",
-    createdAt: "2026-06-18T10:20:00Z"
+    createdAt: "2026-06-18T10:20:00Z",
   },
   {
     id: "order_014",
@@ -1237,12 +1254,12 @@ export const mockOrders = [
         quantity: 1,
         price: 5200000,
         size: "M",
-        color: "Black"
-      }
+        color: "Black",
+      },
     ],
     totalAmount: 5200000,
     status: "SHIPPED",
-    createdAt: "2026-06-23T11:45:00Z"
+    createdAt: "2026-06-23T11:45:00Z",
   },
   {
     id: "order_015",
@@ -1254,12 +1271,12 @@ export const mockOrders = [
         quantity: 1,
         price: 1250000,
         size: "XL",
-        color: "Silver"
-      }
+        color: "Silver",
+      },
     ],
     totalAmount: 1250000,
     status: "DELIVERED",
-    createdAt: "2026-06-08T14:10:00Z"
+    createdAt: "2026-06-08T14:10:00Z",
   },
   {
     id: "order_016",
@@ -1271,12 +1288,12 @@ export const mockOrders = [
         quantity: 1,
         price: 650000,
         size: "S",
-        color: "Pink"
-      }
+        color: "Pink",
+      },
     ],
     totalAmount: 650000,
     status: "PENDING",
-    createdAt: "2026-06-25T15:30:00Z"
+    createdAt: "2026-06-25T15:30:00Z",
   },
   {
     id: "order_017",
@@ -1288,12 +1305,12 @@ export const mockOrders = [
         quantity: 3,
         price: 350000,
         size: "L",
-        color: "Black"
-      }
+        color: "Black",
+      },
     ],
     totalAmount: 1050000,
     status: "DELIVERED",
-    createdAt: "2026-06-12T16:00:00Z"
+    createdAt: "2026-06-12T16:00:00Z",
   },
   {
     id: "order_018",
@@ -1305,12 +1322,12 @@ export const mockOrders = [
         quantity: 1,
         price: 950000,
         size: "M",
-        color: "Cream"
-      }
+        color: "Cream",
+      },
     ],
     totalAmount: 950000,
     status: "DELIVERED",
-    createdAt: "2026-06-05T09:15:00Z"
+    createdAt: "2026-06-05T09:15:00Z",
   },
   {
     id: "order_019",
@@ -1322,12 +1339,12 @@ export const mockOrders = [
         quantity: 2,
         price: 350000,
         size: "S",
-        color: "Neon Pink"
-      }
+        color: "Neon Pink",
+      },
     ],
     totalAmount: 700000,
     status: "SHIPPED",
-    createdAt: "2026-06-22T12:40:00Z"
+    createdAt: "2026-06-22T12:40:00Z",
   },
   {
     id: "order_020",
@@ -1339,12 +1356,12 @@ export const mockOrders = [
         quantity: 1,
         price: 890000,
         size: "M",
-        color: "Navy"
-      }
+        color: "Navy",
+      },
     ],
     totalAmount: 890000,
     status: "PENDING",
-    createdAt: "2026-06-25T11:20:00Z"
+    createdAt: "2026-06-25T11:20:00Z",
   },
   {
     id: "order_021",
@@ -1356,13 +1373,13 @@ export const mockOrders = [
         quantity: 1,
         price: 950000,
         size: "L",
-        color: "Khaki"
-      }
+        color: "Khaki",
+      },
     ],
     totalAmount: 950000,
     status: "DELIVERED",
-    createdAt: "2026-06-15T13:00:00Z"
-  }
+    createdAt: "2026-06-15T13:00:00Z",
+  },
 ];
 
 export const mockReturnRequests = [
@@ -1381,13 +1398,13 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-24T14:30:00Z"
+        timestamp: "2026-06-24T14:30:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-24T16:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-24T16:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_002",
@@ -1404,9 +1421,9 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-24T09:10:00Z"
-      }
-    ]
+        timestamp: "2026-06-24T09:10:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_003",
@@ -1423,17 +1440,17 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-10T11:00:00Z"
+        timestamp: "2026-06-10T11:00:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-11T09:30:00Z"
+        timestamp: "2026-06-11T09:30:00Z",
       },
       {
         status: "APPROVED",
-        timestamp: "2026-06-12T14:20:00Z"
-      }
-    ]
+        timestamp: "2026-06-12T14:20:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_004",
@@ -1450,17 +1467,17 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-18T16:45:00Z"
+        timestamp: "2026-06-18T16:45:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-19T10:00:00Z"
+        timestamp: "2026-06-19T10:00:00Z",
       },
       {
         status: "REJECTED",
-        timestamp: "2026-06-19T11:30:00Z"
-      }
-    ]
+        timestamp: "2026-06-19T11:30:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_005",
@@ -1477,17 +1494,17 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-05T08:20:00Z"
+        timestamp: "2026-06-05T08:20:00Z",
       },
       {
         status: "APPROVED",
-        timestamp: "2026-06-06T09:00:00Z"
+        timestamp: "2026-06-06T09:00:00Z",
       },
       {
         status: "RESOLVED",
-        timestamp: "2026-06-10T15:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-10T15:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_006",
@@ -1504,13 +1521,13 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-23T14:15:00Z"
+        timestamp: "2026-06-23T14:15:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-24T09:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-24T09:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_007",
@@ -1527,9 +1544,9 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-24T18:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-24T18:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_008",
@@ -1546,13 +1563,13 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-08T10:30:00Z"
+        timestamp: "2026-06-08T10:30:00Z",
       },
       {
         status: "APPROVED",
-        timestamp: "2026-06-09T14:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-09T14:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_009",
@@ -1569,13 +1586,13 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-20T11:45:00Z"
+        timestamp: "2026-06-20T11:45:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-21T09:10:00Z"
-      }
-    ]
+        timestamp: "2026-06-21T09:10:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_010",
@@ -1592,17 +1609,17 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-20T08:00:00Z"
+        timestamp: "2026-06-20T08:00:00Z",
       },
       {
         status: "APPROVED",
-        timestamp: "2026-06-21T10:00:00Z"
+        timestamp: "2026-06-21T10:00:00Z",
       },
       {
         status: "RESOLVED",
-        timestamp: "2026-06-23T16:30:00Z"
-      }
-    ]
+        timestamp: "2026-06-23T16:30:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_011",
@@ -1619,9 +1636,9 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-24T20:15:00Z"
-      }
-    ]
+        timestamp: "2026-06-24T20:15:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_012",
@@ -1638,9 +1655,9 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-20T14:30:00Z"
-      }
-    ]
+        timestamp: "2026-06-20T14:30:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_013",
@@ -1657,13 +1674,13 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-15T09:10:00Z"
+        timestamp: "2026-06-15T09:10:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-16T10:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-16T10:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_014",
@@ -1680,17 +1697,17 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-14T11:00:00Z"
+        timestamp: "2026-06-14T11:00:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-15T09:30:00Z"
+        timestamp: "2026-06-15T09:30:00Z",
       },
       {
         status: "APPROVED",
-        timestamp: "2026-06-16T14:20:00Z"
-      }
-    ]
+        timestamp: "2026-06-16T14:20:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_015",
@@ -1707,17 +1724,17 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-10T16:45:00Z"
+        timestamp: "2026-06-10T16:45:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-11T10:00:00Z"
+        timestamp: "2026-06-11T10:00:00Z",
       },
       {
         status: "REJECTED",
-        timestamp: "2026-06-12T11:30:00Z"
-      }
-    ]
+        timestamp: "2026-06-12T11:30:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_016",
@@ -1734,17 +1751,17 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-18T08:20:00Z"
+        timestamp: "2026-06-18T08:20:00Z",
       },
       {
         status: "APPROVED",
-        timestamp: "2026-06-19T09:00:00Z"
+        timestamp: "2026-06-19T09:00:00Z",
       },
       {
         status: "RESOLVED",
-        timestamp: "2026-06-22T15:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-22T15:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_017",
@@ -1761,13 +1778,13 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-22T14:15:00Z"
+        timestamp: "2026-06-22T14:15:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-23T09:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-23T09:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_018",
@@ -1784,9 +1801,9 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-25T18:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-25T18:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_019",
@@ -1803,13 +1820,13 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-18T10:30:00Z"
+        timestamp: "2026-06-18T10:30:00Z",
       },
       {
         status: "APPROVED",
-        timestamp: "2026-06-19T14:00:00Z"
-      }
-    ]
+        timestamp: "2026-06-19T14:00:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_020",
@@ -1826,13 +1843,13 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-12T11:45:00Z"
+        timestamp: "2026-06-12T11:45:00Z",
       },
       {
         status: "UNDER_REVIEW",
-        timestamp: "2026-06-13T09:10:00Z"
-      }
-    ]
+        timestamp: "2026-06-13T09:10:00Z",
+      },
+    ],
   },
   {
     id: "after_sales_021",
@@ -1849,16 +1866,16 @@ export const mockReturnRequests = [
     timeline: [
       {
         status: "SUBMITTED",
-        timestamp: "2026-06-20T08:00:00Z"
+        timestamp: "2026-06-20T08:00:00Z",
       },
       {
         status: "APPROVED",
-        timestamp: "2026-06-21T10:00:00Z"
+        timestamp: "2026-06-21T10:00:00Z",
       },
       {
         status: "RESOLVED",
-        timestamp: "2026-06-24T16:30:00Z"
-      }
-    ]
-  }
+        timestamp: "2026-06-24T16:30:00Z",
+      },
+    ],
+  },
 ];

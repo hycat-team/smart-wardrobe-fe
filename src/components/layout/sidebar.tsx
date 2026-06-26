@@ -1,15 +1,325 @@
-"use client"; import Image from "next/image";
+"use client";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Globe, LogOut, PanelLeftClose, PanelLeftOpen, PlusCircle, ScanQrCode, Settings, ShoppingBag, Shirt, Sparkles, Store, User,
+import {
+  Globe,
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
+  PlusCircle,
+  ScanQrCode,
+  Settings,
+  ShoppingBag,
+  Shirt,
+  Sparkles,
+  Store,
+  User,
 } from "lucide-react";
 import { cn, getUserAvatar } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useB2BDemoStore } from "@/lib/mock-data/b2b/store";
-import { useLogout } from "@/features/auth/queries/auth.queries"; export const NAV_ITEMS = [ { icon: PlusCircle, label: "Thêm đồ nhanh", path: "/wardrobe/explore" }, { icon: Shirt, label: "Tủ quần áo", path: "/wardrobe" }, { icon: Sparkles, label: "AI phối đồ", path: "/ai-stylist" }, { icon: ScanQrCode, label: "Trang phục", path: "/outfits" }, { icon: Globe, label: "Cộng đồng", path: "/community" }, { icon: Store, label: "Thanh lý", path: "/marketplace", comingSoon: true },
-]; export function Sidebar() { const pathname = usePathname(); const user = useAuthStore((state) => state.user); const clearAuthStore = useAuthStore((state) => state.logout); const logoutMutation = useLogout(); const { cart, setCartOpen } = useB2BDemoStore(); const [isCollapsed, setIsCollapsed] = useState(() => { if (typeof window === "undefined") { return false; } return localStorage.getItem("closy_sidebar_collapsed") === "true"; }); const handleToggleCollapse = () => { const nextState = !isCollapsed; setIsCollapsed(nextState); localStorage.setItem("closy_sidebar_collapsed", String(nextState)); }; const handleLogout = () => { clearAuthStore(); logoutMutation.mutate(); }; return ( <aside className={cn( "hidden h-dvh sticky top-0 z-40 border-r border-border/70 bg-background md:flex md:flex-col md:py-6 transition-all duration-300", isCollapsed ? "w-[96px] px-3" : "w-[296px] px-5" )} > <button onClick={handleToggleCollapse} aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} className="absolute -right-3 top-8 rounded-full border border-border/80 bg-background p-1.5 text-muted-foreground shadow-sm transition-colors hover:text-foreground" > {isCollapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />} </button> <div className={cn("mb-6 flex flex-col", isCollapsed ? "items-center" : "px-1")}> {!isCollapsed && ( <span className="mb-2 text-[11px] font-semibold text-muted-foreground">Smart fashion workspace</span> )} <Link href="/" className="flex items-center gap-2"> {isCollapsed ? ( <Image src="/favicon.ico" alt="Closy" width={44} height={44} className="rounded-xl" /> ) : ( <> <span className="text-[1.7rem] font-semibold leading-none text-foreground">Closy</span> <span className="text-lg font-semibold text-terracotta">.</span> </> )} </Link> </div> <DropdownMenu> <DropdownMenuTrigger asChild> <button className={cn( "mb-6 flex items-center border border-border/70 bg-muted/30 text-left shadow-sm transition-colors hover:bg-muted/45", isCollapsed ? "justify-center rounded-2xl p-2.5" : "gap-3 rounded-2xl p-3.5" )} > <Image src={getUserAvatar(user)} alt="Avatar" width={44} height={44} className={cn("rounded-full object-cover", isCollapsed ? "size-10" : "size-11")} /> {!isCollapsed && ( <div className="min-w-0 flex-1"> <p className="truncate text-sm font-semibold text-foreground">{user?.name || "Closy member"}</p> <p className="truncate text-xs text-muted-foreground">Xem hồ sơ và cài đặt</p> </div> )} </button> </DropdownMenuTrigger> <DropdownMenuContent align={isCollapsed ? "start" : "end"} side={isCollapsed ? "right" : "bottom"} sideOffset={isCollapsed ? 12 : 6} className="w-[244px] rounded-2xl border-border/70 p-2 shadow-xl"> <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5"> <Link href="/profile" className="flex items-center gap-3 text-foreground/85"> <User className="size-4" /> Hồ sơ </Link> </DropdownMenuItem> <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5"> <Link href="/profile/purchases" className="flex items-center gap-3 text-foreground/85"> <ShoppingBag className="size-4" /> Đơn hàng </Link> </DropdownMenuItem> <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5"> <Link href="/profile/update" className="flex items-center gap-3 text-foreground/85"> <Settings className="size-4" /> Cài đặt </Link> </DropdownMenuItem> <DropdownMenuSeparator className="my-1 bg-border/60" /> <DropdownMenuItem onClick={handleLogout} className="rounded-xl px-3 py-2.5 text-red-600 focus:bg-red-50 focus:text-red-700"> <div className="flex items-center gap-3"> <LogOut className="size-4" /> Đăng xuất </div> </DropdownMenuItem> </DropdownMenuContent> </DropdownMenu> <nav className="flex flex-1 flex-col gap-1.5"> {NAV_ITEMS.map((item) => { const isActive = item.path === "/wardrobe" ? pathname === "/wardrobe" || (pathname.startsWith("/wardrobe/") && !pathname.startsWith("/wardrobe/explore")) : pathname.startsWith(item.path); const Icon = item.icon; const content = ( <Link href={item.path} className={cn( "group relative flex items-center rounded-2xl transition-all", isCollapsed ? "justify-center p-3.5" : "gap-3 px-4 py-3.5", isActive ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/35 hover:text-foreground" )} > <Icon className="size-5 shrink-0" strokeWidth={1.8} /> {!isCollapsed && ( <> <span className="truncate text-sm font-medium">{item.label}</span> {item.comingSoon && ( <span className="ml-auto rounded-full bg-background/80 px-2 py-0.5 text-[11px] font-semibold text-foreground/80"> Soon </span> )} </> )} </Link> ); if (isCollapsed) { return ( <Tooltip key={item.path}> <TooltipTrigger asChild>{content}</TooltipTrigger> <TooltipContent side="right" sideOffset={12} className="text-xs font-medium"> {item.label} </TooltipContent> </Tooltip> ); } return <div key={item.path}>{content}</div>; })} </nav> <div className="mb-4 mt-2"> {isCollapsed ? ( <Tooltip> <TooltipTrigger asChild> <button onClick={() => setCartOpen(true)} className="flex w-full items-center justify-center rounded-2xl p-3.5 text-muted-foreground transition-colors hover:bg-muted/35 hover:text-foreground" aria-label="Open cart" > <div className="relative"> <ShoppingBag className="size-5" strokeWidth={1.8} /> {cart.length > 0 && ( <span className="absolute -right-1.5 -top-1.5 inline-flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground"> {cart.length} </span> )} </div> </button> </TooltipTrigger> <TooltipContent side="right" sideOffset={12} className="text-xs font-medium">Giỏ hàng</TooltipContent> </Tooltip> ) : ( <button onClick={() => setCartOpen(true)} className="flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-muted-foreground transition-colors hover:bg-muted/35 hover:text-foreground" > <div className="flex items-center gap-3"> <div className="relative"> <ShoppingBag className="size-5" strokeWidth={1.8} /> {cart.length > 0 && ( <span className="absolute -right-1.5 -top-1.5 inline-flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground"> {cart.length} </span> )} </div> <span className="text-sm font-medium">Giỏ hàng</span> </div> </button> )} </div> {!user?.isPremium && ( <div className={cn("mt-auto overflow-hidden border border-border/70 bg-muted/30 shadow-sm", isCollapsed ? "rounded-2xl p-3" : "rounded-3xl p-5")}> {isCollapsed ? ( <Tooltip> <TooltipTrigger asChild> <Link href="/pricing" className="flex items-center justify-center text-foreground/85 transition-colors hover:text-primary"> <Sparkles className="size-5" /> </Link> </TooltipTrigger> <TooltipContent side="right" sideOffset={12} className="text-xs font-medium">Nâng cấp Premium</TooltipContent> </Tooltip> ) : ( <div className="space-y-3"> <div className="flex items-center gap-2 text-sm font-semibold text-foreground"> <Sparkles className="size-4 text-primary" /> Premium </div> <p className="text-sm text-muted-foreground text-pretty"> Mở khóa thêm gợi ý phối đồ và trải nghiệm AI sâu hơn cho tủ đồ của bạn. </p> <Link href="/pricing" className="inline-flex items-center text-sm font-semibold text-foreground transition-colors hover:text-primary"> Xem gói nâng cấp </Link> </div> )} </div> )} </aside> );
-} 
+import { useLogout } from "@/features/auth/queries/auth.queries";
+export const NAV_ITEMS = [
+  { icon: PlusCircle, label: "Thêm đồ nhanh", path: "/wardrobe/explore" },
+  { icon: Shirt, label: "Tủ quần áo", path: "/wardrobe" },
+  { icon: Sparkles, label: "AI phối đồ", path: "/ai-stylist" },
+  { icon: ScanQrCode, label: "Trang phục", path: "/outfits" },
+  { icon: Globe, label: "Cộng đồng", path: "/community" },
+  { icon: Store, label: "Thanh lý", path: "/marketplace", comingSoon: true },
+];
+export function Sidebar() {
+  const pathname = usePathname();
+  const user = useAuthStore((state) => state.user);
+  const clearAuthStore = useAuthStore((state) => state.logout);
+  const logoutMutation = useLogout();
+  const { cart, setCartOpen } = useB2BDemoStore();
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return localStorage.getItem("closy_sidebar_collapsed") === "true";
+  });
+  const handleToggleCollapse = () => {
+    const nextState = !isCollapsed;
+    setIsCollapsed(nextState);
+    localStorage.setItem("closy_sidebar_collapsed", String(nextState));
+  };
+  const handleLogout = () => {
+    clearAuthStore();
+    logoutMutation.mutate();
+  };
+  return (
+    <aside
+      className={cn(
+        "hidden h-dvh sticky top-0 z-40 border-r border-border/70 bg-background md:flex md:flex-col md:py-6 transition-all duration-300",
+        isCollapsed ? "w-[96px] px-3" : "w-[296px] px-5"
+      )}
+    >
+      {" "}
+      <button
+        onClick={handleToggleCollapse}
+        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        className="absolute -right-3 top-8 rounded-full border border-border/80 bg-background p-1.5 text-muted-foreground shadow-sm transition-colors hover:text-foreground"
+      >
+        {" "}
+        {isCollapsed ? (
+          <PanelLeftOpen className="size-4" />
+        ) : (
+          <PanelLeftClose className="size-4" />
+        )}{" "}
+      </button>{" "}
+      <div className={cn("mb-6 flex flex-col", isCollapsed ? "items-center" : "px-1")}>
+        {" "}
+        {!isCollapsed && (
+          <span className="mb-2 text-[11px] font-semibold text-muted-foreground">
+            Smart fashion workspace
+          </span>
+        )}{" "}
+        <Link href="/" className="flex items-center gap-2">
+          {" "}
+          {isCollapsed ? (
+            <Image src="/favicon.ico" alt="Closy" width={44} height={44} className="rounded-xl" />
+          ) : (
+            <>
+              {" "}
+              <span className="text-[1.7rem] font-semibold leading-none text-foreground">
+                Closy
+              </span>{" "}
+              <span className="text-lg font-semibold text-terracotta">.</span>{" "}
+            </>
+          )}{" "}
+        </Link>{" "}
+      </div>{" "}
+      <DropdownMenu>
+        {" "}
+        <DropdownMenuTrigger asChild>
+          {" "}
+          <button
+            className={cn(
+              "mb-6 flex items-center border border-border/70 bg-muted/30 text-left shadow-sm transition-colors hover:bg-muted/45",
+              isCollapsed ? "justify-center rounded-2xl p-2.5" : "gap-3 rounded-2xl p-3.5"
+            )}
+          >
+            {" "}
+            <Image
+              src={getUserAvatar(user)}
+              alt="Avatar"
+              width={44}
+              height={44}
+              className={cn("rounded-full object-cover", isCollapsed ? "size-10" : "size-11")}
+            />{" "}
+            {!isCollapsed && (
+              <div className="min-w-0 flex-1">
+                {" "}
+                <p className="truncate text-sm font-semibold text-foreground">
+                  {user?.name || "Closy member"}
+                </p>{" "}
+                <p className="truncate text-xs text-muted-foreground">Xem hồ sơ và cài đặt</p>{" "}
+              </div>
+            )}{" "}
+          </button>{" "}
+        </DropdownMenuTrigger>{" "}
+        <DropdownMenuContent
+          align={isCollapsed ? "start" : "end"}
+          side={isCollapsed ? "right" : "bottom"}
+          sideOffset={isCollapsed ? 12 : 6}
+          className="w-[244px] rounded-2xl border-border/70 p-2 shadow-xl"
+        >
+          {" "}
+          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5">
+            {" "}
+            <Link href="/profile" className="flex items-center gap-3 text-foreground/85">
+              {" "}
+              <User className="size-4" /> Hồ sơ{" "}
+            </Link>{" "}
+          </DropdownMenuItem>{" "}
+          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5">
+            {" "}
+            <Link href="/profile/purchases" className="flex items-center gap-3 text-foreground/85">
+              {" "}
+              <ShoppingBag className="size-4" /> Đơn hàng{" "}
+            </Link>{" "}
+          </DropdownMenuItem>{" "}
+          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5">
+            {" "}
+            <Link href="/profile/update" className="flex items-center gap-3 text-foreground/85">
+              {" "}
+              <Settings className="size-4" /> Cài đặt{" "}
+            </Link>{" "}
+          </DropdownMenuItem>{" "}
+          <DropdownMenuSeparator className="my-1 bg-border/60" />{" "}
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="rounded-xl px-3 py-2.5 text-red-600 focus:bg-red-50 focus:text-red-700"
+          >
+            {" "}
+            <div className="flex items-center gap-3">
+              {" "}
+              <LogOut className="size-4" /> Đăng xuất{" "}
+            </div>{" "}
+          </DropdownMenuItem>{" "}
+        </DropdownMenuContent>{" "}
+      </DropdownMenu>{" "}
+      <nav className="flex flex-1 flex-col gap-1.5">
+        {" "}
+        {NAV_ITEMS.map((item) => {
+          const isActive =
+            item.path === "/wardrobe"
+              ? pathname === "/wardrobe" ||
+                (pathname.startsWith("/wardrobe/") && !pathname.startsWith("/wardrobe/explore"))
+              : pathname.startsWith(item.path);
+          const Icon = item.icon;
+          const content = (
+            <Link
+              href={item.path}
+              className={cn(
+                "group relative flex items-center rounded-2xl transition-all",
+                isCollapsed ? "justify-center p-3.5" : "gap-3 px-4 py-3.5",
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-muted/35 hover:text-foreground"
+              )}
+            >
+              {" "}
+              <Icon className="size-5 shrink-0" strokeWidth={1.8} />{" "}
+              {!isCollapsed && (
+                <>
+                  {" "}
+                  <span className="truncate text-sm font-medium">{item.label}</span>{" "}
+                  {item.comingSoon && (
+                    <span className="ml-auto rounded-full bg-background/80 px-2 py-0.5 text-[11px] font-semibold text-foreground/80">
+                      {" "}
+                      Soon{" "}
+                    </span>
+                  )}{" "}
+                </>
+              )}{" "}
+            </Link>
+          );
+          if (isCollapsed) {
+            return (
+              <Tooltip key={item.path}>
+                {" "}
+                <TooltipTrigger asChild>{content}</TooltipTrigger>{" "}
+                <TooltipContent side="right" sideOffset={12} className="text-xs font-medium">
+                  {" "}
+                  {item.label}{" "}
+                </TooltipContent>{" "}
+              </Tooltip>
+            );
+          }
+          return <div key={item.path}>{content}</div>;
+        })}{" "}
+      </nav>{" "}
+      <div className="mb-4 mt-2">
+        {" "}
+        {isCollapsed ? (
+          <Tooltip>
+            {" "}
+            <TooltipTrigger asChild>
+              {" "}
+              <button
+                onClick={() => setCartOpen(true)}
+                className="flex w-full items-center justify-center rounded-2xl p-3.5 text-muted-foreground transition-colors hover:bg-muted/35 hover:text-foreground"
+                aria-label="Open cart"
+              >
+                {" "}
+                <div className="relative">
+                  {" "}
+                  <ShoppingBag className="size-5" strokeWidth={1.8} />{" "}
+                  {cart.length > 0 && (
+                    <span className="absolute -right-1.5 -top-1.5 inline-flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                      {" "}
+                      {cart.length}{" "}
+                    </span>
+                  )}{" "}
+                </div>{" "}
+              </button>{" "}
+            </TooltipTrigger>{" "}
+            <TooltipContent side="right" sideOffset={12} className="text-xs font-medium">
+              Giỏ hàng
+            </TooltipContent>{" "}
+          </Tooltip>
+        ) : (
+          <button
+            onClick={() => setCartOpen(true)}
+            className="flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-muted-foreground transition-colors hover:bg-muted/35 hover:text-foreground"
+          >
+            {" "}
+            <div className="flex items-center gap-3">
+              {" "}
+              <div className="relative">
+                {" "}
+                <ShoppingBag className="size-5" strokeWidth={1.8} />{" "}
+                {cart.length > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 inline-flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                    {" "}
+                    {cart.length}{" "}
+                  </span>
+                )}{" "}
+              </div>{" "}
+              <span className="text-sm font-medium">Giỏ hàng</span>{" "}
+            </div>{" "}
+          </button>
+        )}{" "}
+      </div>{" "}
+      {!user?.isPremium && (
+        <div
+          className={cn(
+            "mt-auto overflow-hidden border border-border/70 bg-muted/30 shadow-sm",
+            isCollapsed ? "rounded-2xl p-3" : "rounded-3xl p-5"
+          )}
+        >
+          {" "}
+          {isCollapsed ? (
+            <Tooltip>
+              {" "}
+              <TooltipTrigger asChild>
+                {" "}
+                <Link
+                  href="/pricing"
+                  className="flex items-center justify-center text-foreground/85 transition-colors hover:text-primary"
+                >
+                  {" "}
+                  <Sparkles className="size-5" />{" "}
+                </Link>{" "}
+              </TooltipTrigger>{" "}
+              <TooltipContent side="right" sideOffset={12} className="text-xs font-medium">
+                Nâng cấp Premium
+              </TooltipContent>{" "}
+            </Tooltip>
+          ) : (
+            <div className="space-y-3">
+              {" "}
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                {" "}
+                <Sparkles className="size-4 text-primary" /> Premium{" "}
+              </div>{" "}
+              <p className="text-sm text-muted-foreground text-pretty">
+                {" "}
+                Mở khóa thêm gợi ý phối đồ và trải nghiệm AI sâu hơn cho tủ đồ của bạn.{" "}
+              </p>{" "}
+              <Link
+                href="/pricing"
+                className="inline-flex items-center text-sm font-semibold text-foreground transition-colors hover:text-primary"
+              >
+                {" "}
+                Xem gói nâng cấp{" "}
+              </Link>{" "}
+            </div>
+          )}{" "}
+        </div>
+      )}{" "}
+    </aside>
+  );
+}

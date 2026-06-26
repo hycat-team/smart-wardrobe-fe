@@ -1,1 +1,6 @@
-import { Metadata } from 'next'; import { BrandPostsClient } from './components/BrandPostsClient'; export const metadata: Metadata = { title: 'Quản lý Bài viết | Không gian thương hiệu', }; export default function BrandPostsPage() { return <BrandPostsClient />; } 
+import { Metadata } from "next";
+import { BrandPostsClient } from "./components/BrandPostsClient";
+export const metadata: Metadata = { title: "Quản lý Bài viết | Không gian thương hiệu" };
+export default function BrandPostsPage() {
+  return <BrandPostsClient />;
+}

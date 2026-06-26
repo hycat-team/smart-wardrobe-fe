@@ -17,7 +17,8 @@ export const useChatSessions = () => {
 export const useChatMessages = (contextID: string, enabled: boolean = true) => {
   return useInfiniteQuery({
     queryKey: aiKeys.chatMessages(contextID),
-    queryFn: ({ pageParam = 1 }) => aiApi.getChatMessages(contextID, { page: pageParam, limit: 20 }),
+    queryFn: ({ pageParam = 1 }) =>
+      aiApi.getChatMessages(contextID, { page: pageParam, limit: 20 }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       if (lastPage.metadata.page < lastPage.metadata.totalPages) {

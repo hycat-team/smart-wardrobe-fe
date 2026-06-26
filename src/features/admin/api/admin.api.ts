@@ -1,21 +1,32 @@
-import api from '@/lib/axios';
-import { APIResponse, PaginationResult } from '@/types/api';
-import { AdminUserListRes, UpdateUserStatusReq, AdminPostListRes, AdminPostItemListRes } from '../types';
+import api from "@/lib/axios";
+import { APIResponse, PaginationResult } from "@/types/api";
+import {
+  AdminUserListRes,
+  UpdateUserStatusReq,
+  AdminPostListRes,
+  AdminPostItemListRes,
+} from "../types";
 
 export const adminApi = {
   // Users
   getUsers: async (params?: Record<string, any>): Promise<AdminUserListRes> => {
-    const res = await api.get<APIResponse<AdminUserListRes>>('/admin/users', { params });
+    const res = await api.get<APIResponse<AdminUserListRes>>("/admin/users", { params });
     return res.data.data as AdminUserListRes;
   },
-  updateUserStatus: async ({ id, data }: { id: string; data: UpdateUserStatusReq }): Promise<any> => {
+  updateUserStatus: async ({
+    id,
+    data,
+  }: {
+    id: string;
+    data: UpdateUserStatusReq;
+  }): Promise<any> => {
     const res = await api.patch<APIResponse>(`/admin/users/${id}/status`, data);
     return res.data;
   },
 
   // Posts
   getPosts: async (params?: Record<string, any>): Promise<AdminPostListRes> => {
-    const res = await api.get<APIResponse<AdminPostListRes>>('/admin/posts', { params });
+    const res = await api.get<APIResponse<AdminPostListRes>>("/admin/posts", { params });
     return res.data.data as AdminPostListRes;
   },
   deletePost: async (id: string): Promise<any> => {
@@ -29,7 +40,7 @@ export const adminApi = {
 
   // Post Items (Listings)
   getPostItems: async (params?: Record<string, any>): Promise<AdminPostItemListRes> => {
-    const res = await api.get<APIResponse<AdminPostItemListRes>>('/admin/post-items', { params });
+    const res = await api.get<APIResponse<AdminPostItemListRes>>("/admin/post-items", { params });
     return res.data.data as AdminPostItemListRes;
   },
   getPostComments: async (postPublicID: string): Promise<any[]> => {
@@ -57,14 +68,20 @@ export const adminApi = {
 
   // Category
   getCategories: async (): Promise<any[]> => {
-    const res = await api.get<APIResponse<any[]>>('/admin/categories');
+    const res = await api.get<APIResponse<any[]>>("/admin/categories");
     return res.data.data || [];
   },
   createCategory: async (data: { name: string; slug: string }): Promise<any> => {
-    const res = await api.post<APIResponse>('/admin/categories', data);
+    const res = await api.post<APIResponse>("/admin/categories", data);
     return res.data.data;
   },
-  updateCategory: async ({ id, data }: { id: string; data: { name: string; slug: string } }): Promise<any> => {
+  updateCategory: async ({
+    id,
+    data,
+  }: {
+    id: string;
+    data: { name: string; slug: string };
+  }): Promise<any> => {
     const res = await api.put<APIResponse>(`/admin/categories/${id}`, data);
     return res.data.data;
   },
@@ -75,15 +92,19 @@ export const adminApi = {
 
   // Catalog
   getUploadSignature: async (): Promise<any> => {
-    const res = await api.get<APIResponse<any>>('/admin/wardrobe-items/upload-signature');
+    const res = await api.get<APIResponse<any>>("/admin/wardrobe-items/upload-signature");
     return res.data.data;
   },
   getSystemWardrobeItems: async (params?: Record<string, any>): Promise<PaginationResult<any>> => {
-    const res = await api.get<APIResponse<PaginationResult<any>>>('/admin/wardrobe-items', { params });
+    const res = await api.get<APIResponse<PaginationResult<any>>>("/admin/wardrobe-items", {
+      params,
+    });
     return res.data.data!;
   },
-  batchUploadSystemWardrobeItems: async (data: { items: { categoryId: string; imagePublicId: string; imageUrl: string }[] }): Promise<any> => {
-    const res = await api.post<APIResponse>('/admin/wardrobe-items/batch-upload', data);
+  batchUploadSystemWardrobeItems: async (data: {
+    items: { categoryId: string; imagePublicId: string; imageUrl: string }[];
+  }): Promise<any> => {
+    const res = await api.post<APIResponse>("/admin/wardrobe-items/batch-upload", data);
     return res.data;
   },
   updateSystemWardrobeItem: async ({ id, data }: { id: string; data: any }): Promise<any> => {

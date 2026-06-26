@@ -1,14 +1,14 @@
-import axios, { AxiosError } from 'axios';
-import { toast } from 'sonner';
-import { ErrorResponse } from '@/types/api';
+import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
+import { ErrorResponse } from "@/types/api";
 
 const api = axios.create({
   // Point to Next.js proxy instead of direct backend
-  baseURL: '/api/v1',
+  baseURL: "/api/v1",
   timeout: 10000,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -45,12 +45,18 @@ api.interceptors.response.use(
             error.response.data?.detail === "Vui lòng đăng nhập" ||
             error.response.data?.Detail === "Vui lòng đăng nhập" ||
             error.response.data?.message === "Đã xảy ra lỗi hệ thống" ||
-            error.response.data?.detail === "Đã xảy ra lỗi hệ thống"
-          )
-        );
+            error.response.data?.detail === "Đã xảy ra lỗi hệ thống"));
 
-      if (isAuthError && originalRequest && !originalRequest._retry && !originalRequest.url?.includes('/auth/login')) {
-        if (originalRequest.url?.includes('/auth/logout') || originalRequest.url?.includes('/auth/refresh-token')) {
+      if (
+        isAuthError &&
+        originalRequest &&
+        !originalRequest._retry &&
+        !originalRequest.url?.includes("/auth/login")
+      ) {
+        if (
+          originalRequest.url?.includes("/auth/logout") ||
+          originalRequest.url?.includes("/auth/refresh-token")
+        ) {
           return Promise.reject(error);
         }
 
@@ -71,19 +77,20 @@ api.interceptors.response.use(
 
         try {
           // Gọi API refresh token của BFF
-          await axios.post('/api/v1/auth/refresh-token', {}, { baseURL: '' });
+          await axios.post("/api/v1/auth/refresh-token", {}, { baseURL: "" });
           processQueue(null);
           // Gọi lại request bị fail
           return api(originalRequest);
         } catch (err) {
           processQueue(err, null);
-          const isLoginPage = typeof window !== 'undefined' && window.location.pathname.includes('/auth/login');
-          const isMeEndpoint = originalRequest.url?.endsWith('/me');
+          const isLoginPage =
+            typeof window !== "undefined" && window.location.pathname.includes("/auth/login");
+          const isMeEndpoint = originalRequest.url?.endsWith("/me");
 
           if (!isLoginPage && !isMeEndpoint) {
-            toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+            toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
             setTimeout(() => {
-              window.location.href = '/auth/login';
+              window.location.href = "/auth/login";
             }, 1000);
           }
           return Promise.reject(error);
@@ -104,14 +111,13 @@ api.interceptors.response.use(
       } else if (errorMessage) {
         toast.error(errorMessage);
       } else if (error.response.status >= 500) {
-        toast.error('Lỗi máy chủ! Vui lòng thử lại sau.');
+        toast.error("Lỗi máy chủ! Vui lòng thử lại sau.");
       } else {
-        toast.error('Đã có lỗi xảy ra. Vui lòng thử lại.');
+        toast.error("Đã có lỗi xảy ra. Vui lòng thử lại.");
       }
-
     } else {
       // Network error or timeout
-      toast.error('Không thể kết nối đến máy chủ.');
+      toast.error("Không thể kết nối đến máy chủ.");
     }
     return Promise.reject(error);
   }

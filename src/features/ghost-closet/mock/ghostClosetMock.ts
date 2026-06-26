@@ -1,4 +1,4 @@
-import { GhostItem, WardrobeFitReport } from '../types';
+import { GhostItem, WardrobeFitReport } from "../types";
 
 export const MOCK_GHOST_ITEM: GhostItem = {
   id: "ghost-001",
@@ -6,7 +6,8 @@ export const MOCK_GHOST_ITEM: GhostItem = {
   isGhost: true,
   brandName: "Mori Studio",
   brandId: "mori-studio",
-  imageUrl: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1000&auto=format&fit=crop",
+  imageUrl:
+    "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1000&auto=format&fit=crop",
   category: { id: "cat-outerwear", name: "Áo khoác", slug: "ao-khoac" },
   color: "Đen",
   colorHex: "#1A1A1A",

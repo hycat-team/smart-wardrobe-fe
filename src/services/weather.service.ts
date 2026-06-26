@@ -9,7 +9,7 @@ export interface WeatherData {
 
 export const fetchWeather = async (lat: number, lon: number): Promise<WeatherData> => {
   if (!WEATHER_API_KEY) {
-    throw new Error('Thiếu API Key thời tiết');
+    throw new Error("Thiếu API Key thời tiết");
   }
 
   try {
@@ -20,7 +20,7 @@ export const fetchWeather = async (lat: number, lon: number): Promise<WeatherDat
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Weather API Error:', response.status, errorText);
+      console.error("Weather API Error:", response.status, errorText);
       throw new Error(`Lỗi khi lấy dữ liệu thời tiết: ${response.status}`);
     }
 
@@ -33,7 +33,7 @@ export const fetchWeather = async (lat: number, lon: number): Promise<WeatherDat
       city: data.name,
     };
   } catch (error) {
-    console.error('Weather fetch error:', error);
+    console.error("Weather fetch error:", error);
     throw error;
   }
 };

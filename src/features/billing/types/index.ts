@@ -10,7 +10,7 @@ export interface Statement {
   amount: number;
   balanceBefore: number;
   balanceAfter: number;
-  type: 'TOPUP' | 'PAYMENT' | 'REFUND';
+  type: "TOPUP" | "PAYMENT" | "REFUND";
   description: string;
   createdAt: string;
 }

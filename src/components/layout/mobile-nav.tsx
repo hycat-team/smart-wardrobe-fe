@@ -1,1 +1,56 @@
-"use client"; import Link from "next/link"; import { usePathname } from "next/navigation"; import { UserCircle, ShoppingBag } from "lucide-react"; import { cn } from "@/lib/utils"; import { useAuthStore } from "@/store/useAuthStore"; import { useB2BDemoStore } from "@/lib/mock-data/b2b/store"; import { NAV_ITEMS } from "./sidebar"; export function MobileBottomNav() { const pathname = usePathname(); const user = useAuthStore((state) => state.user); const isPremium = user?.isPremium; const { cart, setCartOpen } = useB2BDemoStore(); return ( <nav className="md:hidden fixed bottom-0 w-full h-[72px] pb-4 pt-2 bg-card border-t border-border flex items-center justify-around px-2 z-50"> {[...NAV_ITEMS.slice(0,4), { icon: UserCircle, label: "", path: "/profile" }].map((item) => { const isActive = pathname.startsWith(item.path); const Icon = item.icon; return ( <Link key={item.path} href={item.path} className={cn( "flex flex-col items-center justify-center gap-1 w-full h-full transition-colors active:scale-95 relative", isActive ? "text-primary" : "text-muted-foreground hover:text-ink" )} > <Icon className={cn("size-5", isActive && "fill-primary/20")} /> {isActive && <div className="w-1 h-1 rounded-full bg-primary mt-1 absolute bottom-0" />} </Link> ); })} {/* Mobile Cart Button */} <button onClick={() => setCartOpen(true)} className="flex flex-col items-center justify-center gap-1 w-full h-full transition-colors active:scale-95 relative text-muted-foreground hover:text-ink" > <div className="relative"> <ShoppingBag className="size-5" /> {cart.length > 0 && ( <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-foreground text-background text-[9px] font-bold w-4 h-4 rounded-full"> {cart.length} </span> )} </div> </button> </nav> ); } 
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { UserCircle, ShoppingBag } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useB2BDemoStore } from "@/lib/mock-data/b2b/store";
+import { NAV_ITEMS } from "./sidebar";
+export function MobileBottomNav() {
+  const pathname = usePathname();
+  const user = useAuthStore((state) => state.user);
+  const isPremium = user?.isPremium;
+  const { cart, setCartOpen } = useB2BDemoStore();
+  return (
+    <nav className="md:hidden fixed bottom-0 w-full h-[72px] pb-4 pt-2 bg-card border-t border-border flex items-center justify-around px-2 z-50">
+      {" "}
+      {[...NAV_ITEMS.slice(0, 4), { icon: UserCircle, label: "", path: "/profile" }].map((item) => {
+        const isActive = pathname.startsWith(item.path);
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.path}
+            href={item.path}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full h-full transition-colors active:scale-95 relative",
+              isActive ? "text-primary" : "text-muted-foreground hover:text-ink"
+            )}
+          >
+            {" "}
+            <Icon className={cn("size-5", isActive && "fill-primary/20")} />{" "}
+            {isActive && (
+              <div className="w-1 h-1 rounded-full bg-primary mt-1 absolute bottom-0" />
+            )}{" "}
+          </Link>
+        );
+      })}{" "}
+      {/* Mobile Cart Button */}{" "}
+      <button
+        onClick={() => setCartOpen(true)}
+        className="flex flex-col items-center justify-center gap-1 w-full h-full transition-colors active:scale-95 relative text-muted-foreground hover:text-ink"
+      >
+        {" "}
+        <div className="relative">
+          {" "}
+          <ShoppingBag className="size-5" />{" "}
+          {cart.length > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-foreground text-background text-[9px] font-bold w-4 h-4 rounded-full">
+              {" "}
+              {cart.length}{" "}
+            </span>
+          )}{" "}
+        </div>{" "}
+      </button>{" "}
+    </nav>
+  );
+}

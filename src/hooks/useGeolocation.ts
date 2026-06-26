@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 export interface LocationData {
   latitude: number | null;
@@ -24,8 +24,8 @@ export function useGeolocation() {
   const fetchIpLocation = async () => {
     try {
       // Dùng ipapi.co miễn phí để lấy vị trí tương đối
-      const response = await fetch('https://ipapi.co/json/');
-      if (!response.ok) throw new Error('Không thể lấy vị trí qua IP');
+      const response = await fetch("https://ipapi.co/json/");
+      if (!response.ok) throw new Error("Không thể lấy vị trí qua IP");
 
       const data = await response.json();
       setLocation({
@@ -38,16 +38,16 @@ export function useGeolocation() {
         isIpFallback: true,
       });
     } catch (error: any) {
-      setLocation(prev => ({
+      setLocation((prev) => ({
         ...prev,
-        error: 'Không thể xác định vị trí',
+        error: "Không thể xác định vị trí",
         loading: false,
       }));
     }
   };
 
   const requestLocation = useCallback(() => {
-    setLocation(prev => ({ ...prev, loading: true, error: null }));
+    setLocation((prev) => ({ ...prev, loading: true, error: null }));
 
     if (!navigator.geolocation) {
       // Trình duyệt không hỗ trợ, dùng IP

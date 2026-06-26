@@ -47,7 +47,7 @@ export interface PostRes {
   lastName?: string;
   likeCount: number;
   media: PostMediaRes[];
-  postType: 'OUTFIT' | 'SALE';
+  postType: "OUTFIT" | "SALE";
   publicId: string;
   sharePath?: string;
   title: string;
@@ -101,7 +101,7 @@ export interface CreatePostReq {
   content: string;
   items?: PostItemInputReq[];
   media?: PostMediaReq[];
-  postType: 'OUTFIT' | 'SALE';
+  postType: "OUTFIT" | "SALE";
   title: string;
 }
 

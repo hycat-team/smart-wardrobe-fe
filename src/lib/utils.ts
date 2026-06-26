@@ -1,10 +1,10 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { Gender } from "@/common/enum"
-import { UserRes } from "@/features/profile/types"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { Gender } from "@/common/enum";
+import { UserRes } from "@/features/profile/types";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export function getUserAvatar(user: UserRes | null | undefined): string {

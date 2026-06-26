@@ -1,1 +1,9 @@
-import { Metadata } from "next"; import { CreateOutfitClient } from "./components/CreateOutfitClient"; export const metadata: Metadata = { title: "Tạo Outfit | Smart Wardrobe", description: "Tạo outfit mới từ tủ đồ của bạn.", }; export default function CreateOutfitPage() { return <CreateOutfitClient />; } 
+import { Metadata } from "next";
+import { CreateOutfitClient } from "./components/CreateOutfitClient";
+export const metadata: Metadata = {
+  title: "Tạo Outfit | Smart Wardrobe",
+  description: "Tạo outfit mới từ tủ đồ của bạn.",
+};
+export default function CreateOutfitPage() {
+  return <CreateOutfitClient />;
+}
