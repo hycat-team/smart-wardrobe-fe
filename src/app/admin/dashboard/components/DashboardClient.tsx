@@ -33,16 +33,16 @@ export function DashboardClient() {
   const totalCatalog = catalogData?.metadata?.totalItems || 0;
 
   return (
-    <div className="flex flex-col gap-10 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full pb-24 text-[#111]">
+    <div className="flex flex-col gap-10 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full pb-24 text-foreground">
 
       {/* High-end Editorial Header */}
-      <div className="flex flex-col gap-8 pt-6 border-b border-black/10 pb-6">
+      <div className="flex flex-col gap-8 pt-6 border-b border-border pb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4 max-w-2xl">
-            <h1 className="text-5xl md:text-6xl font-semibold font-medium text-[#111] leading-[1.1] uppercase">
+            {/* <h1 className="text-5xl md:text-6xl font-semibold font-medium text-foreground leading-[1.1] uppercase">
               OVERVIEW
-            </h1>
-            <p className="text-[12px] text-[#666] font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4">
+            </h1> */}
+            <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-border pl-4">
               Theo dõi sức khỏe và hoạt động của nền tảng. Các thông số vận hành theo thời gian thực.
             </p>
           </div>
@@ -57,18 +57,18 @@ export function DashboardClient() {
           { label: "Catalog", value: catalogLoading ? "..." : totalCatalog.toLocaleString('vi-VN'), change: "Thực tế", icon: TrendingUp },
           { label: "Cần Duyệt (Mock)", value: "14", change: "Alert", icon: ShieldAlert, alert: true },
         ].map((stat, i) => (
-          <div key={i} className="bg-white border border-black/10 p-6 flex flex-col gap-6 shadow-sm relative group hover:border-black/30 transition-colors">
+          <div key={i} className="bg-card border border-border p-6 rounded-3xl flex flex-col gap-6 shadow-sm relative group hover:border-primary/50 transition-colors">
             <div className="flex justify-between items-start">
-              <span className="text-[10px] font-semibold font-bold text-[#888] uppercase tracking-[0.15em] group-hover:text-[#111] transition-colors">{stat.label}</span>
-              <div className="text-[#A3A3A3] group-hover:text-[#111] transition-colors">
+              <span className="text-[10px] font-semibold font-bold text-muted-foreground uppercase tracking-[0.15em] group-hover:text-foreground transition-colors">{stat.label}</span>
+              <div className="text-muted-foreground group-hover:text-foreground transition-colors">
                 <stat.icon className="size-4" strokeWidth={1.5} />
               </div>
             </div>
             <div className="flex items-end justify-between">
-              <span className="text-4xl font-semibold font-medium text-[#111]">{stat.value}</span>
+              <span className="text-4xl font-semibold font-medium text-foreground">{stat.value}</span>
               <span className={cn(
                 "text-[9px] font-semibold font-bold uppercase tracking-widest mb-1",
-                stat.alert ? "text-[#111] border-b border-[#111]" : "text-[#A3A3A3]"
+                stat.alert ? "text-foreground border-b border-foreground" : "text-muted-foreground"
               )}>
                 {stat.change}
               </span>
@@ -81,16 +81,16 @@ export function DashboardClient() {
       <div className="grid lg:grid-cols-3 gap-6">
 
         {/* Main Chart */}
-        <div className="lg:col-span-2 bg-white border border-black/10 p-6 shadow-sm">
-          <div className="mb-8 border-b border-black/5 pb-4">
-            <h3 className="font-semibold text-2xl text-[#111] mb-2">Hoạt Động Tuần</h3>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#666]">Lượt dùng AI & Lưu lượng truy cập</p>
+        <div className="lg:col-span-2 bg-card border border-border p-6 rounded-3xl shadow-sm">
+          <div className="mb-8 border-b border-border pb-4">
+            <h3 className="font-semibold text-2xl text-foreground mb-2">Hoạt Động Tuần</h3>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Lượt dùng AI & Lưu lượng truy cập</p>
           </div>
 
           <div className="h-[300px] w-full relative">
             <ResponsiveContainer width="99%" height={300}>
               <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis dataKey="name" stroke="#A3A3A3" fontSize={10} fontFamily="IBM Plex Mono" tickLine={false} axisLine={false} />
                 <YAxis stroke="#A3A3A3" fontSize={10} fontFamily="IBM Plex Mono" tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000}k`} />
                 <Tooltip
@@ -105,39 +105,39 @@ export function DashboardClient() {
         </div>
 
         {/* System Load */}
-        <div className="bg-white border border-black/10 p-6 shadow-sm flex flex-col">
-          <div className="mb-8 border-b border-black/5 pb-4">
-            <h3 className="font-semibold text-2xl text-[#111] mb-2">Tải Hệ Thống</h3>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#666]">Trạng thái xử lý thời gian thực</p>
+        <div className="bg-card border border-border p-6 rounded-3xl shadow-sm flex flex-col">
+          <div className="mb-8 border-b border-border pb-4">
+            <h3 className="font-semibold text-2xl text-foreground mb-2">Tải Hệ Thống</h3>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Trạng thái xử lý thời gian thực</p>
           </div>
 
           <div className="flex-1 flex flex-col justify-center gap-8">
             <div className="space-y-3">
-              <div className="flex justify-between text-[11px] font-semibold uppercase tracking-widest text-[#111] font-bold">
+              <div className="flex justify-between text-[11px] font-semibold uppercase tracking-widest text-foreground font-bold">
                 <span>LLM Engine</span>
                 <span>45%</span>
               </div>
-              <div className="h-1 w-full bg-[#F8F7F5] overflow-hidden">
-                <div className="h-full bg-[#111] w-[45%]" />
+              <div className="h-1 w-full bg-muted overflow-hidden rounded-full">
+                <div className="h-full bg-primary w-[45%] rounded-full" />
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between text-[11px] font-semibold uppercase tracking-widest text-[#111] font-bold">
+              <div className="flex justify-between text-[11px] font-semibold uppercase tracking-widest text-foreground font-bold">
                 <span>Computer Vision</span>
                 <span>78%</span>
               </div>
-              <div className="h-1 w-full bg-[#F8F7F5] overflow-hidden">
-                <div className="h-full bg-[#666] w-[78%]" />
+              <div className="h-1 w-full bg-muted overflow-hidden rounded-full">
+                <div className="h-full bg-foreground w-[78%] rounded-full" />
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between text-[11px] font-semibold uppercase tracking-widest text-[#111] font-bold">
+              <div className="flex justify-between text-[11px] font-semibold uppercase tracking-widest text-foreground font-bold">
                 <span>Database Query</span>
                 <span>12%</span>
               </div>
-              <div className="h-1 w-full bg-[#F8F7F5] overflow-hidden">
+              <div className="h-1 w-full bg-muted overflow-hidden rounded-full">
                 <div className="h-full bg-[#A3A3A3] w-[12%]" />
               </div>
             </div>

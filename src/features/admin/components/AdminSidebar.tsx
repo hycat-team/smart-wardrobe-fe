@@ -47,17 +47,17 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-[280px] border-r border-black/10 h-dvh sticky top-0 bg-[#F8F7F5] z-40 px-6 py-6 shrink-0 text-[#111]">
+    <aside className="hidden md:flex flex-col w-[280px] border-r border-border h-dvh sticky top-0 bg-card z-40 px-6 py-6 shrink-0 text-foreground">
 
       {/* Editorial Logo */}
       <div className="mb-8 flex flex-col pl-1">
         <div className="flex items-center gap-1.5 mb-1.5">
-          <ShieldAlert className="size-3 text-[#111]" />
-          <span className="text-[9px] font-semibold font-bold tracking-[0.2em] uppercase text-[#111]">System Admin</span>
+          <ShieldAlert className="size-3 text-primary" />
+          <span className="text-[9px] font-semibold tracking-[0.2em] uppercase text-primary">System Admin</span>
         </div>
         <Link href="/admin/dashboard" className="flex items-center group w-fit">
-          <span className="font-semibold text-4xl font-medium tracking-tighter text-[#111]">
-            Closy<span className="text-[#A3A3A3]">.</span>
+          <span className="font-semibold text-4xl text-foreground tracking-tighter">
+            Closy<span className="text-primary">.</span>
           </span>
         </Link>
       </div>
@@ -65,33 +65,30 @@ export function AdminSidebar() {
       {/* Elegant User Profile with Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="flex items-center gap-4 mb-8 p-3 bg-white border border-black/5 hover:border-black/20 transition-all cursor-pointer group outline-none shadow-sm">
+          <div className="flex items-center gap-4 mb-8 p-3 bg-muted/50 border border-border hover:border-primary transition-all cursor-pointer group outline-none shadow-sm rounded-2xl">
             <div className="flex flex-col flex-1 min-w-0 pl-1">
-              <span className="font-semibold text-lg font-medium text-[#111] truncate">
+              <span className="font-semibold text-lg text-foreground truncate">
                 {user?.name || "Administrator"}
               </span>
-              {/* <span className="text-[10px] font-semibold font-bold text-[#666] uppercase tracking-[0.1em] mt-1">
-                Access Level 1
-              </span> */}
             </div>
-            <ChevronRight className="size-4 text-[#A3A3A3] group-hover:text-[#111] transition-colors" />
+            <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[240px] rounded-none border border-black/10 bg-white p-2 shadow-xl">
-          <DropdownMenuItem asChild className="rounded-none px-3 py-2.5 cursor-pointer hover:bg-[#F8F7F5] focus:bg-[#F8F7F5]">
-            <Link href="/" className="flex items-center gap-3 w-full text-[#111]">
+        <DropdownMenuContent align="end" className="w-[240px] rounded-2xl border border-border bg-card p-2 shadow-xl">
+          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted focus:bg-muted">
+            <Link href="/" className="flex items-center gap-3 w-full text-foreground">
               <Sparkles className="size-4" />
-              <span className="font-semibold text-[11px] uppercase tracking-widest font-medium">Về trang User</span>
+              <span className="font-semibold text-[11px] uppercase tracking-widest">Về trang User</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuSeparator className="my-1 bg-black/5" />
+          <DropdownMenuSeparator className="my-1 bg-border" />
           <DropdownMenuItem
             onClick={handleLogout}
-            className="rounded-none px-3 py-2.5 cursor-pointer text-[#111] hover:bg-black hover:text-white focus:bg-black focus:text-white transition-colors"
+            className="rounded-xl px-3 py-2.5 cursor-pointer text-foreground hover:bg-destructive hover:text-destructive-foreground focus:bg-destructive focus:text-destructive-foreground transition-colors"
           >
             <div className="flex items-center gap-3 w-full">
               <LogOutIcon className="size-4" />
-              <span className="font-semibold text-[11px] uppercase tracking-widest font-medium">Đăng xuất</span>
+              <span className="font-semibold text-[11px] uppercase tracking-widest">Đăng xuất</span>
             </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -108,25 +105,20 @@ export function AdminSidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "group flex items-center gap-4 px-4 py-3 transition-all relative overflow-hidden",
-                isActive ? "text-[#111] bg-white border border-black/5 shadow-sm" : "text-[#666] hover:text-[#111] hover:bg-white/50 border border-transparent"
+                "group flex items-center gap-4 px-4 py-3 transition-all relative overflow-hidden rounded-xl",
+                isActive ? "text-primary-foreground bg-primary shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted border border-transparent"
               )}
             >
-              {/* Active Indicator Line */}
-              {isActive && (
-                <span className="absolute left-0 top-0 w-[2px] h-full bg-[#111]" />
-              )}
-
               <Icon
                 className={cn(
                   "size-[18px] transition-transform duration-300 group-hover:scale-110",
-                  isActive ? "text-[#111]" : "text-[#A3A3A3] group-hover:text-[#111]"
+                  isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"
                 )}
                 strokeWidth={isActive ? 2 : 1.5}
               />
               <span className={cn(
-                "font-semibold text-[11px] uppercase tracking-[0.1em]",
-                isActive ? "font-bold" : "font-medium"
+                "font-semibold text-[11px] uppercase tracking-widest",
+                isActive ? "" : ""
               )}>
                 {item.label}
               </span>
