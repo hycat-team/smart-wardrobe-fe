@@ -36,10 +36,10 @@ export const PostShareModal = ({ isOpen, onClose, shareUrl }: PostShareModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-white rounded-2xl border-black/5 p-6 shadow-sm">
+      <DialogContent className="sm:max-w-md bg-card text-card-foreground rounded-3xl border-border p-6 shadow-sm">
         <DialogHeader className="mb-4">
           <DialogTitle className="font-semibold text-lg font-bold">Chia sẻ bài viết</DialogTitle>
-          <DialogDescription className="text-[#666] font-mono text-xs mt-1">
+          <DialogDescription className="text-muted-foreground text-xs mt-1">
             Bất kỳ ai có liên kết này đều có thể xem bài viết
           </DialogDescription>
         </DialogHeader>
@@ -49,16 +49,16 @@ export const PostShareModal = ({ isOpen, onClose, shareUrl }: PostShareModalProp
             <input
               readOnly
               value={shareUrl}
-              className="w-full bg-[#FAFAFA] border border-black/10 rounded-lg px-3 py-2 text-sm text-[#111] font-mono outline-none truncate"
+              className="w-full bg-muted border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none truncate"
             />
           </div>
           <Button
             onClick={handleCopy}
             variant="outline"
             size="sm"
-            className="rounded-lg h-9 w-9 p-0 flex-shrink-0 border-black/10 hover:bg-[#FAFAFA] transition-colors"
+            className="rounded-xl h-9 w-9 p-0 flex-shrink-0 border-border hover:bg-muted transition-colors"
           >
-            {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-[#111]" />}
+            {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-foreground" />}
           </Button>
         </div>
 

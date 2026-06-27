@@ -54,85 +54,85 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[95vw] sm:max-w-[1000px] md:w-[85vw] bg-white border border-[#E5E5E5] text-[#1A1A1A] rounded-none p-0 overflow-hidden flex flex-col md:flex-row h-[80vh] shadow-xl [&>button]:hidden">
-        
+      <DialogContent className="w-[95vw] sm:max-w-[1200px] md:w-[85vw] bg-background border border-border text-foreground rounded-3xl p-0 overflow-hidden flex flex-col md:flex-row h-[80vh] shadow-xl [&>button]:hidden">
+
         {/* Left Side: Post Image */}
-        <div className="hidden md:block w-[60%] h-full bg-[#F5F2EE] relative border-r border-[#E5E5E5]">
+        <div className="hidden md:block w-[60%] h-full bg-muted relative border-r border-border">
           {mediaUrl ? (
-            <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={mediaUrl} 
-              alt="Post" 
+            <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={mediaUrl}
+              alt="Post"
               className="w-full h-full object-contain"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center p-12 bg-black text-white">
-               <div className="flex flex-col gap-4">
-                 <h2 className="font-bold text-3xl">{post.title}</h2>
-                 <p className="text-white/70">{post.content}</p>
-               </div>
+            <div className="w-full h-full flex items-center justify-center p-12 bg-muted text-foreground">
+              <div className="flex flex-col gap-4">
+                <h2 className="font-bold text-3xl">{post.title}</h2>
+                <p className="text-muted-foreground">{post.content}</p>
+              </div>
             </div>
           )}
         </div>
 
         {/* Right Side: Comments & Input */}
-        <div className="w-full md:w-[40%] flex flex-col h-full bg-white relative">
-          
+        <div className="w-full md:w-[40%] flex flex-col h-full bg-background relative">
+
           {/* Header (Author & Close) */}
-          <div className="p-6 border-b border-[#E5E5E5] flex flex-col gap-4">
+          <div className="p-6 border-b border-border flex flex-col gap-4 bg-muted/20">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10 ring-1 ring-black/5">
+                <Avatar className="w-10 h-10 ring-1 ring-border">
                   <AvatarImage src={post.avatarUrl || ''} />
-                  <AvatarFallback className="bg-[#F5F2EE] text-[#1A1A1A] font-bold text-xs">
+                  <AvatarFallback className="bg-muted text-foreground font-bold text-xs">
                     {getInitials(post.firstName, post.lastName, post.username)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <span className="font-bold text-sm text-[#1A1A1A]">{post.username || 'Atelier Curators'}</span>
-                  <span className="text-xs text-[#666666] font-medium">Editorial Team</span>
+                  <span className="font-bold text-sm text-foreground">{post.username || 'Atelier Curators'}</span>
+                  <span className="text-xs text-muted-foreground font-medium">Editorial Team</span>
                 </div>
               </div>
-              <button onClick={onClose} className="text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors p-1">
+              <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             {/* Post Caption as first comment */}
-            <div className="text-sm text-[#1A1A1A] leading-relaxed">
+            <div className="text-sm text-foreground leading-relaxed">
               {post.title && <span className="font-bold mr-1">{post.title}.</span>}
               {post.content}
             </div>
           </div>
 
           {/* Comments List */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-background">
             {isLoading ? (
               <div className="flex justify-center items-center h-full">
-                <Loader2 className="w-6 h-6 animate-spin text-[#A3A3A3]" />
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
               </div>
             ) : comments && comments.length > 0 ? (
               comments.map((comment) => (
-                <CommentItem 
-                  key={comment.id} 
-                  comment={comment} 
-                  postPublicID={post.publicId} 
-                  onReply={handleReply} 
+                <CommentItem
+                  key={comment.id}
+                  comment={comment}
+                  postPublicID={post.publicId}
+                  onReply={handleReply}
                 />
               ))
             ) : (
-              <div className="flex flex-col items-center justify-center h-full text-[#A3A3A3] space-y-2">
+              <div className="flex flex-col items-center justify-center h-full text-muted-foreground space-y-2">
                 <p className="text-sm">No comments yet.</p>
               </div>
             )}
           </div>
 
           {/* Comment Input */}
-          <div className="p-4 border-t border-[#E5E5E5] bg-white mt-auto flex flex-col gap-2">
+          <div className="p-4 border-t border-border bg-background mt-auto flex flex-col gap-2">
             {replyingTo && (
-              <div className="flex items-center justify-between text-[11px] font-medium text-[#666666] px-2 py-1 bg-[#F5F2EE] rounded-sm">
-                <span>Replying to <span className="font-bold text-[#1A1A1A]">@{replyingTo.username}</span></span>
-                <button 
+              <div className="flex items-center justify-between text-[11px] font-medium text-muted-foreground px-2 py-1 bg-muted rounded-full">
+                <span>Replying to <span className="font-bold text-foreground">@{replyingTo.username}</span></span>
+                <button
                   onClick={() => setReplyingTo(null)}
-                  className="hover:text-[#1A1A1A] p-0.5 transition-colors"
+                  className="hover:text-foreground p-0.5 transition-colors"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -143,12 +143,12 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
                 placeholder="Add a comment..."
-                className="flex-1 bg-transparent border-none text-[13px] text-[#1A1A1A] placeholder:text-[#A3A3A3] outline-none"
+                className="flex-1 bg-transparent border-none text-[13px] text-foreground placeholder:text-muted-foreground outline-none"
               />
               <button
                 type="submit"
                 disabled={!commentContent.trim() || isPending}
-                className="text-xs font-bold uppercase tracking-widest text-[#1A1A1A] hover:text-black disabled:opacity-30 disabled:hover:text-[#1A1A1A] transition-colors px-2 py-1"
+                className="text-xs font-bold uppercase tracking-widest text-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-foreground transition-colors px-2 py-1"
               >
                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Post'}
               </button>

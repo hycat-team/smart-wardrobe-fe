@@ -72,32 +72,29 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   return (
     <>
-      <article className="w-full flex flex-col bg-white border border-black/5 rounded-2xl shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
+      <article className="w-full flex flex-col bg-card text-card-foreground border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
         {/* Header Section */}
-        <div className="p-5 flex items-center justify-between border-b border-black/5 bg-[#FAFAFA]/50">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 ring-2 ring-white shadow-sm rounded-full bg-white relative overflow-hidden flex-shrink-0">
+        <div className="p-2.5 flex items-center justify-between border-b border-border bg-muted/30">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 ring-1 ring-background shadow-sm rounded-full relative overflow-hidden flex-shrink-0">
               <Image src={getUserAvatar(post as any)} alt={post.username || 'Avatar'} fill className="object-cover" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-sm text-[#111] font-semibold leading-tight hover:underline">
+              <span className="font-bold text-xs text-foreground leading-tight hover:underline">
                 {post.username || 'ATELIER CURATORS'}
               </span>
-              {/* <span className="text-[10px] font-medium text-[#A3A3A3] uppercase tracking-widest mt-0.5">
-                USER
-              </span> */}
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-semibold">
+            <div className="text-[9px] text-muted-foreground uppercase tracking-widest font-semibold">
               {new Date(post.createdAt).toLocaleDateString('vi-VN')}
             </div>
             {isMounted && profile?.username && profile.username === post.username && (
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="text-[#A3A3A3] hover:text-[#D03027] transition-colors p-1"
+                className="text-muted-foreground hover:text-destructive transition-colors p-1"
                 title="Delete Post"
               >
                 {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
@@ -108,7 +105,7 @@ export const PostCard = ({ post }: PostCardProps) => {
 
         {/* Media Section */}
         {hasMedia && mediaUrl && (
-          <div className="relative w-full aspect-[4/5] bg-[#F5F2EE] overflow-hidden">
+          <div className="relative w-full aspect-square bg-muted overflow-hidden">
             {!isImageLoaded && !hasImageError && (
               <Skeleton className="absolute inset-0 w-full h-full rounded-none bg-gray-100" />
             )}
@@ -135,46 +132,43 @@ export const PostCard = ({ post }: PostCardProps) => {
         )}
 
         {/* Content Section */}
-        <div className="p-6 flex flex-col gap-5 bg-white">
+        <div className="p-3 flex flex-col gap-2.5 bg-card">
           {/* Action Buttons */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               <button
                 onClick={handleLike}
-                className="text-[#111] hover:scale-110 transition-all outline-none"
+                className="text-foreground hover:scale-110 transition-all outline-none"
               >
                 <Heart
                   ref={heartIconRef}
-                  className={cn("w-6 h-6 transition-colors hover:text-[#A3A3A3]", post.isLiked ? "fill-[#D03027] text-[#D03027] hover:text-[#D03027]" : "")}
+                  className={cn("w-[18px] h-[18px] transition-colors hover:text-muted-foreground", post.isLiked ? "fill-destructive text-destructive hover:text-destructive" : "")}
                   strokeWidth={1.5}
                 />
               </button>
               <button
                 onClick={() => setIsCommentsOpen(true)}
-                className="text-[#111] hover:text-[#A3A3A3] hover:scale-110 transition-all outline-none"
+                className="text-foreground hover:text-muted-foreground hover:scale-110 transition-all outline-none"
               >
-                <MessageCircle className="w-6 h-6" strokeWidth={1.5} />
+                <MessageCircle className="w-[18px] h-[18px]" strokeWidth={1.5} />
               </button>
               <button
                 onClick={handleShare}
-                className="text-[#111] hover:text-[#A3A3A3] hover:scale-110 transition-all outline-none"
+                className="text-foreground hover:text-muted-foreground hover:scale-110 transition-all outline-none"
               >
-                <Share2 className="w-6 h-6" strokeWidth={1.5} />
+                <Share2 className="w-[18px] h-[18px]" strokeWidth={1.5} />
               </button>
             </div>
           </div>
 
           {/* Title & Content */}
-          <div className="text-sm text-[#111] leading-relaxed">
-            {/* {post.title && (
-              <span className="font-bold font-semibold mr-3 block mb-1">{post.title}</span>
-            )} */}
-            <span className="font-bold font-semibold mr-3">{post.username || 'ATELIER CURATORS'}</span>
-            <span className="text-[#666]">{post.content}</span>
+          <div className="text-xs text-foreground leading-relaxed">
+            <span className="font-bold mr-2">{post.username || 'ATELIER CURATORS'}</span>
+            <span className="text-muted-foreground">{post.content}</span>
           </div>
 
           {/* Footer Metrics */}
-          <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-semibold">
+          <div className="text-[9px] text-muted-foreground uppercase tracking-widest font-semibold">
             {post.likeCount.toLocaleString()} lượt thích • {post.commentCount} bình luận
           </div>
         </div>

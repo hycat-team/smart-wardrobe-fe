@@ -182,11 +182,11 @@ export const CommunityList = ({
     <div className="w-full flex flex-col gap-8" ref={containerRef}>
       
       {/* Create Post Box */}
-      <form onSubmit={handleSubmit} className="w-full border border-[#E5E5E5] bg-white p-5 flex flex-col gap-4 shadow-sm">
+      <form onSubmit={handleSubmit} className="w-full border border-border rounded-3xl bg-card p-5 flex flex-col gap-4 shadow-sm text-card-foreground">
         <div className="flex items-start gap-4">
-          <Avatar className="w-10 h-10 ring-1 ring-black/5 shrink-0">
+          <Avatar className="w-10 h-10 ring-1 ring-border shrink-0">
             <AvatarImage src={getUserAvatar(user)} className="object-cover" />
-            <AvatarFallback className="bg-black text-white font-medium text-sm">{user?.name ? user.name[0].toUpperCase() : 'U'}</AvatarFallback>
+            <AvatarFallback className="bg-muted text-foreground font-medium text-sm">{user?.name ? user.name[0].toUpperCase() : 'U'}</AvatarFallback>
           </Avatar>
           <div className="flex-1 flex flex-col gap-2">
             <input 
@@ -194,13 +194,13 @@ export const CommunityList = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Tiêu đề bài viết..." 
-              className="w-full bg-transparent border-none outline-none text-lg font-bold pt-1 text-[#1A1A1A] placeholder:text-[#A3A3A3]"
+              className="w-full bg-transparent border-none outline-none text-lg font-bold pt-1 text-foreground placeholder:text-muted-foreground"
             />
             <textarea 
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Chia sẻ phong cách hoặc nguồn cảm hứng mới nhất của bạn..." 
-              className="w-full bg-transparent border-none outline-none text-[15px] text-[#1A1A1A] placeholder:text-[#A3A3A3] resize-none min-h-[40px]"
+              className="w-full bg-transparent border-none outline-none text-[15px] text-foreground placeholder:text-muted-foreground resize-none min-h-[40px]"
               rows={Math.max(1, content.split('\n').length)}
             />
           </div>
@@ -210,7 +210,7 @@ export const CommunityList = ({
         {images.length > 0 && (
           <div className="flex gap-2 mt-2 overflow-x-auto pb-2">
             {images.map((file, index) => (
-              <div key={index} className="relative w-24 h-24 shrink-0 rounded-none bg-gray-100 border border-[#E5E5E5]">
+              <div key={index} className="relative w-24 h-24 shrink-0 rounded-xl bg-muted border border-border overflow-hidden">
                 <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={URL.createObjectURL(file)} 
                   alt="preview" 
                   className="w-full h-full object-cover" 
@@ -218,7 +218,7 @@ export const CommunityList = ({
                 <button
                   type="button"
                   onClick={() => handleRemoveImage(index)}
-                  className="absolute top-1 right-1 bg-black/60 hover:bg-black text-white rounded-full p-1 transition-colors"
+                  className="absolute top-1 right-1 bg-background/60 hover:bg-background text-foreground rounded-full p-1 transition-colors backdrop-blur-sm"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -227,7 +227,7 @@ export const CommunityList = ({
           </div>
         )}
         
-        <div className="h-[1px] w-full bg-[#E5E5E5] my-1" />
+        <div className="h-[1px] w-full bg-border my-1" />
         
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
@@ -242,20 +242,20 @@ export const CommunityList = ({
             <button 
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors outline-none"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors outline-none"
             >
               <ImageIcon className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1A1A1A]">Tải lên</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-foreground">Tải lên</span>
             </button>
-            <button type="button" className="flex items-center gap-2 text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors outline-none">
+            <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors outline-none">
               <TagIcon className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1A1A1A]">Gắn thẻ</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-foreground">Gắn thẻ</span>
             </button>
           </div>
           <Button 
             type="submit" 
             disabled={!content.trim() || isPending || isUploading}
-            className="rounded-none bg-black text-white hover:bg-black/80 font-bold uppercase tracking-widest text-xs px-8 h-10 disabled:opacity-50"
+            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold uppercase tracking-widest text-xs px-8 h-10 disabled:opacity-50"
           >
             {isPending || isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Đăng'}
           </Button>
@@ -265,12 +265,12 @@ export const CommunityList = ({
       {isLoading && !data ? (
         <div className="w-full flex flex-col gap-12 mt-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="w-full bg-white border border-[#E5E5E5] pb-5 flex flex-col gap-4 shadow-sm">
-              <Skeleton className="w-full aspect-[4/5] rounded-none bg-gray-100" />
+            <div key={i} className="w-full bg-card border border-border pb-5 flex flex-col gap-4 shadow-sm rounded-3xl overflow-hidden">
+              <Skeleton className="w-full aspect-[4/5] rounded-none bg-muted" />
               <div className="px-6 flex flex-col gap-3">
-                <Skeleton className="h-8 w-3/4 bg-gray-100" />
-                <Skeleton className="h-4 w-full bg-gray-100" />
-                <Skeleton className="h-4 w-5/6 bg-gray-100" />
+                <Skeleton className="h-8 w-3/4 bg-muted" />
+                <Skeleton className="h-4 w-full bg-muted" />
+                <Skeleton className="h-4 w-5/6 bg-muted" />
               </div>
             </div>
           ))}
@@ -288,10 +288,10 @@ export const CommunityList = ({
       {/* Infinite Scroll Trigger */}
       <div
         ref={loadMoreRef}
-        className="w-full h-32 flex items-center justify-center mt-8 border-t border-black/10"
+        className="w-full h-32 flex items-center justify-center mt-8 border-t border-border"
       >
         {isFetchingNextPage && (
-          <div className="flex items-center space-x-3 text-black font-bold uppercase tracking-widest text-xs">
+          <div className="flex items-center space-x-3 text-muted-foreground font-bold uppercase tracking-widest text-xs">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>Đang tải...</span>
           </div>
