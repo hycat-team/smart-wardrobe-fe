@@ -146,53 +146,53 @@ export function BrandPostsClient() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Bài viết</h1>
+        {/* <h1 className="text-3xl font-bold tracking-tight">Bài viết</h1> */}
         <Button
           onClick={() => handleOpenDialog()}
-          className="rounded-none bg-black hover:bg-black/90 font-bold uppercase tracking-widest flex items-center gap-2"
+          className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-widest flex items-center gap-2"
         >
           <Plus className="w-4 h-4" /> Viết bài mới
         </Button>
       </div>
 
-      <div className="bg-white border border-black/10 overflow-x-auto">
+      <div className="bg-card border border-border shadow-sm p-6 rounded-3xl overflow-x-auto">
         <Table className="min-w-[700px]">
           <TableHeader>
-            <TableRow className="border-black/10 hover:bg-transparent">
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">Bài viết</TableHead>
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">Loại</TableHead>
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">Ngày đăng</TableHead>
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">Tương tác</TableHead>
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50 text-right">Thao tác</TableHead>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Bài viết</TableHead>
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Loại</TableHead>
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Ngày đăng</TableHead>
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Tương tác</TableHead>
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {posts.map(post => (
-              <TableRow key={post.id} className="border-black/10">
+              <TableRow key={post.id} className="border-border hover:bg-muted/50 transition-colors">
                 <TableCell>
                   <div className="flex items-start gap-4">
-                    <div className="w-16 h-20 bg-[#F5F2EE] overflow-hidden shrink-0">
+                    <div className="w-16 h-20 bg-muted rounded-2xl overflow-hidden shrink-0 border border-border">
                       {post.mediaUrls?.[0] ? (
                         <img src={post.mediaUrls[0]} alt="Post media" className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-black/5 text-black/20">
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                           <ImageIcon className="size-5" />
                         </div>
                       )}
                     </div>
-                    <p className="text-sm font-medium line-clamp-3 min-w-[200px] max-w-md">{post.caption}</p>
+                    <p className="text-sm font-medium line-clamp-3 min-w-[200px] max-w-md text-foreground">{post.caption}</p>
                   </div>
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
-                  <span className="px-2 py-1 bg-ink/5 text-ink text-[10px] font-bold uppercase tracking-widest">
+                  <span className="px-3 py-1 bg-muted text-muted-foreground text-[10px] font-bold uppercase tracking-widest rounded-full">
                     {post.type}
                   </span>
                 </TableCell>
-                <TableCell className="text-sm text-black/70 font-mono whitespace-nowrap">
+                <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                   {formatDate(post.createdAt)}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
-                  <div className="flex gap-4 text-sm font-mono text-black/70">
+                  <div className="flex gap-4 text-sm text-muted-foreground">
                     <span>❤️ {post.likeCount}</span>
                     <span>💬 {post.commentCount}</span>
                   </div>
@@ -200,7 +200,7 @@ export function BrandPostsClient() {
                 <TableCell className="text-right">
                   <button
                     onClick={() => handleOpenDialog(post)}
-                    className="text-sm font-bold underline decoration-1 underline-offset-2 text-black/50 hover:text-black flex items-center gap-1 justify-end w-full whitespace-nowrap"
+                    className="text-sm font-bold underline decoration-1 underline-offset-2 text-muted-foreground hover:text-foreground flex items-center gap-1 justify-end w-full whitespace-nowrap"
                   >
                     <Pencil className="size-3" /> Sửa
                   </button>
@@ -212,43 +212,43 @@ export function BrandPostsClient() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-none border border-black/10">
+        <DialogContent className="w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-card rounded-3xl border border-border shadow-lg">
           <DialogHeader>
-            <DialogTitle className="font-semibold text-2xl uppercase font-medium">
+            <DialogTitle className="text-2xl font-bold tracking-tight">
               {editingId ? "Sửa bài viết" : "Viết bài mới"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6 pt-4">
             <div className="space-y-4">
               {/* Image Upload Area */}
-              <label className="block w-full aspect-[4/5] bg-[#F4F1EE] border border-dashed border-ink/20 flex flex-col items-center justify-center text-ink-muted cursor-pointer hover:bg-ink/5 transition-colors group relative overflow-hidden">
+              <label className="block w-full aspect-[4/5] bg-muted/50 border border-dashed border-border flex flex-col items-center justify-center text-muted-foreground cursor-pointer hover:bg-muted transition-colors group relative overflow-hidden rounded-2xl">
                 <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                 {formData.imageUrl ? (
                   <img src={formData.imageUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
                 ) : (
                   <>
-                    <div className="size-10 rounded-full bg-white flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-sm">
-                      <UploadCloud className="size-4 text-ink" />
+                    <div className="size-10 rounded-full bg-background flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-sm">
+                      <UploadCloud className="size-4 text-foreground" />
                     </div>
-                    <p className="text-[10px] font-mono uppercase tracking-widest font-bold">Upload Ảnh</p>
+                    <p className="text-[10px] uppercase tracking-widest font-bold">Upload Ảnh</p>
                   </>
                 )}
               </label>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Nội dung (Caption)</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Nội dung (Caption)</label>
                 <textarea
                   value={formData.caption}
                   onChange={(e) => setFormData(prev => ({ ...prev, caption: e.target.value }))}
                   placeholder="Hôm nay mặc gì?..."
-                  className="w-full min-h-[100px] p-3 text-sm rounded-none border border-ink/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-ink resize-none"
+                  className="w-full min-h-[100px] p-3 text-sm rounded-2xl border border-border bg-muted/50 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none resize-none"
                 />
               </div>
             </div>
 
             <Button
               onClick={handleSave}
-              className="w-full bg-black hover:bg-black/90 text-white rounded-none uppercase font-mono tracking-widest text-[11px] h-12"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-full uppercase tracking-widest font-bold text-[11px] h-12"
             >
               Đăng bài
             </Button>

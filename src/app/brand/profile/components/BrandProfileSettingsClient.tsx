@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { UploadCloud, CheckCircle } from "lucide-react";
+import { UploadCloud, CheckCircle, MapPin, Globe, Link, Pencil, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mockBrands } from "@/lib/mock-data/b2b";
@@ -79,120 +79,157 @@ export function BrandProfileSettingsClient() {
   };
 
   return (
-    <div className="bg-white border border-black/10 max-w-4xl">
-      <div className="p-6 md:p-8 space-y-10">
+    <div className="max-w-5xl mx-auto pb-24 relative">
+      {/* Container chính bọc toàn bộ form */}
+      <div className="bg-card border border-border shadow-sm rounded-3xl overflow-hidden">
         
-        {/* Hình ảnh */}
-        <section className="space-y-6">
-          <h2 className="text-xl font-bold border-b border-black/10 pb-4">Hình ảnh thương hiệu</h2>
-          <div className="flex flex-col md:flex-row gap-8">
-            <div className="space-y-3 shrink-0">
-              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Ảnh đại diện (Logo)</label>
-              <label className="block w-32 h-32 rounded-full bg-[#F4F1EE] border border-dashed border-black/20 flex flex-col items-center justify-center text-black/40 cursor-pointer hover:bg-black/5 transition-colors group relative overflow-hidden shrink-0 mx-auto md:mx-0">
-                <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'logoUrl')} />
-                {formData.logoUrl ? (
-                  <img src={formData.logoUrl} alt="Logo" className="absolute inset-0 w-full h-full object-cover" />
-                ) : (
-                  <UploadCloud className="size-6" />
-                )}
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold">
-                  Thay đổi
-                </div>
-              </label>
+        {/* Header - Live Profile Preview */}
+        <div className="relative mb-16">
+          {/* Ảnh bìa */}
+          <label className="block w-full h-48 md:h-64 bg-muted cursor-pointer group relative overflow-hidden">
+            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'coverUrl')} />
+            {formData.coverUrl ? (
+              <img src={formData.coverUrl} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+                <UploadCloud className="size-8 opacity-50" />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="flex items-center gap-2 bg-background/80 backdrop-blur-sm text-foreground px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest">
+                <Camera className="size-4" /> Thay đổi ảnh bìa
+              </span>
             </div>
-            
-            <div className="space-y-3 w-full flex-1">
-              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Ảnh bìa (Cover)</label>
-              <label className="block w-full h-32 bg-[#F4F1EE] border border-dashed border-black/20 flex flex-col items-center justify-center text-black/40 cursor-pointer hover:bg-black/5 transition-colors group relative overflow-hidden">
-                <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'coverUrl')} />
-                {formData.coverUrl ? (
-                  <img src={formData.coverUrl} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
+          </label>
+
+          {/* Logo đè lên ảnh bìa */}
+          <div className="absolute -bottom-12 left-6 md:left-10 flex items-end">
+            <label className="block w-24 h-24 md:w-32 md:h-32 rounded-full bg-card p-1 cursor-pointer group relative shrink-0 shadow-sm">
+              <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'logoUrl')} />
+              <div className="w-full h-full rounded-full overflow-hidden bg-muted relative">
+                {formData.logoUrl ? (
+                  <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <UploadCloud className="size-6" />
-                    <span className="text-[10px] font-mono uppercase tracking-widest">Tải lên ảnh bìa</span>
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                    <UploadCloud className="size-6 opacity-50" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold">
-                  Thay đổi
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="size-5 text-white" />
                 </div>
-              </label>
-            </div>
+              </div>
+            </label>
           </div>
-        </section>
+        </div>
 
-        {/* Thông tin cơ bản */}
-        <section className="space-y-6">
-          <h2 className="text-xl font-bold border-b border-black/10 pb-4">Thông tin cơ bản</h2>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Tên thương hiệu</label>
-              <Input
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                className="rounded-none border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-black font-medium"
-              />
+        {/* Nội dung bên dưới */}
+        <div className="px-6 md:px-10 pb-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            
+            {/* Cột Trái (Main Info) */}
+            <div className="lg:col-span-2 space-y-8 mt-4 md:mt-0">
+              
+              {/* Tên thương hiệu borderless */}
+              <div className="space-y-2 group relative">
+                <input
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Tên thương hiệu..."
+                  className="w-full bg-transparent text-3xl md:text-4xl font-bold tracking-tight text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 border-none p-0"
+                />
+                <div className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground pointer-events-none">
+                  <Pencil className="size-4" />
+                </div>
+              </div>
+
+              {/* Bento cho Text areas */}
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Mô tả ngắn gọn (Slogan/Tagline)</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Định vị thương hiệu của bạn..."
+                    className="w-full min-h-[60px] p-4 text-base rounded-2xl border border-transparent bg-muted/30 focus-visible:bg-muted/50 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none focus-visible:border-border resize-none transition-all placeholder:text-muted-foreground/50"
+                  />
+                </div>
+                
+                <div className="space-y-3">
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Câu chuyện thương hiệu (Về chúng tôi)</label>
+                  <textarea
+                    value={formData.story}
+                    onChange={(e) => setFormData(prev => ({ ...prev, story: e.target.value }))}
+                    placeholder="Chia sẻ hành trình hoặc giá trị cốt lõi..."
+                    className="w-full min-h-[160px] p-4 text-base rounded-2xl border border-transparent bg-muted/30 focus-visible:bg-muted/50 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none focus-visible:border-border resize-none transition-all placeholder:text-muted-foreground/50 leading-relaxed"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Mô tả ngắn (Description)</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full min-h-[80px] p-3 text-sm rounded-none border border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-black resize-none"
-              />
+
+            {/* Cột Phải (Links & Meta) */}
+            <div className="lg:col-span-1 space-y-6">
+              <div className="bg-muted/30 border border-border p-5 rounded-3xl space-y-5">
+                <h3 className="text-sm font-bold text-foreground mb-4">Thông tin liên hệ</h3>
+                
+                <div className="space-y-4">
+                  {/* Location */}
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      <MapPin className="size-4" />
+                    </div>
+                    <Input
+                      value={formData.location}
+                      onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                      placeholder="Vị trí..."
+                      className="pl-9 h-11 rounded-xl border-border bg-card focus-visible:ring-1 focus-visible:ring-ring font-mono text-sm"
+                    />
+                  </div>
+                  
+                  {/* Website */}
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      <Globe className="size-4" />
+                    </div>
+                    <Input
+                      value={formData.website}
+                      onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                      placeholder="Website..."
+                      className="pl-9 h-11 rounded-xl border-border bg-card focus-visible:ring-1 focus-visible:ring-ring font-mono text-sm"
+                    />
+                  </div>
+                  
+                  {/* Instagram */}
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                      <Link className="size-4" />
+                    </div>
+                    <Input
+                      value={formData.instagram}
+                      onChange={(e) => setFormData(prev => ({ ...prev, instagram: e.target.value }))}
+                      placeholder="Instagram..."
+                      className="pl-9 h-11 rounded-xl border-border bg-card focus-visible:ring-1 focus-visible:ring-ring font-mono text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Câu chuyện thương hiệu (Story)</label>
-              <textarea
-                value={formData.story}
-                onChange={(e) => setFormData(prev => ({ ...prev, story: e.target.value }))}
-                className="w-full min-h-[160px] p-3 text-sm rounded-none border border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:outline-none focus-visible:border-black resize-none"
-              />
-            </div>
+            
           </div>
-        </section>
+        </div>
+      </div>
 
-        {/* Liên kết */}
-        <section className="space-y-6">
-          <h2 className="text-xl font-bold border-b border-black/10 pb-4">Liên kết & Liên hệ</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Vị trí</label>
-              <Input
-                value={formData.location}
-                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                className="rounded-none border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-black font-mono text-sm"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Website</label>
-              <Input
-                value={formData.website}
-                onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-                className="rounded-none border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-black font-mono text-sm"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-black/50">Instagram</label>
-              <Input
-                value={formData.instagram}
-                onChange={(e) => setFormData(prev => ({ ...prev, instagram: e.target.value }))}
-                className="rounded-none border-black/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-black font-mono text-sm"
-              />
-            </div>
-          </div>
-        </section>
-
-        <div className="pt-4 flex justify-end">
+      {/* Sticky Save Bar */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 lg:left-[calc(50%+8rem)] z-40">
+        <div className="bg-background/80 backdrop-blur-md p-2 rounded-full border border-border shadow-lg flex items-center justify-between gap-4">
           <Button 
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-black hover:bg-black/90 text-white rounded-none uppercase font-mono tracking-widest text-[11px] px-8 h-12 flex items-center gap-2 transition-all w-full md:w-auto"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full uppercase font-bold tracking-widest text-[11px] px-8 h-12 flex items-center gap-2 transition-all min-w-[200px] justify-center"
           >
             {isSaving ? (
               <>
-                <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-                Đang lưu...
+                <div className="w-4 h-4 rounded-full border-2 border-primary-foreground/20 border-t-primary-foreground animate-spin" />
+                Đang lưu hồ sơ...
               </>
             ) : (
               <>

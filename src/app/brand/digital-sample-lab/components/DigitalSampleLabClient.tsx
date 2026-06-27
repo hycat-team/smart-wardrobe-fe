@@ -76,24 +76,24 @@ export function DigitalSampleLabClient() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-6">
       <div className="mb-10">
-        <h1 className="text-4xl font-semibold uppercase font-medium text-ink mb-2">Digital Sample Lab</h1>
-        <p className="text-sm font-mono tracking-widest uppercase text-ink-muted border-l-2 border-[#A0522D] pl-3">
+        {/* <h1 className="text-4xl font-bold uppercase tracking-tight text-foreground mb-2">Digital Sample Lab</h1> */}
+        <p className="text-sm tracking-widest uppercase text-muted-foreground border-l-2 border-primary pl-3">
           Thử nghiệm thiết kế trên tủ đồ thực tế trước khi sản xuất
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1 space-y-4">
-          <label className="aspect-[4/5] bg-[#F4F1EE] border border-dashed border-ink/20 flex flex-col items-center justify-center text-ink-muted cursor-pointer hover:bg-ink/5 transition-colors group relative overflow-hidden block w-full">
+          <label className="aspect-[4/5] bg-muted/50 border border-dashed border-border flex flex-col items-center justify-center text-muted-foreground cursor-pointer hover:bg-muted transition-colors group relative overflow-hidden block w-full rounded-3xl">
             <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
             {imageUrl ? (
               <img src={imageUrl} alt="Uploaded Sample" className="absolute inset-0 w-full h-full object-cover" />
             ) : (
               <>
-                <div className="size-12 rounded-full bg-white flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
-                  <UploadCloud className="size-5 text-ink" />
+                <div className="size-12 rounded-full bg-background flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                  <UploadCloud className="size-5 text-foreground" />
                 </div>
-                <p className="text-[11px] font-mono uppercase tracking-widest font-bold">Upload Bản Vẽ / 3D Render</p>
+                <p className="text-[11px] uppercase tracking-widest font-bold">Upload Bản Vẽ / 3D Render</p>
                 <p className="text-[10px] mt-2">PNG, JPG up to 10MB</p>
               </>
             )}
@@ -101,36 +101,36 @@ export function DigitalSampleLabClient() {
         </div>
 
         <div className="md:col-span-2">
-          <form onSubmit={handleSubmit} className="space-y-8 bg-white p-8 border border-ink/10 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-8 bg-card p-8 border border-border shadow-sm rounded-3xl">
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Tên Sản Phẩm</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Tên Sản Phẩm</label>
                 <input
                   required
                   type="text"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
                   placeholder="VD: Minimal Structured Blazer"
-                  className="w-full bg-[#F4F1EE]/50 border border-ink/10 p-3 text-sm focus:outline-none focus:border-ink transition-colors"
+                  className="w-full bg-muted/50 border border-border p-3 text-sm focus:outline-none focus:border-border focus:ring-1 focus:ring-ring transition-colors rounded-xl"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Product Concept</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Product Concept</label>
                 <textarea
                   required
                   value={concept}
                   onChange={(e) => setConcept(e.target.value)}
                   placeholder="Mô tả ý tưởng, phom dáng, chất liệu dự kiến..."
-                  className="w-full bg-[#F4F1EE]/50 border border-ink/10 p-3 text-sm min-h-[100px] resize-none focus:outline-none focus:border-ink transition-colors"
+                  className="w-full bg-muted/50 border border-border p-3 text-sm min-h-[100px] resize-none focus:outline-none focus:border-border focus:ring-1 focus:ring-ring transition-colors rounded-xl"
                 />
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Variants (Màu sắc / Kiểu dáng)</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Variants (Màu sắc / Kiểu dáng)</label>
                   {variants.length < 3 && (
-                    <button type="button" onClick={addVariant} className="text-[10px] font-mono uppercase tracking-widest text-[#A0522D] hover:underline flex items-center gap-1">
+                    <button type="button" onClick={addVariant} className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline flex items-center gap-1">
                       <Plus className="size-3" /> Thêm Variant
                     </button>
                   )}
@@ -138,8 +138,8 @@ export function DigitalSampleLabClient() {
 
                 <div className="space-y-3">
                   {variants.map((v, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-[#F4F1EE]/50 border border-ink/10 p-2 pr-3">
-                      <div className="size-8 border border-ink/10 overflow-hidden relative shrink-0">
+                    <div key={i} className="flex items-center gap-3 bg-muted/50 border border-border p-2 pr-3 rounded-xl">
+                      <div className="size-8 border border-border overflow-hidden relative shrink-0 rounded-full">
                         <input
                           type="color"
                           value={v.color}
@@ -156,7 +156,7 @@ export function DigitalSampleLabClient() {
                         className="flex-1 bg-transparent border-none p-2 text-sm focus:outline-none"
                       />
                       {variants.length > 1 && (
-                        <button type="button" onClick={() => removeVariant(i)} className="text-ink-muted hover:text-red-500 transition-colors">
+                        <button type="button" onClick={() => removeVariant(i)} className="text-muted-foreground hover:text-destructive transition-colors">
                           <X className="size-4" />
                         </button>
                       )}
@@ -166,26 +166,26 @@ export function DigitalSampleLabClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Mức giá dự kiến (VNĐ)</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Mức giá dự kiến (VNĐ)</label>
                 <input
                   required
                   type="number"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className="w-full bg-[#F4F1EE]/50 border border-ink/10 p-3 text-sm font-mono focus:outline-none focus:border-ink transition-colors"
+                  className="w-full bg-muted/50 border border-border p-3 text-sm focus:outline-none focus:border-border focus:ring-1 focus:ring-ring transition-colors rounded-xl font-mono"
                 />
               </div>
             </div>
 
-            <div className="pt-6 border-t border-ink/10">
+            <div className="pt-6 border-t border-border">
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-14 bg-ink text-cream hover:bg-ink/90 font-mono text-[11px] uppercase tracking-widest rounded-none"
+                className="w-full h-14 bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-[11px] uppercase tracking-widest rounded-full"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
-                    <div className="size-4 border-2 border-cream/30 border-t-cream rounded-full animate-spin" />
+                    <div className="size-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                     Đang thiết lập thử nghiệm...
                   </div>
                 ) : (
@@ -194,7 +194,7 @@ export function DigitalSampleLabClient() {
                   </div>
                 )}
               </Button>
-              <p className="text-center text-[10px] text-ink-muted mt-4">
+              <p className="text-center text-[10px] text-muted-foreground mt-4">
                 Mẫu số này sẽ được tạm thời thêm vào tủ đồ của các user phù hợp để đánh giá Wardrobe Impact.
               </p>
             </div>
