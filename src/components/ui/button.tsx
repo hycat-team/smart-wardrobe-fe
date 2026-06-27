@@ -1,4 +1,4 @@
-﻿import { Button as ButtonPrimitive } from "@base-ui/react/button";
+import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
@@ -17,7 +17,7 @@ const buttonVariants = cva(
         ghost:
           "rounded-full text-foreground hover:bg-accent-soft hover:text-foreground aria-expanded:bg-accent-soft aria-expanded:text-foreground",
         destructive:
-          "rounded-full bg-primary text-primary-foreground hover:bg-primary/85 focus-visible:border-primary focus-visible:ring-primary/20",
+          "rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:border-destructive focus-visible:ring-destructive/20",
         link: "rounded-none px-0 text-primary underline-offset-4 hover:underline",
       },
       size: {
