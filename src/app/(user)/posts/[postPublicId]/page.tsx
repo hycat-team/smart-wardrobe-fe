@@ -1,9 +1,5 @@
 import { serverFetch } from '@/lib/server-fetch';
 import { PostRes } from '@/features/community/types';
-import PostDetailClient from './components/PostDetailClient';
-import { Suspense } from 'react';
-import { Loader2 } from 'lucide-react';
-import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }: { params: Promise<{ postPublicId: string }> }) {
   try {
@@ -20,30 +16,19 @@ export async function generateMetadata({ params }: { params: Promise<{ postPubli
   }
 }
 
-export default async function PostDetailPage({ params }: { params: Promise<{ postPublicId: string }> }) {
-  const resolvedParams = await params;
-  let initialData: PostRes | null = null;
-  try {
-    initialData = await serverFetch<PostRes>(`/posts/${resolvedParams.postPublicId}`, {
-      cache: 'no-store'
-    });
-  } catch (error) {
-    // Return 404 if post is not found
-    notFound();
-  }
+import { Suspense } from 'react';
+import { PostData } from './components/PostData';
+import Loading from './loading';
 
-  if (!initialData) {
-    notFound();
-  }
-
+export default function PostDetailPage({ params }: { params: Promise<{ postPublicId: string }> }) {
   return (
-    <Suspense fallback={
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="size-10 text-[#111] animate-spin" />
-        <p className="text-sm text-muted-foreground font-mono">Đang tải bài viết...</p>
-      </div>
-    }>
-      <PostDetailClient postPublicId={resolvedParams.postPublicId} initialData={initialData} />
+    <Suspense fallback={<Loading />}>
+      <PostWrapper params={params} />
     </Suspense>
   );
+}
+
+async function PostWrapper({ params }: { params: Promise<{ postPublicId: string }> }) {
+  const resolvedParams = await params;
+  return <PostData postPublicId={resolvedParams.postPublicId} />;
 }

@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@heroui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -54,19 +54,6 @@ import { toast } from "sonner";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useMySubscription } from "@/features/subscription/queries/subscription.queries";
-
-const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
-
-const CATEGORY_SLUG_MAP: Record<string, string> = {
-  Áo: "ao",
-  Quần: "quan",
-  Váy: "vay",
-  Giày: "giay",
-  "Phụ kiện": "phu-kien",
-  "Áo khoác": "ao-khoac",
-  Mũ: "mu",
-  Khác: "other",
-};
 
 // Helper to map color string to standard filter value
 const getColorValue = (color: string) => {
@@ -159,12 +146,11 @@ export default function WardrobeClient({
 
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
 
-  // Map category param to backend slug
-  const slugToFetch =
-    categoryParam === "Tất cả"
-      ? undefined
-      : CATEGORY_SLUG_MAP[categoryParam] || categoryParam;
-
+  let slugToFetch: string | undefined = undefined;
+  if (categoryParam !== "Tất cả") {
+    const found = category?.find((c: any) => c.name === categoryParam);
+    slugToFetch = found ? found.slug : categoryParam;
+  }
   // Load real wardrobe items
   const {
     data,

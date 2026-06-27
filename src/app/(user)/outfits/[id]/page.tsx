@@ -1,9 +1,6 @@
 import { Metadata } from "next";
-import { Suspense } from "react";
 import { serverFetch } from "@/lib/server-fetch";
 import { OutfitRes as Outfit } from "@/features/outfits/types";
-import { OutfitDetailClient } from "./components/OutfitDetailClient";
-import { Loader2 } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -24,18 +21,20 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-export default async function EditOutfitPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const outfit = await serverFetch<Outfit>(`/outfits/${id}`);
-  
+import { Suspense } from "react";
+import { OutfitData } from "./components/OutfitData";
+import Loading from "./loading";
+
+export default function EditOutfitPage({ params }: { params: Promise<{ id: string }> }) {
   return (
-    <Suspense fallback={
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="size-10 text-terracotta animate-spin" />
-        <p className="text-sm text-ink-muted font-mono">Đang tải bộ phối đồ...</p>
-      </div>
-    }>
-      <OutfitDetailClient outfitId={id} initialOutfit={outfit || undefined} />
+    <Suspense fallback={<Loading />}>
+      <OutfitWrapper params={params} />
     </Suspense>
   );
+}
+
+// Extract wrapper component to await params
+async function OutfitWrapper({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <OutfitData id={id} />;
 }

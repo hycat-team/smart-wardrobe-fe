@@ -26,9 +26,16 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
+import { Suspense } from 'react';
+import { WardrobeItemData } from './components/WardrobeItemData';
+import Loading from './loading';
+
 export default async function WardrobeItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const item = await serverFetch<WardrobeItem>(`/wardrobe-items/${id}`);
   
-  return <WardrobeItemDetailClient itemId={id} initialItem={item || undefined} />;
+  return (
+    <Suspense fallback={<Loading />}>
+      <WardrobeItemData id={id} />
+    </Suspense>
+  );
 }

@@ -10,7 +10,7 @@ import { useUserCategories } from "@/features/admin/queries/admin.queries";
 import { WardrobeItemRes } from "@/features/wardrobe/types";
 import { Loader2, Plus, ArrowLeft, Search } from "lucide-react";
 import { WardrobeCard } from "../../components/WardrobeCard";
-import { Skeleton } from "@heroui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Pagination,
   PaginationContent,
