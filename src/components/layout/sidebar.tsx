@@ -30,7 +30,8 @@ import {
   ShoppingBag,
   PanelLeftClose,
   PanelLeftOpen,
-  Globe
+  Globe,
+  type LucideIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -40,7 +41,14 @@ import { getUserAvatar } from "@/lib/utils";
 import Image from "next/image";
 import { useSidebarStore } from "@/store/useSidebarStore";
 
-export const NAV_ITEMS = [
+export type NavItem = {
+  icon: LucideIcon;
+  label: string;
+  path: string;
+  comingSoon?: boolean;
+};
+
+export const NAV_ITEMS: NavItem[] = [
   // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
   { icon: Globe, label: "Cộng Đồng", path: "/community" },
   { icon: Shirt, label: "Tủ Quần Áo", path: "/wardrobe" },
