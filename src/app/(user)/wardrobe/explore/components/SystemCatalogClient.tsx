@@ -6,6 +6,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useSystemCatalogItems, useInitClosetFromCatalog } from "@/features/wardrobe/queries/wardrobe.queries";
+import { useUserCategories } from "@/features/admin/queries/admin.queries";
 import { WardrobeItemRes } from "@/features/wardrobe/types";
 import { Loader2, Plus, ArrowLeft, Search } from "lucide-react";
 import { WardrobeCard } from "../../components/WardrobeCard";
@@ -21,26 +22,23 @@ import {
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 
-const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
 
-const CATEGORY_SLUG_MAP: Record<string, string> = {
-  "Áo": "ao",
-  "Quần": "quan",
-  "Váy": "vay",
-  "Giày": "giay",
-  "Phụ kiện": "phu-kien",
-  "Áo khoác": "ao-khoac",
-  "Mũ": "mu",
-  "Khác": "other"
-};
 
 export function SystemCatalogClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
+  const { data: categoriesData } = useUserCategories();
+  const categories = categoriesData || [];
+
   const categoryParam = searchParams.get("category") || "Tất cả";
-  const slugToFetch = categoryParam === "Tất cả" ? undefined : CATEGORY_SLUG_MAP[categoryParam] || categoryParam;
+  
+  let slugToFetch: string | undefined = undefined;
+  if (categoryParam !== "Tất cả") {
+    const found = categories.find((c: any) => c.name === categoryParam);
+    slugToFetch = found ? found.slug : categoryParam;
+  }
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
   const containerRef = useRef<HTMLDivElement>(null);
   const actionBarRef = useRef<HTMLDivElement>(null);
@@ -158,12 +156,12 @@ export function SystemCatalogClient() {
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
       {/* Search Input */}
       <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-[240px]">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888] size-4" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
         <input
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full bg-[#F8F7F5] border border-black/10 focus:border-black focus:ring-0 pl-10 pr-4 py-3 rounded-none outline-none transition-all font-semibold text-[11px] text-[#111] placeholder:text-[#888] uppercase tracking-widest"
+          className="w-full bg-background border border-border focus:border-primary focus:ring-0 pl-10 pr-4 py-3 rounded-xl outline-none transition-all duration-200 text-xs font-semibold text-foreground placeholder:text-muted-foreground uppercase tracking-widest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           placeholder="TÌM KIẾM..."
         />
       </form>
@@ -175,13 +173,13 @@ export function SystemCatalogClient() {
       {/* Sticky Top Action Bar */}
       <div
         className={cn(
-          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-[#F4F1EE]/80 dark:bg-[#111]/80 backdrop-blur-xl border-b border-black/10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           isScrolled ? "translate-y-0 shadow-sm opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
         )}
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="hidden md:flex items-center gap-2">
-            <span className="font-semibold font-medium text-2xl text-[#111] uppercase tracking-wide">
+            <span className="font-semibold text-2xl text-foreground uppercase tracking-wide">
               Explore
             </span>
           </div>
@@ -191,21 +189,21 @@ export function SystemCatalogClient() {
 
       <div className="max-w-[1400px] mx-auto space-y-8 pb-32 px-4 sm:px-8 lg:px-12 font-sans" ref={containerRef}>
         {/* High-end Editorial Header */}
-        <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-black/10 pb-6">
+        <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-border pb-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-4 max-w-2xl flex items-center gap-4">
               {/* <button 
               onClick={() => router.back()}
-              className="p-2 hover:bg-[#F8F7F5] rounded-full transition-colors text-[#666] hover:text-[#111]"
+              className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
               aria-label="Back"
             >
               <ArrowLeft className="w-6 h-6" />
             </button> */}
               <div>
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold font-medium text-[#111] leading-[1.1] uppercase">
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase">
                   Explore
                 </h1>
-                <p className="text-[12px] text-[#666] font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4 mt-4">
+                <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-primary pl-4 mt-4">
                   Thêm nhanh các trang phục từ hệ thống vào tủ đồ của bạn
                 </p>
               </div>
@@ -217,23 +215,29 @@ export function SystemCatalogClient() {
           {/* Filters Row */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mt-4">
             <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
-              {CATEGORIES.map((cat) => {
-                const isActive = categoryParam === cat;
-                const label = cat === "Tất cả" ? "Tất cả" : cat;
+              {[{ name: "Tất cả", slug: "tat-ca" }, ...categories].map((cat: any) => {
+                const isActive = categoryParam === cat.name;
+                const label = cat.name;
                 return (
                   <button
-                    key={cat}
-                    onClick={() => updateParams({ category: cat === "Tất cả" ? null : cat, page: "1" })}
+                    key={cat.name}
+                    onClick={() => updateParams({ category: cat.name === "Tất cả" ? null : cat.name, page: "1" })}
                     className={cn(
-                      "relative pb-2 px-1 text-[11px] font-mono uppercase tracking-[0.2em] transition-colors group",
-                      isActive ? "text-[#111] font-bold" : "text-[#888] hover:text-[#111] font-medium"
+                      "text-[11px] font-semibold uppercase tracking-[0.2em] relative transition-colors duration-200 group pb-2",
+                      isActive
+                        ? "text-foreground font-semibold"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     {label}
-                    <span className={cn(
-                      "absolute bottom-0 left-0 h-[2px] bg-[#111] transition-all duration-300",
-                      isActive ? "w-full" : "w-0 group-hover:w-full"
-                    )} />
+                    <span
+                      className={cn(
+                        "absolute bottom-0 left-0 h-[2px] bg-primary transition-all duration-300",
+                        isActive
+                          ? "w-full"
+                          : "w-0 group-hover:w-full",
+                      )}
+                    />
                   </button>
                 );
               })}
@@ -246,14 +250,14 @@ export function SystemCatalogClient() {
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="flex flex-col h-full bg-[#F8F7F5] border border-black/5">
-                  <Skeleton className="relative aspect-[4/5] bg-muted/60 p-3 md:p-6 overflow-hidden flex-shrink-0 rounded-none" />
-                  <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
+                <div key={i} className="flex flex-col h-full bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
+                  <Skeleton className="relative aspect-[4/5] bg-muted p-3 md:p-6 overflow-hidden flex-shrink-0" />
+                  <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-card border-t border-border">
                     <div className="space-y-2">
-                      <Skeleton className="h-6 w-3/4 rounded-none bg-muted/60" />
-                      <Skeleton className="h-3 w-1/2 rounded-none bg-muted/60 mt-2" />
+                      <Skeleton className="h-6 w-3/4 rounded-full bg-muted" />
+                      <Skeleton className="h-3 w-1/2 rounded-full bg-muted mt-2" />
                     </div>
-                    <Skeleton className="h-3 w-1/3 rounded-none bg-muted/60" />
+                    <Skeleton className="h-3 w-1/3 rounded-full bg-muted" />
                   </div>
                 </div>
               ))}
@@ -295,7 +299,7 @@ export function SystemCatalogClient() {
                       e.preventDefault();
                       if (pageParam > 1) updateParams({ page: (pageParam - 1).toString() });
                     }}
-                    className={pageParam <= 1 ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest"}
+                    className={pageParam <= 1 ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest rounded-full" : "font-semibold text-[11px] uppercase tracking-widest rounded-full hover:bg-muted"}
                     text="TRƯỚC"
                   />
                 </PaginationItem>
@@ -316,7 +320,12 @@ export function SystemCatalogClient() {
                             e.preventDefault();
                             updateParams({ page: pageNum.toString() });
                           }}
-                          className="font-semibold text-[11px] uppercase tracking-widest rounded-none border-black/10"
+                          className={cn(
+                            "font-semibold text-[11px] uppercase tracking-widest rounded-full transition-colors",
+                            pageParam === pageNum 
+                              ? "bg-primary text-primary-foreground hover:bg-primary/90 border-transparent shadow-sm" 
+                              : "hover:bg-muted border-transparent"
+                          )}
                         >
                           {pageNum}
                         </PaginationLink>
@@ -342,7 +351,7 @@ export function SystemCatalogClient() {
                       e.preventDefault();
                       if (pageParam < metadata.totalPages) updateParams({ page: (pageParam + 1).toString() });
                     }}
-                    className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest"}
+                    className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest rounded-full" : "font-semibold text-[11px] uppercase tracking-widest rounded-full hover:bg-muted"}
                     text="SAU"
                   />
                 </PaginationItem>

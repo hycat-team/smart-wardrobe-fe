@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useMyOutfits, useDeleteOutfit } from "@/features/outfits/queries/outfits.queries";
 import { OutfitRes as Outfit } from "@/features/outfits/types";
 import { OutfitCard } from "./OutfitCard";
+import { useSidebarStore } from "@/store/useSidebarStore";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import {
@@ -66,6 +67,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   const [sortParam, setSortParam] = useState<SortOption>("Mới Nhất");
   const [outfitToDelete, setOutfitToDelete] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -213,8 +215,11 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
       {/* Sticky Top Action Bar */}
       <div
         className={cn(
-          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          isScrolled ? "translate-y-0 shadow-sm opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+          "fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          isCollapsed ? "md:left-[88px]" : "md:left-[280px]",
+          isScrolled
+            ? "translate-y-0 shadow-sm opacity-100"
+            : "-translate-y-full opacity-0 pointer-events-none",
         )}
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">

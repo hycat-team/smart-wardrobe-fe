@@ -51,7 +51,7 @@ export function GlobalAIChat() {
   useEffect(() => {
     if (!chatContainerRef.current) return;
     if (isOpen) {
-      gsap.fromTo(chatContainerRef.current, 
+      gsap.fromTo(chatContainerRef.current,
         { y: 50, opacity: 0, scale: 0.95, transformOrigin: "bottom right", display: "flex" },
         { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.2)" }
       );
@@ -69,7 +69,7 @@ export function GlobalAIChat() {
     setIsHistoryOpen(false);
     setContextID(session.id);
     setChatMessages([]);
-    
+
     try {
       toast.loading("Đang tải lịch sử...", { id: "load_history" });
       const res = await aiApi.getChatMessages(session.id, { limit: 100 });
@@ -85,7 +85,7 @@ export function GlobalAIChat() {
         if (timeDiff !== 0) return timeDiff;
         return b._originalIndex - a._originalIndex;
       });
-      
+
       setChatMessages(formattedMessages);
       toast.success("Đã tải lịch sử trò chuyện", { id: "load_history" });
     } catch (error: any) {
@@ -188,9 +188,9 @@ export function GlobalAIChat() {
 
   return (
     <div ref={containerRef} className="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[100] flex flex-col items-end justify-end pointer-events-none gap-4">
-      
+
       {/* Chat Window */}
-      <div 
+      <div
         ref={chatContainerRef}
         className={cn(
           "w-[350px] md:w-[400px] h-[600px] max-h-[80vh] bg-white border border-[#E5E5E5] shadow-2xl flex flex-col overflow-hidden pointer-events-auto relative origin-bottom-right mb-4 rounded-xl",
@@ -263,7 +263,7 @@ export function GlobalAIChat() {
               <MoveRight className="w-4 h-4" />
             </button>
           </div>
-          <button 
+          <button
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
             className="text-[10px] font-bold text-[#A3A3A3] hover:text-[#1A1A1A] uppercase tracking-widest mt-2 self-start px-1"
           >

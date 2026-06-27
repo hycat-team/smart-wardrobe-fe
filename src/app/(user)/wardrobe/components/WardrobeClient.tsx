@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, Search, Tag, Trash2 } from "lucide-react";
+import { Loader2, Plus, Search, Tag, Trash2, UploadCloud, Compass, Library } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import {
@@ -15,6 +15,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@heroui/react";
 import {
   Select,
@@ -42,6 +48,7 @@ import {
 } from "@/features/wardrobe/types";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { WardrobeCard } from "./WardrobeCard";
+import { useSidebarStore } from "@/store/useSidebarStore";
 import { toast } from "sonner";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -135,6 +142,7 @@ export default function WardrobeClient({
   const [isScrolled, setIsScrolled] = useState(false);
   const { mutate: bulkDelete, isPending: isDeleting } =
     useBulkDeleteWardrobeItems();
+  const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 
   const [searchInput, setSearchInput] = useState(searchParam);
   const lastPushedQ = useRef(searchParam);
@@ -343,12 +351,23 @@ export default function WardrobeClient({
         />
       </form>
 
-      <Button
-        onClick={() => router.push("/wardrobe/upload")}
-        className="h-[42px] rounded-full bg-primary px-8 text-xs font-semibold uppercase tracking-[0.15em] text-primary-foreground transition-all duration-200 hover:bg-primary/90"
-      >
-        <Plus className="mr-2 size-4" /> Thêm Đồ
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            className="h-[42px] rounded-full bg-primary px-8 text-xs font-semibold uppercase tracking-[0.15em] text-primary-foreground transition-all duration-200 hover:bg-primary/90"
+          >
+            <Plus className="mr-2 size-4" /> Thêm Đồ
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-[200px] rounded-2xl border border-border bg-card p-2 shadow-xl">
+          <DropdownMenuItem onClick={() => router.push("/wardrobe/upload")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted flex items-center gap-2">
+            <UploadCloud className="w-4 h-4" /> Tự tải lên ảnh
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push("/wardrobe/explore")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted mt-1 flex items-center gap-2">
+            <Library className="w-4 h-4" /> Lấy từ thư viên
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Button
         onClick={() => {
           setIsSelectMode(!isSelectMode);
@@ -362,7 +381,7 @@ export default function WardrobeClient({
             : "border-border text-foreground hover:bg-muted",
         )}
       >
-        {isSelectMode ? "Hủy chọn" : "Chọn nhiều"}
+        {isSelectMode ? "Hủy chọn" : "Xóa nhiều"}
       </Button>
       {isSelectMode && selectedIds.length > 0 && (
         <AlertDialog>
@@ -426,7 +445,8 @@ export default function WardrobeClient({
       {/* Sticky Top Action Bar */}
       <div
         className={cn(
-          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          isCollapsed ? "md:left-[88px]" : "md:left-[280px]",
           isScrolled
             ? "translate-y-0 shadow-sm opacity-100"
             : "-translate-y-full opacity-0 pointer-events-none",
@@ -435,7 +455,7 @@ export default function WardrobeClient({
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="hidden md:flex items-center gap-2">
             <span className="text-2xl font-semibold uppercase tracking-wide text-foreground">
-              Wardrobe
+              Tủ đồ
             </span>
           </div>
           {renderActions()}
@@ -454,7 +474,7 @@ export default function WardrobeClient({
               Wardrobe
             </h1> */}
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase">
-                Wardrobe
+                Tủ đồ
               </h1>
               <p className="text-sm text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-border pl-4">
                 Bộ sưu tập của bạn.
@@ -640,13 +660,24 @@ export default function WardrobeClient({
                 của bạn để tạo ra những bộ phối đồ mới.
               </p>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/wardrobe/upload")}
-              className="mt-4 h-14 rounded-full border-border px-8 text-xs font-semibold uppercase tracking-[0.2em] text-foreground hover:bg-muted"
-            >
-              Thêm đồ
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="mt-4 h-14 rounded-full border-border px-8 text-xs font-semibold uppercase tracking-[0.2em] text-foreground hover:bg-muted"
+                >
+                  <Plus className="mr-2 size-4" /> Thêm đồ
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-[200px] rounded-2xl border border-border bg-card p-2 shadow-xl">
+                <DropdownMenuItem onClick={() => router.push("/wardrobe/upload")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted flex items-center gap-2">
+                  <UploadCloud className="w-4 h-4" /> Tự tải lên ảnh
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/wardrobe/explore")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted mt-1 flex items-center gap-2">
+                  <Library className="w-4 h-4" /> Lấy từ thư viện
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
 

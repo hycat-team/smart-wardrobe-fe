@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { usePostComments, useAddComment, useDeleteComment } from '../queries/community.queries';
 import { useProfile } from '@/features/profile/queries/profile.queries';
@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PostRes } from '../types';
 import { CommentItem } from './CommentItem';
 import Image from 'next/image';
+import { getUserAvatar } from '@/lib/utils';
 
 interface PostCommentsModalProps {
   isOpen: boolean;
@@ -51,11 +52,13 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
 
   const hasMedia = post.media && post.media.length > 0;
   const mediaUrl = hasMedia ? post.media[0].mediaUrl : null;
+  const isPostOwner = profile?.id === post.userId || profile?.username === post.username;
+  const postDisplayAvatar = isPostOwner && profile ? getUserAvatar(profile) : (post.avatarUrl || '/images-male.png');
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[95vw] sm:max-w-[1200px] md:w-[85vw] bg-background border border-border text-foreground rounded-3xl p-0 overflow-hidden flex flex-col md:flex-row h-[80vh] shadow-xl [&>button]:hidden">
-
+      <DialogContent aria-describedby={undefined} className="w-[95vw] sm:max-w-[1200px] md:w-[85vw] bg-background border border-border text-foreground rounded-3xl p-0 overflow-hidden flex flex-col md:flex-row h-[80vh] shadow-xl [&>button]:hidden">
+        <DialogTitle className="sr-only">Chi tiết bài viết và bình luận</DialogTitle>
         {/* Left Side: Post Image */}
         <div className="hidden md:block w-[60%] h-full bg-muted relative border-r border-border">
           {mediaUrl ? (
@@ -80,15 +83,17 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
           <div className="p-6 border-b border-border flex flex-col gap-4 bg-muted/20">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10 ring-1 ring-border">
-                  <AvatarImage src={post.avatarUrl || ''} />
-                  <AvatarFallback className="bg-muted text-foreground font-bold text-xs">
-                    {getInitials(post.firstName, post.lastName, post.username)}
-                  </AvatarFallback>
-                </Avatar>
+                <Image
+                  src={postDisplayAvatar}
+                  alt="Avatar"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-full object-cover ring-1 ring-border shrink-0"
+                />
                 <div className="flex flex-col">
                   <span className="font-bold text-sm text-foreground">{post.username || 'Atelier Curators'}</span>
                   <span className="text-xs text-muted-foreground font-medium">Editorial Team</span>
+
                 </div>
               </div>
               <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors p-1">

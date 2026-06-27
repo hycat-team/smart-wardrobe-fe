@@ -102,8 +102,8 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
     <div className="animate-in fade-in duration-700 max-w-2xl mx-auto w-full pb-20 pt-10">
       {/* Profile Header */}
       <div className="text-center mb-10 space-y-3">
-        <h1 className="font-heading text-4xl md:text-5xl text-foreground font-bold tracking-tight">Profile Information</h1>
-        <p className="font-body-sm text-muted-foreground">Update your personal details and preferences.</p>
+        <h1 className="font-heading text-4xl md:text-5xl text-foreground font-bold tracking-tight">Thông tin cá nhân</h1>
+        <p className="font-body-sm text-muted-foreground">Cập nhật thông tin cá nhân và tùy chọn của bạn.</p>
       </div>
 
       {/* Avatar Section */}
@@ -114,7 +114,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
             className="w-full h-full object-cover opacity-90 transition-opacity group-hover:opacity-75"
           />
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 backdrop-blur-[2px]">
-            <span className="text-[10px] font-label-caps uppercase tracking-wider text-primary-foreground bg-primary/80 px-2 py-1 rounded-full">Edit</span>
+            <span className="text-[10px] font-label-caps uppercase tracking-wider text-primary-foreground bg-primary/80 px-2 py-1 rounded-full">Sửa</span>
           </div>
         </div>
       </div>
@@ -124,7 +124,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
         <div className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className={labelClassName}>First Name</label>
+              <label className={labelClassName}>Họ</label>
               <input
                 name="firstName"
                 value={profileData.firstName}
@@ -135,7 +135,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
               />
             </div>
             <div>
-              <label className={labelClassName}>Last Name</label>
+              <label className={labelClassName}>Tên</label>
               <input
                 name="lastName"
                 value={profileData.lastName}
@@ -148,7 +148,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className={labelClassName}>Date of Birth</label>
+              <label className={labelClassName}>Ngày sinh</label>
               <div className={cn("flex items-center w-full", inputClassName, "p-0 overflow-hidden pr-3 transition-all", !profileData.dateOfBirth && "text-muted-foreground/50")}>
                 <input
                   type="date"
@@ -157,12 +157,12 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
                   onChange={handleProfileChange}
                   className="w-full h-full bg-transparent border-none outline-none text-foreground font-body-sm px-4 py-3 [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
                 />
-                  <Popover>
-                    <PopoverTrigger className="outline-none opacity-50 hover:opacity-100 transition-opacity shrink-0">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </PopoverTrigger>
+                <Popover>
+                  <PopoverTrigger className="outline-none opacity-50 hover:opacity-100 transition-opacity shrink-0">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 bg-background border-border rounded-2xl shadow-xl">
                     <Calendar
                       mode="single"
@@ -186,7 +186,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
               </div>
             </div>
             <div>
-              <label className={labelClassName}>Gender</label>
+              <label className={labelClassName}>Giới tính</label>
               <Select
                 value={profileData.gender ? profileData.gender.toString() : ""}
                 onValueChange={(value) => setProfileData(prev => ({ ...prev, gender: Number(value) }))}
@@ -209,7 +209,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className={labelClassName}>Email Address</label>
+              <label className={labelClassName}>Địa chỉ email</label>
               <input
                 name="email"
                 value={profileData.email}
@@ -218,7 +218,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
               />
             </div>
             <div>
-              <label className={labelClassName}>Address</label>
+              <label className={labelClassName}>Địa chỉ</label>
               <input
                 name="address"
                 value={profileData.address}
@@ -254,7 +254,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
             disabled={isUpdating}
             className="bg-primary text-primary-foreground px-8 py-3 rounded-full text-sm font-bold tracking-wider hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-70 flex items-center gap-2"
           >
-            {isUpdating ? <><Loader2 className="size-4 animate-spin" /> Saving...</> : "Save Changes"}
+            {isUpdating ? <><Loader2 className="size-4 animate-spin" /> Đang lưu...</> : "Lưu thay đổi"}
           </button>
         </div>
       </form>
@@ -262,13 +262,13 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
       {/* Password Section */}
       <div className="mt-16 pt-16 border-t border-border space-y-8">
         <div className="text-center mb-8 space-y-2">
-          <h2 className="font-heading text-3xl text-foreground font-bold tracking-tight">Security</h2>
-          <p className="font-body-sm text-muted-foreground">Update your password to keep your account secure.</p>
+          <h2 className="font-heading text-3xl text-foreground font-bold tracking-tight">Bảo mật</h2>
+          <p className="font-body-sm text-muted-foreground">Cập nhật mật khẩu để giữ cho tài khoản của bạn an toàn.</p>
         </div>
 
         <form onSubmit={handleSavePassword} className="space-y-6">
           <div>
-            <label className={labelClassName}>Current Password</label>
+            <label className={labelClassName}>Mật khẩu hiện tại</label>
             <div className="relative">
               <input
                 name="oldPassword"
@@ -290,7 +290,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className={labelClassName}>New Password</label>
+              <label className={labelClassName}>Mật khẩu mới</label>
               <div className="relative">
                 <input
                   name="newPassword"
@@ -311,7 +311,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
               </div>
             </div>
             <div>
-              <label className={labelClassName}>Confirm New Password</label>
+              <label className={labelClassName}>Xác nhận mật khẩu mới</label>
               <div className="relative">
                 <input
                   name="confirmPassword"
@@ -333,7 +333,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 pt-2">
+          {/* <div className="flex items-center space-x-3 pt-2">
             <input
               type="checkbox"
               id="logoutAllDevices"
@@ -345,7 +345,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
             <label htmlFor="logoutAllDevices" className="text-[13px] font-medium text-muted-foreground select-none cursor-pointer">
               Sign out from all other devices
             </label>
-          </div>
+          </div> */}
 
           <div className="pt-8 border-t border-border flex items-center justify-end gap-6">
             <button
@@ -353,14 +353,14 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "", logoutAllDevices: false })}
             >
-              Cancel
+              Hủy
             </button>
             <button
               type="submit"
               disabled={isChangingPassword}
               className="bg-primary text-primary-foreground px-8 py-3 rounded-full text-sm font-bold tracking-wider hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-70 flex items-center gap-2"
             >
-              {isChangingPassword ? <><Loader2 className="size-4 animate-spin" /> Updating...</> : "Update Password"}
+              {isChangingPassword ? <><Loader2 className="size-4 animate-spin" /> Đang cập nhật...</> : "Cập nhật mật khẩu"}
             </button>
           </div>
         </form>

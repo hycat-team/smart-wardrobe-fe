@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 import { useAuthStore } from "@/store/useAuthStore";
 import { UserCircle, LayoutDashboard, User as UserIcon, Settings, LogOut, Menu, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -70,14 +70,14 @@ export function GuestHeader() {
             {isLoggedIn ? (
               <>
                 <Link
-                  href="/wardrobe"
+                  href="/community"
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                     hover:opacity-100
                     ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
                   `}
                 >
-                  Tủ đồ
+                  Cộng đồng
                 </Link>
                 <Link
                   href="/ai-stylist"
@@ -90,15 +90,17 @@ export function GuestHeader() {
                   AI Stylist
                 </Link>
                 <Link
-                  href="/community"
+                  href="/wardrobe"
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                     hover:opacity-100
                     ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
                   `}
                 >
-                  Cộng đồng
+                  Tủ đồ
                 </Link>
+
+
 
                 {/* Divider */}
                 <div className={`w-px h-5 transition-colors duration-500 ${scrolled ? "bg-white/10" : "bg-[#1A1A1A]/10"}`} />
@@ -115,18 +117,19 @@ export function GuestHeader() {
                           : "ring-[#1A1A1A]/10 ring-offset-[#F4F1EE]"
                         }
                       `}>
-                        <Avatar className="size-9">
-                          <AvatarImage src={getUserAvatar(user)} alt={user?.username || "User"} className="object-cover" />
-                          <AvatarFallback className="bg-[#D9C5B2] text-white font-semibold text-xs">
-                            {user?.firstName?.charAt(0) || user?.username?.charAt(0) || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
+                        <Image
+                          src={getUserAvatar(user)}
+                          alt={user?.username || "User"}
+                          width={36}
+                          height={36}
+                          className="size-full object-cover"
+                        />
                       </div>
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-56 rounded-none border border-[#1A1A1A]/10 bg-white p-2 shadow-lg mt-2"
+                    className="w-56 rounded-2xl border border-[#1A1A1A]/10 bg-white p-2 shadow-lg mt-2"
                   >
                     <div className="px-3 py-3 border-b border-[#1A1A1A]/5 mb-2">
                       <p className="font-semibold text-base font-medium text-[#1A1A1A]">
@@ -135,19 +138,19 @@ export function GuestHeader() {
                       <p className="font-semibold text-[10px] text-[#707070] uppercase tracking-wider mt-1">{user?.email}</p>
                     </div>
                     <DropdownMenuItem asChild>
-                      <Link href="/profile" className="cursor-pointer rounded-none font-semibold text-[11px] uppercase tracking-wider py-2.5 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
+                      <Link href="/profile" className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
                         <UserIcon className="mr-3 h-4 w-4" />
                         Hồ sơ
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/wardrobe" className="cursor-pointer rounded-none font-semibold text-[11px] uppercase tracking-wider py-2.5 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
+                      <Link href="/wardrobe" className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
                         <LayoutDashboard className="mr-3 h-4 w-4" />
                         Tủ đồ
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/profile/update" className="cursor-pointer rounded-none font-semibold text-[11px] uppercase tracking-wider py-2.5 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
+                      <Link href="/profile/update" className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
                         <Settings className="mr-3 h-4 w-4" />
                         Cài đặt
                       </Link>
@@ -155,7 +158,7 @@ export function GuestHeader() {
                     <DropdownMenuSeparator className="bg-[#1A1A1A]/5" />
                     <DropdownMenuItem
                       onClick={() => logout()}
-                      className="cursor-pointer rounded-none font-semibold text-[11px] uppercase tracking-wider py-2.5 text-red-600 focus:bg-red-50 focus:text-red-700"
+                      className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-red-600 focus:bg-red-50 focus:text-red-700"
                     >
                       <LogOut className="mr-3 h-4 w-4" />
                       Đăng xuất
@@ -218,10 +221,13 @@ export function GuestHeader() {
             {/* User Info */}
             <div className="flex flex-col items-center gap-4 mb-8">
               <div className="size-16 rounded-full overflow-hidden ring-2 ring-[#D9C5B2] ring-offset-4 ring-offset-[#1A1A1A]">
-                <Avatar className="size-16 ring-2 ring-[#D9C5B2] ring-offset-4 ring-offset-[#1A1A1A]">
-                  <AvatarImage src={getUserAvatar(user)} alt={user?.username || "User"} className="object-cover" />
-                  <AvatarFallback className="bg-[#D9C5B2] text-white text-lg">{user?.firstName?.charAt(0) || 'U'}</AvatarFallback>
-                </Avatar>
+                <Image
+                  src={getUserAvatar(user)}
+                  alt={user?.username || "User"}
+                  width={64}
+                  height={64}
+                  className="size-full object-cover"
+                />
               </div>
               <p className="font-semibold text-white text-xl">
                 {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username}

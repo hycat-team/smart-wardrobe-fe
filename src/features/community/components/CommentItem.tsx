@@ -5,6 +5,8 @@ import { useCommentReplies, useDeleteComment, useUpdateComment } from '../querie
 import { Loader2, Trash2, MoreHorizontal, Pencil, X } from 'lucide-react';
 import { useProfile } from '@/features/profile/queries/profile.queries';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { getUserAvatar } from '@/lib/utils';
+import Image from 'next/image';
 
 interface CommentItemProps {
   comment: CommentRes;
@@ -33,6 +35,7 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
 
   const isOwner = profile?.id === comment.userId || profile?.username === comment.username;
   const hasReplies = replies && replies.length > 0;
+  const displayAvatar = isOwner && profile ? getUserAvatar(profile) : (comment.avatarUrl || '/images-male.png');
 
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,12 +56,13 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
   return (
     <div className={`flex flex-col gap-3 ${isReply ? 'mt-4' : ''}`}>
       <div className="flex gap-3 group items-start">
-        <Avatar className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} rounded-full ring-1 ring-border shrink-0 mt-0.5`}>
-          <AvatarImage src={comment.avatarUrl || ''} className="rounded-full object-cover" />
-          <AvatarFallback className={`rounded-full ${isReply ? 'text-[9px]' : 'text-[10px]'} bg-muted text-foreground font-bold`}>
-            {getInitials(comment.firstName, comment.lastName, comment.username)}
-          </AvatarFallback>
-        </Avatar>
+        <Image
+          src={displayAvatar}
+          alt="Avatar"
+          width={32}
+          height={32}
+          className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} rounded-full object-cover ring-1 ring-border shrink-0 mt-0.5`}
+        />
         
         <div className="flex-1 flex flex-col gap-1 min-w-0">
           <div className="flex justify-between items-start">

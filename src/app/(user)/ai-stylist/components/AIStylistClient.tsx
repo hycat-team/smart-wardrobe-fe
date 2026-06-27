@@ -119,6 +119,9 @@ function AIStylistContent() {
       setOutfitData(res);
 
       // Initialize selected items from the main items
+      const canvasW = canvasRef.current?.clientWidth || 800;
+      const canvasH = canvasRef.current?.clientHeight || 600;
+
       const initialItems = res.items.map(item => ({
         id: crypto.randomUUID(),
         clothingItemId: item.primary.id,
@@ -129,8 +132,8 @@ function AIStylistContent() {
         brandName: (item.primary as any).brandName,
         wardrobeImpact: (item.primary as any).wardrobeImpact,
         price: item.primary.price,
-        x: Math.random() * 100 + 50,
-        y: Math.random() * 100 + 50,
+        x: canvasW / 2 - 150 + (Math.random() * 100 - 50),
+        y: canvasH / 2 - 200 + (Math.random() * 100 - 50),
         scale: 100,
         zIndex: 1
       }));

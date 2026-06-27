@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { GhostItem } from "../types";
-import { Check, ArrowDown, ArrowUp, X, BookmarkPlus, ShoppingBag, EyeOff, ThumbsDown } from "lucide-react";
+import { Check, ArrowDown, ArrowUp, X, BookmarkPlus, ShoppingBag, EyeOff, ThumbsDown, RefreshCcw } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -43,7 +43,7 @@ export function WardrobeImpactPanel({
 
   return (
     <Sheet modal={false} open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent showCloseButton={false} side="right" className="w-full sm:max-w-md bg-background p-0 overflow-hidden border-l border-border flex flex-col h-full sm:rounded-l-3xl shadow-2xl">
+      <SheetContent showCloseButton={false} side="right" className="w-full sm:max-w-md bg-background p-0 overflow-hidden border-l border-border flex flex-col h-full sm:rounded-l-3xl shadow-2xl z-200">
         <ScrollArea className="flex-1 w-full h-full">
           {/* Header Image */}
           <div className="relative aspect-[4/5] w-full bg-muted">
@@ -153,19 +153,21 @@ export function WardrobeImpactPanel({
 
         {/* Action Bar */}
         <div className="p-5 border-t border-border bg-background/90 backdrop-blur-md shrink-0 space-y-4">
+
           <Button
-            onClick={onSwap}
+            onClick={onWaitlist}
             className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[11px] font-bold tracking-widest uppercase h-12 shadow-sm"
           >
-            Đổi món khác
+
+            <ShoppingBag className="size-3.5 mr-1.5" /> Thêm giỏ hàng
           </Button>
 
           <div className="flex gap-2 justify-between">
+            <Button onClick={onSwap} variant="ghost" size="sm" className="flex-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted">
+              <RefreshCcw className="size-3.5 mr-1.5" />  Đổi món khác
+            </Button>
             <Button onClick={onSave} variant="ghost" size="sm" className="flex-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted">
               <BookmarkPlus className="size-3.5 mr-1.5" /> Lưu
-            </Button>
-            <Button onClick={onWaitlist} variant="ghost" size="sm" className="flex-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-muted">
-              <ShoppingBag className="size-3.5 mr-1.5" /> Thêm giỏ hàng
             </Button>
             <Button onClick={onNotMyStyle} variant="ghost" size="sm" className="flex-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-destructive hover:text-destructive hover:bg-destructive/10">
               <ThumbsDown className="size-3.5 mr-1.5" /> Bỏ qua

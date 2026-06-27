@@ -38,13 +38,14 @@ import { useB2BDemoStore } from "@/lib/mock-data/b2b/store";
 import { useLogout } from "@/features/auth/queries/auth.queries";
 import { getUserAvatar } from "@/lib/utils";
 import Image from "next/image";
+import { useSidebarStore } from "@/store/useSidebarStore";
 
 export const NAV_ITEMS = [
-  { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
+  // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
+  { icon: Globe, label: "Cộng Đồng", path: "/community" },
   { icon: Shirt, label: "Tủ Quần Áo", path: "/wardrobe" },
   { icon: Sparkles, label: "AI Phối Đồ", path: "/ai-stylist" },
   { icon: ScanQrCode, label: "Trang Phục", path: "/outfits" },
-  { icon: Globe, label: "Cộng Đồng", path: "/community" },
   // { icon: Store, label: "Thanh Lý", path: "/marketplace", comingSoon: true },
 ];
 
@@ -55,7 +56,7 @@ export function Sidebar() {
   const clearAuthStore = useAuthStore((state) => state.logout);
   const logoutMutation = useLogout();
   const { cart, setCartOpen } = useB2BDemoStore();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, setIsCollapsed, toggleCollapse } = useSidebarStore();
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -63,12 +64,10 @@ export function Sidebar() {
     if (saved === "true") {
       setIsCollapsed(true);
     }
-  }, []);
+  }, [setIsCollapsed]);
 
   const handleToggleCollapse = () => {
-    const newState = !isCollapsed;
-    setIsCollapsed(newState);
-    localStorage.setItem("closy_sidebar_collapsed", String(newState));
+    toggleCollapse();
   };
 
   const handleLogout = () => {
@@ -227,7 +226,7 @@ export function Sidebar() {
           if (isCollapsed) {
             return (
               <Tooltip key={item.path}>
-                <TooltipTrigger>
+                <TooltipTrigger render={<div />}>
                   {content}
                 </TooltipTrigger>
                 <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest">
@@ -245,11 +244,10 @@ export function Sidebar() {
       <div className="mb-4 mt-2">
         {isCollapsed ? (
           <Tooltip>
-            <TooltipTrigger>
-              <button
-                onClick={() => setCartOpen(true)}
-                className="group flex items-center justify-center w-full p-3 rounded-xl transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-muted/30"
-              >
+            <TooltipTrigger
+              onClick={() => setCartOpen(true)}
+              className="group flex items-center justify-center w-full p-3 rounded-xl transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-muted/30"
+            >
                 <div className="relative">
                   <ShoppingBag className="size-5 transition-transform duration-300 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" strokeWidth={1.5} />
                   {cart.length > 0 && (
@@ -258,7 +256,6 @@ export function Sidebar() {
                     </span>
                   )}
                 </div>
-              </button>
             </TooltipTrigger>
             <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest">
               Giỏ Hàng
@@ -294,7 +291,7 @@ export function Sidebar() {
 
           {isCollapsed ? (
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger render={<div />}>
                 <Link href="/pricing">
                   <Sparkles className="size-5 text-foreground/80 group-hover:text-[#D9C5B2] transition-colors" />
                 </Link>
