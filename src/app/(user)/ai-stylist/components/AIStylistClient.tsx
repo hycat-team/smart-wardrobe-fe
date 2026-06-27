@@ -351,7 +351,7 @@ function AIStylistContent() {
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-center max-w-md">
                     <Sparkles className="w-8 h-8 text-muted-foreground mb-6" strokeWidth={1} />
-                    <h3 className="text-xl font-bold text-foreground uppercase tracking-tight mb-3">THE BLANK CANVAS</h3>
+                    <h3 className="text-xl font-bold text-foreground uppercase tracking-tight mb-3">Khung sáng tạo</h3>
                     <p className="text-balance text-muted-foreground text-[13px] leading-relaxed">
                       Thiết lập thông số kỹ thuật và nhập ý tưởng thiết kế ở bảng điều khiển bên phải. Hệ thống CLOSY AI sẽ kiến tạo một bộ trang phục dành riêng cho bạn.
                     </p>
@@ -402,7 +402,7 @@ function AIStylistContent() {
                 </div>
               </div>
 
-              {/* <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
+              <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
                 <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
                   PHONG CÁCH (STYLE)
                 </label>
@@ -430,7 +430,7 @@ function AIStylistContent() {
                     </button>
                   ))}
                 </div>
-              </div> */}
+              </div>
 
               {/* <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
                 <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
@@ -492,7 +492,7 @@ function AIStylistContent() {
                 </div>
               </div> */}
 
-              <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
+              {/* <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
                 <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
                   TÔNG MÀU (COLOR TONE)
                 </label>
@@ -520,7 +520,7 @@ function AIStylistContent() {
                     </button>
                   ))}
                 </div>
-              </div>
+              </div> */}
 
               <div className="group flex flex-col gap-2 pt-2 focus-within:border-foreground transition-colors border-b border-transparent">
                 <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">

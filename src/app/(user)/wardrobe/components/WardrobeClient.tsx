@@ -45,6 +45,7 @@ import { WardrobeCard } from "./WardrobeCard";
 import { toast } from "sonner";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { useUserCategories } from "@/features/admin/queries/admin.queries";
 
 const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
 
@@ -119,6 +120,8 @@ export default function WardrobeClient({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const { data: category } = useUserCategories()
 
   // Sync Search state with query params
   const categoryParam = searchParams.get("category") || "Tất cả";
@@ -467,15 +470,15 @@ export default function WardrobeClient({
           {/* Categories / Tabs - Magazine Index Style */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
             <div className="flex flex-wrap gap-x-8 gap-y-4">
-              {CATEGORIES.map((cat) => {
-                const label = cat;
+              {category?.map((cat) => {
+                const label = cat.name;
                 return (
                   <button
-                    key={cat}
-                    onClick={() => handleCategoryChange(cat)}
+                    key={cat.id}
+                    onClick={() => handleCategoryChange(cat.name)}
                     className={cn(
                       "text-xs font-semibold uppercase tracking-[0.2em] relative transition-colors duration-200 group pb-2",
-                      categoryParam === cat
+                      categoryParam === cat.name
                         ? "text-foreground font-semibold"
                         : "text-muted-foreground hover:text-foreground",
                     )}

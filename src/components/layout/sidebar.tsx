@@ -45,7 +45,7 @@ export const NAV_ITEMS = [
   { icon: Sparkles, label: "AI Phối Đồ", path: "/ai-stylist" },
   { icon: ScanQrCode, label: "Trang Phục", path: "/outfits" },
   { icon: Globe, label: "Cộng Đồng", path: "/community" },
-  { icon: Store, label: "Thanh Lý", path: "/marketplace", comingSoon: true },
+  // { icon: Store, label: "Thanh Lý", path: "/marketplace", comingSoon: true },
 ];
 
 export function Sidebar() {

@@ -3,11 +3,11 @@ import { cn } from "@/lib/utils";
 import { Sparkles, SlidersHorizontal } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export const OCCASIONS = ["Đi học", "Đi làm", "Hẹn hò", "Tiệc", "Thể thao", "Ở nhà"];
-export const STYLES = ["Tối giản", "Thường ngày", "Trang trọng", "Thời thượng", "Cổ điển", "Đường phố"];
-export const SEASONS = ["Mùa xuân", "Mùa hạ", "Mùa thu", "Mùa đông"];
-export const WEATHERS = ["Ấm áp", "Lạnh", "Mưa", "Mát mẻ"];
-export const COLOR_TONES = ["Sáng", "Tối", "Trung tính", "Nhiều màu"];
+export const OCCASIONS = ["Không có", "Ở nhà", "Đi học", "Đi làm", "Hẹn hò", "Tiệc", "Thể thao"];
+export const STYLES = ["Không có", "Tối giản", "Thường ngày", "Trang trọng", "Cổ điển", "Đường phố"];
+export const SEASONS = ["Không có", "Mùa xuân", "Mùa hạ", "Mùa thu", "Mùa đông"];
+export const WEATHERS = ["Không có", "Ấm áp", "Lạnh", "Mưa", "Mát mẻ"];
+export const COLOR_TONES = ["Không có", "Sáng", "Tối", "Trung tính", "Nhiều màu"];
 
 export const occasionMap: Record<string, string> = {
   "Đi học": "casual",

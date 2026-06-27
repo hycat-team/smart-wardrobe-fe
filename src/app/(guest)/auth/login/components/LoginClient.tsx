@@ -52,7 +52,7 @@ export function LoginClient() {
 
         <form noValidate className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-2">
-          <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="email">Email / Tên Đăng Nhập</label>
+          <label className="block font-inter text-[12px] font-bold text-muted-foreground uppercase tracking-[0.1em]" htmlFor="email">Email / Tên Đăng Nhập</label>
           <input
             id="email"
             type="text"
@@ -61,15 +61,15 @@ export function LoginClient() {
             {...register("email")}
             onFocus={() => setFocusedInput('email')}
             onBlur={() => setFocusedInput(null)}
-            className={`w-full block font-inter text-[16px] text-ethos-primary placeholder:text-ethos-outline-variant py-3 focus:outline-none focus:ring-0 border-0 border-b border-ethos-primary bg-transparent transition-all duration-300 ${focusedInput === 'email' ? 'bg-ethos-surface-low border-b-2 px-4 rounded-none' : 'px-0'} ${errors.email ? 'border-red-500' : ''}`}
+            className={`w-full block font-inter text-[16px] text-foreground placeholder:text-muted-foreground/60 px-4 py-3 focus:outline-none focus:ring-1 focus:ring-primary border bg-muted/50 transition-all duration-300 rounded-2xl ${focusedInput === 'email' ? 'border-primary' : 'border-border'} ${errors.email ? 'border-red-500' : ''}`}
           />
           {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
         </div>
 
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="password">Mật khẩu</label>
-            <Link href="/auth/forgot-password" tabIndex={3} className="font-inter text-[13px] text-ethos-on-surface-variant hover:text-ethos-primary transition-colors">Quên mật khẩu?</Link>
+            <label className="block font-inter text-[12px] font-bold text-muted-foreground uppercase tracking-[0.1em]" htmlFor="password">Mật khẩu</label>
+            <Link href="/auth/forgot-password" tabIndex={3} className="font-inter text-[13px] text-muted-foreground hover:text-primary transition-colors">Quên mật khẩu?</Link>
           </div>
           <input
             id="password"
@@ -79,7 +79,7 @@ export function LoginClient() {
             {...register("password")}
             onFocus={() => setFocusedInput('password')}
             onBlur={() => setFocusedInput(null)}
-            className={`w-full block font-inter text-[16px] text-ethos-primary placeholder:text-ethos-outline-variant py-3 focus:outline-none focus:ring-0 border-0 border-b border-ethos-primary bg-transparent transition-all duration-300 ${focusedInput === 'password' ? 'bg-ethos-surface-low border-b-2 px-4 rounded-none' : 'px-0'} ${errors.password ? 'border-red-500' : ''}`}
+            className={`w-full block font-inter text-[16px] text-foreground placeholder:text-muted-foreground/60 px-4 py-3 focus:outline-none focus:ring-1 focus:ring-primary border bg-muted/50 transition-all duration-300 rounded-2xl ${focusedInput === 'password' ? 'border-primary' : 'border-border'} ${errors.password ? 'border-red-500' : ''}`}
           />
           {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
         </div>
@@ -89,7 +89,7 @@ export function LoginClient() {
             type="submit"
             disabled={isPending}
             tabIndex={4}
-            className="w-full h-12 bg-ethos-primary text-ethos-on-primary font-inter text-[15px] font-medium flex items-center justify-center hover:bg-ethos-primary-container hover:shadow-[0_10px_30px_rgba(45,45,45,0.15)] transition-all duration-300 ease-in-out group disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full h-12 bg-primary text-primary-foreground font-inter text-[15px] font-medium flex items-center justify-center rounded-full hover:bg-primary/90 hover:shadow-lg transition-all duration-300 ease-in-out group disabled:opacity-70 disabled:cursor-not-allowed"
           >
             <span>{isPending ? "Đang đăng nhập..." : "Đăng Nhập"}</span>
             {!isPending && (

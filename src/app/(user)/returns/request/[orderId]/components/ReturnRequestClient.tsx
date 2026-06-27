@@ -33,8 +33,8 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
 
   if (!order || !orderItem || !product) {
     return (
-      <div className="flex-1 bg-white flex items-center justify-center min-h-[50vh]">
-        <p className="text-black/50">Không tìm thấy thông tin sản phẩm hoặc đơn hàng.</p>
+      <div className="flex-1 bg-background flex items-center justify-center min-h-[50vh]">
+        <p className="text-muted-foreground">Không tìm thấy thông tin sản phẩm hoặc đơn hàng.</p>
       </div>
     );
   }
@@ -93,30 +93,30 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
   };
 
   return (
-    <div className="flex-1 bg-white text-black min-h-screen pb-24">
+    <div className="flex-1 bg-background text-foreground min-h-screen pb-24">
       <div className="max-w-[800px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <Link href="/profile/purchases" className="inline-flex items-center gap-2 text-sm font-bold text-black/50 hover:text-black mb-8 uppercase tracking-widest transition-colors">
+        <Link href="/profile/purchases" className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground mb-8 uppercase tracking-widest transition-colors">
           <ChevronLeft className="w-4 h-4" /> Quay lại đơn hàng
         </Link>
         
         <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-2">Yêu cầu Đổi/Trả</h1>
-        <p className="text-black/50 mb-10">Mã đơn: {orderId}</p>
+        <p className="text-muted-foreground mb-10">Mã đơn: {orderId}</p>
 
-        <div className="flex gap-4 p-4 border border-black/10 bg-[#FAFAFA] mb-10">
-          <div className="w-20 aspect-[3/4] bg-[#F5F2EE] overflow-hidden flex-shrink-0">
+        <div className="flex gap-4 p-4 border border-border bg-muted/50 rounded-3xl mb-10">
+          <div className="w-20 aspect-[3/4] bg-secondary/20 rounded-2xl overflow-hidden flex-shrink-0">
             <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col justify-center gap-1">
             <span className="font-bold text-sm">{product.name}</span>
-            <div className="text-xs text-black/60 mt-1">
-              Size: <span className="font-bold text-black">{orderItem.size}</span> | Màu: <span className="font-bold text-black">{orderItem.color}</span>
+            <div className="text-xs text-muted-foreground mt-1">
+              Size: <span className="font-bold text-foreground">{orderItem.size}</span> | Màu: <span className="font-bold text-foreground">{orderItem.color}</span>
             </div>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-8">
           <div className="flex flex-col gap-4">
-            <label className="font-bold text-sm uppercase tracking-widest">Loại yêu cầu</label>
+            <label className="font-bold text-sm uppercase tracking-widest text-muted-foreground">Loại yêu cầu</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 { id: 'SIZE_EXCHANGE', label: 'Đổi kích cỡ / màu sắc' },
@@ -127,7 +127,7 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
                 <div 
                   key={opt.id}
                   onClick={() => setType(opt.id)}
-                  className={`p-4 border cursor-pointer font-bold text-sm transition-all ${type === opt.id ? 'border-black bg-black text-white' : 'border-black/20 text-black hover:border-black/50'}`}
+                  className={`p-4 border rounded-2xl cursor-pointer font-bold text-sm transition-all ${type === opt.id ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-foreground hover:border-primary/50'}`}
                 >
                   {opt.label}
                 </div>
@@ -136,27 +136,27 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
           </div>
 
           <div className="flex flex-col gap-4">
-            <label className="font-bold text-sm uppercase tracking-widest">Lý do chi tiết</label>
+            <label className="font-bold text-sm uppercase tracking-widest text-muted-foreground">Lý do chi tiết</label>
             <Textarea 
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Vui lòng mô tả chi tiết vấn đề..."
-              className="min-h-[120px] rounded-none border-black/20 focus-visible:ring-black"
+              className="min-h-[120px] rounded-2xl border-border focus-visible:ring-primary"
             />
           </div>
 
           <div className="flex flex-col gap-4">
-            <label className="font-bold text-sm uppercase tracking-widest">Phương án mong muốn</label>
+            <label className="font-bold text-sm uppercase tracking-widest text-muted-foreground">Phương án mong muốn</label>
             <Input 
               value={preferredResolution}
               onChange={(e) => setPreferredResolution(e.target.value)}
               placeholder="VD: Đổi sang size L"
-              className="h-12 rounded-none border-black/20 focus-visible:ring-black"
+              className="h-12 rounded-2xl border-border focus-visible:ring-primary"
             />
           </div>
 
           <div className="flex flex-col gap-4">
-            <label className="font-bold text-sm uppercase tracking-widest">Hình ảnh minh hoạ (Tùy chọn)</label>
+            <label className="font-bold text-sm uppercase tracking-widest text-muted-foreground">Hình ảnh minh hoạ (Tùy chọn)</label>
             <input 
               type="file" 
               accept="image/*" 
@@ -166,23 +166,23 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
               onChange={handleImageUpload}
             />
             <div 
-              className="border-2 border-dashed border-black/20 p-8 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-[#FAFAFA] hover:border-black/40 transition-all"
+              className="border-2 border-dashed border-border rounded-3xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 hover:border-primary/50 transition-all"
               onClick={() => fileInputRef.current?.click()}
             >
-              <UploadCloud className="w-8 h-8 text-black/40" />
-              <span className="text-sm font-bold text-black/60">Kéo thả hoặc click để tải ảnh lên</span>
-              <span className="text-xs text-black/40">Hỗ trợ JPG, PNG (Tối đa 5MB)</span>
+              <UploadCloud className="w-8 h-8 text-muted-foreground" />
+              <span className="text-sm font-bold text-foreground/80">Kéo thả hoặc click để tải ảnh lên</span>
+              <span className="text-xs text-muted-foreground">Hỗ trợ JPG, PNG (Tối đa 5MB)</span>
             </div>
             
             {images.length > 0 && (
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-4 mt-4">
                 {images.map((img, idx) => (
-                  <div key={idx} className="relative aspect-square border border-black/10 group">
+                  <div key={idx} className="relative aspect-square border border-border rounded-xl overflow-hidden group">
                     <img src={img} alt="Uploaded preview" className="w-full h-full object-cover" />
                     <button 
                       type="button"
                       onClick={() => removeImage(idx)}
-                      className="absolute top-1 right-1 bg-black text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 bg-background/80 text-foreground hover:bg-destructive hover:text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-colors"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -192,7 +192,7 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
             )}
           </div>
 
-          <Button type="submit" className="w-full h-14 rounded-none bg-black hover:bg-black/90 text-white font-bold uppercase tracking-widest mt-4">
+          <Button type="submit" className="w-full h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-widest mt-4 shadow-sm">
             Gửi yêu cầu
           </Button>
         </form>

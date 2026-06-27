@@ -95,26 +95,26 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
     });
   };
 
-  const inputClassName = "w-full bg-cream-dark/30 border border-cream-dark/50 focus:border-ink focus:ring-1 focus:ring-ink focus:bg-transparent rounded-xl px-4 py-3 outline-none transition-all font-body-sm text-ink placeholder:text-ink-muted/50";
-  const labelClassName = "block text-[11px] font-label-caps text-ink-muted uppercase tracking-wider mb-2 font-bold";
+  const inputClassName = "w-full bg-muted/50 border border-border focus:border-primary focus:ring-1 focus:ring-primary focus:bg-transparent rounded-2xl px-4 py-3 outline-none transition-all font-body-sm text-foreground placeholder:text-muted-foreground";
+  const labelClassName = "block text-[11px] font-label-caps text-muted-foreground uppercase tracking-wider mb-2 font-bold";
 
   return (
     <div className="animate-in fade-in duration-700 max-w-2xl mx-auto w-full pb-20 pt-10">
       {/* Profile Header */}
       <div className="text-center mb-10 space-y-3">
-        <h1 className="font-heading text-4xl md:text-5xl text-ink font-bold tracking-tight">Profile Information</h1>
-        <p className="font-body-sm text-ink-muted">Update your personal details and preferences.</p>
+        <h1 className="font-heading text-4xl md:text-5xl text-foreground font-bold tracking-tight">Profile Information</h1>
+        <p className="font-body-sm text-muted-foreground">Update your personal details and preferences.</p>
       </div>
 
       {/* Avatar Section */}
       <div className="flex justify-center mb-12 relative">
-        <div className="size-24 rounded-full overflow-hidden border border-cream-dark/50 bg-cream-dark/30 relative group cursor-not-allowed">
+        <div className="size-24 rounded-full overflow-hidden border border-border bg-muted/50 relative group cursor-not-allowed">
           <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={getUserAvatar(profile)}
             alt="Avatar"
             className="w-full h-full object-cover opacity-90 transition-opacity group-hover:opacity-75"
           />
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 backdrop-blur-[2px]">
-            <span className="text-[10px] font-label-caps uppercase tracking-wider text-ink bg-white/80 px-2 py-1 rounded">Edit</span>
+            <span className="text-[10px] font-label-caps uppercase tracking-wider text-primary-foreground bg-primary/80 px-2 py-1 rounded-full">Edit</span>
           </div>
         </div>
       </div>
@@ -149,13 +149,13 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className={labelClassName}>Date of Birth</label>
-              <div className={cn("flex items-center w-full", inputClassName, "p-0 overflow-hidden pr-3 transition-all", !profileData.dateOfBirth && "text-ink-muted/50")}>
+              <div className={cn("flex items-center w-full", inputClassName, "p-0 overflow-hidden pr-3 transition-all", !profileData.dateOfBirth && "text-muted-foreground/50")}>
                 <input
                   type="date"
                   name="dateOfBirth"
                   value={profileData.dateOfBirth}
                   onChange={handleProfileChange}
-                  className="w-full h-full bg-transparent border-none outline-none text-ink font-body-sm px-4 py-3 [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
+                  className="w-full h-full bg-transparent border-none outline-none text-foreground font-body-sm px-4 py-3 [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
                 />
                   <Popover>
                     <PopoverTrigger className="outline-none opacity-50 hover:opacity-100 transition-opacity shrink-0">
@@ -163,7 +163,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background border-cream-dark/50 rounded-xl shadow-xl">
+                  <PopoverContent className="w-auto p-0 bg-background border-border rounded-2xl shadow-xl">
                     <Calendar
                       mode="single"
                       captionLayout="dropdown"
@@ -198,10 +198,10 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
                     {profileData.gender === Gender.Other && "Khác"}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent alignItemWithTrigger={false} className="bg-background border-cream-dark/50 shadow-xl rounded-xl z-50">
-                  <SelectItem value={Gender.Male.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Nam</SelectItem>
-                  <SelectItem value={Gender.Female.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Nữ</SelectItem>
-                  <SelectItem value={Gender.Other.toString()} className="focus:bg-cream-dark/30 cursor-pointer">Khác</SelectItem>
+                <SelectContent alignItemWithTrigger={false} className="bg-background border-border shadow-xl rounded-2xl z-50 overflow-hidden">
+                  <SelectItem value={Gender.Male.toString()} className="focus:bg-muted cursor-pointer rounded-xl mx-1 my-0.5">Nam</SelectItem>
+                  <SelectItem value={Gender.Female.toString()} className="focus:bg-muted cursor-pointer rounded-xl mx-1 my-0.5">Nữ</SelectItem>
+                  <SelectItem value={Gender.Other.toString()} className="focus:bg-muted cursor-pointer rounded-xl mx-1 my-0.5">Khác</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -214,7 +214,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
                 name="email"
                 value={profileData.email}
                 readOnly
-                className={cn(inputClassName, "opacity-70 cursor-not-allowed bg-cream-dark/10")}
+                className={cn(inputClassName, "opacity-70 cursor-not-allowed bg-muted/30")}
               />
             </div>
             <div>
@@ -231,10 +231,10 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
         </div>
 
         {/* Profile Form Actions */}
-        <div className="pt-8 border-t border-cream-dark/50 flex items-center justify-end gap-6">
+        <div className="pt-8 border-t border-border flex items-center justify-end gap-6">
           <button
             type="button"
-            className="text-sm font-medium text-ink-muted hover:text-ink transition-colors"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => {
               // Reset
               setProfileData({
@@ -252,7 +252,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
           <button
             type="submit"
             disabled={isUpdating}
-            className="bg-[#1A1A1A] text-[#F9F9F7] px-8 py-3 rounded-xl text-sm font-medium hover:bg-black transition-colors shadow-lg shadow-black/10 disabled:opacity-70 flex items-center gap-2"
+            className="bg-primary text-primary-foreground px-8 py-3 rounded-full text-sm font-bold tracking-wider hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-70 flex items-center gap-2"
           >
             {isUpdating ? <><Loader2 className="size-4 animate-spin" /> Saving...</> : "Save Changes"}
           </button>
@@ -260,10 +260,10 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
       </form>
 
       {/* Password Section */}
-      <div className="mt-16 pt-16 border-t border-cream-dark/50 space-y-8">
+      <div className="mt-16 pt-16 border-t border-border space-y-8">
         <div className="text-center mb-8 space-y-2">
-          <h2 className="font-heading text-3xl text-ink font-bold tracking-tight">Security</h2>
-          <p className="font-body-sm text-ink-muted">Update your password to keep your account secure.</p>
+          <h2 className="font-heading text-3xl text-foreground font-bold tracking-tight">Security</h2>
+          <p className="font-body-sm text-muted-foreground">Update your password to keep your account secure.</p>
         </div>
 
         <form onSubmit={handleSavePassword} className="space-y-6">
@@ -281,7 +281,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
               <button
                 type="button"
                 onClick={() => setShowOldPassword(!showOldPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink transition-colors focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
               >
                 {showOldPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -304,7 +304,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
                 <button
                   type="button"
                   onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink transition-colors focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
                 >
                   {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -325,7 +325,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink transition-colors focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
                 >
                   {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -340,17 +340,17 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
               name="logoutAllDevices"
               checked={passwordData.logoutAllDevices}
               onChange={handlePasswordChange}
-              className="size-5 rounded-md border-cream-dark/50 bg-cream-dark/30 text-ink focus:ring-ink"
+              className="size-5 rounded-md border-border bg-muted/50 text-primary focus:ring-primary"
             />
-            <label htmlFor="logoutAllDevices" className="text-[13px] font-medium text-ink-muted select-none cursor-pointer">
+            <label htmlFor="logoutAllDevices" className="text-[13px] font-medium text-muted-foreground select-none cursor-pointer">
               Sign out from all other devices
             </label>
           </div>
 
-          <div className="pt-8 border-t border-cream-dark/50 flex items-center justify-end gap-6">
+          <div className="pt-8 border-t border-border flex items-center justify-end gap-6">
             <button
               type="button"
-              className="text-sm font-medium text-ink-muted hover:text-ink transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "", logoutAllDevices: false })}
             >
               Cancel
@@ -358,7 +358,7 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
             <button
               type="submit"
               disabled={isChangingPassword}
-              className="bg-[#1A1A1A] text-[#F9F9F7] px-8 py-3 rounded-xl text-sm font-medium hover:bg-black transition-colors shadow-lg shadow-black/10 disabled:opacity-70 flex items-center gap-2"
+              className="bg-primary text-primary-foreground px-8 py-3 rounded-full text-sm font-bold tracking-wider hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-70 flex items-center gap-2"
             >
               {isChangingPassword ? <><Loader2 className="size-4 animate-spin" /> Updating...</> : "Update Password"}
             </button>

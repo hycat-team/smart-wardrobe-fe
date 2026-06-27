@@ -10,6 +10,9 @@ import { useProfile } from "@/features/profile/queries/profile.queries";
 import { getUserAvatar } from "@/lib/utils";
 import { useEffect } from "react";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import { subscriptionApi } from "@/features/subscription/api/subscription.api";
+import { CurrentPlanCard } from "@/features/subscription/components/CurrentPlanCard";
 
 export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   // Pass initialProfile to useProfile so React Query hydrates it immediately
@@ -21,6 +24,18 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   // Format avatar and name to display
   const avatar = getUserAvatar(profile);
   const name = profile?.firstName + (profile?.lastName ? ` ${profile.lastName}` : "");
+
+  const { data: mySubscription } = useQuery({
+    queryKey: ['subscription', 'me'],
+    queryFn: () => subscriptionApi.getMySubscription(),
+    retry: 0,
+  });
+
+  const { data: dailyQuota } = useQuery({
+    queryKey: ['subscription', 'quota'],
+    queryFn: () => subscriptionApi.getDailyQuota(),
+    retry: 0,
+  });
 
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-8 animate-in fade-in duration-500 pb-16 pt-10 font-sans px-4">
@@ -88,6 +103,16 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
         </TabsList>
 
         <TabsContent value="overview" className="animate-in fade-in duration-500">
+          {/* Current Subscription Section */}
+          {mySubscription && dailyQuota && (
+            <section className="mb-8">
+              <h2 className="font-bold text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-6 md:text-left ml-2">
+                GÓI HIỆN TẠI CỦA BẠN
+              </h2>
+              <CurrentPlanCard subscription={mySubscription} quota={dailyQuota} />
+            </section>
+          )}
+
           {/* Premium Only: Style DNA & Insights */}
           {isPremium ? (
             <div className="grid md:grid-cols-2 gap-6">
