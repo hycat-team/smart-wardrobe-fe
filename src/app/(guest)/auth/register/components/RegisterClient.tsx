@@ -285,22 +285,20 @@ export function RegisterClient() {
                   name="dateOfBirth"
                   render={({ field }) => (
                     <Popover>
-                      <PopoverTrigger asChild>
-                        <button
-                          type="button"
-                          className={`w-full flex items-center justify-between text-left font-inter text-[16px] bg-transparent border-none outline-none ${!field.value ? 'text-muted-foreground/60' : 'text-foreground'}`}
-                          onFocus={() => setFocusedInput('dateOfBirth')}
-                          onBlur={() => setFocusedInput(null)}
-                        >
-                          {field.value ? (
-                            new Date(field.value).toLocaleDateString('vi-VN')
-                          ) : (
-                            <span>dd/mm/yyyy</span>
-                          )}
-                          <svg className="w-5 h-5 ml-4 text-muted-foreground group-focus-within:text-primary transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </button>
+                      <PopoverTrigger
+                        type="button"
+                        className={`w-full flex items-center justify-between text-left font-inter text-[16px] bg-transparent border-none outline-none ${!field.value ? 'text-muted-foreground/60' : 'text-foreground'}`}
+                        onFocus={() => setFocusedInput('dateOfBirth')}
+                        onBlur={() => setFocusedInput(null)}
+                      >
+                        {field.value ? (
+                          new Date(field.value).toLocaleDateString('vi-VN')
+                        ) : (
+                          <span>dd/mm/yyyy</span>
+                        )}
+                        <svg className="w-5 h-5 ml-4 text-muted-foreground group-focus-within:text-primary transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 bg-background border-border shadow-xl shadow-black/10" align="start">
                         <Calendar
