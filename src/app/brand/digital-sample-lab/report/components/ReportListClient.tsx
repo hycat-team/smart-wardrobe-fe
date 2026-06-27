@@ -27,7 +27,7 @@ export function ReportListClient() {
         </Link>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-ink/10 pb-6">
           <div>
-            <h1 className="text-4xl font-['Playfair_Display'] uppercase font-medium text-ink mb-2">My Sample Reports</h1>
+            <h1 className="text-4xl font-semibold uppercase font-medium text-ink mb-2">My Sample Reports</h1>
             <p className="text-sm font-mono tracking-widest uppercase text-ink-muted border-l-2 border-[#A0522D] pl-3">
               Danh sách các chiến dịch thử nghiệm mẫu số
             </p>
@@ -64,7 +64,7 @@ export function ReportListClient() {
                     <h3 className="text-lg font-bold text-ink group-hover:text-[#A0522D] transition-colors">{report.productName || "Unnamed Product"}</h3>
                   </div>
                   <p className="text-sm text-ink-muted line-clamp-2 mb-4">{report.concept}</p>
-                  
+
                   <div className="flex flex-wrap gap-2 mb-6">
                     {report.variants?.map((v: any, i: number) => (
                       <div key={i} className="flex items-center gap-1.5 bg-[#F4F1EE] px-2 py-1">
@@ -74,7 +74,7 @@ export function ReportListClient() {
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="pt-4 border-t border-ink/10 flex items-center justify-between text-xs text-ink-muted font-mono uppercase tracking-widest mt-auto">
                   <span className="flex items-center gap-1"><Calendar className="size-3" /> {new Date(report.createdAt).toLocaleDateString('vi-VN')}</span>
                   <span className="text-[#A0522D] flex items-center gap-1 group-hover:translate-x-1 transition-transform">Xem Report &rarr;</span>

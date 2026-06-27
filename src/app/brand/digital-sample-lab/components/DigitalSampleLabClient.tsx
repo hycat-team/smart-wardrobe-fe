@@ -44,12 +44,12 @@ export function DigitalSampleLabClient() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     const newSampleId = `sample-${Date.now()}`;
     try {
       const existingStr = localStorage.getItem("digital_sample_lab_reports");
       const existing = existingStr ? JSON.parse(existingStr) : [];
-      
+
       const newReport = {
         id: newSampleId,
         productName,
@@ -59,13 +59,13 @@ export function DigitalSampleLabClient() {
         imageUrl,
         createdAt: new Date().toISOString()
       };
-      
+
       existing.push(newReport);
       localStorage.setItem("digital_sample_lab_reports", JSON.stringify(existing));
     } catch (e) {
       console.error(e);
     }
-    
+
     // Giả lập tạo sample test
     setTimeout(() => {
       setIsSubmitting(false);
@@ -76,7 +76,7 @@ export function DigitalSampleLabClient() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-6">
       <div className="mb-10">
-        <h1 className="text-4xl font-['Playfair_Display'] uppercase font-medium text-ink mb-2">Digital Sample Lab</h1>
+        <h1 className="text-4xl font-semibold uppercase font-medium text-ink mb-2">Digital Sample Lab</h1>
         <p className="text-sm font-mono tracking-widest uppercase text-ink-muted border-l-2 border-[#A0522D] pl-3">
           Thử nghiệm thiết kế trên tủ đồ thực tế trước khi sản xuất
         </p>
@@ -135,7 +135,7 @@ export function DigitalSampleLabClient() {
                     </button>
                   )}
                 </div>
-                
+
                 <div className="space-y-3">
                   {variants.map((v, i) => (
                     <div key={i} className="flex items-center gap-3 bg-[#F4F1EE]/50 border border-ink/10 p-2 pr-3">

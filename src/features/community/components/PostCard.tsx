@@ -80,7 +80,7 @@ export const PostCard = ({ post }: PostCardProps) => {
               <Image src={getUserAvatar(post as any)} alt={post.username || 'Avatar'} fill className="object-cover" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-sm text-[#111] font-['IBM_Plex_Mono'] leading-tight hover:underline">
+              <span className="font-bold text-sm text-[#111] font-semibold leading-tight hover:underline">
                 {post.username || 'ATELIER CURATORS'}
               </span>
               {/* <span className="text-[10px] font-medium text-[#A3A3A3] uppercase tracking-widest mt-0.5">
@@ -90,7 +90,7 @@ export const PostCard = ({ post }: PostCardProps) => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono']">
+            <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-semibold">
               {new Date(post.createdAt).toLocaleDateString('vi-VN')}
             </div>
             {isMounted && profile?.username && profile.username === post.username && (
@@ -167,14 +167,14 @@ export const PostCard = ({ post }: PostCardProps) => {
           {/* Title & Content */}
           <div className="text-sm text-[#111] leading-relaxed">
             {/* {post.title && (
-              <span className="font-bold font-['IBM_Plex_Mono'] mr-3 block mb-1">{post.title}</span>
+              <span className="font-bold font-semibold mr-3 block mb-1">{post.title}</span>
             )} */}
-            <span className="font-bold font-['IBM_Plex_Mono'] mr-3">{post.username || 'ATELIER CURATORS'}</span>
+            <span className="font-bold font-semibold mr-3">{post.username || 'ATELIER CURATORS'}</span>
             <span className="text-[#666]">{post.content}</span>
           </div>
 
           {/* Footer Metrics */}
-          <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono']">
+          <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-semibold">
             {post.likeCount.toLocaleString()} lượt thích • {post.commentCount} bình luận
           </div>
         </div>

@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 export function BrandPostsClient() {
   const [posts, setPosts] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     caption: "",
@@ -26,7 +26,7 @@ export function BrandPostsClient() {
   useEffect(() => {
     // Load default mock posts for this brand
     const defaultPosts = mockBrandPosts.filter(p => p.brandId === 'brand_001');
-    
+
     // Load custom posts from localStorage
     try {
       const stored = localStorage.getItem("brand_custom_posts");
@@ -78,7 +78,7 @@ export function BrandPostsClient() {
 
       if (editingId) {
         const existingIndex = customPosts.findIndex(p => p.id === editingId);
-        
+
         const updatedPost = {
           id: editingId,
           brandId: "brand_001",
@@ -120,14 +120,14 @@ export function BrandPostsClient() {
       }
 
       localStorage.setItem("brand_custom_posts", JSON.stringify(customPosts));
-      
+
       const defaultPosts = mockBrandPosts.filter(p => p.brandId === 'brand_001');
       const overriddenIds = customPosts.map(p => p.id);
       const filteredDefaults = defaultPosts.filter(p => !overriddenIds.includes(p.id));
-      
+
       setPosts([...customPosts, ...filteredDefaults].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
       setIsDialogOpen(false);
-    } catch(e) {
+    } catch (e) {
       console.error("Error saving post", e);
     }
   };
@@ -147,7 +147,7 @@ export function BrandPostsClient() {
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Bài viết</h1>
-        <Button 
+        <Button
           onClick={() => handleOpenDialog()}
           className="rounded-none bg-black hover:bg-black/90 font-bold uppercase tracking-widest flex items-center gap-2"
         >
@@ -198,7 +198,7 @@ export function BrandPostsClient() {
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
-                  <button 
+                  <button
                     onClick={() => handleOpenDialog(post)}
                     className="text-sm font-bold underline decoration-1 underline-offset-2 text-black/50 hover:text-black flex items-center gap-1 justify-end w-full whitespace-nowrap"
                   >
@@ -214,7 +214,7 @@ export function BrandPostsClient() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-none border border-black/10">
           <DialogHeader>
-            <DialogTitle className="font-['Playfair_Display'] text-2xl uppercase font-medium">
+            <DialogTitle className="font-semibold text-2xl uppercase font-medium">
               {editingId ? "Sửa bài viết" : "Viết bài mới"}
             </DialogTitle>
           </DialogHeader>
@@ -246,7 +246,7 @@ export function BrandPostsClient() {
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={handleSave}
               className="w-full bg-black hover:bg-black/90 text-white rounded-none uppercase font-mono tracking-widest text-[11px] h-12"
             >

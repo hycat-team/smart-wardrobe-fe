@@ -46,7 +46,7 @@ export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, ind
         {/* Minimal Badges */}
         <div className="absolute top-4 left-4 z-10">
           {outfit.status === 1 && (
-            <span className="text-[9px] font-['IBM_Plex_Mono'] px-3 py-1.5 bg-[#111] text-white uppercase tracking-[0.12em] flex items-center gap-1.5">
+            <span className="text-[9px] font-semibold px-3 py-1.5 bg-[#111] text-white uppercase tracking-[0.12em] flex items-center gap-1.5">
               <Sparkles className="size-3" /> AI
             </span>
           )}
@@ -54,31 +54,31 @@ export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, ind
 
         {/* Action overlay (subtle) */}
         <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button 
+          <button
             onClick={(e) => onToggleFavorite(outfit.id, e)}
             className="text-black/40 hover:text-black transition-colors"
           >
             <Heart className={cn("size-5", isFavorite && "fill-red-500 text-red-500")} />
           </button>
-          <button 
+          <button
             onClick={(e) => onDelete(outfit.id, e)}
             className="text-black/40 hover:text-red-500 transition-colors"
           >
             <Trash2 className="size-5" />
           </button>
         </div>
-        
+
         {/* Hover View Details */}
         <div className="absolute inset-0 bg-white/92 opacity-0 group-hover:opacity-100 transition-opacity duration-250 flex flex-col items-center justify-end pb-8 pointer-events-none">
           <div className="flex flex-col items-center gap-2 mb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 delay-75">
-            <span className="font-['IBM_Plex_Mono'] text-[9px] uppercase tracking-widest text-[#666]">
+            <span className="font-semibold text-[9px] uppercase tracking-widest text-[#666]">
               {itemsInOutfit.length} Items
             </span>
-            <span className="font-['IBM_Plex_Mono'] text-[9px] uppercase tracking-widest text-[#666]">
+            <span className="font-semibold text-[9px] uppercase tracking-widest text-[#666]">
               {outfit.description || "Everyday Look"}
             </span>
           </div>
-          <div className="text-black font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] border-b border-black pb-0.5">
+          <div className="text-black font-semibold text-[11px] uppercase tracking-[0.12em] border-b border-black pb-0.5">
             View Details
           </div>
         </div>
@@ -87,14 +87,14 @@ export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, ind
       {/* Information Area - 25% Visual Weight */}
       <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
         <div>
-          <h3 className="font-['Playfair_Display'] text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
+          <h3 className="font-semibold text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
             {outfit.name}
           </h3>
-          <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#666] mt-2 truncate">
+          <p className="font-semibold text-[11px] uppercase tracking-[0.12em] text-[#666] mt-2 truncate">
             {outfit.description || "Curated Outfit"}
           </p>
         </div>
-        <div className="flex justify-between items-center font-['IBM_Plex_Mono'] text-[11px] text-[#888]">
+        <div className="flex justify-between items-center font-semibold text-[11px] text-[#888]">
           <span>{itemsInOutfit.length} Pieces</span>
           <span>{outfit.createdAt ? new Date(outfit.createdAt).toLocaleDateString("en-GB").replace(/\//g, '.') : "00.00.00"}</span>
         </div>

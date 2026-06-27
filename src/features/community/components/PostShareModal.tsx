@@ -38,12 +38,12 @@ export const PostShareModal = ({ isOpen, onClose, shareUrl }: PostShareModalProp
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-white rounded-2xl border-black/5 p-6 shadow-sm">
         <DialogHeader className="mb-4">
-          <DialogTitle className="font-['IBM_Plex_Mono'] text-lg font-bold">Chia sẻ bài viết</DialogTitle>
+          <DialogTitle className="font-semibold text-lg font-bold">Chia sẻ bài viết</DialogTitle>
           <DialogDescription className="text-[#666] font-mono text-xs mt-1">
             Bất kỳ ai có liên kết này đều có thể xem bài viết
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="flex items-center space-x-2 mt-2">
           <div className="flex-1 overflow-hidden">
             <input
@@ -52,10 +52,10 @@ export const PostShareModal = ({ isOpen, onClose, shareUrl }: PostShareModalProp
               className="w-full bg-[#FAFAFA] border border-black/10 rounded-lg px-3 py-2 text-sm text-[#111] font-mono outline-none truncate"
             />
           </div>
-          <Button 
-            onClick={handleCopy} 
-            variant="outline" 
-            size="sm" 
+          <Button
+            onClick={handleCopy}
+            variant="outline"
+            size="sm"
             className="rounded-lg h-9 w-9 p-0 flex-shrink-0 border-black/10 hover:bg-[#FAFAFA] transition-colors"
           >
             {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-[#111]" />}

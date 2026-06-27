@@ -9,12 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  UsersIcon, 
-  MessageSquareIcon, 
-  GridIcon, 
-  LayoutDashboardIcon, 
-  LogOutIcon, 
+import {
+  UsersIcon,
+  MessageSquareIcon,
+  GridIcon,
+  LayoutDashboardIcon,
+  LogOutIcon,
   TrendingUp,
   Sparkles,
   ChevronRight,
@@ -48,15 +48,15 @@ export function AdminSidebar() {
 
   return (
     <aside className="hidden md:flex flex-col w-[280px] border-r border-black/10 h-dvh sticky top-0 bg-[#F8F7F5] z-40 px-6 py-6 shrink-0 text-[#111]">
-      
+
       {/* Editorial Logo */}
       <div className="mb-8 flex flex-col pl-1">
         <div className="flex items-center gap-1.5 mb-1.5">
           <ShieldAlert className="size-3 text-[#111]" />
-          <span className="text-[9px] font-['IBM_Plex_Mono'] font-bold tracking-[0.2em] uppercase text-[#111]">System Admin</span>
+          <span className="text-[9px] font-semibold font-bold tracking-[0.2em] uppercase text-[#111]">System Admin</span>
         </div>
         <Link href="/admin/dashboard" className="flex items-center group w-fit">
-          <span className="font-['Playfair_Display'] text-4xl font-medium tracking-tighter text-[#111]">
+          <span className="font-semibold text-4xl font-medium tracking-tighter text-[#111]">
             Closy<span className="text-[#A3A3A3]">.</span>
           </span>
         </Link>
@@ -67,10 +67,10 @@ export function AdminSidebar() {
         <DropdownMenuTrigger asChild>
           <div className="flex items-center gap-4 mb-8 p-3 bg-white border border-black/5 hover:border-black/20 transition-all cursor-pointer group outline-none shadow-sm">
             <div className="flex flex-col flex-1 min-w-0 pl-1">
-              <span className="font-['Playfair_Display'] text-lg font-medium text-[#111] truncate">
+              <span className="font-semibold text-lg font-medium text-[#111] truncate">
                 {user?.name || "Administrator"}
               </span>
-              {/* <span className="text-[10px] font-['IBM_Plex_Mono'] font-bold text-[#666] uppercase tracking-[0.1em] mt-1">
+              {/* <span className="text-[10px] font-semibold font-bold text-[#666] uppercase tracking-[0.1em] mt-1">
                 Access Level 1
               </span> */}
             </div>
@@ -81,17 +81,17 @@ export function AdminSidebar() {
           <DropdownMenuItem asChild className="rounded-none px-3 py-2.5 cursor-pointer hover:bg-[#F8F7F5] focus:bg-[#F8F7F5]">
             <Link href="/" className="flex items-center gap-3 w-full text-[#111]">
               <Sparkles className="size-4" />
-              <span className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest font-medium">Về trang User</span>
+              <span className="font-semibold text-[11px] uppercase tracking-widest font-medium">Về trang User</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="my-1 bg-black/5" />
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={handleLogout}
             className="rounded-none px-3 py-2.5 cursor-pointer text-[#111] hover:bg-black hover:text-white focus:bg-black focus:text-white transition-colors"
           >
             <div className="flex items-center gap-3 w-full">
               <LogOutIcon className="size-4" />
-              <span className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest font-medium">Đăng xuất</span>
+              <span className="font-semibold text-[11px] uppercase tracking-widest font-medium">Đăng xuất</span>
             </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -116,16 +116,16 @@ export function AdminSidebar() {
               {isActive && (
                 <span className="absolute left-0 top-0 w-[2px] h-full bg-[#111]" />
               )}
-              
-              <Icon 
+
+              <Icon
                 className={cn(
                   "size-[18px] transition-transform duration-300 group-hover:scale-110",
                   isActive ? "text-[#111]" : "text-[#A3A3A3] group-hover:text-[#111]"
-                )} 
-                strokeWidth={isActive ? 2 : 1.5} 
+                )}
+                strokeWidth={isActive ? 2 : 1.5}
               />
               <span className={cn(
-                "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.1em]",
+                "font-semibold text-[11px] uppercase tracking-[0.1em]",
                 isActive ? "font-bold" : "font-medium"
               )}>
                 {item.label}

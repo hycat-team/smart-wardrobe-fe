@@ -25,7 +25,7 @@ export function SystemWardrobeClient() {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const { data, isLoading, isError } = useAdminCatalog({ q: searchTerm, page, limit: 20 });
-  
+
   const { mutate: deleteItem, isPending: isDeleting } = useDeleteSystemWardrobeItem();
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export function SystemWardrobeClient() {
 
   useGSAP(() => {
     if (items.length === 0) return;
-    
+
     gsap.from(".catalog-row", {
       y: 10,
       opacity: 0,
@@ -73,19 +73,19 @@ export function SystemWardrobeClient() {
               Manage the master database of wardrobe items. Strict moderation protocol enabled.
             </p>
           </div>
-          
+
           <div className="flex gap-4 w-full md:w-auto">
             <div className="relative flex-1 md:w-80 group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-gray-400 group-focus-within:text-green-600 transition-colors" />
-              <input 
-                type="text" 
-                placeholder="QUERY.ITEMS..." 
+              <input
+                type="text"
+                placeholder="QUERY.ITEMS..."
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
                 className="h-12 w-full pl-12 pr-4 bg-white border border-gray-300 focus:border-green-500 text-black font-mono text-xs uppercase tracking-widest transition-colors outline-none rounded-none placeholder:text-gray-400"
               />
             </div>
-            <button 
+            <button
               onClick={() => setIsBatchUploadOpen(true)}
               className="h-12 px-6 flex items-center gap-2 bg-black text-white hover:bg-green-500 hover:text-black transition-colors font-mono text-xs uppercase tracking-widest font-bold rounded-none"
             >
@@ -93,7 +93,7 @@ export function SystemWardrobeClient() {
             </button>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-6 text-[10px] font-mono uppercase tracking-[0.2em] text-gray-500">
           <span>Total Records: <strong className="text-black">{items.length}</strong></span>
           <span>Status: <strong className="text-green-600">Online</strong></span>
@@ -137,7 +137,7 @@ export function SystemWardrobeClient() {
                       <div className="absolute inset-0 flex items-center justify-center text-[8px] font-mono text-gray-400 uppercase">N/A</div>
                     )}
                   </div>
-                  
+
                   {/* Identifier */}
                   <div className="flex flex-col gap-1 min-w-0">
                     <span className="font-heading text-lg font-bold text-black truncate uppercase tracking-tight">{item.name || item.title || 'UNNAMED_ENTITY'}</span>
@@ -159,14 +159,14 @@ export function SystemWardrobeClient() {
 
                   {/* Actions */}
                   <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
+                    <button
                       onClick={() => setEditingItem(item)}
                       className="size-8 flex items-center justify-center border border-gray-300 text-gray-600 hover:border-black hover:text-white hover:bg-black transition-all"
                       title="Edit Record"
                     >
                       <Edit className="size-3.5" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => setDeletingId(item.id)}
                       className="size-8 flex items-center justify-center border border-gray-300 text-gray-600 hover:border-red-500 hover:text-red-500 hover:bg-red-50 transition-all"
                       title="Purge Record"
@@ -190,7 +190,7 @@ export function SystemWardrobeClient() {
                     e.preventDefault();
                     if (page > 1) setPage((p) => p - 1);
                   }}
-                  className={page <= 1 ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                  className={page <= 1 ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest"}
                   text="TRƯỚC"
                 />
               </PaginationItem>
@@ -211,7 +211,7 @@ export function SystemWardrobeClient() {
                           e.preventDefault();
                           setPage(pageNum);
                         }}
-                        className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest rounded-none border-black/10"
+                        className="font-semibold text-[11px] uppercase tracking-widest rounded-none border-black/10"
                       >
                         {pageNum}
                       </PaginationLink>
@@ -237,7 +237,7 @@ export function SystemWardrobeClient() {
                     e.preventDefault();
                     if (page < data.metadata.totalPages) setPage((p) => p + 1);
                   }}
-                  className={page >= data.metadata.totalPages ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest"}
+                  className={page >= data.metadata.totalPages ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest"}
                   text="SAU"
                 />
               </PaginationItem>
@@ -255,13 +255,13 @@ export function SystemWardrobeClient() {
               This action will permanently erase the selected record from the system catalog. This operation cannot be undone.
             </p>
             <div className="flex gap-4">
-              <button 
+              <button
                 onClick={() => setDeletingId(null)}
                 className="flex-1 py-3 border border-gray-300 text-gray-600 font-mono text-xs uppercase tracking-widest hover:border-black hover:text-black transition-colors"
               >
                 Abort
               </button>
-              <button 
+              <button
                 onClick={handleDelete}
                 disabled={isDeleting}
                 className="flex-1 py-3 bg-red-500 text-white font-mono text-xs uppercase tracking-widest font-bold hover:bg-red-600 transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
@@ -274,15 +274,15 @@ export function SystemWardrobeClient() {
       )}
 
       {/* Sub-components */}
-      <BatchUploadModal 
-        isOpen={isBatchUploadOpen} 
-        onClose={() => setIsBatchUploadOpen(false)} 
+      <BatchUploadModal
+        isOpen={isBatchUploadOpen}
+        onClose={() => setIsBatchUploadOpen(false)}
       />
-      
-      <ItemEditDrawer 
-        item={editingItem} 
-        isOpen={!!editingItem} 
-        onClose={() => setEditingItem(null)} 
+
+      <ItemEditDrawer
+        item={editingItem}
+        isOpen={!!editingItem}
+        onClose={() => setEditingItem(null)}
       />
     </div>
   );

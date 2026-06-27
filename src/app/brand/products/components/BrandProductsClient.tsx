@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 export function BrandProductsClient() {
   const [products, setProducts] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -27,7 +27,7 @@ export function BrandProductsClient() {
   useEffect(() => {
     // Load default mock products for this brand
     const defaultProducts = mockProducts.filter(p => p.brandId === 'brand_001');
-    
+
     // Load custom products from localStorage
     try {
       const stored = localStorage.getItem("brand_custom_products");
@@ -82,7 +82,7 @@ export function BrandProductsClient() {
       if (editingId) {
         // Only allow editing custom products (if it's a mock product, we could fork it, but let's just allow overriding)
         const existingIndex = customProducts.findIndex(p => p.id === editingId);
-        
+
         const updatedProduct = {
           id: editingId,
           brandId: "brand_001",
@@ -118,16 +118,16 @@ export function BrandProductsClient() {
       }
 
       localStorage.setItem("brand_custom_products", JSON.stringify(customProducts));
-      
+
       // Update state
       const defaultProducts = mockProducts.filter(p => p.brandId === 'brand_001');
       // Remove default products that were overridden
       const overriddenIds = customProducts.map(p => p.id);
       const filteredDefaults = defaultProducts.filter(p => !overriddenIds.includes(p.id));
-      
+
       setProducts([...customProducts, ...filteredDefaults]);
       setIsDialogOpen(false);
-    } catch(e) {
+    } catch (e) {
       console.error("Error saving product", e);
     }
   };
@@ -136,7 +136,7 @@ export function BrandProductsClient() {
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Sản phẩm</h1>
-        <Button 
+        <Button
           onClick={() => handleOpenDialog()}
           className="rounded-none bg-black hover:bg-black/90 font-bold uppercase tracking-widest flex items-center gap-2"
         >
@@ -180,7 +180,7 @@ export function BrandProductsClient() {
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <button 
+                  <button
                     onClick={() => handleOpenDialog(product)}
                     className="text-sm font-bold underline decoration-1 underline-offset-2 text-black/50 hover:text-black flex items-center gap-1 justify-end w-full whitespace-nowrap"
                   >
@@ -196,7 +196,7 @@ export function BrandProductsClient() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-none border border-black/10">
           <DialogHeader>
-            <DialogTitle className="font-['Playfair_Display'] text-2xl uppercase font-medium">
+            <DialogTitle className="font-semibold text-2xl uppercase font-medium">
               {editingId ? "Sửa sản phẩm" : "Thêm sản phẩm"}
             </DialogTitle>
           </DialogHeader>
@@ -248,7 +248,7 @@ export function BrandProductsClient() {
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={handleSave}
               className="w-full bg-black hover:bg-black/90 text-white rounded-none uppercase font-mono tracking-widest text-[11px] h-12"
             >

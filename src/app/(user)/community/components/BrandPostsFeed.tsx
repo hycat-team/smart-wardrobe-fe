@@ -11,7 +11,7 @@ export function BrandPostsFeed() {
   return (
     <div className="flex flex-col gap-12 mb-10">
       <div className="flex items-center gap-4 mb-2">
-        <h3 className="font-['Playfair_Display'] text-2xl font-medium text-[#111]">Local Brand Updates</h3>
+        <h3 className="font-semibold text-2xl font-medium text-[#111]">Local Brand Updates</h3>
         <div className="h-px bg-black/10 flex-1"></div>
       </div>
 
@@ -25,28 +25,28 @@ export function BrandPostsFeed() {
               <Link href={`/brands/${brand.id}`} className="flex items-center gap-4">
                 <Avatar className="w-12 h-12 ring-2 ring-white shadow-sm rounded-full bg-white">
                   <AvatarImage src={brand.logoUrl} className="object-cover" />
-                  <AvatarFallback className="bg-[#111] text-white text-sm font-['Playfair_Display']">{brand.name[0]}</AvatarFallback>
+                  <AvatarFallback className="bg-[#111] text-white text-sm font-semibold">{brand.name[0]}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <span className="font-bold text-sm text-[#111] font-['IBM_Plex_Mono'] leading-tight hover:underline">{brand.name}</span>
+                  <span className="font-bold text-sm text-[#111] font-semibold leading-tight hover:underline">{brand.name}</span>
                   <span className="text-[10px] font-medium text-[#A3A3A3] uppercase tracking-widest mt-0.5">{post.type}</span>
                 </div>
               </Link>
-              <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono']">
+              <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-semibold">
                 {new Date(post.createdAt).toLocaleDateString('vi-VN')}
               </div>
             </div>
-            
+
             <div className="relative aspect-[4/5] bg-[#F5F2EE] w-full overflow-hidden">
-              <img 
-                src={post.mediaUrls[0]} 
-                alt="Brand Post" 
+              <img
+                src={post.mediaUrls[0]}
+                alt="Brand Post"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
               />
               {post.taggedProductIds.length > 0 && (
                 <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-2 flex items-center gap-2 shadow-sm rounded-full cursor-pointer hover:bg-white transition-colors">
                   <div className="w-1.5 h-1.5 bg-[#111] rounded-full animate-pulse"></div>
-                  <span className="text-[10px] font-bold tracking-widest uppercase text-[#111] font-['IBM_Plex_Mono']">Shoppable Look</span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-[#111] font-semibold">Shoppable Look</span>
                 </div>
               )}
             </div>
@@ -70,11 +70,11 @@ export function BrandPostsFeed() {
               </div>
 
               <div className="text-sm text-[#111] leading-relaxed">
-                <span className="font-bold font-['IBM_Plex_Mono'] mr-3">{brand.name}</span>
+                <span className="font-bold font-semibold mr-3">{brand.name}</span>
                 <span className="text-[#666]">{post.caption}</span>
               </div>
-              
-              <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-['IBM_Plex_Mono']">
+
+              <div className="text-[10px] text-[#A3A3A3] uppercase tracking-widest font-semibold">
                 {post.likeCount.toLocaleString()} lượt thích • {post.commentCount} bình luận
               </div>
             </div>

@@ -55,7 +55,7 @@ export function WardrobeImpactPanel({
             <div className="absolute top-4 left-4 bg-[#A0522D] text-white text-[10px] font-mono uppercase tracking-widest px-3 py-1">
               Ghost Item
             </div>
-            <button 
+            <button
               onClick={onClose}
               className="absolute top-4 right-4 bg-black/20 text-white p-2 hover:bg-black/40 transition-colors backdrop-blur-sm"
             >
@@ -67,7 +67,7 @@ export function WardrobeImpactPanel({
             {/* Product Info */}
             <div>
               <p className="text-xs font-mono text-ink-muted uppercase tracking-[0.2em] mb-2">{item.brandName}</p>
-              <h2 className="text-2xl font-['Playfair_Display'] font-medium text-ink mb-1 uppercase">
+              <h2 className="text-2xl font-semibold font-medium text-ink mb-1 uppercase">
                 {item.category?.name || "Sản phẩm"} {item.color}
               </h2>
               <p className="font-mono text-sm tracking-widest text-[#A0522D]">{formatPrice(item.price)}</p>
@@ -78,7 +78,7 @@ export function WardrobeImpactPanel({
               <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-2 border-b border-ink/10">
                 Wardrobe Impact
               </h3>
-              
+
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <Check className="size-4 text-[#A0522D] mt-0.5 shrink-0" />
@@ -87,7 +87,7 @@ export function WardrobeImpactPanel({
                     <p className="text-[11px] font-mono uppercase tracking-widest text-ink-muted mt-0.5">Bạn đang sở hữu</p>
                   </div>
                 </li>
-                
+
                 <li className="flex items-start gap-3">
                   <Check className="size-4 text-[#A0522D] mt-0.5 shrink-0" />
                   <div>
@@ -128,8 +128,8 @@ export function WardrobeImpactPanel({
                   <span className="text-sm font-medium">{item.wardrobeImpact.colorCompatibilityScore}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-ink/10">
-                  <div 
-                    className="h-full bg-[#A0522D] transition-all duration-1000" 
+                  <div
+                    className="h-full bg-[#A0522D] transition-all duration-1000"
                     style={{ width: `${item.wardrobeImpact.colorCompatibilityScore}%` }}
                   />
                 </div>
@@ -141,13 +141,13 @@ export function WardrobeImpactPanel({
         {/* Action Bar */}
         <div className="p-6 border-t border-ink/10 bg-cream/90 backdrop-blur-md shrink-0 space-y-3">
           <div className="flex gap-3">
-            <Button 
+            <Button
               onClick={onKeep}
               className="flex-1 rounded-none bg-ink text-cream hover:bg-ink/80 text-xs font-mono tracking-widest uppercase h-12"
             >
               Giữ trong Outfit
             </Button>
-            <Button 
+            <Button
               onClick={onSwap}
               variant="outline"
               className="flex-1 rounded-none border-ink text-ink hover:bg-ink hover:text-cream text-xs font-mono tracking-widest uppercase h-12"
@@ -155,7 +155,7 @@ export function WardrobeImpactPanel({
               Đổi món khác
             </Button>
           </div>
-          
+
           <div className="flex gap-2 justify-between">
             <Button onClick={onSave} variant="ghost" size="sm" className="flex-1 rounded-none text-[10px] font-mono uppercase tracking-widest text-ink-muted hover:text-ink hover:bg-ink/5">
               <BookmarkPlus className="size-3.5 mr-1.5" /> Lưu

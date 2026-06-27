@@ -38,7 +38,7 @@ export default function PricingPage() {
       {/* Editorial Hero Section */}
       <div className="pt-32 pb-20 px-6 md:px-12 text-center max-w-4xl mx-auto border-b border-[#1A1A1A]/10 mb-20 relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-[#1A1A1A]/20" />
-        <h1 className="font-['Playfair_Display'] text-5xl md:text-7xl font-medium tracking-tight mb-8 leading-[1.3] text-[#1A1A1A]">
+        <h1 className="font-semibold text-5xl md:text-7xl font-medium tracking-tight mb-8 leading-[1.3] text-[#1A1A1A]">
           Khám phá tiềm năng<br />
           <span className="italic text-[#D9C5B2]">tủ đồ của bạn.</span>
         </h1>
@@ -51,7 +51,7 @@ export default function PricingPage() {
         {/* Current Subscription Section */}
         {mySubscription && dailyQuota && (
           <section className="mx-auto w-full max-w-5xl">
-            <h2 className="font-['IBM_Plex_Mono'] text-[10px] font-bold uppercase tracking-[0.3em] text-[#1A1A1A]/40 mb-6 text-center">
+            <h2 className="font-semibold text-[10px] font-bold uppercase tracking-[0.3em] text-[#1A1A1A]/40 mb-6 text-center">
               GÓI HIỆN TẠI CỦA BẠN
             </h2>
             <CurrentPlanCard subscription={mySubscription} quota={dailyQuota} />
@@ -61,9 +61,9 @@ export default function PricingPage() {
         {/* Pricing Plans Section */}
         <section className="mx-auto w-full">
           <div className="text-center mb-16">
-            <h2 className="font-['Playfair_Display'] text-4xl md:text-5xl font-medium mb-6">Thẻ Hội Viên</h2>
+            <h2 className="font-semibold text-4xl md:text-5xl font-medium mb-6">Thẻ Hội Viên</h2>
             <div className="w-12 h-px bg-[#D9C5B2] mx-auto mb-6" />
-            <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest text-[#1A1A1A]/50">
+            <p className="font-semibold text-[11px] uppercase tracking-widest text-[#1A1A1A]/50">
               Chọn gói phù hợp với phong cách của bạn
             </p>
           </div>
@@ -83,7 +83,7 @@ export default function PricingPage() {
                 );
               })
             ) : (
-              <div className="col-span-full bg-[#F4F1EE] text-center text-[#1A1A1A]/50 py-32 font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-widest">
+              <div className="col-span-full bg-[#F4F1EE] text-center text-[#1A1A1A]/50 py-32 font-semibold text-[12px] uppercase tracking-widest">
                 Chưa có gói hội viên nào được cấu hình.
               </div>
             )}

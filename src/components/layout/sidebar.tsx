@@ -81,9 +81,9 @@ export function Sidebar() {
       "hidden md:flex flex-col border-r border-border/60 h-dvh sticky top-0 bg-[#FAFAFA] dark:bg-[#111111] z-40 py-6 transition-all duration-300",
       isCollapsed ? "w-[88px] px-3" : "w-[280px] px-6"
     )}>
-      
+
       {/* Collapse Toggle Button */}
-      <button 
+      <button
         onClick={handleToggleCollapse}
         className="absolute -right-3 top-8 bg-background border border-border/60 rounded-full p-1 z-50 text-muted-foreground hover:text-foreground transition-colors"
       >
@@ -101,10 +101,10 @@ export function Sidebar() {
         )}
         <Link href="/" className="flex items-center group w-fit">
           <span className={cn(
-            "font-['Playfair_Display'] font-light tracking-tighter text-primary transition-all",
+            "font-semibold font-light tracking-tighter text-primary transition-all",
             isCollapsed ? "text-2xl" : "text-4xl"
           )}>
-            {isCollapsed ? <img src="/favicon.ico" width={50} height={50}></img> : <><span className="font-['Playfair_Display']"> Closy </span><span className="text-[#D9C5B2]">.</span></>}
+            {isCollapsed ? <img src="/favicon.ico" width={50} height={50}></img> : <><span className="font-semibold"> Closy </span><span className="text-[#D9C5B2]">.</span></>}
           </span>
         </Link>
       </div>
@@ -230,7 +230,7 @@ export function Sidebar() {
                 <TooltipTrigger>
                   {content}
                 </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={12} className="font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest">
+                <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest">
                   {item.label} {item.comingSoon && "(Sắp ra mắt)"}
                 </TooltipContent>
               </Tooltip>
@@ -260,7 +260,7 @@ export function Sidebar() {
                 </div>
               </button>
             </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={12} className="font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest">
+            <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest">
               Giỏ Hàng
             </TooltipContent>
           </Tooltip>
@@ -293,16 +293,16 @@ export function Sidebar() {
           {!isCollapsed && <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#D9C5B2]/20 rounded-full blur-2xl transition-colors duration-700 group-hover:bg-[#D9C5B2]/30" />}
 
           {isCollapsed ? (
-             <Tooltip>
-               <TooltipTrigger>
-                 <Link href="/pricing">
-                   <Sparkles className="size-5 text-foreground/80 group-hover:text-[#D9C5B2] transition-colors" />
-                 </Link>
-               </TooltipTrigger>
-               <TooltipContent side="right" sideOffset={12} className="font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest text-[#D9C5B2]">
-                 Nâng Cấp Premium
-               </TooltipContent>
-             </Tooltip>
+            <Tooltip>
+              <TooltipTrigger>
+                <Link href="/pricing">
+                  <Sparkles className="size-5 text-foreground/80 group-hover:text-[#D9C5B2] transition-colors" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest text-[#D9C5B2]">
+                Nâng Cấp Premium
+              </TooltipContent>
+            </Tooltip>
           ) : (
             <div className="relative z-10 flex flex-col gap-2">
               <div className="flex items-center justify-between mb-1">
