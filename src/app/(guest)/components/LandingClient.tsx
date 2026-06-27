@@ -243,7 +243,7 @@ export function LandingClient() {
           <CopyBlock className="copy-1" badge={<><Sparkles className="size-3" /> Tủ đồ kỹ thuật số</>} heading="Số hoá tủ đồ." body="Chụp 1 lần. AI tự động bóc tách nền, phân loại màu sắc và chất liệu." />
           <CopyBlock className="copy-2" badge={<><Check className="size-3" /> Gợi ý từ AI</>} heading="Stylist Cá Nhân." body="Hàng ngàn gợi ý phối đồ từ chính tủ đồ của bạn. Đổi món cực nhanh chỉ với 1 chạm." />
           <CopyBlock className="copy-3" badge={<><MessageCircle className="size-3" /> Trợ lý AI</>} heading="Hiểu gu của bạn." body="Closy phân tích thời tiết, hoàn cảnh và thấu hiểu phong cách riêng để tư vấn mỗi ngày." />
-          <CopyBlock className="copy-4" badge={<><Share2 className="size-3" /> Cộng đồng</>} heading="Chia sẻ & Pass đồ." body="Tìm nguồn cảm hứng mới. Chuyển nhượng đồ ít mặc dễ dàng chỉ với một nút bấm." />
+          <CopyBlock className="copy-4" badge={<><Share2 className="size-3" /> Cộng đồng</>} heading="Chia sẻ & Bán đồ." body="Tìm nguồn cảm hứng mới. Chuyển nhượng đồ ít mặc dễ dàng chỉ với một nút bấm." />
         </div>
       </section>
 
