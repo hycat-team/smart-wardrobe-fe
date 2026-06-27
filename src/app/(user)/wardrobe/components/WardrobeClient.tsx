@@ -53,6 +53,7 @@ import { toast } from "sonner";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useUserCategories } from "@/features/admin/queries/admin.queries";
+import { useMySubscription } from "@/features/subscription/queries/subscription.queries";
 
 const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
 
@@ -142,6 +143,11 @@ export default function WardrobeClient({
   const [isScrolled, setIsScrolled] = useState(false);
   const { mutate: bulkDelete, isPending: isDeleting } =
     useBulkDeleteWardrobeItems();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const { data: subscription } = useMySubscription();
+  const maxOutfits = subscription?.maxOutfits || 0;
+
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 
   const [searchInput, setSearchInput] = useState(searchParam);
@@ -477,10 +483,10 @@ export default function WardrobeClient({
                 Tủ đồ
               </h1>
               <p className="text-sm text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-border pl-4">
-                Bộ sưu tập của bạn.
+
                 {realItems.length > 0
-                  ? ` Đang lưu trữ ${realItems.length} món đồ.`
-                  : " Hãy bắt đầu thêm đồ."}
+                  ? ` Bạn đang lưu trữ ${realItems.length} / ${maxOutfits} món đồ.`
+                  : "Hãy bắt đầu thêm đồ."}
               </p>
             </div>
 
@@ -507,7 +513,7 @@ export default function WardrobeClient({
                     <span
                       className={cn(
                         "absolute bottom-0 left-0 h-[2px] bg-primary transition-all duration-300",
-                        categoryParam === cat
+                        categoryParam === cat.name
                           ? "w-full"
                           : "w-0 group-hover:w-full",
                       )}

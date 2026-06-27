@@ -259,7 +259,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                 { label: "Tất cả", value: "all" },
                 { label: "Tạo bởi AI", value: "ai" },
                 { label: "Thủ công", value: "manual" },
-                { label: "Đã lưu", value: "saved" }
+                // { label: "Đã lưu", value: "saved" }
               ].map(tab => {
                 const isActive = filterParam === tab.value;
                 return (
@@ -289,7 +289,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                   <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-[11px] font-semibold uppercase tracking-widest text-foreground w-auto gap-1">
                     <SelectValue placeholder="Mới nhất" />
                   </SelectTrigger>
-                  <SelectContent align="end" className="rounded-2xl border-border bg-card">
+                  <SelectContent align="end" alignItemWithTrigger={false} className="rounded-2xl border-border bg-card mt-1">
                     <SelectItem value="Mới Nhất" className="font-semibold text-[11px] uppercase tracking-widest hover:bg-muted">Mới nhất</SelectItem>
                     <SelectItem value="Cũ Nhất" className="font-semibold text-[11px] uppercase tracking-widest hover:bg-muted">Cũ nhất</SelectItem>
                   </SelectContent>

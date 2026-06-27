@@ -284,44 +284,45 @@ export function RegisterClient() {
                   control={control}
                   name="dateOfBirth"
                   render={({ field }) => (
-                    <>
-                      <input
-                        type="date"
-                        id="dateOfBirth"
-                        value={field.value}
-                        onChange={field.onChange}
-                        onFocus={() => setFocusedInput('dateOfBirth')}
-                        onBlur={() => setFocusedInput(null)}
-                        className="w-full bg-transparent border-none outline-none text-foreground font-inter text-[16px] [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-fields-wrapper]:p-0"
-                      />
-                      <Popover>
-                        <PopoverTrigger className="p-1 outline-none text-muted-foreground group-focus-within:text-primary transition-colors shrink-0">
-                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          className={`w-full flex items-center justify-between text-left font-inter text-[16px] bg-transparent border-none outline-none ${!field.value ? 'text-muted-foreground/60' : 'text-foreground'}`}
+                          onFocus={() => setFocusedInput('dateOfBirth')}
+                          onBlur={() => setFocusedInput(null)}
+                        >
+                          {field.value ? (
+                            new Date(field.value).toLocaleDateString('vi-VN')
+                          ) : (
+                            <span>dd/mm/yyyy</span>
+                          )}
+                          <svg className="w-5 h-5 ml-4 text-muted-foreground group-focus-within:text-primary transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 bg-background border-border shadow-xl shadow-black/10" align="start">
-                          <Calendar
-                            mode="single"
-                            captionLayout="dropdown"
-                            startMonth={new Date(1900, 0)}
-                            endMonth={new Date(new Date().getFullYear() + 10, 11)}
-                            selected={field.value ? new Date(field.value) : undefined}
-                            onSelect={(date) => {
-                              if (date) {
-                                const y = date.getFullYear();
-                                const m = String(date.getMonth() + 1).padStart(2, '0');
-                                const d = String(date.getDate()).padStart(2, '0');
-                                field.onChange(`${y}-${m}-${d}`);
-                              } else {
-                                field.onChange("");
-                              }
-                            }}
-                            className="bg-background text-foreground"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </>
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-background border-border shadow-xl shadow-black/10" align="start">
+                        <Calendar
+                          mode="single"
+                          captionLayout="dropdown"
+                          startMonth={new Date(1900, 0)}
+                          endMonth={new Date(new Date().getFullYear() + 10, 11)}
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => {
+                            if (date) {
+                              const y = date.getFullYear();
+                              const m = String(date.getMonth() + 1).padStart(2, '0');
+                              const d = String(date.getDate()).padStart(2, '0');
+                              field.onChange(`${y}-${m}-${d}`);
+                            } else {
+                              field.onChange("");
+                            }
+                          }}
+                          className="bg-background text-foreground"
+                        />
+                      </PopoverContent>
+                    </Popover>
                   )}
                 />
               </div>

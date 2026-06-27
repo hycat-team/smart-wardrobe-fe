@@ -96,7 +96,7 @@ export function WardrobeCard({
               </button>
             </div>
 
-            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-end bg-card/90 pb-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            {/* <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-end bg-card/90 pb-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               <div className="flex flex-col items-center gap-2 mb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 delay-75">
                 <span className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Worn 14 Times
@@ -108,7 +108,7 @@ export function WardrobeCard({
               <div className="border-b border-foreground pb-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground">
                 View Details
               </div>
-            </div>
+            </div> */}
           </>
         )}
       </div>
@@ -121,22 +121,22 @@ export function WardrobeCard({
               {getWardrobeItemName(item)}
             </h3>
           )}
-          {item.style && (
+          {/* {item.style && (
             <p className="mt-1.5 truncate text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
               {item.style}
             </p>
-          )}
+          )} */}
         </div>
 
         {!hideDetails && (
           <>
-            <p className="mt-2 truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            {/* <p className="mt-2 truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
               {(item as any).brand ||
                 (typeof item.category === "object"
                   ? (item.category as any)?.name
                   : item.category) ||
                 "ACNE STUDIOS"}
-            </p>
+            </p> */}
             {/* <div className="font-semibold text-[11px] text-[#888] mt-auto pt-2">
               <span>Size {(item as any).size || "S"}</span>
               {item.color && <span> • {item.color}</span>}

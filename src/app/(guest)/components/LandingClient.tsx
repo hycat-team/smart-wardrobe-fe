@@ -24,9 +24,11 @@ import {
   METRICS, BEFORE_ITEMS, AFTER_ITEMS, TESTIMONIALS,
   FEED_CARDS, NON_OUTFIT_CARDS, OUTFIT_CARDS,
 } from "./data/landing-data";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export function LandingClient() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuthStore();
 
   // All GSAP animations in custom hook (mobile-aware + a11y)
   useScrollytelling(containerRef);
@@ -359,9 +361,9 @@ export function LandingClient() {
             Không cần thẻ tín dụng. 30 giây.
           </p>
 
-          <Link href="/auth/register" className="cta-button opacity-0 mt-8 md:mt-10">
+          <Link href={user ? "/wardrobe" : "/auth/register"} className="cta-button opacity-0 mt-8 md:mt-10">
             <Button className="bg-white text-[#1A1A1A] rounded-full px-10 md:px-12 py-6 md:py-7 text-base md:text-lg font-bold hover:scale-[1.03] shadow-[0_0_40px_rgba(217,197,178,0.3)] hover:bg-white transition-all duration-300">
-              Bắt Đầu Miễn Phí →
+              {user ? "Vào Tủ Đồ →" : "Bắt Đầu Miễn Phí →"}
             </Button>
           </Link>
         </div>
