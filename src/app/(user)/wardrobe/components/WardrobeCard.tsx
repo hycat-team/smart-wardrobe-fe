@@ -31,7 +31,7 @@ export function WardrobeCard({
     <div
       onClick={onClick}
       className={cn(
-        "group relative flex h-full cursor-pointer flex-col rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        "group relative flex h-full cursor-pointer flex-col rounded-2xl border border-border bg-card overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
         isSelectMode &&
         isSelected &&
         "border-2 border-primary shadow-none hover:translate-y-0",
@@ -45,7 +45,7 @@ export function WardrobeCard({
           sizes="(max-width: 768px) 50vw, 33vw"
           alt={getWardrobeItemName(item)}
           className={cn(
-            "h-full w-full object-contain drop-shadow-sm transition-transform duration-200",
+            "h-full w-full object-contain drop-shadow-sm transition-transform duration-300",
             !isProcessing && "group-hover:scale-105",
             isProcessing && "blur-md opacity-60",
           )}
@@ -91,8 +91,7 @@ export function WardrobeCard({
             <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <button
                 className="text-muted-foreground transition-colors hover:text-foreground"
-                title="Save / Favorite"
-              >
+                title="Save / Favorite">
                 <Heart className="size-5" />
               </button>
             </div>
@@ -115,7 +114,7 @@ export function WardrobeCard({
       </div>
 
       {/* Information Area - 25% Visual Weight */}
-      <div className="flex flex-grow flex-col border-t border-border bg-card p-3 md:p-4 md:pt-5">
+      <div className="flex flex-grow flex-col border-t border-border p-3 md:p-4 md:pt-5">
         <div>
           {!hideTitle && (
             <h3 className="line-clamp-2 text-[22px] font-semibold leading-[130%] text-card-foreground">

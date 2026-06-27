@@ -391,7 +391,7 @@ export function UploadClient() {
                   </div>
 
                   {/* Information Area - 25% Visual Weight */}
-                  <div className="flex flex-grow flex-col justify-between gap-3 border-t border-border bg-card p-4 pt-4">
+                  <div className="flex flex-grow flex-col justify-between gap-3 border-t border-border p-4 pt-4">
                     <div>
                       <h3
                         className="line-clamp-1 text-[16px] font-semibold leading-[130%] text-foreground"

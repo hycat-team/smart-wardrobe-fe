@@ -15,6 +15,13 @@ export const useAdminCategories = () => {
   });
 };
 
+export const useUserCategories = () => {
+  return useQuery({
+    queryKey: ['user-categories'],
+    queryFn: () => adminApi.getUserCategories(),
+  });
+};
+
 export const useCreateCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({

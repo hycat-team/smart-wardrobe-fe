@@ -182,26 +182,26 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
         params.set("page", "1");
         router.push("?" + params.toString(), { scroll: false });
       }} className="relative w-full sm:w-[240px]">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#888] size-4" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
         <input
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full bg-[#F8F7F5] border border-black/10 focus:border-black focus:ring-0 pl-10 pr-4 py-3 rounded-none outline-none transition-all font-semibold text-[11px] text-[#111] placeholder:text-[#888] uppercase tracking-widest"
+          className="w-full bg-muted border border-border focus:border-foreground focus:ring-0 pl-10 pr-4 py-3 rounded-xl outline-none transition-all duration-200 font-semibold text-[11px] text-foreground placeholder:text-muted-foreground uppercase tracking-widest"
           placeholder="TÌM KIẾM..."
         />
       </form>
 
       <button
         onClick={() => router.push("/ai-stylist")}
-        className="h-12 px-6 border border-[#E5E5E5] text-[#111] font-semibold text-[11px] uppercase tracking-widest hover:border-[#111] transition-colors flex items-center justify-center gap-2"
+        className="h-11 px-6 border border-border text-foreground font-semibold text-[11px] uppercase tracking-widest hover:border-foreground rounded-full transition-colors duration-200 flex items-center justify-center gap-2"
       >
         <Sparkles className="size-3.5" /> Tạo bằng AI
       </button>
 
       <button
         onClick={() => router.push("/outfits/create")}
-        className="h-12 px-8 bg-[#111] text-white font-semibold text-[11px] font-medium uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black/80 transition-colors"
+        className="h-11 px-8 bg-primary text-primary-foreground font-semibold text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-primary/90 rounded-full transition-colors duration-200"
       >
         <Plus className="size-4" /> Tạo Bộ Phối
       </button>
@@ -213,33 +213,33 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
       {/* Sticky Top Action Bar */}
       <div
         className={cn(
-          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-[#F4F1EE]/80 dark:bg-[#111]/80 backdrop-blur-xl border-b border-black/10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           isScrolled ? "translate-y-0 shadow-sm opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
         )}
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="hidden md:flex items-center gap-2">
-            <span className="font-semibold font-medium text-2xl text-[#111] uppercase tracking-wide">
-              Curations
+            <span className="font-semibold text-2xl text-foreground uppercase tracking-wide">
+              TRANG PHỤC
             </span>
           </div>
           {renderActions()}
         </div>
       </div>
 
-      <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-[#111]">
+      <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-foreground">
         {/* High-end Editorial Header */}
-        <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-black/10 pb-6">
+        <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-border pb-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-4 max-w-2xl">
               {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
               Curations
             </h1> */}
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold font-medium text-[#111] leading-[1.1] uppercase">
-                Curations
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase">
+                TRANG PHỤC
               </h1>
-              <p className="text-[12px] text-[#666] font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-black/10 pl-4">
-                Kho lưu trữ phong cách cá nhân của bạn.
+              <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-border pl-4">
+                Kho lưu trữ phong cách cá nhân của bạn. <br />
                 {outfits.length > 0 ? ` Đang lưu trữ ${outfits.length} bộ phối.` : " Hãy bắt đầu tạo bộ phối của bạn."}
               </p>
             </div>
@@ -262,13 +262,13 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                     key={tab.value}
                     onClick={() => handleFilterChange(tab.value)}
                     className={cn(
-                      "relative pb-2 px-1 text-[11px] font-mono uppercase tracking-[0.2em] transition-colors group",
-                      isActive ? "text-[#111] font-bold" : "text-[#888] hover:text-[#111] font-medium"
+                      "relative pb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors duration-200 group",
+                      isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground font-medium"
                     )}
                   >
                     {tab.label}
                     <span className={cn(
-                      "absolute bottom-0 left-0 h-[2px] bg-[#111] transition-all duration-300",
+                      "absolute bottom-0 left-0 h-[2px] bg-foreground transition-all duration-300",
                       isActive ? "w-full" : "w-0 group-hover:w-full"
                     )} />
                   </button>
@@ -279,14 +279,14 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
             <div className="flex items-center gap-6">
               {/* Sort Dropdown */}
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono text-[#888] uppercase tracking-[0.15em]">Sort:</span>
+                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">Sort:</span>
                 <Select value={sortParam} onValueChange={(value) => setSortParam(value as SortOption)}>
-                  <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-[11px] font-mono uppercase tracking-widest text-[#111] font-medium w-auto gap-1">
+                  <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-[11px] font-semibold uppercase tracking-widest text-foreground w-auto gap-1">
                     <SelectValue placeholder="Mới nhất" />
                   </SelectTrigger>
-                  <SelectContent align="end" className="rounded-none border-black/10 bg-white">
-                    <SelectItem value="Mới Nhất" className="font-mono text-[11px] uppercase tracking-widest hover:bg-black/5">Mới nhất</SelectItem>
-                    <SelectItem value="Cũ Nhất" className="font-mono text-[11px] uppercase tracking-widest hover:bg-black/5">Cũ nhất</SelectItem>
+                  <SelectContent align="end" className="rounded-2xl border-border bg-card">
+                    <SelectItem value="Mới Nhất" className="font-semibold text-[11px] uppercase tracking-widest hover:bg-muted">Mới nhất</SelectItem>
+                    <SelectItem value="Cũ Nhất" className="font-semibold text-[11px] uppercase tracking-widest hover:bg-muted">Cũ nhất</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -298,16 +298,16 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
         {isLoading && !outfits.length ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="flex flex-col h-full bg-[#F8F7F5] border border-black/5">
+              <div key={i} className="flex flex-col h-full bg-card rounded-2xl overflow-hidden border border-border">
                 <Skeleton className="relative w-full aspect-[3/4] bg-muted/60 overflow-hidden flex-shrink-0 rounded-none" />
-                <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
+                <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 border-t border-border">
                   <div className="space-y-2">
-                    <Skeleton className="h-6 w-3/4 rounded-none bg-muted/60" />
-                    <Skeleton className="h-3 w-1/2 rounded-none bg-muted/60 mt-2" />
+                    <Skeleton className="h-6 w-3/4 rounded-full bg-muted/60" />
+                    <Skeleton className="h-3 w-1/2 rounded-full bg-muted/60 mt-2" />
                   </div>
                   <div className="flex justify-between items-center mt-3">
-                    <Skeleton className="h-3 w-1/4 rounded-none bg-muted/60" />
-                    <Skeleton className="h-3 w-1/4 rounded-none bg-muted/60" />
+                    <Skeleton className="h-3 w-1/4 rounded-full bg-muted/60" />
+                    <Skeleton className="h-3 w-1/4 rounded-full bg-muted/60" />
                   </div>
                 </div>
               </div>
@@ -333,18 +333,18 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
         ) : (
           /* Empty State */
           <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
-            <div className="size-20 bg-[#F7F6F4] border border-[#E5E5E5] flex items-center justify-center text-[#A3A3A3]">
+            <div className="size-20 bg-muted border border-border rounded-2xl flex items-center justify-center text-muted-foreground">
               <Shirt className="size-8 stroke-1" />
             </div>
             <div className="space-y-4">
-              <h3 className="font-semibold text-3xl text-[#111] uppercase tracking-tight">Trống</h3>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-[#666] leading-relaxed">
+              <h3 className="font-semibold text-3xl text-foreground uppercase tracking-tight">Trống</h3>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground leading-relaxed">
                 Không có bộ phối nào phù hợp với bộ lọc hiện tại. Hãy chọn tất cả hoặc tạo bộ phối mới.
               </p>
             </div>
             <button
               onClick={() => handleFilterChange("all")}
-              className="h-12 px-8 border border-[#111] text-[#111] font-semibold text-[11px] uppercase tracking-widest hover:bg-black hover:text-white transition-colors mt-4"
+              className="h-11 px-8 border border-foreground text-foreground font-semibold text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background rounded-full transition-colors duration-200 mt-4"
             >
               Xóa Bộ Lọc
             </button>
@@ -388,7 +388,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                           params.set("page", pageNum.toString());
                           router.push("?" + params.toString(), { scroll: false });
                         }}
-                        className="font-semibold text-[11px] uppercase tracking-widest rounded-none border-black/10"
+                        className="font-semibold text-[11px] uppercase tracking-widest rounded-full border-border"
                       >
                         {pageNum}
                       </PaginationLink>
@@ -428,18 +428,18 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
 
         {/* Delete Confirmation Popup */}
         <AlertDialog open={!!outfitToDelete} onOpenChange={(open) => !open && setOutfitToDelete(null)}>
-          <AlertDialogContent className="rounded-none border border-black/10 bg-white">
+          <AlertDialogContent className="rounded-2xl border border-border bg-card">
             <AlertDialogHeader>
-              <AlertDialogTitle className="font-semibold text-2xl font-medium text-[#111]">Xóa Bộ Phối</AlertDialogTitle>
-              <AlertDialogDescription className="font-semibold text-[12px] text-[#666] leading-relaxed">
+              <AlertDialogTitle className="font-semibold text-2xl text-foreground">Xóa Bộ Phối</AlertDialogTitle>
+              <AlertDialogDescription className="font-semibold text-[12px] text-muted-foreground leading-relaxed">
                 Bạn có chắc chắn muốn xóa bộ phối này khỏi lưu trữ vĩnh viễn không? Hành động này không thể hoàn tác.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="mt-6 flex gap-4">
-              <AlertDialogCancel className="rounded-none border border-black/10 bg-white font-semibold text-[11px] uppercase tracking-widest flex-1 hover:bg-[#F8F7F5] transition-colors m-0">HỦY BỎ</AlertDialogCancel>
+              <AlertDialogCancel className="rounded-full border border-border bg-card font-semibold text-[11px] uppercase tracking-widest flex-1 hover:bg-muted transition-colors m-0">HỦY BỎ</AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmDelete}
-                className="rounded-none bg-red-600 text-white hover:bg-red-700 font-semibold text-[11px] uppercase tracking-widest flex-1 transition-colors m-0"
+                className="rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 font-semibold text-[11px] uppercase tracking-widest flex-1 transition-colors m-0"
               >
                 ĐỒNG Ý XÓA
               </AlertDialogAction>

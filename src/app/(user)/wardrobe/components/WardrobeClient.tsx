@@ -474,7 +474,7 @@ export default function WardrobeClient({
                     key={cat}
                     onClick={() => handleCategoryChange(cat)}
                     className={cn(
-                      "text-xs font-semibold uppercase tracking-[0.2em] relative transition-colors group pb-2",
+                      "text-xs font-semibold uppercase tracking-[0.2em] relative transition-colors duration-200 group pb-2",
                       categoryParam === cat
                         ? "text-foreground font-semibold"
                         : "text-muted-foreground hover:text-foreground",

@@ -160,7 +160,7 @@ export function WardrobeItemDetailClient({
         {/* Main Split Layout: 5/7 */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           {/* Left Column: Minimal Image Area */}
-          <div className="image-frame relative w-full aspect-[3/4] p-8 md:p-12 lg:col-span-5 transition-all duration-200">
+          <div className="image-frame relative w-full aspect-[3/4] p-8 md:p-12 lg:col-span-5 transition-all duration-200 overflow-hidden rounded-2xl">
             {isProcessing && (
               <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-4">
                 <div className="size-10 border border-foreground border-t-transparent rounded-full animate-spin" />
