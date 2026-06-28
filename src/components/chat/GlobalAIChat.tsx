@@ -23,7 +23,7 @@ export function GlobalAIChat() {
   const router = useRouter();
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const { data: chatSessionsData, isLoading: isLoadingSessions } = useChatSessions();
+  const { data: chatSessionsData, isLoading: isLoadingSessions } = useChatSessions(isOpen);
 
   const [isChatting, setIsChatting] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);

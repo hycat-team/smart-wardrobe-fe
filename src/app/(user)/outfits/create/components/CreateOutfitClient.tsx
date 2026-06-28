@@ -138,9 +138,12 @@ function CreateOutfitContent() {
 
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message || "Đã xảy ra lỗi khi lưu.", { id: "saving_outfit" });
+      if (!err.isAxiosError) {
+        toast.error(err.message || "Đã xảy ra lỗi khi lưu.");
+      }
     } finally {
       setIsSaving(false);
+      toast.dismiss("saving_outfit");
     }
   };
 

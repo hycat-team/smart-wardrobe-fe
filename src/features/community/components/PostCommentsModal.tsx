@@ -19,7 +19,7 @@ interface PostCommentsModalProps {
 export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalProps) => {
   const [commentContent, setCommentContent] = useState('');
   const [replyingTo, setReplyingTo] = useState<{ commentId: string; username: string } | null>(null);
-  const { data: comments, isLoading } = usePostComments(post.publicId);
+  const { data: comments, isLoading } = usePostComments(post.publicId, isOpen);
   const { mutate: addComment, isPending } = useAddComment();
   const { mutate: deleteComment, isPending: isDeletingComment } = useDeleteComment();
   const { data: profile } = useProfile();

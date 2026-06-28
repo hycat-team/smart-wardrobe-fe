@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { subscriptionApi } from '../api/subscription.api';
 import { toast } from 'sonner';
+import { handleApiError } from '@/lib/api-error';
 
 export const useDailyQuota = () => {
   return useQuery({
@@ -34,6 +35,9 @@ export const useToggleAutoRenew = () => {
       // Invalidate the subscription query to refresh data
       queryClient.invalidateQueries({ queryKey: ['subscription', 'me'] });
     },
+    onError: (error) => {
+      handleApiError(error, 'Cập nhật trạng thái gia hạn thất bại.');
+    }
   });
 };
 export const useToggleAutoRenewMutation = useToggleAutoRenew; // alias for backwards compatibility

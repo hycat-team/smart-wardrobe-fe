@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { billingApi } from '../api/billing.api';
 import { toast } from 'sonner';
 import { DirectPurchaseReq, TopUpReq } from '../types';
+import { handleApiError } from '@/lib/api-error';
 
 export const useTopupMutation = () => {
   return useMutation({
@@ -13,6 +14,9 @@ export const useTopupMutation = () => {
         window.location.href = targetUrl;
       }
     },
+    onError: (error) => {
+      handleApiError(error, 'Không thể tạo link nạp tiền.');
+    }
   });
 };
 
@@ -26,9 +30,11 @@ export const usePurchaseDirectMutation = () => {
         window.location.href = targetUrl;
       }
     },
+    onError: (error) => {
+      handleApiError(error, 'Không thể tạo link thanh toán.');
+    }
   });
 };
-
 
 export const usePurchaseWithWalletMutation = () => {
   const queryClient = useQueryClient();
@@ -41,5 +47,8 @@ export const usePurchaseWithWalletMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['wallet', 'balance'] });
       queryClient.invalidateQueries({ queryKey: ['subscription', 'me'] });
     },
+    onError: (error) => {
+      handleApiError(error, 'Thanh toán bằng ví thất bại.');
+    }
   });
 };

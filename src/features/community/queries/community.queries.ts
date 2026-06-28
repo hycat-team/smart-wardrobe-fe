@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery, keepPreviousDa
 import { communityApi } from '../api/community.api';
 import { toast } from 'sonner';
 import { PostRes, CreatePostReq } from '../types';
+import { handleApiError } from '@/lib/api-error';
 
 export const COMMUNITY_QUERY_KEYS = {
   all: ['community'] as const,
@@ -33,11 +34,11 @@ export const usePostDetail = (postPublicID: string, initialData?: PostRes) => {
   });
 };
 
-export const usePostComments = (postPublicID: string) => {
+export const usePostComments = (postPublicID: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: COMMUNITY_QUERY_KEYS.comments(postPublicID),
     queryFn: () => communityApi.getPostComments(postPublicID),
-    enabled: !!postPublicID,
+    enabled: !!postPublicID && enabled,
   });
 };
 
@@ -96,7 +97,6 @@ export const useLikePost = () => {
       return { previousDetail };
     },
     onError: (_err, _variables, _context: unknown) => {
-      toast.error('Có lỗi xảy ra khi cập nhật lượt thích.');
       // Revert if error
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.all });
     },
@@ -113,14 +113,14 @@ export const useAddComment = () => {
   return useMutation({
     mutationFn: ({ postPublicID, content, parentCommentId }: { postPublicID: string; content: string; parentCommentId?: string }) =>
       communityApi.addComment(postPublicID, { content, parentCommentId }),
-    onSuccess: (res, variables) => {
+    onSuccess: (res: any, variables) => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.feed() });
-      toast.success('Đã gửi bình luận!');
+      toast.success(res?.message || 'Đã gửi bình luận!');
     },
-    onError: () => {
-      toast.error('Có lỗi xảy ra khi gửi bình luận.');
+    onError: (error) => {
+      handleApiError(error, 'Có lỗi xảy ra khi gửi bình luận.');
     }
   });
 };
@@ -129,13 +129,13 @@ export const useCreatePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreatePostReq) => communityApi.createPost(data),
-    onSuccess: () => {
+    onSuccess: (res: any) => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.all });
       queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
-      toast.success('Đã tạo bài viết thành công!');
+      toast.success(res?.message || 'Đã tạo bài viết thành công!');
     },
-    onError: () => {
-      toast.error('Có lỗi xảy ra khi tạo bài viết.');
+    onError: (error) => {
+      handleApiError(error, 'Có lỗi xảy ra khi tạo bài viết.');
     }
   });
 };
@@ -144,13 +144,13 @@ export const useDeletePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (postPublicID: string) => communityApi.deletePost(postPublicID),
-    onSuccess: () => {
+    onSuccess: (res: any) => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.feed() });
       queryClient.invalidateQueries({ queryKey: ['admin-posts'] });
-      toast.success('Đã xoá bài viết.');
+      toast.success(res?.message || 'Đã xoá bài viết.');
     },
-    onError: () => {
-      toast.error('Có lỗi xảy ra khi xoá bài viết.');
+    onError: (error) => {
+      handleApiError(error, 'Có lỗi xảy ra khi xoá bài viết.');
     }
   });
 };
@@ -160,13 +160,13 @@ export const useDeleteComment = () => {
   return useMutation({
     mutationFn: ({ postPublicID, commentID }: { postPublicID: string, commentID: string }) => 
       communityApi.deleteComment(postPublicID, commentID),
-    onSuccess: (_, variables) => {
+    onSuccess: (res: any, variables) => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
-      toast.success('Đã xoá bình luận.');
+      toast.success(res?.message || 'Đã xoá bình luận.');
     },
-    onError: () => {
-      toast.error('Có lỗi xảy ra khi xoá bình luận.');
+    onError: (error) => {
+      handleApiError(error, 'Có lỗi xảy ra khi xoá bình luận.');
     }
   });
 };
@@ -176,13 +176,13 @@ export const useUpdateComment = () => {
   return useMutation({
     mutationFn: ({ postPublicID, commentID, content }: { postPublicID: string, commentID: string, content: string }) => 
       communityApi.updateComment(postPublicID, commentID, { content }),
-    onSuccess: (_, variables) => {
+    onSuccess: (res: any, variables) => {
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.comments(variables.postPublicID) });
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.detail(variables.postPublicID) });
-      toast.success('Đã cập nhật bình luận.');
+      toast.success(res?.message || 'Đã cập nhật bình luận.');
     },
-    onError: () => {
-      toast.error('Có lỗi xảy ra khi cập nhật bình luận.');
+    onError: (error) => {
+      handleApiError(error, 'Có lỗi xảy ra khi cập nhật bình luận.');
     }
   });
 };

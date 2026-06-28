@@ -234,7 +234,7 @@ function AIStylistContent() {
       return newItems;
     });
 
-    toast.success("Đã đổi sang món đồ khác");
+    // toast.success("Đã đổi sang món đồ khác");
   };
 
   const handleSaveOutfit = async () => {
@@ -289,13 +289,16 @@ function AIStylistContent() {
         })),
       });
 
-      toast.success("Đã lưu bộ phối đồ thành công!", { id: "save_outfit" });
+      // toast.success("Đã lưu bộ phối đồ thành công!", { id: "save_outfit" });
       router.push("/outfits");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error("Không thể lưu bộ phối đồ", { id: "save_outfit" });
+      if (!error.isAxiosError) {
+        toast.error(error.message || "Không thể lưu bộ phối đồ");
+      }
     } finally {
       setIsSaving(false);
+      toast.dismiss("save_outfit");
     }
   };
 
@@ -648,7 +651,7 @@ function AIStylistContent() {
               selected: true,
             });
 
-            toast.success("Đã thêm vào giỏ hàng!");
+            // toast.success("Đã thêm vào giỏ hàng!");
           }
         }}
         onHideBrand={() => {

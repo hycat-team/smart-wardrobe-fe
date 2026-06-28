@@ -229,14 +229,17 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
       };
 
       await updateOutfitMutation.mutateAsync({ id: outfitId, data: payload });
-      toast.success("Cập nhật bộ phối đồ thành công!", { id: "saving_outfit" });
+      // toast.success("Cập nhật bộ phối đồ thành công!", { id: "saving_outfit" });
       router.push("/outfits");
 
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message || "Đã xảy ra lỗi khi lưu.", { id: "saving_outfit" });
+      if (!err.isAxiosError) {
+        toast.error(err.message || "Đã xảy ra lỗi khi lưu.");
+      }
     } finally {
       setIsSaving(false);
+      toast.dismiss("saving_outfit");
     }
   };
 
