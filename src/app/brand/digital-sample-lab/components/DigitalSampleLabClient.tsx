@@ -116,7 +116,7 @@ export function DigitalSampleLabClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Product Concept</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Mô tả sản phẩm</label>
                 <textarea
                   required
                   value={concept}
@@ -128,10 +128,10 @@ export function DigitalSampleLabClient() {
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Variants (Màu sắc / Kiểu dáng)</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Màu sắc</label>
                   {variants.length < 3 && (
                     <button type="button" onClick={addVariant} className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline flex items-center gap-1">
-                      <Plus className="size-3" /> Thêm Variant
+                      <Plus className="size-3" /> Thêm Màu sắc
                     </button>
                   )}
                 </div>
@@ -190,7 +190,7 @@ export function DigitalSampleLabClient() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Sparkles className="size-4" /> Khởi Tạo Digital Sample Test
+                    <Sparkles className="size-4" /> Khởi Tạo thiết kế thử nghiệm
                   </div>
                 )}
               </Button>

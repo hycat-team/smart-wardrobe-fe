@@ -101,13 +101,60 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
         setCustomOccasion(outfit.description || "");
       }
 
-      const initialItems = (outfit.items || []).map((item: any) => ({
-        ...(item.wardrobeItem || {}),
-        scale: Math.round((item.scale || 1) * 100),
-        x: item.positionX || 0,
-        y: item.positionY || 0,
-        zIndex: item.layerOrder || 1,
-      })).filter((x: any) => x.id);
+      let brandYOffset = -150;
+      let accessoryYOffset = -150;
+      
+      const initialItems = (outfit.items || []).map((item: any) => {
+        const wardrobeItem = item.wardrobeItem || {};
+        let x = item.positionX || 0;
+        let y = item.positionY || 0;
+        let zIndex = item.layerOrder || 1;
+        
+        // Apply smart fallback positioning if coordinates are near 0 or missing
+        if (Math.abs(x) < 5 && Math.abs(y) < 5) {
+          const isBrand = wardrobeItem.isGhost || wardrobeItem.brandName;
+          
+          if (isBrand) {
+            x = 280; // Right side
+            y = brandYOffset;
+            brandYOffset += 240;
+            zIndex = 10;
+          } else {
+            const slug = (wardrobeItem.category?.slug || '').toLowerCase();
+            const role = (wardrobeItem.role || '').toLowerCase();
+            
+            if (slug === 'phu-kien' || slug.startsWith('phu-kien-') || slug.includes('accessory') || role.includes('phụ kiện')) {
+              x = -280; // Left side
+              y = accessoryYOffset;
+              accessoryYOffset += 240;
+              zIndex = 5;
+            } else if (slug === 'mu' || slug === 'non' || slug.includes('hat') || role.includes('mũ') || role.includes('nón')) {
+              y = -350;
+              zIndex = 4;
+            } else if (slug === 'ao' || slug.startsWith('ao-') || slug.includes('top') || slug.includes('jacket') || role.includes('áo')) {
+              y = -180;
+              zIndex = 3;
+            } else if (slug === 'quan' || slug === 'vay' || slug.startsWith('quan-') || slug.startsWith('vay-') || slug.includes('bottom') || slug.includes('skirt') || role.includes('quần') || role.includes('váy')) {
+              y = 120;
+              zIndex = 2;
+            } else if (slug === 'giay' || slug.startsWith('giay-') || slug.includes('shoes') || slug.includes('footwear') || role.includes('giày')) {
+              y = 270;
+              zIndex = 3;
+            } else {
+              y = (Math.random() * 80 - 40);
+              x = (Math.random() * 80 - 40);
+            }
+          }
+        }
+
+        return {
+          ...wardrobeItem,
+          scale: Math.round((item.scale || 1) * 100),
+          x,
+          y,
+          zIndex,
+        };
+      }).filter((x: any) => x.id);
 
       setSelectedItems(initialItems);
     }
@@ -367,9 +414,9 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
           </div>
 
           {/* RIGHT COLUMN: STYLING CANVAS (LG: 8/12) */}
-          <div className="lg:col-span-8 h-full flex flex-col relative min-h-[600px] outfit-panel">
+          <div className="lg:col-span-8 flex flex-col gap-0 relative min-h-[600px] h-[600px] lg:h-[800px] border border-border bg-card shadow-sm rounded-2xl overflow-hidden outfit-panel">
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-widest text-foreground bg-card border border-border px-3 py-1.5 rounded-full flex items-center gap-2">
                 <Layers className="size-3.5" /> CANVAS STUDIO
                 <span className="bg-muted text-foreground px-1.5 py-0.5 rounded-full text-[9px]">{selectedItems.length} MÓN</span>
@@ -380,11 +427,9 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
                   type="button"
                   onClick={() => {
                     setSelectedItems([]);
-                    setOutfitName("");
                   }}
-                  className="text-[10px] text-muted-foreground hover:text-foreground px-3 py-1.5 uppercase tracking-widest flex items-center gap-1.5 transition-colors font-bold"
+                  className="text-[10px] text-foreground bg-card border border-border px-3 py-1.5 rounded-full uppercase tracking-widest flex items-center gap-1.5 transition-colors font-bold hover:bg-muted"
                 >
-                  {/* <Trash2 className="size-3.5" /> LÀM MỚI */}
                   <RefreshCcw className="size-3.5" /> LÀM MỚI
                 </button>
               )}

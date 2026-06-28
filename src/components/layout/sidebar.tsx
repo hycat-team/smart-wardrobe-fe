@@ -31,7 +31,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Globe,
-  type LucideIcon
+  type LucideIcon,
+  Images
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -53,7 +54,7 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: Globe, label: "Cộng Đồng", path: "/community" },
   { icon: Shirt, label: "Tủ Quần Áo", path: "/wardrobe" },
   { icon: Sparkles, label: "AI Phối Đồ", path: "/ai-stylist" },
-  { icon: ScanQrCode, label: "Trang Phục", path: "/outfits" },
+  { icon: Images, label: "Trang Phục", path: "/outfits" },
   // { icon: Store, label: "Thanh Lý", path: "/marketplace", comingSoon: true },
 ];
 
@@ -256,14 +257,14 @@ export function Sidebar() {
               onClick={() => setCartOpen(true)}
               className="group flex items-center justify-center w-full p-3 rounded-xl transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-muted/30"
             >
-                <div className="relative">
-                  <ShoppingBag className="size-5 transition-transform duration-300 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" strokeWidth={1.5} />
-                  {cart.length > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-foreground text-background text-[9px] font-bold w-4 h-4 rounded-full z-10 shadow-sm border border-background">
-                      {cart.length}
-                    </span>
-                  )}
-                </div>
+              <div className="relative">
+                <ShoppingBag className="size-5 transition-transform duration-300 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" strokeWidth={1.5} />
+                {cart.length > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-foreground text-background text-[9px] font-bold w-4 h-4 rounded-full z-10 shadow-sm border border-background">
+                    {cart.length}
+                  </span>
+                )}
+              </div>
             </TooltipTrigger>
             <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest">
               Giỏ Hàng

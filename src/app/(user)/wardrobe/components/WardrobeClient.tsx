@@ -41,6 +41,7 @@ import {
 import {
   useMyWardrobe,
   useBulkDeleteWardrobeItems,
+  useCategories,
 } from "@/features/wardrobe/queries/wardrobe.queries";
 import {
   WardrobeItemRes as WardrobeItem,
@@ -52,7 +53,6 @@ import { useSidebarStore } from "@/store/useSidebarStore";
 import { toast } from "sonner";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useUserCategories } from "@/features/admin/queries/admin.queries";
 import { useMySubscription } from "@/features/subscription/queries/subscription.queries";
 
 const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
@@ -129,7 +129,7 @@ export default function WardrobeClient({
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const { data: category } = useUserCategories()
+  const { data: category } = useCategories()
 
   // Sync Search state with query params
   const categoryParam = searchParams.get("category") || "Tất cả";
@@ -460,7 +460,7 @@ export default function WardrobeClient({
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="hidden md:flex items-center gap-2">
-            <span className="text-2xl font-semibold uppercase tracking-wide text-foreground">
+            <span className="text-2xl font-semibold uppercase tracking-wide text-foreground whitespace-nowrap">
               Tủ đồ
             </span>
           </div>
@@ -479,7 +479,7 @@ export default function WardrobeClient({
               {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-foreground leading-[0.85] uppercase">
               Wardrobe
             </h1> */}
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase whitespace-nowrap">
                 Tủ đồ
               </h1>
               <p className="text-sm text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-border pl-4">
@@ -589,7 +589,7 @@ export default function WardrobeClient({
               isFetching && "opacity-60 blur-[1px]",
             )}
           >
-            {sortedItems.map((item) => {
+            {sortedItems.map((item, index) => {
               const isProcessing =
                 item.status === WardrobeItemStatus.Processing;
               const isFailed = item.status === WardrobeItemStatus.Failed;
@@ -647,6 +647,7 @@ export default function WardrobeClient({
                     isSelected={selectedIds.includes(item.id)}
                     onClick={handleCardClick}
                     getWardrobeItemName={getWardrobeItemName}
+                    priority={index < 4}
                   />
                 </div>
               );

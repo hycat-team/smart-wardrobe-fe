@@ -83,12 +83,12 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
         </div>
 
         <div className="relative z-10 flex md:flex-col gap-3 w-full md:w-auto">
-          <button className="flex-1 md:flex-none h-10 px-6 bg-ink text-cream hover:bg-ink/90 rounded-xl text-xs font-mono font-medium transition-all">
+          <button className="flex-1 md:flex-none h-10 px-6 bg-primary text-white hover:bg-gray-800 rounded-xl text-xs font-mono font-medium transition-all">
             <Link href="/profile/update"> Chỉnh sửa</Link>
           </button>
-          <button className="flex-1 md:flex-none h-10 px-6 bg-secondary text-foreground hover:bg-secondary/80 rounded-xl text-xs font-mono font-medium border border-border transition-all flex items-center justify-center gap-2">
+          {/* <button className="flex-1 md:flex-none h-10 px-6 bg-secondary text-foreground hover:bg-secondary/80 rounded-xl text-xs font-mono font-medium border border-border transition-all flex items-center justify-center gap-2">
             <Settings className="size-4" /> Cài đặt
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -103,7 +103,6 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
         </TabsList>
 
         <TabsContent value="overview" className="animate-in fade-in duration-500">
-          {/* Current Subscription Section */}
           {mySubscription && dailyQuota && (
             <section className="mb-8">
               <h2 className="font-bold text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-6 md:text-left ml-2">
@@ -113,11 +112,9 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
             </section>
           )}
 
-          {/* Premium Only: Style DNA & Insights */}
-          {isPremium ? (
+          {/* {isPremium ? (
             <div className="grid md:grid-cols-2 gap-6">
 
-              {/* Radar Chart: Style DNA */}
               <div className="bg-card border border-border rounded-3xl p-6 relative overflow-hidden flex flex-col items-center">
                 <div className="w-full flex justify-between items-start mb-6 z-10">
                   <div>
@@ -128,14 +125,13 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
                 </div>
 
                 <div className="relative size-64 z-10 mt-2 mb-6">
-                  {/* Radar Chart Mockup */}
+
                   <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_0_15px_rgba(184,151,90,0.15)]">
-                    {/* Background grids */}
+
                     <polygon points="50,10 90,30 90,70 50,90 10,70 10,30" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-border/50" />
                     <polygon points="50,30 70,40 70,60 50,70 30,60 30,40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-border/50" />
                     <polygon points="50,40 60,45 60,55 50,60 40,55 40,45" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-border/50" />
 
-                    {/* Axes */}
                     <line x1="50" y1="50" x2="50" y2="10" stroke="currentColor" strokeWidth="0.5" className="text-border/50" />
                     <line x1="50" y1="50" x2="90" y2="30" stroke="currentColor" strokeWidth="0.5" className="text-border/50" />
                     <line x1="50" y1="50" x2="90" y2="70" stroke="currentColor" strokeWidth="0.5" className="text-border/50" />
@@ -143,10 +139,10 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
                     <line x1="50" y1="50" x2="10" y2="70" stroke="currentColor" strokeWidth="0.5" className="text-border/50" />
                     <line x1="50" y1="50" x2="10" y2="30" stroke="currentColor" strokeWidth="0.5" className="text-border/50" />
 
-                    {/* Data Polygon */}
+
                     <polygon points="50,15 80,35 75,65 50,85 20,60 15,35" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.5" className="text-primary transition-all duration-1000 ease-in-out" />
 
-                    {/* Labels */}
+
                     <text x="50" y="6" fontSize="4" textAnchor="middle" fill="currentColor" className="text-muted-foreground font-mono font-bold">Minimalist</text>
                     <text x="94" y="31" fontSize="4" textAnchor="start" fill="currentColor" className="text-muted-foreground font-mono font-bold">Elegant</text>
                     <text x="94" y="72" fontSize="4" textAnchor="start" fill="currentColor" className="text-muted-foreground font-mono font-bold">Edgy</text>
@@ -161,7 +157,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
                 </p>
               </div>
 
-              {/* Sustainability & Stats */}
+
               <div className="space-y-6">
                 <div className="bg-card border border-border rounded-3xl p-6 relative overflow-hidden group hover:border-primary/50 transition-colors">
                   <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
@@ -225,7 +221,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
         </TabsContent>
 
         <TabsContent value="wallet" className="animate-in fade-in duration-500 mt-2">

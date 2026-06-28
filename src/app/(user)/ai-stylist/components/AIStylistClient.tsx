@@ -122,21 +122,63 @@ function AIStylistContent() {
       const canvasW = canvasRef.current?.clientWidth || 800;
       const canvasH = canvasRef.current?.clientHeight || 600;
 
-      const initialItems = res.items.map(item => ({
-        id: crypto.randomUUID(),
-        clothingItemId: item.primary.id,
-        imageUrl: item.primary.imageUrl,
-        category: item.primary.category,
-        _role: item.role,
-        isGhost: (item.primary as any).isGhost,
-        brandName: (item.primary as any).brandName,
-        wardrobeImpact: (item.primary as any).wardrobeImpact,
-        price: item.primary.price,
-        x: canvasW / 2 - 150 + (Math.random() * 100 - 50),
-        y: canvasH / 2 - 200 + (Math.random() * 100 - 50),
-        scale: 100,
-        zIndex: 1
-      }));
+      let brandYOffset = -150; // Start higher for brand items on the right
+      let accessoryYOffset = -150; // Start higher for accessories on the left
+
+      const initialItems = res.items.map(item => {
+        const isBrand = (item.primary as any).isGhost || (item.primary as any).brandName;
+        let x = 0;
+        let y = 0;
+        let zIndex = 1;
+
+        if (isBrand) {
+          x = 280; // Offset to the right side of the canvas
+          y = brandYOffset;
+          brandYOffset += 240; // Stack vertically
+          zIndex = 10;
+        } else {
+          const slug = (item.primary.category?.slug || '').toLowerCase();
+          const role = (item.role || '').toLowerCase();
+
+          if (slug === 'phu-kien' || slug.startsWith('phu-kien-') || slug.includes('accessory') || role.includes('phụ kiện')) {
+            x = -280; // Offset to the left side of the canvas
+            y = accessoryYOffset;
+            accessoryYOffset += 240; // Stack vertically
+            zIndex = 5;
+          } else if (slug === 'mu' || slug === 'non' || slug.includes('hat') || role.includes('mũ') || role.includes('nón')) {
+            y = -350;
+            zIndex = 4;
+          } else if (slug === 'ao' || slug.startsWith('ao-') || slug.includes('top') || slug.includes('jacket') || role.includes('áo')) {
+            y = -180;
+            zIndex = 3;
+          } else if (slug === 'quan' || slug === 'vay' || slug.startsWith('quan-') || slug.startsWith('vay-') || slug.includes('bottom') || slug.includes('skirt') || role.includes('quần') || role.includes('váy')) {
+            y = 120;
+            zIndex = 2;
+          } else if (slug === 'giay' || slug.startsWith('giay-') || slug.includes('shoes') || slug.includes('footwear') || role.includes('giày')) {
+            y = 270;
+            zIndex = 3;
+          } else {
+            y = (Math.random() * 80 - 40);
+            x = (Math.random() * 80 - 40);
+          }
+        }
+
+        return {
+          id: crypto.randomUUID(),
+          clothingItemId: item.primary.id,
+          imageUrl: item.primary.imageUrl,
+          category: item.primary.category,
+          _role: item.role,
+          isGhost: (item.primary as any).isGhost,
+          brandName: (item.primary as any).brandName,
+          wardrobeImpact: (item.primary as any).wardrobeImpact,
+          price: item.primary.price,
+          x,
+          y,
+          scale: isBrand ? 80 : 100,
+          zIndex
+        };
+      });
       setSelectedItems(initialItems);
       setAlternativeIndices({});
       toast.success("Đã tạo bộ phối đồ thành công!");

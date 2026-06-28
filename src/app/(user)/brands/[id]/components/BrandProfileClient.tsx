@@ -141,9 +141,9 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
               >
                 {isFollowing ? 'Đang theo dõi' : 'Theo dõi'}
               </Button>
-              <Button variant="default" className="flex-1 sm:flex-none rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B5952F] hover:opacity-90 text-white font-semibold text-xs font-medium uppercase tracking-widest px-6 lg:px-8 h-12 shadow-md border-0">
+              {/* <Button variant="default" className="flex-1 sm:flex-none rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B5952F] hover:opacity-90 text-white font-semibold text-xs font-medium uppercase tracking-widest px-6 lg:px-8 h-12 shadow-md border-0">
                 Membership
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>

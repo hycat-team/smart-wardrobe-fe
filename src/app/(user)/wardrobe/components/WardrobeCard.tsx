@@ -14,6 +14,7 @@ interface WardrobeCardProps {
   getWardrobeItemName: (item: WardrobeItem) => string;
   hideDetails?: boolean;
   hideTitle?: boolean;
+  priority?: boolean;
 }
 
 export function WardrobeCard({
@@ -26,6 +27,7 @@ export function WardrobeCard({
   getWardrobeItemName,
   hideDetails = false,
   hideTitle = false,
+  priority = false,
 }: WardrobeCardProps) {
   return (
     <div
@@ -42,6 +44,7 @@ export function WardrobeCard({
       <div className="image-frame relative aspect-[4/5] flex-shrink-0 p-3 md:p-6">
         <Image
           fill
+          priority={priority}
           sizes="(max-width: 768px) 50vw, 33vw"
           alt={getWardrobeItemName(item)}
           className={cn(

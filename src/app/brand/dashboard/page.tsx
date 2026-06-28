@@ -56,7 +56,7 @@ export default function BrandDashboardPage() {
       </div>
 
       {/* Recommended Action */}
-      <div className="bg-amber-500/10 border border-amber-500/20 p-6 flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4 rounded-3xl">
+      {/* <div className="bg-amber-500/10 border border-amber-500/20 p-6 flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4 rounded-3xl">
         <div>
           <h3 className="font-bold text-amber-600 dark:text-amber-400 text-lg">Gợi ý hành động</h3>
           <p className="text-muted-foreground text-sm mt-1">Sản phẩm "Luna Structured Blazer" đang được quan tâm nhiều trong tuần qua. Hãy tạo một chiến dịch ưu đãi cho những người đã lưu sản phẩm này.</p>
@@ -64,7 +64,7 @@ export default function BrandDashboardPage() {
         <button className="whitespace-nowrap px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold uppercase tracking-widest text-[10px] transition-colors rounded-full shadow-sm">
           Tạo Campaign
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

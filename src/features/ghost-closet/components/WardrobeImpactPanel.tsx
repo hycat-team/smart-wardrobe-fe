@@ -5,7 +5,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { GhostItem } from "../types";
 import { Check, ArrowDown, ArrowUp, X, BookmarkPlus, ShoppingBag, EyeOff, ThumbsDown, RefreshCcw } from "lucide-react";
 import Image from "next/image";
@@ -44,7 +43,7 @@ export function WardrobeImpactPanel({
   return (
     <Sheet modal={false} open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent showCloseButton={false} side="right" className="w-full sm:max-w-md bg-background p-0 overflow-hidden border-l border-border flex flex-col h-full sm:rounded-l-3xl shadow-2xl z-200">
-        <ScrollArea className="flex-1 w-full h-full">
+        <div className="flex-1 overflow-y-auto w-full min-h-0">
           {/* Header Image */}
           <div className="relative aspect-[4/5] w-full bg-muted">
             <Image
@@ -149,7 +148,7 @@ export function WardrobeImpactPanel({
               </div>
             </div> */}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Action Bar */}
         <div className="p-5 border-t border-border bg-background/90 backdrop-blur-md shrink-0 space-y-4">

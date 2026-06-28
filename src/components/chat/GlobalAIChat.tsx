@@ -223,7 +223,7 @@ export function GlobalAIChat() {
           {chatMessages.length === 0 ? (
             <div className="flex flex-col gap-2 items-start mt-4">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>
-              <div className="bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] p-3 rounded-lg text-[13px] leading-relaxed">
+              <div className="bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] p-4 rounded-2xl rounded-tl-sm shadow-sm text-[13px] leading-relaxed mr-6 md:mr-12">
                 Xin chào! Tôi có thể giúp gì cho bạn hôm nay?
               </div>
             </div>
