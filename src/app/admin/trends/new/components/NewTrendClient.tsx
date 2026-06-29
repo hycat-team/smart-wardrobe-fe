@@ -67,7 +67,7 @@ export function NewTrendClient() {
             setTags("");
             setImages([]);
           }}
-          className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90 px-8"
+          className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90 px-8 rounded-full"
         >
           Tạo Trend Mới
         </Button>
@@ -98,7 +98,7 @@ export function NewTrendClient() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="VD: Y2K Revival, Minimalist Summer..."
-                className="h-12 bg-card border-border focus-visible:ring-1 focus-visible:ring-primary text-base"
+                className="h-12 bg-card border-border focus-visible:ring-1 focus-visible:ring-primary text-base rounded-2xl"
               />
             </div>
 
@@ -109,7 +109,7 @@ export function NewTrendClient() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Mô tả chi tiết các item đặc trưng, màu sắc chủ đạo, cách phối để AI có thể hiểu và gợi ý cho người dùng..."
-                className="min-h-[160px] resize-none bg-card border-border focus-visible:ring-1 focus-visible:ring-primary text-sm leading-relaxed"
+                className="min-h-[160px] resize-none bg-card border-border focus-visible:ring-1 focus-visible:ring-primary text-sm leading-relaxed rounded-2xl"
               />
             </div>
 
@@ -120,7 +120,7 @@ export function NewTrendClient() {
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 placeholder="VD: denim, oversize, vintage, earth tone"
-                className="bg-card border-border focus-visible:ring-1 focus-visible:ring-primary font-mono text-sm"
+                className="h-12 bg-card border-border focus-visible:ring-1 focus-visible:ring-primary font-mono text-sm rounded-2xl"
               />
             </div>
 
@@ -149,7 +149,7 @@ export function NewTrendClient() {
           <Button 
             type="submit" 
             disabled={isPublishing}
-            className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-bold tracking-widest text-sm rounded-xl shadow-md"
+            className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-bold tracking-widest text-sm rounded-full shadow-md"
           >
             {isPublishing ? "ĐANG HUẤN LUYỆN AI..." : "XUẤT BẢN XU HƯỚNG"}
           </Button>

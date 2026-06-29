@@ -14,6 +14,7 @@ interface WardrobeCardProps {
   getWardrobeItemName: (item: WardrobeItem) => string;
   hideDetails?: boolean;
   hideTitle?: boolean;
+  priority?: boolean;
 }
 
 export function WardrobeCard({
@@ -26,45 +27,50 @@ export function WardrobeCard({
   getWardrobeItemName,
   hideDetails = false,
   hideTitle = false,
+  priority = false,
 }: WardrobeCardProps) {
   return (
     <div
       onClick={onClick}
       className={cn(
-        "group flex flex-col h-full cursor-pointer relative bg-[#F8F7F5] border border-black/5 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ease-out",
-        isSelectMode && isSelected && "border-2 border-[#111] shadow-none hover:translate-y-0",
-        isLocked && "opacity-75"
+        "group relative flex h-full cursor-pointer flex-col rounded-2xl border border-border bg-card overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        isSelectMode &&
+        isSelected &&
+        "border-2 border-primary shadow-none hover:translate-y-0",
+        isLocked && "opacity-75",
       )}
     >
       {/* Image Area - 75% Visual Weight */}
-      <div className="relative aspect-[4/5] bg-[#F7F6F4] p-3 md:p-6 overflow-hidden flex-shrink-0">
+      <div className="image-frame relative aspect-[4/5] flex-shrink-0 p-3 md:p-6">
         <Image
           fill
+          priority={priority}
           sizes="(max-width: 768px) 50vw, 33vw"
           alt={getWardrobeItemName(item)}
           className={cn(
-            "w-full h-full object-contain drop-shadow-sm transition-transform duration-250",
-            !isProcessing && "group-hover:scale-[1.02]",
-            isProcessing && "blur-md opacity-60"
+            "h-full w-full object-contain drop-shadow-sm transition-transform duration-300",
+            !isProcessing && "group-hover:scale-105",
+            isProcessing && "blur-md opacity-60",
           )}
           src={applyCloudinaryTrim(item.imageUrl || undefined)}
-        
         />
         {isProcessing && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
-            <div className="size-8 border-2 border-black/20 border-t-black rounded-full animate-spin mb-3"></div>
-            <span className="font-['IBM_Plex_Mono'] text-[10px] uppercase font-bold text-black bg-white/90 px-3 py-1.5 shadow-sm tracking-widest">AI ĐANG XỬ LÝ</span>
+            <div className="mb-3 size-8 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-foreground"></div>
+            <span className="rounded-full bg-card/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-card-foreground shadow-sm">
+              AI ĐANG XỬ LÝ
+            </span>
           </div>
         )}
         {/* Top-Left Selection State */}
         {isSelectMode && (
           <div className="absolute top-4 left-4 z-20">
             {isSelected ? (
-              <div className="bg-[#111] text-white flex items-center justify-center size-5 shadow-sm">
+              <div className="flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
                 <Check className="size-3.5" />
               </div>
             ) : (
-              <div className="bg-white text-[#111] flex items-center justify-center size-5 opacity-0 group-hover:opacity-100 shadow-sm border border-black/10 transition-all duration-200">
+              <div className="flex size-5 items-center justify-center rounded-full border border-border bg-card text-card-foreground opacity-0 shadow-sm transition-all duration-200 group-hover:opacity-100">
                 <Plus className="size-3.5" />
               </div>
             )}
@@ -75,7 +81,7 @@ export function WardrobeCard({
         {item.colorHex && (
           <div className="absolute top-4 right-4 z-10 transition-opacity duration-300 group-hover:opacity-0">
             <div
-              className="w-[14px] h-[14px] rounded-full border border-black/10 shadow-sm"
+              className="h-[14px] w-[14px] rounded-full border border-border shadow-sm"
               style={{ backgroundColor: item.colorHex }}
               title={item.color || "Màu sắc"}
             />
@@ -86,49 +92,55 @@ export function WardrobeCard({
         {!isSelectMode && !isLocked && !isProcessing && (
           <>
             <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button className="text-black/40 hover:text-black transition-colors" title="Save / Favorite">
+              <button
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                title="Save / Favorite">
                 <Heart className="size-5" />
               </button>
             </div>
-            
-            <div className="absolute inset-0 bg-white/92 opacity-0 group-hover:opacity-100 transition-opacity duration-250 flex flex-col items-center justify-end pb-8 pointer-events-none">
+
+            {/* <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-end bg-card/90 pb-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               <div className="flex flex-col items-center gap-2 mb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 delay-75">
-                <span className="font-['IBM_Plex_Mono'] text-[9px] uppercase tracking-widest text-[#666]">
+                <span className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Worn 14 Times
                 </span>
-                <span className="font-['IBM_Plex_Mono'] text-[9px] uppercase tracking-widest text-[#666]">
+                <span className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Matches 32 Items
                 </span>
               </div>
-              <div className="text-black font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] border-b border-black pb-0.5">
+              <div className="border-b border-foreground pb-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground">
                 View Details
               </div>
-            </div>
+            </div> */}
           </>
         )}
       </div>
 
       {/* Information Area - 25% Visual Weight */}
-      <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow bg-white border-t border-black/5">
+      <div className="flex flex-grow flex-col border-t border-border p-3 md:p-4 md:pt-5">
         <div>
           {!hideTitle && (
-            <h3 className="font-['Playfair_Display'] text-[22px] font-medium leading-[130%] text-[#111] line-clamp-2">
+            <h3 className="line-clamp-2 text-[22px] font-semibold leading-[130%] text-card-foreground">
               {getWardrobeItemName(item)}
             </h3>
           )}
-          {item.style && (
-            <p className="font-['IBM_Plex_Mono'] text-[10px] uppercase tracking-[0.15em] text-[#888] mt-1.5 truncate">
+          {/* {item.style && (
+            <p className="mt-1.5 truncate text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
               {item.style}
             </p>
-          )}
+          )} */}
         </div>
-        
+
         {!hideDetails && (
           <>
-            <p className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.12em] text-[#666] mt-2 truncate">
-              {(item as any).brand || (typeof item.category === 'object' ? (item.category as any)?.name : item.category) || "ACNE STUDIOS"}
-            </p>
-            {/* <div className="font-['IBM_Plex_Mono'] text-[11px] text-[#888] mt-auto pt-2">
+            {/* <p className="mt-2 truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              {(item as any).brand ||
+                (typeof item.category === "object"
+                  ? (item.category as any)?.name
+                  : item.category) ||
+                "ACNE STUDIOS"}
+            </p> */}
+            {/* <div className="font-semibold text-[11px] text-[#888] mt-auto pt-2">
               <span>Size {(item as any).size || "S"}</span>
               {item.color && <span> • {item.color}</span>}
             </div> */}

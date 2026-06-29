@@ -19,18 +19,19 @@ import { OutfitCanvasBoard } from "@/features/outfits/components/OutfitCanvasBoa
 import { uploadToCloudinary, applyCloudinaryTrim } from "@/lib/cloudinary";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useUserCategories } from "@/features/admin/queries/admin.queries";
 
 gsap.registerPlugin(useGSAP);
 
-const OCCASIONS = ["Casual", "Workwear", "Summer", "Party", "Formal", "Sporty"];
+const OCCASIONS = ["Bình thường", "Đi làm", "Hè", "Dự tiệc", "Trang trọng", "Thể thao"];
 
 function CreateOutfitContent() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const isPremium = user?.isPremium;
-  
+
   const [outfitName, setOutfitName] = useState("");
-  const [occasion, setOccasion] = useState("Casual");
+  const [occasion, setOccasion] = useState("Bình thường");
   const [customOccasion, setCustomOccasion] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tất cả");
   const [isSaving, setIsSaving] = useState(false);
@@ -134,60 +135,64 @@ function CreateOutfitContent() {
       await createOutfitMutation.mutateAsync(payload);
       // toast.success("Lưu bộ phối đồ thành công!", { id: "saving_outfit" });
       router.push("/outfits");
-      
+
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message || "Đã xảy ra lỗi khi lưu.", { id: "saving_outfit" });
+      if (!err.isAxiosError) {
+        toast.error(err.message || "Đã xảy ra lỗi khi lưu.");
+      }
     } finally {
       setIsSaving(false);
+      toast.dismiss("saving_outfit");
     }
   };
 
   // Filter closet items by category, status InWardrobe, and isLocked === false
-  const categories = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
-  
+  const { data: categories } = useUserCategories()
+  // const categories = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
+
   const activeClosetItems = realItems.filter(
     item => item.status === WardrobeItemStatus.InWardrobe && !item.isLocked
   );
 
-  const filteredCloset = activeCategory === "Tất cả" 
-    ? activeClosetItems 
+  const filteredCloset = activeCategory === "Tất cả"
+    ? activeClosetItems
     : activeClosetItems.filter(x => x.category?.name === activeCategory);
 
   return (
-    <div ref={containerRef} className="flex-1 min-h-screen bg-white text-[#1A1A1A] pb-24 md:pb-12 font-sans selection:bg-[#1A1A1A] selection:text-white">
+    <div ref={containerRef} className="flex-1 min-h-screen bg-background text-foreground pb-24 md:pb-12 font-sans selection:bg-primary selection:text-primary-foreground">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col pt-8 lg:pt-12">
-        
+
         {/* Page Header */}
-        <div className="mb-8 md:mb-10 border-b border-[#E5E5E5] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6 outfit-panel">
+        <div className="mb-8 md:mb-10 border-b border-border pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6 outfit-panel">
           <div>
-            <Link 
-              href="/outfits" 
-              className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#A3A3A3] hover:text-[#1A1A1A] transition-colors mb-4"
+            <Link
+              href="/outfits"
+              className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors mb-4"
             >
-              <ArrowLeft className="size-3.5" /> QUAY LẠI OUTFITS
+              <ArrowLeft className="size-3.5" /> QUAY LẠI TRANG PHỤC
             </Link>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-2 uppercase">
-              STUDIO CANVAS
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground mb-2 uppercase">
+              BẢNG THIẾT KẾ
             </h2>
-            <p className="text-xs md:text-sm text-[#666666] tracking-wide uppercase font-medium">
-              MIX & MATCH TO CREATE YOUR BESPOKE LOOK
+            <p className="text-xs md:text-sm text-muted-foreground tracking-wide uppercase font-medium">
+              Phối và kết hợp để tạo nên phong cách dành riêng cho bạn.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-            <button
+            {/* <button
               type="button"
               onClick={handleAIMatch}
-              className="flex-1 sm:flex-none px-6 py-3 border border-[#E5E5E5] text-[#1A1A1A] font-bold text-[11px] uppercase tracking-widest hover:bg-black hover:text-white transition-colors flex items-center justify-center gap-2"
+              className="flex-1 sm:flex-none px-6 py-3 border border-border text-foreground font-bold text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background rounded-full transition-colors flex items-center justify-center gap-2"
             >
               <Sparkles className="size-3.5" /> AI TỰ PHỐI
-            </button>
+            </button> */}
             <button
               type="button"
               onClick={handleSaveOutfit}
               disabled={isSaving}
-              className="flex-1 sm:flex-none px-8 py-3 bg-[#1A1A1A] text-white font-bold text-[11px] uppercase tracking-widest hover:bg-black/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 sm:flex-none px-8 py-3 bg-primary text-primary-foreground font-bold text-[11px] uppercase tracking-widest hover:bg-primary/90 rounded-full transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
               {isSaving ? "ĐANG LƯU..." : "LƯU PHỐI ĐỒ"}
@@ -196,42 +201,42 @@ function CreateOutfitContent() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          
+
           {/* LEFT COLUMN: THE CLOSET & SETTINGS (LG: 4/12) */}
           <div className="lg:col-span-4 space-y-8 flex flex-col-reverse lg:flex-col">
-            
+
             {/* THE CLOSET */}
-            <div className="outfit-panel flex flex-col h-[500px] border border-[#E5E5E5] bg-white">
-              <div className="p-5 border-b border-[#E5E5E5] bg-[#F9F9F9]">
-                <h3 className="font-bold text-[13px] text-[#1A1A1A] uppercase tracking-widest">TỦ ĐỒ CÁ NHÂN</h3>
-                <p className="text-[10px] text-[#888888] font-bold uppercase tracking-widest mt-1">CHỌN ĐỒ KÉO VÀO BÀN PHỐI</p>
+            <div className="outfit-panel flex flex-col h-[500px] border border-border bg-card rounded-2xl overflow-hidden shadow-sm">
+              <div className="p-5 border-b border-border bg-muted">
+                <h3 className="font-bold text-[13px] text-foreground uppercase tracking-widest">TỦ ĐỒ CÁ NHÂN</h3>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1">CHỌN ĐỒ KÉO VÀO BÀN PHỐI</p>
               </div>
 
               {/* Categories */}
-              <div className="flex flex-wrap gap-2 p-4 border-b border-[#E5E5E5] shrink-0 bg-white">
-                {categories.map(cat => (
+              <div className="flex flex-wrap gap-2 p-4 border-b border-border shrink-0 bg-card">
+                {categories?.map(cat => (
                   <button
-                    key={cat}
+                    key={cat.id}
                     type="button"
-                    onClick={() => setActiveCategory(cat)}
+                    onClick={() => setActiveCategory(cat.name)}
                     className={cn(
-                      "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border whitespace-nowrap",
-                      activeCategory === cat 
-                        ? "bg-black text-white border-black" 
-                        : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black"
+                      "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border whitespace-nowrap rounded-full",
+                      activeCategory === cat
+                        ? "bg-foreground text-background border-foreground"
+                        : "bg-transparent text-foreground border-border hover:border-foreground"
                     )}
                   >
-                    {cat}
+                    {cat.name}
                   </button>
                 ))}
               </div>
 
               {/* Items Grid */}
-              <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-white">
+              <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-card">
                 {isLoadingWardrobe ? (
                   <div className="flex flex-col items-center justify-center py-12 gap-4">
-                    <div className="w-8 h-8 border-2 border-[#1A1A1A] border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">ĐANG TẢI TỦ ĐỒ...</span>
+                    <div className="w-8 h-8 border-2 border-foreground border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">ĐANG TẢI TỦ ĐỒ...</span>
                   </div>
                 ) : filteredCloset.length > 0 ? (
                   <div className="grid grid-cols-3 gap-2">
@@ -242,17 +247,17 @@ function CreateOutfitContent() {
                           key={item.id}
                           onClick={() => handleItemToggle(item)}
                           className={cn(
-                            "relative aspect-square border cursor-pointer transition-all select-none group bg-[#F9F9F9] overflow-hidden",
-                            isSelected 
-                              ? "border-black shadow-sm" 
-                              : "border-[#E5E5E5] hover:border-[#1A1A1A]"
+                            "relative aspect-square border cursor-pointer transition-all select-none group bg-muted overflow-hidden rounded-xl",
+                            isSelected
+                              ? "border-foreground shadow-sm"
+                              : "border-border hover:border-foreground"
                           )}
                         >
                           <img src={applyCloudinaryTrim(item.imageUrl)} alt={getWardrobeItemName(item)} className="w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" />
                           {isSelected && (
-                            <div className="absolute inset-0 border-[3px] border-black flex flex-col items-end justify-start p-1 pointer-events-none">
-                              <div className="bg-black size-4 flex items-center justify-center">
-                                <span className="text-white text-[10px] font-bold leading-none">✓</span>
+                            <div className="absolute inset-0 border-[3px] border-foreground flex flex-col items-end justify-start p-1 pointer-events-none rounded-xl">
+                              <div className="bg-foreground size-4 flex items-center justify-center rounded-sm">
+                                <span className="text-background text-[10px] font-bold leading-none">✓</span>
                               </div>
                             </div>
                           )}
@@ -261,22 +266,22 @@ function CreateOutfitContent() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-12 border border-dashed border-[#E5E5E5]">
-                    <span className="text-[10px] text-[#888888] font-bold uppercase tracking-widest">TRỐNG</span>
+                  <div className="text-center py-12 border border-dashed border-border rounded-xl">
+                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">TRỐNG</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* OUTFIT FORM SETTINGS */}
-            <div className="outfit-panel border border-[#E5E5E5] bg-white flex flex-col shadow-sm">
-              <div className="p-5 border-b border-[#E5E5E5] bg-[#F9F9F9]">
-                <h3 className="font-bold text-[13px] text-[#1A1A1A] uppercase tracking-widest">THÔNG TIN BỘ PHỐI</h3>
+            <div className="outfit-panel border border-border bg-card rounded-2xl overflow-hidden flex flex-col shadow-sm">
+              <div className="p-5 border-b border-border bg-muted">
+                <h3 className="font-bold text-[13px] text-foreground uppercase tracking-widest">THÔNG TIN BỘ PHỐI</h3>
               </div>
-              
+
               <div className="p-6 flex flex-col gap-6">
                 <div className="flex flex-col gap-3">
-                  <label htmlFor="outfit-name" className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]">TÊN BỘ PHỐI *</label>
+                  <label htmlFor="outfit-name" className="text-[10px] font-bold uppercase tracking-widest text-foreground">TÊN BỘ PHỐI *</label>
                   <input
                     id="outfit-name"
                     type="text"
@@ -284,12 +289,12 @@ function CreateOutfitContent() {
                     value={outfitName}
                     onChange={(e) => setOutfitName(e.target.value)}
                     placeholder="Tên bộ trang phục..."
-                    className="w-full bg-transparent border-b border-[#E5E5E5] focus:border-[#1A1A1A] outline-none pb-2 text-[13px] font-medium text-[#1A1A1A] placeholder:text-[#A3A3A3] transition-colors rounded-none"
+                    className="w-full bg-transparent border-b border-border focus:border-foreground outline-none pb-2 text-[13px] font-medium text-foreground placeholder:text-muted-foreground transition-colors rounded-none"
                   />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]">DỊP SỬ DỤNG</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-foreground">DỊP SỬ DỤNG</label>
                   <div className="flex flex-wrap gap-2">
                     {OCCASIONS.map(occ => (
                       <button
@@ -300,10 +305,10 @@ function CreateOutfitContent() {
                           setCustomOccasion("");
                         }}
                         className={cn(
-                          "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border",
+                          "px-3.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors border rounded-full",
                           occasion === occ && !customOccasion
-                            ? "bg-black text-white border-black" 
-                            : "bg-transparent text-[#1A1A1A] border-[#E5E5E5] hover:border-black"
+                            ? "bg-foreground text-background border-foreground"
+                            : "bg-transparent text-foreground border-border hover:border-foreground"
                         )}
                       >
                         {occ}
@@ -317,11 +322,11 @@ function CreateOutfitContent() {
 
           {/* RIGHT COLUMN: STYLING CANVAS (LG: 8/12) */}
           <div className="lg:col-span-8 h-full flex flex-col relative min-h-[600px] outfit-panel">
-            
+
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A] bg-white border border-[#E5E5E5] px-3 py-1.5 flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-foreground bg-card border border-border px-3 py-1.5 rounded-full flex items-center gap-2">
                 <Layers className="size-3.5" /> CANVAS STUDIO
-                <span className="bg-[#E5E5E5] text-[#1A1A1A] px-1.5 py-0.5 text-[9px]">{selectedItems.length} MÓN</span>
+                <span className="bg-muted text-foreground px-1.5 py-0.5 rounded-full text-[9px]">{selectedItems.length} MÓN</span>
               </span>
 
               {selectedItems.length > 0 && (
@@ -331,7 +336,7 @@ function CreateOutfitContent() {
                     setSelectedItems([]);
                     setOutfitName("");
                   }}
-                  className="text-[10px] text-[#A3A3A3] hover:text-[#1A1A1A] px-3 py-1.5 uppercase tracking-widest flex items-center gap-1.5 transition-colors font-bold"
+                  className="text-[10px] text-muted-foreground hover:text-foreground px-3 py-1.5 uppercase tracking-widest flex items-center gap-1.5 transition-colors font-bold"
                 >
                   <Trash2 className="size-3.5" /> LÀM MỚI
                 </button>
@@ -339,7 +344,7 @@ function CreateOutfitContent() {
             </div>
 
             {/* THE DRAG & DROP CANVAS */}
-            <OutfitCanvasBoard 
+            <OutfitCanvasBoard
               canvasRef={canvasRef}
               selectedItems={selectedItems}
               updateScale={updateScale}
@@ -348,12 +353,12 @@ function CreateOutfitContent() {
               handleDragEnd={handleDragEnd}
               emptyState={
                 <div className="text-center space-y-6 p-12">
-                  <div className="w-16 h-16 border border-[#E5E5E5] flex items-center justify-center mx-auto text-[#A3A3A3] bg-white">
+                  <div className="w-16 h-16 border border-border rounded-2xl flex items-center justify-center mx-auto text-muted-foreground bg-card">
                     <Grid className="w-6 h-6" />
                   </div>
                   <div className="space-y-3">
-                    <p className="text-2xl font-bold text-[#1A1A1A] uppercase tracking-tight">CANVAS TRỐNG</p>
-                    <p className="text-[13px] text-[#666666] leading-relaxed max-w-sm mx-auto">
+                    <p className="text-2xl font-bold text-foreground uppercase tracking-tight">CANVAS TRỐNG</p>
+                    <p className="text-[13px] text-muted-foreground leading-relaxed max-w-sm mx-auto">
                       Kéo các trang phục từ tủ đồ vào đây để bắt đầu ghép phối. Bạn có thể tự do phóng to, thu nhỏ và kéo thả.
                     </p>
                   </div>

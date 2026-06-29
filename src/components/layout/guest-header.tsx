@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 import { useAuthStore } from "@/store/useAuthStore";
 import { UserCircle, LayoutDashboard, User as UserIcon, Settings, LogOut, Menu, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -49,7 +49,7 @@ export function GuestHeader() {
           <Link href="/" className="relative group flex items-baseline gap-1">
             <span
               className={`
-                font-['Playfair_Display'] font-medium tracking-[-0.03em] transition-all duration-500
+                font-semibold font-medium tracking-[-0.03em] transition-all duration-500
                 ${scrolled ? "text-2xl text-white" : "text-4xl md:text-5xl text-[#1A1A1A]"}
               `}
             >
@@ -57,7 +57,7 @@ export function GuestHeader() {
             </span>
             <span
               className={`
-                font-['Playfair_Display'] italic transition-all duration-500
+                font-semibold italic transition-all duration-500
                 ${scrolled ? "text-sm text-[#D9C5B2]" : "text-lg md:text-xl text-[#D9C5B2]"}
               `}
             >
@@ -70,19 +70,19 @@ export function GuestHeader() {
             {isLoggedIn ? (
               <>
                 <Link
-                  href="/wardrobe"
+                  href="/community"
                   className={`
-                    font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.2em] transition-all duration-300
+                    font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                     hover:opacity-100
                     ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
                   `}
                 >
-                  Tủ đồ
+                  Cộng đồng
                 </Link>
                 <Link
                   href="/ai-stylist"
                   className={`
-                    font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.2em] transition-all duration-300
+                    font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                     hover:opacity-100
                     ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
                   `}
@@ -90,15 +90,17 @@ export function GuestHeader() {
                   AI Stylist
                 </Link>
                 <Link
-                  href="/community"
+                  href="/wardrobe"
                   className={`
-                    font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.2em] transition-all duration-300
+                    font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                     hover:opacity-100
                     ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
                   `}
                 >
-                  Cộng đồng
+                  Tủ đồ
                 </Link>
+
+
 
                 {/* Divider */}
                 <div className={`w-px h-5 transition-colors duration-500 ${scrolled ? "bg-white/10" : "bg-[#1A1A1A]/10"}`} />
@@ -115,39 +117,40 @@ export function GuestHeader() {
                           : "ring-[#1A1A1A]/10 ring-offset-[#F4F1EE]"
                         }
                       `}>
-                        <Avatar className="size-9">
-                          <AvatarImage src={getUserAvatar(user)} alt={user?.username || "User"} className="object-cover" />
-                          <AvatarFallback className="bg-[#D9C5B2] text-white font-['IBM_Plex_Mono'] text-xs">
-                            {user?.firstName?.charAt(0) || user?.username?.charAt(0) || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
+                        <Image
+                          src={getUserAvatar(user)}
+                          alt={user?.username || "User"}
+                          width={36}
+                          height={36}
+                          className="size-full object-cover"
+                        />
                       </div>
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-56 rounded-none border border-[#1A1A1A]/10 bg-white p-2 shadow-lg mt-2"
+                    className="w-56 rounded-2xl border border-[#1A1A1A]/10 bg-white p-2 shadow-lg mt-2"
                   >
                     <div className="px-3 py-3 border-b border-[#1A1A1A]/5 mb-2">
-                      <p className="font-['Playfair_Display'] text-base font-medium text-[#1A1A1A]">
+                      <p className="font-semibold text-base font-medium text-[#1A1A1A]">
                         {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username}
                       </p>
-                      <p className="font-['IBM_Plex_Mono'] text-[10px] text-[#707070] uppercase tracking-wider mt-1">{user?.email}</p>
+                      <p className="font-semibold text-[10px] text-[#707070] uppercase tracking-wider mt-1">{user?.email}</p>
                     </div>
                     <DropdownMenuItem asChild>
-                      <Link href="/profile" className="cursor-pointer rounded-none font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-wider py-2.5 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
+                      <Link href="/profile" className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
                         <UserIcon className="mr-3 h-4 w-4" />
                         Hồ sơ
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/wardrobe" className="cursor-pointer rounded-none font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-wider py-2.5 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
+                      <Link href="/wardrobe" className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
                         <LayoutDashboard className="mr-3 h-4 w-4" />
                         Tủ đồ
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/profile/update" className="cursor-pointer rounded-none font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-wider py-2.5 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
+                      <Link href="/profile/update" className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
                         <Settings className="mr-3 h-4 w-4" />
                         Cài đặt
                       </Link>
@@ -155,7 +158,7 @@ export function GuestHeader() {
                     <DropdownMenuSeparator className="bg-[#1A1A1A]/5" />
                     <DropdownMenuItem
                       onClick={() => logout()}
-                      className="cursor-pointer rounded-none font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-wider py-2.5 text-red-600 focus:bg-red-50 focus:text-red-700"
+                      className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-red-600 focus:bg-red-50 focus:text-red-700"
                     >
                       <LogOut className="mr-3 h-4 w-4" />
                       Đăng xuất
@@ -168,7 +171,7 @@ export function GuestHeader() {
                 <Link
                   href="/auth/login"
                   className={`
-                    font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.2em] transition-all duration-300
+                    font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                     ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
                   `}
                 >
@@ -177,7 +180,7 @@ export function GuestHeader() {
                 <Link href="/auth/register">
                   <button
                     className={`
-                      font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.15em] px-7 py-2.5 transition-all duration-500 border
+                      font-semibold text-[11px] uppercase tracking-[0.15em] px-7 py-2.5 transition-all duration-500 border
                       ${scrolled
                         ? "bg-white text-[#1A1A1A] border-white hover:bg-[#D9C5B2] hover:border-[#D9C5B2] hover:text-white"
                         : "bg-[#1A1A1A] text-white border-[#1A1A1A] hover:bg-[#D9C5B2] hover:border-[#D9C5B2]"
@@ -218,12 +221,15 @@ export function GuestHeader() {
             {/* User Info */}
             <div className="flex flex-col items-center gap-4 mb-8">
               <div className="size-16 rounded-full overflow-hidden ring-2 ring-[#D9C5B2] ring-offset-4 ring-offset-[#1A1A1A]">
-                <Avatar className="size-16 ring-2 ring-[#D9C5B2] ring-offset-4 ring-offset-[#1A1A1A]">
-                  <AvatarImage src={getUserAvatar(user)} alt={user?.username || "User"} className="object-cover" />
-                  <AvatarFallback className="bg-[#D9C5B2] text-white text-lg">{user?.firstName?.charAt(0) || 'U'}</AvatarFallback>
-                </Avatar>
+                <Image
+                  src={getUserAvatar(user)}
+                  alt={user?.username || "User"}
+                  width={64}
+                  height={64}
+                  className="size-full object-cover"
+                />
               </div>
-              <p className="font-['Playfair_Display'] text-white text-xl">
+              <p className="font-semibold text-white text-xl">
                 {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username}
               </p>
             </div>
@@ -237,7 +243,7 @@ export function GuestHeader() {
 
             <button
               onClick={() => { logout(); setMobileMenuOpen(false); }}
-              className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.3em] text-red-400 hover:text-red-300 transition-colors"
+              className="font-semibold text-[11px] uppercase tracking-[0.3em] text-red-400 hover:text-red-300 transition-colors"
             >
               Đăng xuất
             </button>
@@ -247,7 +253,7 @@ export function GuestHeader() {
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="font-['Playfair_Display'] text-5xl text-white font-medium mb-8"
+              className="font-semibold text-5xl text-white font-medium mb-8"
             >
               CLOSY<span className="text-[#D9C5B2] italic">.</span>
             </Link>
@@ -255,7 +261,7 @@ export function GuestHeader() {
             <MobileNavLink href="/auth/login" onClick={() => setMobileMenuOpen(false)}>Đăng nhập</MobileNavLink>
 
             <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)}>
-              <button className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-[0.15em] px-10 py-3 bg-white text-[#1A1A1A] hover:bg-[#D9C5B2] hover:text-white transition-all duration-300 mt-4">
+              <button className="font-semibold text-[11px] uppercase tracking-[0.15em] px-10 py-3 bg-white text-[#1A1A1A] hover:bg-[#D9C5B2] hover:text-white transition-all duration-300 mt-4">
                 Bắt Đầu Miễn Phí
               </button>
             </Link>
@@ -271,7 +277,7 @@ function MobileNavLink({ href, children, onClick }: { href: string; children: Re
     <Link
       href={href}
       onClick={onClick}
-      className="font-['IBM_Plex_Mono'] text-[12px] uppercase tracking-[0.3em] text-white/50 hover:text-white transition-colors duration-300"
+      className="font-semibold text-[12px] uppercase tracking-[0.3em] text-white/50 hover:text-white transition-colors duration-300"
     >
       {children}
     </Link>

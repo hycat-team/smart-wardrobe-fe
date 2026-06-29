@@ -100,9 +100,9 @@ export const CreatePostModal = () => {
           <span>Tạo bài viết</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px] p-0 overflow-hidden bg-surface">
-        <DialogHeader className="px-6 py-4 border-b border-border/40">
-          <DialogTitle className="text-xl font-semibold text-primary">Tạo bài viết mới</DialogTitle>
+      <DialogContent className="sm:max-w-[525px] p-0 overflow-hidden bg-background rounded-3xl border-border">
+        <DialogHeader className="px-6 py-4 border-b border-border">
+          <DialogTitle className="text-xl font-semibold text-foreground">Tạo bài viết mới</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="flex flex-col">
@@ -113,7 +113,7 @@ export const CreatePostModal = () => {
                 placeholder="Tiêu đề bài viết..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full text-lg font-medium bg-transparent border-0 border-b border-transparent focus:border-border/50 focus:ring-0 placeholder:text-muted-foreground outline-none px-0 py-2 transition-colors"
+                className="w-full text-lg font-medium bg-transparent border-0 border-b border-transparent focus:border-border/50 focus:ring-0 text-foreground placeholder:text-muted-foreground outline-none px-0 py-2 transition-colors"
                 autoFocus
               />
             </div>
@@ -123,7 +123,7 @@ export const CreatePostModal = () => {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={5}
-                className="w-full text-sm bg-transparent border-0 focus:ring-0 placeholder:text-muted-foreground outline-none resize-none px-0 py-2"
+                className="w-full text-sm bg-transparent border-0 focus:ring-0 text-foreground placeholder:text-muted-foreground outline-none resize-none px-0 py-2"
               />
             </div>
             
@@ -170,11 +170,11 @@ export const CreatePostModal = () => {
             </div>
           </div>
           
-          <div className="px-6 py-4 bg-muted/20 border-t border-border/40 flex justify-end gap-3">
-            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+          <div className="px-6 py-4 bg-muted/20 border-t border-border flex justify-end gap-3">
+            <Button type="button" variant="ghost" className="rounded-full" onClick={() => setOpen(false)}>
               Hủy
             </Button>
-            <Button type="submit" disabled={isPending || isUploading || !title.trim() || !content.trim()}>
+            <Button type="submit" className="rounded-full" disabled={isPending || isUploading || !title.trim() || !content.trim()}>
               {isPending || isUploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

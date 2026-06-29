@@ -60,6 +60,12 @@ export const adminApi = {
     const res = await api.get<APIResponse<any[]>>('/admin/categories');
     return res.data.data || [];
   },
+
+  getUserCategories: async (): Promise<any[]> => {
+    const res = await api.get<APIResponse<any[]>>('/categories');
+    return res.data.data || [];
+  },
+
   createCategory: async (data: { name: string; slug: string }): Promise<any> => {
     const res = await api.post<APIResponse>('/admin/categories', data);
     return res.data.data;

@@ -29,8 +29,8 @@ export const BEFORE_ITEMS: ComparisonItem[] = [
 ];
 
 export const AFTER_ITEMS: ComparisonItem[] = [
-  { icon: Sparkles, text: "2 phút có ngay outfit hoàn hảo" },
-  { icon: Smartphone, text: "Quản lý tủ đồ gọn gàng trên app" },
+  { icon: Sparkles, text: "2 phút có  ngay Trang phục hoàn hảo" },
+  { icon: Smartphone, text: "Quản lý tủ đồ gọn gàng trên Trang web" },
   { icon: Target, text: "AI thấu hiểu gu thẩm mỹ của bạn" },
 ];
 
@@ -112,20 +112,20 @@ export const HOW_IT_WORKS_STEPS: Step[] = [
   {
     number: "01",
     iconSrc: "/Icon/camera.png",
-    title: "Chụp & Upload",
+    title: "Chụp & Úp Ảnh",
     description: "Chụp ảnh tủ đồ, AI tự động bóc tách nền, phân loại màu sắc và chất liệu cho từng món.",
   },
   {
     number: "02",
     iconSrc: "/Icon/technical-support.png",
-    title: "AI Gợi Ý Outfit",
+    title: "AI Gợi Ý Trang Phục",
     description: "Nhận gợi ý phối đồ phù hợp thời tiết, hoàn cảnh và phong cách riêng của bạn mỗi ngày.",
   },
   {
     number: "03",
     iconSrc: "/Icon/swap.png",
-    title: "Chia Sẻ & Pass Đồ",
-    description: "Kết nối cộng đồng Gen Z, pass đồ ít mặc và tìm nguồn cảm hứng mới mỗi ngày.",
+    title: "Chia Sẻ & Bán Đồ",
+    description: "Kết nối cộng đồng Gen Z, bán món đồ ít mặc và tìm nguồn cảm hứng mới mỗi ngày.",
   },
 ];
 

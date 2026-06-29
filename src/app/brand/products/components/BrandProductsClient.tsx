@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 export function BrandProductsClient() {
   const [products, setProducts] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -27,7 +27,7 @@ export function BrandProductsClient() {
   useEffect(() => {
     // Load default mock products for this brand
     const defaultProducts = mockProducts.filter(p => p.brandId === 'brand_001');
-    
+
     // Load custom products from localStorage
     try {
       const stored = localStorage.getItem("brand_custom_products");
@@ -82,7 +82,7 @@ export function BrandProductsClient() {
       if (editingId) {
         // Only allow editing custom products (if it's a mock product, we could fork it, but let's just allow overriding)
         const existingIndex = customProducts.findIndex(p => p.id === editingId);
-        
+
         const updatedProduct = {
           id: editingId,
           brandId: "brand_001",
@@ -118,16 +118,16 @@ export function BrandProductsClient() {
       }
 
       localStorage.setItem("brand_custom_products", JSON.stringify(customProducts));
-      
+
       // Update state
       const defaultProducts = mockProducts.filter(p => p.brandId === 'brand_001');
       // Remove default products that were overridden
       const overriddenIds = customProducts.map(p => p.id);
       const filteredDefaults = defaultProducts.filter(p => !overriddenIds.includes(p.id));
-      
+
       setProducts([...customProducts, ...filteredDefaults]);
       setIsDialogOpen(false);
-    } catch(e) {
+    } catch (e) {
       console.error("Error saving product", e);
     }
   };
@@ -135,54 +135,54 @@ export function BrandProductsClient() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Sản phẩm</h1>
-        <Button 
+        {/* <h1 className="text-3xl font-bold tracking-tight">Sản phẩm</h1> */}
+        <Button
           onClick={() => handleOpenDialog()}
-          className="rounded-none bg-black hover:bg-black/90 font-bold uppercase tracking-widest flex items-center gap-2"
+          className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-widest flex items-center gap-2"
         >
           <Plus className="w-4 h-4" /> Thêm sản phẩm
         </Button>
       </div>
 
-      <div className="bg-white border border-black/10 overflow-x-auto">
+      <div className="bg-card border border-border shadow-sm p-6 rounded-3xl overflow-x-auto">
         <Table className="min-w-[600px]">
           <TableHeader>
-            <TableRow className="border-black/10 hover:bg-transparent">
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">Sản phẩm</TableHead>
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">SKU</TableHead>
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">Giá bán</TableHead>
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50">Trạng thái</TableHead>
-              <TableHead className="font-bold text-xs uppercase tracking-widest text-black/50 text-right">Thao tác</TableHead>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Sản phẩm</TableHead>
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">SKU</TableHead>
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Giá bán</TableHead>
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Trạng thái</TableHead>
+              <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {products.map(product => (
-              <TableRow key={product.id} className="border-black/10">
+              <TableRow key={product.id} className="border-border hover:bg-muted/50 transition-colors">
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#F5F2EE] overflow-hidden shrink-0">
+                    <div className="w-10 h-10 bg-muted rounded-xl overflow-hidden shrink-0 border border-border">
                       {product.imageUrls?.[0] ? (
                         <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-black/5 text-black/20">
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                           <UploadCloud className="size-4" />
                         </div>
                       )}
                     </div>
-                    <span className="font-bold text-sm min-w-[120px] line-clamp-2">{product.name}</span>
+                    <span className="font-bold text-sm min-w-[120px] line-clamp-2 text-foreground">{product.name}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm font-mono whitespace-nowrap">{product.sku}</TableCell>
-                <TableCell className="text-sm font-bold font-mono text-[#A0522D] whitespace-nowrap">{product.price.toLocaleString()}đ</TableCell>
+                <TableCell className="text-sm text-muted-foreground whitespace-nowrap">{product.sku}</TableCell>
+                <TableCell className="text-sm font-bold text-primary whitespace-nowrap">{product.price.toLocaleString()}đ</TableCell>
                 <TableCell>
-                  <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
+                  <span className="px-3 py-1 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap rounded-full">
                     In Stock
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <button 
+                  <button
                     onClick={() => handleOpenDialog(product)}
-                    className="text-sm font-bold underline decoration-1 underline-offset-2 text-black/50 hover:text-black flex items-center gap-1 justify-end w-full whitespace-nowrap"
+                    className="text-sm font-bold underline decoration-1 underline-offset-2 text-muted-foreground hover:text-foreground flex items-center gap-1 justify-end w-full whitespace-nowrap"
                   >
                     <Pencil className="size-3" /> Sửa
                   </button>
@@ -194,63 +194,63 @@ export function BrandProductsClient() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-none border border-black/10">
+        <DialogContent className="w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-card rounded-3xl border border-border shadow-lg">
           <DialogHeader>
-            <DialogTitle className="font-['Playfair_Display'] text-2xl uppercase font-medium">
+            <DialogTitle className="text-2xl font-bold tracking-tight text-foreground">
               {editingId ? "Sửa sản phẩm" : "Thêm sản phẩm"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6 pt-4">
             <div className="space-y-4">
               {/* Image Upload Area */}
-              <label className="block w-full aspect-video bg-[#F4F1EE] border border-dashed border-ink/20 flex flex-col items-center justify-center text-ink-muted cursor-pointer hover:bg-ink/5 transition-colors group relative overflow-hidden">
+              <label className="block w-full aspect-video bg-muted/50 border border-dashed border-border flex flex-col items-center justify-center text-muted-foreground cursor-pointer hover:bg-muted transition-colors group relative overflow-hidden rounded-2xl">
                 <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                 {formData.imageUrl ? (
                   <img src={formData.imageUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
                 ) : (
                   <>
-                    <div className="size-10 rounded-full bg-white flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-sm">
-                      <UploadCloud className="size-4 text-ink" />
+                    <div className="size-10 rounded-full bg-background flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-sm">
+                      <UploadCloud className="size-4 text-foreground" />
                     </div>
-                    <p className="text-[10px] font-mono uppercase tracking-widest font-bold">Upload Ảnh</p>
+                    <p className="text-[10px] uppercase tracking-widest font-bold">Upload Ảnh</p>
                   </>
                 )}
               </label>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Tên Sản Phẩm</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Tên Sản Phẩm</label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Ví dụ: Áo Sơ Mi"
-                  className="rounded-none border-ink/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-ink"
+                  className="rounded-xl border-border bg-muted/50 focus-visible:ring-1 focus-visible:ring-ring"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Mã SKU</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Mã SKU</label>
                   <Input
                     value={formData.sku}
                     onChange={(e) => setFormData(prev => ({ ...prev, sku: e.target.value }))}
-                    className="rounded-none border-ink/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-ink font-mono"
+                    className="rounded-xl border-border bg-muted/50 focus-visible:ring-1 focus-visible:ring-ring"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-mono uppercase tracking-widest font-bold text-ink">Giá Bán (VNĐ)</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Giá Bán (VNĐ)</label>
                   <Input
                     type="number"
                     value={formData.price}
                     onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
-                    className="rounded-none border-ink/10 bg-[#F4F1EE]/50 focus-visible:ring-0 focus-visible:border-ink font-mono text-[#A0522D] font-bold"
+                    className="rounded-xl border-border bg-muted/50 focus-visible:ring-1 focus-visible:ring-ring text-primary font-bold"
                   />
                 </div>
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={handleSave}
-              className="w-full bg-black hover:bg-black/90 text-white rounded-none uppercase font-mono tracking-widest text-[11px] h-12"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-full uppercase tracking-widest font-bold text-[11px] h-12"
             >
               Lưu Sản Phẩm
             </Button>

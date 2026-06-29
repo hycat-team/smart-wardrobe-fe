@@ -1,22 +1,9 @@
 "use client";
-import { useState, useEffect, Suspense, useRef } from "react";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Plus, Edit2, Tag, Search, Filter,
-  X, Eye, Lock, Loader2, Sparkles, Check, Trash2
-} from "lucide-react";
-import Link from "next/link";
+import { Loader2, Plus, Search, Tag, Trash2, UploadCloud, Compass, Library } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +15,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Skeleton } from "@heroui/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -45,66 +38,85 @@ import {
   PaginationLink,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { useMyWardrobe, useBulkDeleteWardrobeItems } from "@/features/wardrobe/queries/wardrobe.queries";
-import { applyCloudinaryTrim } from "@/lib/cloudinary";
-import { WardrobeItemStatus } from "@/features/wardrobe/types";
+import {
+  useMyWardrobe,
+  useBulkDeleteWardrobeItems,
+  useCategories,
+} from "@/features/wardrobe/queries/wardrobe.queries";
+import {
+  WardrobeItemRes as WardrobeItem,
+  WardrobeItemStatus,
+} from "@/features/wardrobe/types";
+import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { WardrobeCard } from "./WardrobeCard";
+import { useSidebarStore } from "@/store/useSidebarStore";
 import { toast } from "sonner";
-
-const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
-
-const CATEGORY_SLUG_MAP: Record<string, string> = {
-  "Áo": "ao",
-  "Quần": "quan",
-  "Váy": "vay",
-  "Giày": "giay",
-  "Phụ kiện": "phu-kien",
-  "Áo khoác": "ao-khoac",
-  "Mũ": "mu",
-  "Khác": "other"
-};
-
-const COLORS = [
-  { name: "Trắng", value: "white", hex: "#FFFFFF" },
-  { name: "Đen", value: "black", hex: "#1A1A1A" },
-  { name: "Xanh dương", value: "blue", hex: "#2563EB" },
-  { name: "Xám", value: "gray", hex: "#9CA3AF" },
-  { name: "Đỏ", value: "red", hex: "#DC2626" },
-  { name: "Vàng", value: "yellow", hex: "#F59E0B" },
-  { name: "Be", value: "beige", hex: "#F5F5DC" },
-];
-
-const TAGS = ["Casual", "Minimalist", "Denim", "Elegant", "Summer", "Formal", "Workwear", "Sporty"];
-
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { getWardrobeItemName, getColorHex } from "@/features/wardrobe/utils";
+import { useMySubscription } from "@/features/subscription/queries/subscription.queries";
 
 // Helper to map color string to standard filter value
 const getColorValue = (color: string) => {
   const map: Record<string, string> = {
-    "Trắng": "white",
-    "Đen": "black",
+    Trắng: "white",
+    Đen: "black",
     "Xanh dương": "blue",
-    "Xanh": "blue",
-    "Xám": "gray",
-    "Đỏ": "red",
-    "Vàng": "yellow",
-    "Be": "beige",
+    Xanh: "blue",
+    Xám: "gray",
+    Đỏ: "red",
+    Vàng: "yellow",
+    Be: "beige",
   };
   return map[color] || color?.toLowerCase() || "";
 };
 
-export default function WardrobeClient({ initialData }: { initialData: any[] }) {
+const getCategoryName = (item: WardrobeItem) =>
+  typeof item.category === "object" &&
+    item.category !== null &&
+    "name" in item.category
+    ? String(item.category.name || "")
+    : String(item.category || "");
+
+const getItemTimestamp = (item: WardrobeItem) => {
+  const itemRecord = item as WardrobeItem & {
+    createdAt?: string;
+    dateAdded?: string;
+  };
+  const rawDate = itemRecord.createdAt || itemRecord.dateAdded;
+  return rawDate ? new Date(rawDate).getTime() : 0;
+};
+
+const getSearchableText = (item: WardrobeItem) => {
+  const itemRecord = item as WardrobeItem & {
+    name?: string;
+    brand?: string;
+    tags?: string[];
+  };
+
+  return [
+    getWardrobeItemName(item).toLowerCase(),
+    getCategoryName(item).toLowerCase(),
+    (itemRecord.name || "").toLowerCase(),
+    (item.color || "").toLowerCase(),
+    (item.material || "").toLowerCase(),
+    (item.style || "").toLowerCase(),
+    (itemRecord.brand || "").toLowerCase(),
+  ].join(" ");
+};
+export default function WardrobeClient({
+  initialData,
+}: {
+  initialData: WardrobeItem[] | { items?: WardrobeItem[] };
+}) {
   const router = useRouter();
   const pathname = usePathname();
-  const user = useAuthStore((state) => state.user);
-  const isPremium = user?.isPremium;
   const searchParams = useSearchParams();
 
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const { data: category } = useCategories()
 
   // Sync Search state with query params
   const categoryParam = searchParams.get("category") || "Tất cả";
@@ -116,7 +128,14 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { mutate: bulkDelete, isPending: isDeleting } = useBulkDeleteWardrobeItems();
+  const { mutate: bulkDelete, isPending: isDeleting } =
+    useBulkDeleteWardrobeItems();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const { data: subscription } = useMySubscription();
+  const maxOutfits = subscription?.maxOutfits || 0;
+
+  const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 
   const [searchInput, setSearchInput] = useState(searchParam);
   const lastPushedQ = useRef(searchParam);
@@ -127,18 +146,22 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
 
-  // Map category param to backend slug
-  const slugToFetch = categoryParam === "Tất cả" ? undefined : CATEGORY_SLUG_MAP[categoryParam] || categoryParam;
-
+  let slugToFetch: string | undefined = undefined;
+  if (categoryParam !== "Tất cả") {
+    const found = category?.find((c: any) => c.name === categoryParam);
+    slugToFetch = found ? found.slug : categoryParam;
+  }
   // Load real wardrobe items
   const {
     data,
     isLoading: isLoadingItems,
     isFetching,
-    refetch
+    refetch,
   } = useMyWardrobe(slugToFetch, pageParam);
 
-  const rawInitialItems = Array.isArray(initialData) ? initialData : ((initialData as any)?.items || []);
+  const rawInitialItems = Array.isArray(initialData)
+    ? initialData
+    : initialData.items || [];
   const realItems = data ? data.items : rawInitialItems;
   const metadata = data?.metadata;
 
@@ -212,21 +235,31 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
 
   // Active filters counting
   const activeFiltersCount =
-    (colorParam ? 1 : 0) +
-    (tagParam ? 1 : 0) +
-    (searchParam ? 1 : 0);
+    (colorParam ? 1 : 0) + (tagParam ? 1 : 0) + (searchParam ? 1 : 0);
 
   // Filter & Sort Logic
-  const filteredItems = realItems.filter((item: any) => {
-    const itemCatName = item.category?.name || "";
-    const matchesCategory = categoryParam === "Tất cả" || itemCatName === categoryParam;
+  const filteredItems = realItems.filter((item) => {
+    const itemCatName = getCategoryName(item);
+    const matchesCategory =
+      categoryParam === "Tất cả" || itemCatName === categoryParam;
 
-    const matchesColor = !colorParam || getColorValue(item.color || "") === colorParam;
+    const matchesColor =
+      !colorParam || getColorValue(item.color || "") === colorParam;
 
     // Tag filter (for mock tags backward compatibility, or matching backend style/material)
-    const mockTags = (item as any).tags || [];
-    const backendTags = [item.style, item.material, item.pattern, item.seasonality].filter(Boolean);
-    const matchesTag = !tagParam || mockTags.includes(tagParam) || backendTags.includes(tagParam);
+    const mockTags = (
+      (item as WardrobeItem & { tags?: string[] }).tags || []
+    ).filter(Boolean);
+    const backendTags = [
+      item.style,
+      item.material,
+      item.pattern,
+      item.seasonality,
+    ].filter(Boolean);
+    const matchesTag =
+      !tagParam ||
+      mockTags.includes(tagParam) ||
+      backendTags.includes(tagParam);
 
     const searchTokens = searchParam.toLowerCase().split(/\s+/).filter(Boolean);
     const itemName = getWardrobeItemName(item).toLowerCase();
@@ -239,18 +272,27 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
       (item.color || "").toLowerCase(),
       (item.material || "").toLowerCase(),
       (item.style || "").toLowerCase(),
-      (item.brand || "").toLowerCase()
+      ((item as any).brand || "").toLowerCase(),
     ].join(" ");
 
     // Ensure EVERY word in the search query exists SOMEWHERE in the item's combined text (AND logic)
-    const matchesSearch = !searchParam || searchTokens.every(token => itemText.includes(token));
+    const matchesSearch =
+      !searchParam || searchTokens.every((token) => itemText.includes(token));
 
     return matchesCategory && matchesColor && matchesTag && matchesSearch;
   });
 
   const sortedItems = [...filteredItems].sort((a, b) => {
-    const timeA = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : ((a as any).dateAdded ? new Date((a as any).dateAdded).getTime() : 0);
-    const timeB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : ((b as any).dateAdded ? new Date((b as any).dateAdded).getTime() : 0);
+    const timeA = (a as any).createdAt
+      ? new Date((a as any).createdAt).getTime()
+      : (a as any).dateAdded
+        ? new Date((a as any).dateAdded).getTime()
+        : 0;
+    const timeB = (b as any).createdAt
+      ? new Date((b as any).createdAt).getTime()
+      : (b as any).dateAdded
+        ? new Date((b as any).dateAdded).getTime()
+        : 0;
 
     if (sortParam === "Mới nhất" || sortParam === "newest") {
       return timeB - timeA;
@@ -264,82 +306,122 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
     return 0;
   });
 
-  useGSAP(() => {
-    if (sortedItems.length > 0 && !isFetching) {
-      gsap.fromTo(
-        ".wardrobe-card",
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, stagger: 0.05, ease: "power3.out", duration: 0.6, clearProps: "all" }
-      );
-    }
-  }, { scope: containerRef, dependencies: [sortedItems.length, isFetching] });
+  useGSAP(
+    () => {
+      if (sortedItems.length > 0 && !isFetching) {
+        gsap.fromTo(
+          ".wardrobe-card",
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.05,
+            ease: "power3.out",
+            duration: 0.6,
+            clearProps: "all",
+          },
+        );
+      }
+    },
+    { scope: containerRef, dependencies: [sortedItems.length, isFetching] },
+  );
 
   const renderActions = () => (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
       {/* Search Input */}
-      <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-[240px]">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted size-4" />
+      <form
+        onSubmit={handleSearchSubmit}
+        className="relative w-full sm:w-[240px]"
+      >
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
         <input
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full bg-cream border border-ink/20 focus:border-ink focus:ring-0 pl-10 pr-4 py-3 rounded-none outline-none transition-all font-mono text-xs text-ink placeholder:text-ink-muted uppercase tracking-widest"
+          className="w-full bg-background border border-border focus:border-primary focus:ring-0 pl-10 pr-4 py-3 rounded-xl outline-none transition-all duration-200 text-xs font-semibold text-foreground placeholder:text-muted-foreground uppercase tracking-widest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           placeholder="TÌM KIẾM..."
         />
       </form>
 
-      <Button
-        onClick={() => router.push("/wardrobe/upload")}
-        className="rounded-none bg-ink text-cream hover:bg-ink/80 text-xs font-mono tracking-[0.15em] h-[42px] px-8 transition-colors uppercase"
-      >
-        <Plus className="mr-2 size-4" /> Thêm Đồ
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            className="h-[42px] rounded-full bg-primary px-8 text-xs font-semibold uppercase tracking-[0.15em] text-primary-foreground transition-all duration-200 hover:bg-primary/90"
+          >
+            <Plus className="mr-2 size-4" /> Thêm Đồ
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-[200px] rounded-2xl border border-border bg-card p-2 shadow-xl">
+          <DropdownMenuItem onClick={() => router.push("/wardrobe/upload")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted flex items-center gap-2">
+            <UploadCloud className="w-4 h-4" /> Tự tải lên ảnh
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push("/wardrobe/explore")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted mt-1 flex items-center gap-2">
+            <Library className="w-4 h-4" /> Lấy từ thư viên
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Button
         onClick={() => {
           setIsSelectMode(!isSelectMode);
           setSelectedIds([]);
         }}
         variant={isSelectMode ? "default" : "outline"}
-        className={cn("rounded-none text-xs font-mono tracking-[0.15em] h-[42px] px-4 transition-colors uppercase", isSelectMode ? "bg-ink text-cream hover:bg-ink/90" : "border-ink text-ink")}
+        className={cn(
+          "rounded-full text-xs font-semibold tracking-[0.15em] h-[42px] px-4 transition-all duration-200 uppercase",
+          isSelectMode
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "border-border text-foreground hover:bg-muted",
+        )}
       >
-        {isSelectMode ? "Hủy chọn" : "Chọn nhiều"}
+        {isSelectMode ? "Hủy chọn" : "Xóa nhiều"}
       </Button>
       {isSelectMode && selectedIds.length > 0 && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
               disabled={isDeleting}
-              className="rounded-none bg-[#D03027] text-cream hover:bg-[#D03027]/90 text-xs font-mono tracking-[0.15em] h-[42px] px-4 transition-colors uppercase border-none"
+              className="h-[42px] rounded-full border-none bg-destructive px-4 text-xs font-semibold uppercase tracking-[0.15em] text-primary-foreground transition-all duration-200 hover:bg-destructive/90"
             >
-              {isDeleting ? <Loader2 className="size-4 animate-spin mr-2" /> : <Trash2 className="size-[15px] mr-1.5" />}
+              {isDeleting ? (
+                <Loader2 className="size-4 animate-spin mr-2" />
+              ) : (
+                <Trash2 className="size-[15px] mr-1.5" />
+              )}
               Xóa ({selectedIds.length})
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="rounded-none border border-ink/10 bg-cream p-8 shadow-xl sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
+          <AlertDialogContent className="rounded-2xl border border-border bg-card p-8 shadow-lg sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
             <AlertDialogHeader className="space-y-4 text-left">
-              <AlertDialogTitle className="font-heading text-4xl uppercase tracking-tighter text-ink leading-none">
-                Cảnh báo <br /><span className="text-[#D03027]">Xóa Dữ Liệu</span>
+              <AlertDialogTitle className="text-4xl font-semibold uppercase tracking-tighter leading-none text-card-foreground">
+                Cảnh báo <br />
+                <span className="text-destructive">Xóa Dữ Liệu</span>
               </AlertDialogTitle>
-              <AlertDialogDescription className="font-mono text-[11px] text-ink-muted uppercase tracking-widest leading-relaxed border-l-2 border-[#D03027] pl-4 mt-6">
-                Bạn đang chuẩn bị xóa vĩnh viễn {selectedIds.length} trang phục khỏi hệ thống.
-                <br /><br />
-                Hành động này không thể hoàn tác. Các item này sẽ bị gỡ bỏ khỏi mọi outfit liên quan.
+              <AlertDialogDescription className="mt-6 border-l-2 border-destructive pl-4 text-[11px] font-semibold uppercase tracking-widest leading-relaxed text-muted-foreground">
+                Bạn đang chuẩn bị xóa vĩnh viễn {selectedIds.length} trang phục
+                khỏi hệ thống.
+                <br />
+                <br />
+                Hành động này không thể hoàn tác. Các item này sẽ bị gỡ bỏ khỏi
+                mọi outfit liên quan.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="mt-10 flex gap-4 sm:space-x-0 w-full sm:justify-between">
-              <AlertDialogCancel className="flex-1 rounded-none border border-ink/20 bg-transparent text-ink font-mono text-xs tracking-widest uppercase hover:bg-ink hover:text-cream h-12 transition-colors m-0">
+              <AlertDialogCancel className="m-0 h-12 flex-1 rounded-xl border border-border bg-transparent text-xs font-semibold uppercase tracking-widest text-foreground transition-all duration-200 hover:bg-muted">
                 Hủy bỏ
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => {
-                  bulkDelete({ ids: selectedIds }, {
-                    onSuccess: () => {
-                      setIsSelectMode(false);
-                      setSelectedIds([]);
-                    }
-                  });
+                  bulkDelete(
+                    { ids: selectedIds },
+                    {
+                      onSuccess: () => {
+                        setIsSelectMode(false);
+                        setSelectedIds([]);
+                      },
+                    },
+                  );
                 }}
-                className="flex-1 rounded-none border-none bg-[#D03027] text-cream font-mono text-xs tracking-widest uppercase hover:bg-[#D03027]/90 h-12 transition-colors m-0"
+                className="m-0 h-12 flex-1 rounded-xl border-none bg-destructive text-xs font-semibold uppercase tracking-widest text-primary-foreground transition-all duration-200 hover:bg-destructive/90"
               >
                 Xác nhận
               </AlertDialogAction>
@@ -353,245 +435,320 @@ export default function WardrobeClient({ initialData }: { initialData: any[] }) 
   return (
     <>
       {/* Sticky Top Action Bar */}
-      <div 
+      <div
         className={cn(
-          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-[#F4F1EE]/80 dark:bg-[#111]/80 backdrop-blur-xl border-b border-ink/10 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          isScrolled ? "translate-y-0 shadow-sm opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+          "fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          isCollapsed ? "md:left-[88px]" : "md:left-[280px]",
+          isScrolled
+            ? "translate-y-0 shadow-sm opacity-100"
+            : "-translate-y-full opacity-0 pointer-events-none",
         )}
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="hidden md:flex items-center gap-2">
-            <span className="font-['Playfair_Display'] font-medium text-2xl text-[#111] uppercase tracking-wide">
-              Wardrobe
+            <span className="text-2xl font-semibold uppercase tracking-wide text-foreground whitespace-nowrap">
+              Tủ đồ
             </span>
           </div>
           {renderActions()}
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans selection:bg-ink selection:text-cream" ref={containerRef}>
+      <div
+        className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans selection:bg-accent selection:text-accent-foreground"
+        ref={containerRef}
+      >
         {/* High-end Editorial Header */}
-      <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-ink/10 pb-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-4 max-w-2xl">
-            {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
+        <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-border pb-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-4 max-w-2xl">
+              {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-foreground leading-[0.85] uppercase">
               Wardrobe
             </h1> */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-['Playfair_Display'] font-medium text-[#111] leading-[1.1] uppercase">
-              Wardrobe
-            </h1>
-            <p className="text-sm text-ink-muted font-mono uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-ink/20 pl-4">
-              Bộ sưu tập của bạn.
-              {realItems.length > 0 ? ` Đang lưu trữ ${realItems.length} món đồ.` : " Hãy bắt đầu thêm đồ."}
-            </p>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase whitespace-nowrap">
+                Tủ đồ
+              </h1>
+              <p className="text-sm text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-border pl-4">
+
+                {realItems.length > 0
+                  ? ` Bạn đang lưu trữ ${realItems.length} / ${maxOutfits} món đồ.`
+                  : "Hãy bắt đầu thêm đồ."}
+              </p>
+            </div>
+
+            {renderActions()}
           </div>
 
-          {renderActions()}
+          {/* Categories / Tabs - Magazine Index Style */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
+            <div className="flex flex-wrap gap-x-8 gap-y-4">
+              {category?.map((cat) => {
+                const label = cat.name;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => handleCategoryChange(cat.name)}
+                    className={cn(
+                      "text-xs font-semibold uppercase tracking-[0.2em] relative transition-colors duration-200 group pb-2",
+                      categoryParam === cat.name
+                        ? "text-foreground font-semibold"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {label}
+                    <span
+                      className={cn(
+                        "absolute bottom-0 left-0 h-[2px] bg-primary transition-all duration-300",
+                        categoryParam === cat.name
+                          ? "w-full"
+                          : "w-0 group-hover:w-full",
+                      )}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center gap-4 rounded-xl border border-border px-4 py-2">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Sắp xếp
+              </span>
+              <Select
+                value={sortParam}
+                onValueChange={(value) => handleSortChange(value as string)}
+              >
+                <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-xs font-semibold uppercase tracking-widest text-foreground w-auto">
+                  <SelectValue placeholder="Mới nhất" />
+                </SelectTrigger>
+                <SelectContent
+                  alignItemWithTrigger={false}
+                  align="end"
+                  sideOffset={4}
+                >
+                  <SelectItem
+                    value="Mới nhất"
+                    className="text-xs font-semibold uppercase tracking-widest"
+                  >
+                    Mới nhất
+                  </SelectItem>
+                  <SelectItem
+                    value="Cũ nhất"
+                    className="text-xs font-semibold uppercase tracking-widest"
+                  >
+                    Cũ nhất
+                  </SelectItem>
+                  <SelectItem
+                    value="Tên"
+                    className="text-xs font-semibold uppercase tracking-widest"
+                  >
+                    Theo tên
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
-        {/* Categories / Tabs - Magazine Index Style */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
-          <div className="flex flex-wrap gap-x-8 gap-y-4">
-            {CATEGORIES.map((cat, idx) => {
-              const label = cat;
+        {/* Grid Content */}
+        {isLoadingItems ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="flex flex-col h-full rounded-2xl border border-border bg-card"
+              >
+                <Skeleton className="image-frame relative aspect-[4/5] flex-shrink-0 bg-muted/60 p-3 md:p-6" />
+                <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-card border-t border-border">
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-3/4 rounded-xl bg-muted/60" />
+                    <Skeleton className="h-3 w-1/2 rounded-xl bg-muted/60 mt-2" />
+                  </div>
+                  <Skeleton className="h-3 w-1/3 rounded-xl bg-muted/60" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : sortedItems.length > 0 ? (
+          <div
+            className={cn(
+              "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300",
+              isFetching && "opacity-60 blur-[1px]",
+            )}
+          >
+            {sortedItems.map((item, index) => {
+              const isProcessing =
+                item.status === WardrobeItemStatus.Processing;
+              const isFailed = item.status === WardrobeItemStatus.Failed;
+              const isLocked = item.isLocked;
+
+              const handleCardClick = () => {
+                if (isSelectMode) {
+                  if (selectedIds.includes(item.id)) {
+                    setSelectedIds(selectedIds.filter((id) => id !== item.id));
+                  } else {
+                    setSelectedIds([...selectedIds, item.id]);
+                  }
+                  return;
+                }
+                if (isLocked) {
+                  toast.error(
+                    "Trang phục bị khóa do vượt quá hạn ngạch. Vui lòng nâng cấp gói cước!",
+                  );
+                  return;
+                }
+                if (isProcessing) {
+                  if (isFetching) return; // Prevent concurrent fetches
+
+                  if (spamClickCount.current >= 5) {
+                    toast.error(
+                      "Bạn thao tác quá nhanh, vui lòng chờ trong giây lát!",
+                    );
+                    return;
+                  }
+
+                  spamClickCount.current += 1;
+                  if (spamClickTimeout.current)
+                    clearTimeout(spamClickTimeout.current);
+                  spamClickTimeout.current = setTimeout(() => {
+                    spamClickCount.current = 0;
+                  }, 10000); // Reset limit after 10 seconds
+
+                  toast.promise(refetch(), {
+                    loading: "Đang làm mới dữ liệu từ AI...",
+                    success: "Đã cập nhật kết quả mới nhất!",
+                    error: "Lỗi khi tải dữ liệu",
+                  });
+                  return;
+                }
+                router.push(`/wardrobe/item/${item.id}`);
+              };
+
               return (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={cn(
-                    "text-xs font-mono uppercase tracking-[0.2em] relative transition-colors group pb-2",
-                    categoryParam === cat
-                      ? "text-ink font-bold"
-                      : "text-ink-muted hover:text-ink"
-                  )}
-                >
-                  {label}
-                  <span className={cn(
-                    "absolute bottom-0 left-0 h-[2px] bg-ink transition-all duration-300",
-                    categoryParam === cat ? "w-full" : "w-0 group-hover:w-full"
-                  )} />
-                </button>
+                <div key={item.id} className="wardrobe-card">
+                  <WardrobeCard
+                    item={item}
+                    isLocked={!!isLocked}
+                    isProcessing={isProcessing}
+                    isSelectMode={isSelectMode}
+                    isSelected={selectedIds.includes(item.id)}
+                    onClick={handleCardClick}
+                    getWardrobeItemName={getWardrobeItemName}
+                    priority={index < 4}
+                  />
+                </div>
               );
             })}
           </div>
-
-          <div className="flex items-center gap-4 border border-ink/20 px-4 py-2">
-            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink-muted">Sắp xếp</span>
-            <Select value={sortParam} onValueChange={(value) => handleSortChange(value as string)}>
-              <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-xs font-mono uppercase tracking-widest text-ink font-bold w-auto">
-                <SelectValue placeholder="Mới nhất" />
-              </SelectTrigger>
-              <SelectContent alignItemWithTrigger={false} align="end" sideOffset={4}>
-                <SelectItem value="Mới nhất" className="font-mono text-xs uppercase tracking-widest font-bold">Mới nhất</SelectItem>
-                <SelectItem value="Cũ nhất" className="font-mono text-xs uppercase tracking-widest font-bold">Cũ nhất</SelectItem>
-                <SelectItem value="Tên" className="font-mono text-xs uppercase tracking-widest font-bold">Theo tên</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-
-      {/* Grid Content */}
-      {isLoadingItems ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="flex flex-col h-full bg-[#F8F7F5] border border-black/5">
-              <Skeleton className="relative aspect-[4/5] bg-muted/60 p-3 md:p-6 overflow-hidden flex-shrink-0 rounded-none" />
-              <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-white border-t border-black/5">
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-3/4 rounded-none bg-muted/60" />
-                  <Skeleton className="h-3 w-1/2 rounded-none bg-muted/60 mt-2" />
-                </div>
-                <Skeleton className="h-3 w-1/3 rounded-none bg-muted/60" />
-              </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
+            <div className="flex size-24 items-center justify-center rounded-2xl bg-accent-soft text-muted-foreground">
+              <Tag className="size-10 stroke-1" />
             </div>
-          ))}
-        </div>
-      ) : sortedItems.length > 0 ? (
-        <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", isFetching && "opacity-60 blur-[1px]")}>
-          {sortedItems.map((item: any) => {
-            const isProcessing = item.status === WardrobeItemStatus.Processing;
-            const isFailed = item.status === WardrobeItemStatus.Failed;
-            const isLocked = item.isLocked;
+            <div className="space-y-4">
+              <h3 className="text-4xl font-semibold text-foreground uppercase tracking-tight">
+                Trống
+              </h3>
+              <p className="text-xs font-semibold uppercase tracking-widest leading-relaxed text-muted-foreground">
+                Tủ đồ của bạn đang trống. Hãy bắt đầu số hóa các món đồ thực tế
+                của bạn để tạo ra những bộ phối đồ mới.
+              </p>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="mt-4 h-14 rounded-full border-border px-8 text-xs font-semibold uppercase tracking-[0.2em] text-foreground hover:bg-muted"
+                >
+                  <Plus className="mr-2 size-4" /> Thêm đồ
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-[200px] rounded-2xl border border-border bg-card p-2 shadow-xl">
+                <DropdownMenuItem onClick={() => router.push("/wardrobe/upload")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted flex items-center gap-2">
+                  <UploadCloud className="w-4 h-4" /> Tự tải lên ảnh
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/wardrobe/explore")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted mt-1 flex items-center gap-2">
+                  <Library className="w-4 h-4" /> Lấy từ thư viện
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
 
-            const handleCardClick = () => {
-              if (isSelectMode) {
-                if (selectedIds.includes(item.id)) {
-                  setSelectedIds(selectedIds.filter(id => id !== item.id));
-                } else {
-                  setSelectedIds([...selectedIds, item.id]);
-                }
-                return;
-              }
-              if (isLocked) {
-                toast.error("Trang phục bị khóa do vượt quá hạn ngạch. Vui lòng nâng cấp gói cước!");
-                return;
-              }
-              if (isProcessing) {
-                if (isFetching) return; // Prevent concurrent fetches
-
-                if (spamClickCount.current >= 5) {
-                  toast.error("Bạn thao tác quá nhanh, vui lòng chờ trong giây lát!");
-                  return;
-                }
-
-                spamClickCount.current += 1;
-                if (spamClickTimeout.current) clearTimeout(spamClickTimeout.current);
-                spamClickTimeout.current = setTimeout(() => {
-                  spamClickCount.current = 0;
-                }, 10000); // Reset limit after 10 seconds
-
-                toast.promise(refetch(), {
-                  loading: 'Đang làm mới dữ liệu từ AI...',
-                  success: 'Đã cập nhật kết quả mới nhất!',
-                  error: 'Lỗi khi tải dữ liệu',
-                });
-                return;
-              }
-              router.push(`/wardrobe/item/${item.id}`);
-            };
-
-            return (
-              <div key={item.id} className="wardrobe-card">
-                <WardrobeCard
-                  item={item}
-                  isLocked={isLocked}
-                  isProcessing={isProcessing}
-                  isSelectMode={isSelectMode}
-                  isSelected={selectedIds.includes(item.id)}
-                  onClick={handleCardClick}
-                  getWardrobeItemName={getWardrobeItemName}
+        {metadata && metadata.totalPages > 1 && (
+          <Pagination className="mt-16 border-t border-border pb-12 pt-16">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (pageParam > 1)
+                      updateParams({ page: (pageParam - 1).toString() });
+                  }}
+                  className={
+                    pageParam <= 1
+                      ? "pointer-events-none text-[11px] font-semibold uppercase tracking-widest opacity-50"
+                      : "text-[11px] font-semibold uppercase tracking-widest transition-colors hover:text-foreground"
+                  }
+                  text="TRƯỚC"
                 />
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
-          <div className="size-24 bg-[#e0dcd5] flex items-center justify-center text-ink/40">
-            <Tag className="size-10 stroke-1" />
-          </div>
-          <div className="space-y-4">
-            <h3 className="font-heading text-4xl text-ink uppercase tracking-tight">Trống</h3>
-            <p className="text-xs font-mono uppercase tracking-widest text-ink-muted leading-relaxed">
-              Tủ đồ của bạn đang trống. Hãy bắt đầu số hóa các món đồ thực tế của bạn để tạo ra những bộ phối đồ mới.
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => router.push("/wardrobe/upload")}
-            className="rounded-none border-ink text-ink hover:bg-ink hover:text-cream text-xs font-mono tracking-[0.2em] uppercase h-14 px-8 mt-4"
-          >
-            Thêm đồ
-          </Button>
-        </div>
-      )}
+              </PaginationItem>
 
-      {metadata && metadata.totalPages > 1 && (
-        <Pagination className="mt-16 pb-12 border-t border-ink/10 pt-16">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (pageParam > 1) updateParams({ page: (pageParam - 1).toString() });
-                }}
-                className={pageParam <= 1 ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:text-terracotta transition-colors"}
-                text="TRƯỚC"
-              />
-            </PaginationItem>
+              {[...Array(metadata.totalPages)].map((_, i) => {
+                const pageNum = i + 1;
+                if (
+                  pageNum === 1 ||
+                  pageNum === metadata.totalPages ||
+                  (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)
+                ) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        href="#"
+                        isActive={pageParam === pageNum}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          updateParams({ page: pageNum.toString() });
+                        }}
+                        className="rounded-xl border-border text-[11px] font-semibold uppercase tracking-widest"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
 
-            {[...Array(metadata.totalPages)].map((_, i) => {
-              const pageNum = i + 1;
-              if (
-                pageNum === 1 ||
-                pageNum === metadata.totalPages ||
-                (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)
-              ) {
-                return (
-                  <PaginationItem key={pageNum}>
-                    <PaginationLink
-                      href="#"
-                      isActive={pageParam === pageNum}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        updateParams({ page: pageNum.toString() });
-                      }}
-                      className="font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest rounded-none border-ink/10"
-                    >
-                      {pageNum}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              }
+                if (pageNum === pageParam - 2 || pageNum === pageParam + 2) {
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
 
-              if (pageNum === pageParam - 2 || pageNum === pageParam + 2) {
-                return (
-                  <PaginationItem key={pageNum}>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-              }
+                return null;
+              })}
 
-              return null;
-            })}
-
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (pageParam < metadata.totalPages) updateParams({ page: (pageParam + 1).toString() });
-                }}
-                className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest" : "font-['IBM_Plex_Mono'] text-[11px] uppercase tracking-widest hover:text-terracotta transition-colors"}
-                text="SAU"
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
-    </div>
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (pageParam < metadata.totalPages)
+                      updateParams({ page: (pageParam + 1).toString() });
+                  }}
+                  className={
+                    pageParam >= metadata.totalPages
+                      ? "pointer-events-none text-[11px] font-semibold uppercase tracking-widest opacity-50"
+                      : "text-[11px] font-semibold uppercase tracking-widest transition-colors hover:text-foreground"
+                  }
+                  text="SAU"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
+      </div>
     </>
   );
 }

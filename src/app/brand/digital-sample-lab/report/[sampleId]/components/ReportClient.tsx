@@ -16,11 +16,11 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
       if (existingStr) {
         const reports = JSON.parse(existingStr);
         const data = reports.find((r: any) => r.id === sampleId);
-        
+
         if (data) {
           if (data.productName) setProductName(data.productName);
           if (data.imageUrl) setImageUrl(data.imageUrl);
-          
+
           if (data.variants && data.variants.length > 0) {
             const newVariants = data.variants.map((v: any, index: number) => {
               const mockVariant = MOCK_FIT_REPORT.variantComparison[index] || MOCK_FIT_REPORT.variantComparison[0];
@@ -31,7 +31,7 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
                 savedRate: mockVariant.savedRate
               };
             });
-            
+
             setReport(prev => ({ ...prev, variantComparison: newVariants }));
           }
         }
@@ -39,7 +39,7 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
     } catch (e) {
       console.error("Error loading sample data", e);
     }
-    
+
     const loadStats = () => {
       try {
         const analyticsStr = localStorage.getItem("closy_ghost_analytics");
@@ -49,18 +49,18 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
             setActualStats(stats[sampleId]);
           }
         }
-      } catch(e) { console.error(e); }
+      } catch (e) { console.error(e); }
     };
-    
+
     loadStats();
-    
+
     // Listen for storage events across tabs to update stats in real-time
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'closy_ghost_analytics') {
         loadStats();
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [sampleId]);
@@ -76,7 +76,7 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
         </Link>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-ink/10 pb-6">
           <div>
-            <h1 className="text-4xl font-['Playfair_Display'] uppercase font-medium text-ink mb-2">{productName}</h1>
+            <h1 className="text-4xl font-semibold uppercase font-medium text-ink mb-2">{productName}</h1>
             <p className="text-sm font-mono tracking-widest uppercase text-ink-muted border-l-2 border-[#A0522D] pl-3">
               Sample ID: {sampleId}
             </p>
@@ -128,7 +128,7 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
 
         {/* Right Column: Detailed Insights */}
         <div className="lg:col-span-2 space-y-8">
-          
+
           <div className="bg-white p-6 border border-ink/10 shadow-sm">
             <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-4 border-b border-ink/10 mb-6">Variant Performance</h3>
             <div className="overflow-x-auto">

@@ -61,10 +61,10 @@ export const TypingIndicator = () => {
   }, { scope: container });
 
   return (
-    <div ref={container} className="flex items-center gap-1.5 h-6 px-1 mt-1">
-      <div className="typing-dot w-1.5 h-1.5 bg-[#1A1A1A]"></div>
-      <div className="typing-dot w-1.5 h-1.5 bg-[#1A1A1A]"></div>
-      <div className="typing-dot w-1.5 h-1.5 bg-[#1A1A1A]"></div>
+    <div ref={container} className="flex items-center justify-center gap-1 h-5 px-1">
+      <div className="typing-dot w-1.5 h-1.5 rounded-full bg-[#1A1A1A]/70"></div>
+      <div className="typing-dot w-1.5 h-1.5 rounded-full bg-[#1A1A1A]/70"></div>
+      <div className="typing-dot w-1.5 h-1.5 rounded-full bg-[#1A1A1A]/70"></div>
     </div>
   );
 };
@@ -98,12 +98,12 @@ export function AIChatMessage({ msg, isChatting, isGenerating, onGenerateRedirec
 
       {(!cleanContent && msg.role === 'ai' && !isChatting) ? null : (
         <div className={cn(
-          "text-[13px] leading-relaxed",
+          "text-[13px] leading-relaxed rounded-2xl shadow-sm",
           msg.role === 'user'
-            ? "p-4 bg-[#1A1A1A] text-white ml-6 md:ml-12"
+            ? "p-4 bg-[#1A1A1A] text-white ml-6 md:ml-12 rounded-tr-sm"
             : (msg.role === 'ai' && !cleanContent && isChatting)
-                ? "py-2 px-1 mr-6 md:mr-12"
-                : "p-4 bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] mr-6 md:mr-12"
+                ? "py-2.5 px-3.5 bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] mr-6 md:mr-12 rounded-tl-sm self-start"
+                : "p-4 bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] mr-6 md:mr-12 rounded-tl-sm"
         )}>
           {msg.role === 'ai' && !cleanContent && isChatting ? (
             <TypingIndicator />

@@ -30,7 +30,9 @@ import {
   ShoppingBag,
   PanelLeftClose,
   PanelLeftOpen,
-  Globe
+  Globe,
+  type LucideIcon,
+  Images
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -38,14 +40,22 @@ import { useB2BDemoStore } from "@/lib/mock-data/b2b/store";
 import { useLogout } from "@/features/auth/queries/auth.queries";
 import { getUserAvatar } from "@/lib/utils";
 import Image from "next/image";
+import { useSidebarStore } from "@/store/useSidebarStore";
 
-export const NAV_ITEMS = [
-  { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
+export type NavItem = {
+  icon: LucideIcon;
+  label: string;
+  path: string;
+  comingSoon?: boolean;
+};
+
+export const NAV_ITEMS: NavItem[] = [
+  // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
+  { icon: Globe, label: "Cộng Đồng", path: "/community" },
   { icon: Shirt, label: "Tủ Quần Áo", path: "/wardrobe" },
   { icon: Sparkles, label: "AI Phối Đồ", path: "/ai-stylist" },
-  { icon: ScanQrCode, label: "Trang Phục", path: "/outfits" },
-  { icon: Globe, label: "Cộng Đồng", path: "/community" },
-  { icon: Store, label: "Thanh Lý", path: "/marketplace", comingSoon: true },
+  { icon: Images, label: "Trang Phục", path: "/outfits" },
+  // { icon: Store, label: "Thanh Lý", path: "/marketplace", comingSoon: true },
 ];
 
 export function Sidebar() {
@@ -55,7 +65,7 @@ export function Sidebar() {
   const clearAuthStore = useAuthStore((state) => state.logout);
   const logoutMutation = useLogout();
   const { cart, setCartOpen } = useB2BDemoStore();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, setIsCollapsed, toggleCollapse } = useSidebarStore();
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -63,12 +73,10 @@ export function Sidebar() {
     if (saved === "true") {
       setIsCollapsed(true);
     }
-  }, []);
+  }, [setIsCollapsed]);
 
   const handleToggleCollapse = () => {
-    const newState = !isCollapsed;
-    setIsCollapsed(newState);
-    localStorage.setItem("closy_sidebar_collapsed", String(newState));
+    toggleCollapse();
   };
 
   const handleLogout = () => {
@@ -81,9 +89,9 @@ export function Sidebar() {
       "hidden md:flex flex-col border-r border-border/60 h-dvh sticky top-0 bg-[#FAFAFA] dark:bg-[#111111] z-40 py-6 transition-all duration-300",
       isCollapsed ? "w-[88px] px-3" : "w-[280px] px-6"
     )}>
-      
+
       {/* Collapse Toggle Button */}
-      <button 
+      <button
         onClick={handleToggleCollapse}
         className="absolute -right-3 top-8 bg-background border border-border/60 rounded-full p-1 z-50 text-muted-foreground hover:text-foreground transition-colors"
       >
@@ -101,10 +109,10 @@ export function Sidebar() {
         )}
         <Link href="/" className="flex items-center group w-fit">
           <span className={cn(
-            "font-['Playfair_Display'] font-light tracking-tighter text-primary transition-all",
+            "font-semibold font-light tracking-tighter text-primary transition-all",
             isCollapsed ? "text-2xl" : "text-4xl"
           )}>
-            {isCollapsed ? <img src="/favicon.ico" width={50} height={50}></img> : <><span className="font-['Playfair_Display']"> Closy </span><span className="text-[#D9C5B2]">.</span></>}
+            {isCollapsed ? <img src="/favicon.ico" width={50} height={50}></img> : <><span className="font-semibold"> Closy </span><span className="text-[#D9C5B2]">.</span></>}
           </span>
         </Link>
       </div>
@@ -227,10 +235,10 @@ export function Sidebar() {
           if (isCollapsed) {
             return (
               <Tooltip key={item.path}>
-                <TooltipTrigger>
+                <TooltipTrigger render={<div />}>
                   {content}
                 </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={12} className="font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest">
+                <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest">
                   {item.label} {item.comingSoon && "(Sắp ra mắt)"}
                 </TooltipContent>
               </Tooltip>
@@ -245,22 +253,20 @@ export function Sidebar() {
       <div className="mb-4 mt-2">
         {isCollapsed ? (
           <Tooltip>
-            <TooltipTrigger>
-              <button
-                onClick={() => setCartOpen(true)}
-                className="group flex items-center justify-center w-full p-3 rounded-xl transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-muted/30"
-              >
-                <div className="relative">
-                  <ShoppingBag className="size-5 transition-transform duration-300 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" strokeWidth={1.5} />
-                  {cart.length > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-foreground text-background text-[9px] font-bold w-4 h-4 rounded-full z-10 shadow-sm border border-background">
-                      {cart.length}
-                    </span>
-                  )}
-                </div>
-              </button>
+            <TooltipTrigger
+              onClick={() => setCartOpen(true)}
+              className="group flex items-center justify-center w-full p-3 rounded-xl transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-muted/30"
+            >
+              <div className="relative">
+                <ShoppingBag className="size-5 transition-transform duration-300 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" strokeWidth={1.5} />
+                {cart.length > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-foreground text-background text-[9px] font-bold w-4 h-4 rounded-full z-10 shadow-sm border border-background">
+                    {cart.length}
+                  </span>
+                )}
+              </div>
             </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={12} className="font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest">
+            <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest">
               Giỏ Hàng
             </TooltipContent>
           </Tooltip>
@@ -293,16 +299,16 @@ export function Sidebar() {
           {!isCollapsed && <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#D9C5B2]/20 rounded-full blur-2xl transition-colors duration-700 group-hover:bg-[#D9C5B2]/30" />}
 
           {isCollapsed ? (
-             <Tooltip>
-               <TooltipTrigger>
-                 <Link href="/pricing">
-                   <Sparkles className="size-5 text-foreground/80 group-hover:text-[#D9C5B2] transition-colors" />
-                 </Link>
-               </TooltipTrigger>
-               <TooltipContent side="right" sideOffset={12} className="font-['IBM_Plex_Mono'] text-xs font-medium uppercase tracking-widest text-[#D9C5B2]">
-                 Nâng Cấp Premium
-               </TooltipContent>
-             </Tooltip>
+            <Tooltip>
+              <TooltipTrigger render={<div />}>
+                <Link href="/pricing">
+                  <Sparkles className="size-5 text-foreground/80 group-hover:text-[#D9C5B2] transition-colors" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest text-[#D9C5B2]">
+                Nâng Cấp Premium
+              </TooltipContent>
+            </Tooltip>
           ) : (
             <div className="relative z-10 flex flex-col gap-2">
               <div className="flex items-center justify-between mb-1">

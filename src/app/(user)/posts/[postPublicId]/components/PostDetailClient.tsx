@@ -19,7 +19,7 @@ export default function PostDetailClient({ postPublicId, initialData }: PostDeta
   if (isLoading && !post) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="size-10 text-[#111] animate-spin" />
+        <Loader2 className="size-10 text-foreground animate-spin" />
       </div>
     );
   }
@@ -27,8 +27,8 @@ export default function PostDetailClient({ postPublicId, initialData }: PostDeta
   if (!post) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-sm text-[#111] font-mono">Không tìm thấy bài viết.</p>
-        <button onClick={() => router.push('/community')} className="text-xs uppercase tracking-widest border-b border-black/20 pb-0.5 hover:border-black transition-colors">
+        <p className="text-sm text-foreground font-medium">Không tìm thấy bài viết.</p>
+        <button onClick={() => router.push('/community')} className="bg-foreground text-background rounded-full px-6 py-3 font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-opacity mt-2">
           Quay lại cộng đồng
         </button>
       </div>
@@ -39,7 +39,7 @@ export default function PostDetailClient({ postPublicId, initialData }: PostDeta
     <div className="max-w-2xl mx-auto py-8 px-4">
       <button 
         onClick={() => router.push('/community')}
-        className="flex items-center gap-2 text-sm text-[#666] hover:text-[#111] transition-colors mb-6 font-mono group outline-none"
+        className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full px-4 py-2 -ml-4 mb-6 transition-colors group outline-none font-bold uppercase tracking-widest text-xs"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         QUAY LẠI CỘNG ĐỒNG

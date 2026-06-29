@@ -2,6 +2,14 @@ import axios, { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import { ErrorResponse } from '@/types/api';
 
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    silent?: boolean;
+    showErrorToast?: boolean;
+    errorToastMessage?: string;
+  }
+}
+
 const api = axios.create({
   // Point to Next.js proxy instead of direct backend
   baseURL: '/api/v1',
@@ -18,6 +26,7 @@ let failedQueue: Array<{
   resolve: (value?: unknown) => void;
   reject: (reason?: any) => void;
 }> = [];
+let hasShownSessionExpiredToast = false;
 
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
@@ -36,16 +45,22 @@ api.interceptors.response.use(
   },
   async (error: AxiosError<ErrorResponse>) => {
     const originalRequest = error.config as any;
+    const silent = originalRequest?.silent === true;
+    const showErrorToast = originalRequest?.showErrorToast === true;
+    const customErrorMessage = originalRequest?.errorToastMessage;
 
     if (error.response) {
+      const status = error.response.status;
+      const errorData = error.response.data;
+      
       const isAuthError =
-        error.response.status === 401 ||
-        (error.response.status === 500 &&
-          (error.response.data?.message === "Vui lòng đăng nhập" ||
-            error.response.data?.detail === "Vui lòng đăng nhập" ||
-            error.response.data?.Detail === "Vui lòng đăng nhập" ||
-            error.response.data?.message === "Đã xảy ra lỗi hệ thống" ||
-            error.response.data?.detail === "Đã xảy ra lỗi hệ thống"
+        status === 401 ||
+        (status === 500 &&
+          (errorData?.message === "Vui lòng đăng nhập" ||
+            errorData?.detail === "Vui lòng đăng nhập" ||
+            errorData?.Detail === "Vui lòng đăng nhập" ||
+            errorData?.message === "Đã xảy ra lỗi hệ thống" ||
+            errorData?.detail === "Đã xảy ra lỗi hệ thống"
           )
         );
 
@@ -58,12 +73,8 @@ api.interceptors.response.use(
           return new Promise(function (resolve, reject) {
             failedQueue.push({ resolve, reject });
           })
-            .then(() => {
-              return api(originalRequest);
-            })
-            .catch((err) => {
-              return Promise.reject(err);
-            });
+            .then(() => api(originalRequest))
+            .catch((err) => Promise.reject(err));
         }
 
         originalRequest._retry = true;
@@ -71,20 +82,15 @@ api.interceptors.response.use(
 
         try {
           // Gọi API refresh token của BFF
-          await axios.post('/api/v1/auth/refresh-token', {}, { baseURL: '' });
+          await axios.post('/api/auth/refresh-token', {}, { baseURL: '' });
           processQueue(null);
-          // Gọi lại request bị fail
+          hasShownSessionExpiredToast = false; // Reset if successful
           return api(originalRequest);
         } catch (err) {
           processQueue(err, null);
-          const isLoginPage = typeof window !== 'undefined' && window.location.pathname.includes('/auth/login');
-          const isMeEndpoint = originalRequest.url?.endsWith('/me');
-
-          if (!isLoginPage && !isMeEndpoint) {
+          if (!hasShownSessionExpiredToast && !silent) {
             toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-            setTimeout(() => {
-              window.location.href = '/auth/login';
-            }, 1000);
+            hasShownSessionExpiredToast = true;
           }
           return Promise.reject(error);
         } finally {
@@ -92,27 +98,27 @@ api.interceptors.response.use(
         }
       }
 
-      // Xử lý các lỗi khác có format ErrorResponse từ server
-      const errorData = error.response.data;
-      const errorMessage = errorData?.message || errorData?.detail;
-      const errorTitle = errorData?.title;
-
-      if (errorTitle && errorMessage) {
-        toast.error(errorTitle, { description: errorMessage });
-      } else if (errorTitle) {
-        toast.error(errorTitle);
-      } else if (errorMessage) {
-        toast.error(errorMessage);
-      } else if (error.response.status >= 500) {
-        toast.error('Lỗi máy chủ! Vui lòng thử lại sau.');
-      } else {
-        toast.error('Đã có lỗi xảy ra. Vui lòng thử lại.');
+      // Xử lý thông báo lỗi (nếu không silent)
+      if (!silent) {
+        if (customErrorMessage) {
+          toast.error(customErrorMessage);
+        } else if (status >= 500) {
+          toast.error('Lỗi hệ thống. Vui lòng thử lại sau.');
+        } else if (status === 403 || status === 429) {
+          toast.error(errorData?.message || errorData?.detail || errorData?.title || 'Bạn không có quyền thực hiện hoặc thao tác quá nhanh.');
+        } else if (showErrorToast) {
+          // Ép hiện toast cho 400, 404, 409, 422
+          toast.error(errorData?.message || errorData?.detail || errorData?.title || 'Thao tác thất bại. Vui lòng thử lại.');
+        }
       }
 
-    } else {
+    } else if (error.request) {
       // Network error or timeout
-      toast.error('Không thể kết nối đến máy chủ.');
+      if (!silent) {
+        toast.error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra đường truyền.');
+      }
     }
+
     return Promise.reject(error);
   }
 );
