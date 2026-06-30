@@ -1,0 +1,47 @@
+# Hướng dẫn Kiểm tra (Testing Workflow) Thiết lập Loyalty Program
+
+Dưới đây là luồng kiểm tra thủ công toàn diện từ khi khởi tạo Brand mới cho đến khi thiết lập và sử dụng thành công chức năng Loyalty Program mà chúng ta vừa hoàn thiện.
+
+---
+
+## Bước 1: Tạo và Kích hoạt Brand (Admin)
+
+1. **Khởi tạo Brand mới:**
+   - (Cách 1) Dùng tài khoản **User thường** vào trang Profile -> Đăng ký bán hàng -> Điền thông tin tạo Brand. Brand lúc này sẽ có trạng thái `PENDING`.
+   - (Cách 2) Dùng tài khoản **Admin** gọi trực tiếp API `POST /api/v1/admin/brands` để tạo Brand ở trạng thái `ACTIVE`.
+2. **Duyệt Brand (Active):**
+   - Đăng nhập tài khoản **Admin**.
+   - Truy cập vào trang Quản lý Brand của Admin (hoặc gọi API `PATCH /api/v1/admin/brands/:brandId/status`).
+   - Đổi trạng thái Brand sang `ACTIVE`.
+
+## Bước 2: Thiết lập chương trình Loyalty (Brand Owner)
+
+1. Đăng nhập vào hệ thống bằng tài khoản **Owner của Brand** vừa được duyệt.
+2. Truy cập vào **Brand Portal** (Kênh người bán) -> Chọn Brand của bạn.
+3. Chuyển sang Tab **"Hội viên" (Loyalty)**.
+4. Tại đây, do Brand mới tinh nên bạn sẽ thấy thông báo: *"Thương hiệu của bạn chưa thiết lập chương trình khách hàng thân thiết"*.
+5. Bấm vào nút **"Thiết lập chương trình"**.
+6. Một Dialog cấu hình sẽ hiện ra. Bạn nhập các thông số:
+   - **Tên chương trình:** Vd: `Thành viên Smart Wardrobe`.
+   - **Số tiền / 1 điểm:** Vd: `10000` (Nghĩa là khách mua 10k sẽ được 1 điểm).
+   - **Hạn sử dụng:** Vd: `365` ngày (Hoặc để trống nếu không hết hạn).
+   - **Chế độ làm tròn:** Vd: `Làm tròn xuống (Floor)`.
+7. Bấm **"Lưu cấu hình"**.
+   - > **Kỳ vọng:** Thông báo "Cập nhật thành công" hiện ra, giao diện tự động load lại và hiển thị Card màu đen báo hiệu chương trình "Đang hoạt động" cùng với Tỷ lệ quy đổi vừa cài đặt.
+
+## Bước 3: Chỉnh sửa chương trình Loyalty
+
+1. Ngay tại giao diện tóm tắt chương trình Loyalty vừa hiện ra, bấm vào nút **"Cấu hình"** (Có icon bánh răng).
+2. Form chỉnh sửa sẽ hiện ra với các dữ liệu cũ đã được điền sẵn.
+3. Thử đổi Số tiền / 1 điểm thành `20000` và bấm Lưu.
+   - > **Kỳ vọng:** Thông tin quy đổi trên giao diện lập tức cập nhật thành `20.000đ = 1 điểm`.
+
+## Bước 4: Test chức năng cấp quyền / Tích điểm cho Khách hàng
+
+1. Chuyển sang Tab **"Khách hàng" (Customers)** trong Brand Portal.
+2. Bấm vào nút **"Thêm khách offline"** (Hoặc chọn 1 khách hàng đã có sẵn trong danh sách).
+3. Tại trang Chi tiết khách hàng, bấm vào nút **"Cộng điểm" (Earn Points)**.
+4. Nhập vào số tiền hoá đơn (Vd: `200000`).
+   - > **Kỳ vọng 1:** Số điểm hiển thị dự kiến nhận được sẽ là `10 điểm` (Do 200k / 20k = 10).
+5. Bấm Xác nhận cộng điểm.
+   - > **Kỳ vọng 2:** Không còn báo lỗi 400 *"Brand chua co loyalty program active"* như trước đó. Khách hàng đã được cộng thành công 10 điểm vào tài khoản!
