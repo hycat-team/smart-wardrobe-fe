@@ -1,18 +1,19 @@
 export interface BrandCustomer {
   id: string;
-  name: string;
+  brandId: string;
+  userId?: string | null;
+  customerName?: string;
   phoneE164?: string;
-  email?: string;
-  totalOrders: number;
-  totalSpent: number;
-  lastPurchaseAt?: string;
-  status?: string; // e.g., 'VIP', 'Mới'
-  loyaltyAccountId?: string;
+  externalCustomerCode?: string;
+  joinedSource?: string;
+  status?: string;
+  joinedAt?: string;
+  claimedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CustomerDetail extends BrandCustomer {
-  createdAt: string;
-  externalCustomerCode?: string;
 }
 
 export interface LoyaltyTransaction {

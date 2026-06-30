@@ -238,7 +238,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                 {activeProducts.map(product => (
                   <Link key={product.id} href={`/products/${product.id}`} className="group flex flex-col gap-4">
                     <div className="relative aspect-[3/4] bg-muted overflow-hidden rounded-2xl">
-                      <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out mix-blend-multiply" />
+                      <img src={product.imageUrls?.[0] || 'https://placehold.co/300x400?text=No+Image'} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out mix-blend-multiply" />
                       {product.discountPrice && (
                         <div className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-[10px] font-bold px-3 py-1.5 uppercase tracking-widest rounded-full">
                           Sale

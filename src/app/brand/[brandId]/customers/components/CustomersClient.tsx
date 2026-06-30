@@ -88,25 +88,40 @@ export default function CustomersClient() {
                 users.map((user) => (
                   <TableRow key={user.id} className="group cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => router.push(`/brand/${brandId}/customers/${user.id}`)}>
                     <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-foreground group-hover:text-primary transition-colors">{user.name}</span>
-                        <span className="text-xs text-muted-foreground">{user.id}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0">
+                          {user.userAvatarUrl ? (
+                            <img src={user.userAvatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold">
+                              {((user.userFullName || user.customerName || 'K')[0]).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-foreground group-hover:text-primary transition-colors">
+                            {user.userFullName || user.customerName || 'Khách hàng'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {user.userId ? `User ID: ${user.userId.slice(0, 8)}...` : 'Khách Offline'}
+                          </span>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                        {user.email && <div className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> {user.email}</div>}
-                        {user.phone && <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> {user.phone}</div>}
+                        {user.phoneE164 && <div className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> {user.phoneE164}</div>}
+                        {user.externalCustomerCode && <div className="flex items-center gap-1.5"><span className="font-bold">Mã:</span> {user.externalCustomerCode}</div>}
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-medium text-foreground">
-                      {formatCurrency(user.totalSpent)}
+                      -
                     </TableCell>
                     <TableCell className="text-center">
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-bold">{user.totalOrders}</span>
+                      -
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {user.lastPurchaseAt ? new Date(user.lastPurchaseAt).toLocaleDateString('vi-VN') : '-'}
+                      {user.joinedAt ? new Date(user.joinedAt).toLocaleDateString('vi-VN') : '-'}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm" className="rounded-full">

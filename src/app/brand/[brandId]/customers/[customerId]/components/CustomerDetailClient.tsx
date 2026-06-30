@@ -57,12 +57,21 @@ export default function CustomerDetailClient() {
         <Button variant="ghost" size="icon" className="rounded-full" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
+        <div className="w-12 h-12 rounded-full bg-muted overflow-hidden shrink-0 flex items-center justify-center">
+          {customer.userAvatarUrl ? (
+            <img src={customer.userAvatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-primary font-bold text-lg">
+              {((customer.userFullName || customer.customerName || 'K')[0]).toUpperCase()}
+            </span>
+          )}
+        </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">{customer.name}</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{customer.userFullName || customer.customerName || 'Khách hàng'}</h1>
           <p className="text-muted-foreground text-sm">ID: {customer.id}</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          {!customer.loyaltyAccountId && (
+          {!customer.userId && (
             <Button variant="outline" className="rounded-full" onClick={() => setIsClaimDialogOpen(true)}>
               Tạo mã Claim
             </Button>
@@ -115,14 +124,14 @@ export default function CustomerDetailClient() {
             <CardContent className="p-6 flex flex-col items-center justify-center text-center h-full gap-2">
               <CreditCard className="w-8 h-8 text-primary mb-2" />
               <span className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Tổng chi tiêu</span>
-              <span className="text-3xl font-bold">{formatCurrency(customer.totalSpent)}</span>
+              <span className="text-3xl font-bold">-</span>
             </CardContent>
           </Card>
           <Card className="rounded-3xl border-border bg-card shadow-sm">
             <CardContent className="p-6 flex flex-col items-center justify-center text-center h-full gap-2">
               <ShoppingBag className="w-8 h-8 text-primary mb-2" />
               <span className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Tổng đơn hàng</span>
-              <span className="text-3xl font-bold">{customer.totalOrders}</span>
+              <span className="text-3xl font-bold">-</span>
             </CardContent>
           </Card>
         </div>
@@ -148,13 +157,7 @@ export default function CustomerDetailClient() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {!customer.loyaltyAccountId ? (
-                     <TableRow>
-                     <TableCell colSpan={5} className="text-center py-20 text-muted-foreground">
-                       Khách hàng chưa có tài khoản Loyalty.
-                     </TableCell>
-                   </TableRow>
-                  ) : isLoadingTx ? (
+                  {isLoadingTx ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-20">
                         <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
