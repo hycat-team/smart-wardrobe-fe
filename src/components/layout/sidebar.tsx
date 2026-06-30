@@ -31,6 +31,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Globe,
+  Compass,
   type LucideIcon,
   Images
 } from "lucide-react";
@@ -52,10 +53,11 @@ export type NavItem = {
 export const NAV_ITEMS: NavItem[] = [
   // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
   { icon: Globe, label: "Cộng Đồng", path: "/community" },
+  { icon: Compass, label: "Khám Phá", path: "/brands" },
   { icon: Shirt, label: "Tủ Quần Áo", path: "/wardrobe" },
   { icon: Sparkles, label: "AI Phối Đồ", path: "/ai-stylist" },
   { icon: Images, label: "Trang Phục", path: "/outfits" },
-  // { icon: Store, label: "Thanh Lý", path: "/marketplace", comingSoon: true },
+  { icon: Store, label: "Kênh Thương Hiệu", path: "/brand-portal/select" },
 ];
 
 export function Sidebar() {
@@ -168,6 +170,21 @@ export function Sidebar() {
               <span className="font-body-sm text-[13px] font-medium">Cài đặt</span>
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuSeparator className="my-1 bg-border/40" />
+          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+            <Link href="/brand-portal/select" className="flex items-center gap-3 w-full text-foreground/80">
+              <Store className="size-4" />
+              <span className="font-body-sm text-[13px] font-medium">Kênh Thương Hiệu</span>
+            </Link>
+          </DropdownMenuItem>
+          {user?.roleSlug === 'admin' && (
+            <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+              <Link href="/admin/brands" className="flex items-center gap-3 w-full text-red-500/80 hover:text-red-500">
+                <Settings className="size-4" />
+                <span className="font-body-sm text-[13px] font-medium">Quản trị hệ thống</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator className="my-1 bg-border/40" />
           <DropdownMenuItem
             onClick={handleLogout}

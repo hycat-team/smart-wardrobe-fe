@@ -2,10 +2,23 @@
 
 import React from 'react';
 import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
-import { mockProducts } from '@/lib/mock-data/b2b';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useGetBrandItemDetail } from '@/features/brands/queries/user-brands.queries';
+
+function ProductCell({ productId }: { productId: string }) {
+  const { data: product } = useGetBrandItemDetail(productId);
+  
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-12 h-12 bg-muted rounded-2xl overflow-hidden shrink-0 border border-border">
+        {product?.imageUrls?.[0] && <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover" />}
+      </div>
+      <span className="font-bold text-sm text-foreground line-clamp-2 min-w-[150px]">{product?.name || "Đang tải..."}</span>
+    </div>
+  );
+}
 
 export default function CustomerCareClient() {
   const { returnRequests, updateReturnRequestStatus } = useB2BDemoStore();
@@ -49,7 +62,6 @@ export default function CustomerCareClient() {
                 <TableCell colSpan={5} className="text-center py-10 text-muted-foreground italic">Không có yêu cầu nào.</TableCell>
               </TableRow>
             ) : brandRequests.map(req => {
-              const product = mockProducts.find(p => p.id === req.productId);
               return (
                 <TableRow key={req.id} className="border-border hover:bg-muted/50 transition-colors">
                   <TableCell className="whitespace-nowrap">
@@ -59,12 +71,7 @@ export default function CustomerCareClient() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-muted rounded-2xl overflow-hidden shrink-0 border border-border">
-                        <img src={product?.imageUrls[0]} alt={product?.name} className="w-full h-full object-cover" />
-                      </div>
-                      <span className="font-bold text-sm text-foreground line-clamp-2 min-w-[150px]">{product?.name}</span>
-                    </div>
+                    <ProductCell productId={req.productId} />
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1 min-w-[200px]">

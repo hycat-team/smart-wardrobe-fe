@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { mockProducts, mockBrands } from '@/lib/mock-data/b2b';
 import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
 import { Button } from '@/components/ui/button';
-import { Heart, Share2, Sparkles, ShoppingBag, ChevronLeft } from 'lucide-react';
+import { Heart, Share2, Sparkles, ShoppingBag, ChevronLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useGetBrandItemDetail, useGetActiveBrandDetail } from '@/features/brands/queries/user-brands.queries';
 
 interface ProductDetailClientProps {
   productId: string;
@@ -16,30 +16,22 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ productId }: ProductDetailClientProps) {
   const router = useRouter();
   
-  const [product, setProduct] = useState<any>(mockProducts.find(p => p.id === productId));
-  const [brand, setBrand] = useState<any>(mockBrands.find(b => b.id === product?.brandId));
-
-  useEffect(() => {
-    if (!product) {
-      try {
-        const stored = localStorage.getItem("brand_custom_products");
-        if (stored) {
-          const customProducts = JSON.parse(stored);
-          const customProduct = customProducts.find((p: any) => p.id === productId);
-          if (customProduct) {
-            setProduct(customProduct);
-            setBrand(mockBrands.find(b => b.id === customProduct.brandId));
-          }
-        }
-      } catch (e) {}
-    }
-  }, [productId, product]);
+  const { data: product, isLoading: isProductLoading } = useGetBrandItemDetail(productId);
+  const { data: brand, isLoading: isBrandLoading } = useGetActiveBrandDetail(product?.brandId || "");
 
   const addToCart = useB2BDemoStore(state => state.addToCart);
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
+
+  if (isProductLoading || isBrandLoading) {
+    return (
+      <div className="flex-1 bg-background text-foreground min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!product || !brand) return null;
 

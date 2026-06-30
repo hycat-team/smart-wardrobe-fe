@@ -1,26 +1,37 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { mockBrands, mockBrandPosts, mockProducts } from '@/lib/mock-data/b2b';
+import { mockBrands, mockBrandPosts } from '@/lib/mock-data/b2b';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, MessageCircle, Bookmark, Share2, BadgeCheck, MapPin, Link as LinkIcon, Camera } from 'lucide-react';
+import { Heart, MessageCircle, Bookmark, Share2, BadgeCheck, MapPin, Link as LinkIcon, Camera, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useGetActiveBrandDetail, useJoinLoyalty, useGetBrandItems } from '@/features/brands/queries/user-brands.queries';
+import BrandChatWindow from './BrandChatWindow';
 
 interface BrandProfileClientProps {
   brandId: string;
 }
 
 export default function BrandProfileClient({ brandId }: BrandProfileClientProps) {
-  const baseBrand = mockBrands.find(b => b.id === brandId);
+  const router = useRouter();
+  const { data: brandData, isLoading } = useGetActiveBrandDetail(brandId);
+  const { data: brandItems } = useGetBrandItems(brandId);
+  const { mutateAsync: joinLoyalty, isPending: isJoining } = useJoinLoyalty();
+
+
+  // We merge API data with mock base to keep the rich UI for missing fields (cover, story)
+  const baseBrand = mockBrands.find(b => b.id === brandId) || mockBrands[0];
   const [displayBrand, setDisplayBrand] = useState<any>(baseBrand);
 
   const [brandPosts, setBrandPosts] = useState(mockBrandPosts.filter(p => p.brandId === brandId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
-  const [products, setProducts] = useState(mockProducts.filter(p => p.brandId === brandId));
+  const [products, setProducts] = useState<any[]>([]);
 
   // Follow button state
   const [isFollowing, setIsFollowing] = useState(baseBrand?.isFollowing || false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   useEffect(() => {
     // Load custom brand profile
@@ -32,18 +43,6 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
           ...baseBrand,
           ...customProfile,
         });
-      }
-    } catch (e) { }
-
-    // Load custom products
-    try {
-      const stored = localStorage.getItem("brand_custom_products");
-      if (stored) {
-        const customProducts = JSON.parse(stored);
-        const defaultProducts = mockProducts.filter(p => p.brandId === brandId);
-        const overriddenIds = customProducts.map((p: any) => p.id);
-        const filteredDefaults = defaultProducts.filter(p => !overriddenIds.includes(p.id));
-        setProducts([...customProducts.filter((p: any) => p.brandId === brandId), ...filteredDefaults]);
       }
     } catch (e) { }
 
@@ -62,10 +61,37 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
         );
       }
     } catch (e) { }
-  }, [brandId, baseBrand]);
+
+    if (brandData) {
+      setDisplayBrand((prev: any) => ({
+        ...prev,
+        ...brandData,
+        // Ensure name and logo are overridden by API
+        name: brandData.name || prev.name,
+        logoUrl: brandData.logoUrl || prev.logoUrl,
+        description: brandData.description || prev.description,
+      }));
+    }
+
+    if (brandItems) {
+      setProducts(brandItems);
+    }
+  }, [brandId, baseBrand, brandData, brandItems]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground mb-4" />
+      </div>
+    );
+  }
 
   if (!displayBrand) return null;
   const brand = displayBrand;
+
+  const activeProducts = products.filter(p => 
+    !p.status || p.status === 'ACTIVE' || p.status === 'active' || p.stockStatus === 'IN_STOCK'
+  );
 
   return (
     <div className="flex-1 bg-background pb-20">
@@ -76,6 +102,15 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
       </div> */}
 
       <div className="w-[calc(100%+2rem)] -mx-4 md:w-[calc(100%+4rem)] md:-mx-8 h-[300px] md:h-[450px] relative bg-muted group overflow-hidden">
+        {/* Nút Back */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="absolute top-4 left-4 z-20 bg-background/50 hover:bg-background/80 backdrop-blur-sm rounded-full"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
         <img src={brand.coverUrl} alt="Cover" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2s] ease-out" />
 
         {/* Top-to-bottom gradient */}
@@ -141,9 +176,21 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
               >
                 {isFollowing ? 'Đang theo dõi' : 'Theo dõi'}
               </Button>
-              {/* <Button variant="default" className="flex-1 sm:flex-none rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B5952F] hover:opacity-90 text-white font-semibold text-xs font-medium uppercase tracking-widest px-6 lg:px-8 h-12 shadow-md border-0">
-                Membership
-              </Button> */}
+              <Button
+                variant="outline"
+                onClick={() => setIsChatOpen(true)}
+                className="flex-1 sm:flex-none rounded-full font-semibold text-xs font-medium uppercase tracking-widest px-6 lg:px-8 h-12 shadow-sm transition-colors"
+              >
+                Nhắn tin
+              </Button>
+              <Button 
+                variant="default" 
+                onClick={() => joinLoyalty(brandId)}
+                disabled={isJoining}
+                className="flex-1 sm:flex-none rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B5952F] hover:opacity-90 text-white font-semibold text-xs font-medium uppercase tracking-widest px-6 lg:px-8 h-12 shadow-md border-0 disabled:opacity-50"
+              >
+                {isJoining ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Membership'}
+              </Button>
             </div>
           </div>
         </div>
@@ -184,11 +231,11 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
           </TabsList>
 
           <TabsContent value="shop" className="focus-visible:outline-none focus-visible:ring-0 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {products.length === 0 ? (
+            {activeProducts.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground font-semibold text-sm uppercase tracking-widest">Brand chưa đăng sản phẩm nào.</div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12">
-                {products.map(product => (
+                {activeProducts.map(product => (
                   <Link key={product.id} href={`/products/${product.id}`} className="group flex flex-col gap-4">
                     <div className="relative aspect-[3/4] bg-muted overflow-hidden rounded-2xl">
                       <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out mix-blend-multiply" />
@@ -282,6 +329,9 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
           </TabsContent>
         </Tabs>
       </div>
+
+      <BrandChatWindow brandId={brandId} isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }
+

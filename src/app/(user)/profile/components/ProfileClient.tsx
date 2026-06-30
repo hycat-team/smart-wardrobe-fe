@@ -13,6 +13,8 @@ import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { subscriptionApi } from "@/features/subscription/api/subscription.api";
 import { CurrentPlanCard } from "@/features/subscription/components/CurrentPlanCard";
+import { ClaimAccountTab } from "./ClaimAccountTab";
+
 
 export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   // Pass initialProfile to useProfile so React Query hydrates it immediately
@@ -222,7 +224,9 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
               </div>
             </div>
           )} */}
+          <ClaimAccountTab />
         </TabsContent>
+
 
         <TabsContent value="wallet" className="animate-in fade-in duration-500 mt-2">
           <WalletPageContent />

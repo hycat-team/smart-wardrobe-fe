@@ -4,6 +4,105 @@ This document is auto-generated from `swagger.json` to provide comprehensive det
 
 ## Admin
 
+### `GET` `/api/v1/admin/brands`
+
+**Summary**: Lấy danh sách brand (Admin)
+
+**Description**: Cho phép admin lấy danh sách brand phân trang, tìm kiếm theo tên/slug và lọc theo trạng thái của brand.
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `limit` | query | integer | No |  |
+| `page` | query | integer | No |  |
+| `q` | query | string | No |  |
+| `status` | query | string | No |  |
+
+**Responses**:
+
+- **200**: Lấy danh sách brand thành công
+  - Data Schema: [AdminBrandListRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoadminbrandlistres)
+    **Properties**:
+    - `items` (Array<BrandRes>)
+    - `metadata` (ref: PaginationMetadata)
+
+---
+
+### `POST` `/api/v1/admin/brands`
+
+**Summary**: Tạo brand active trực tiếp (Admin)
+
+**Request Body**:
+
+Thông tin brand
+
+- Schema: [CreateBrandReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandreq)
+    **Properties**:
+    - `description` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `name` (string) **(Required)**
+    - `slug` (string) **(Required)**
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres)
+    **Properties**:
+    - `approvedAt` (string)
+    - `approvedByUserId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `description` (string)
+    - `id` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `name` (string)
+    - `slug` (string)
+    - `status` (ref: BrandStatus)
+    - `updatedAt` (string)
+
+---
+
+### `PATCH` `/api/v1/admin/brands/{brandId}/status`
+
+**Summary**: Cập nhật trạng thái brand (Admin)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Request Body**:
+
+Trạng thái mới
+
+- Schema: [UpdateBrandStatusReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebrandstatusreq)
+    **Properties**:
+    - `status` (ref: BrandStatus) **(Required)**
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres)
+    **Properties**:
+    - `approvedAt` (string)
+    - `approvedByUserId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `description` (string)
+    - `id` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `name` (string)
+    - `slug` (string)
+    - `status` (ref: BrandStatus)
+    - `updatedAt` (string)
+
+---
+
 ### `GET` `/api/v1/admin/categories`
 
 **Summary**: Lấy danh sách danh mục trang phục (Admin)
@@ -123,189 +222,6 @@ Thông tin danh mục cần cập nhật
 **Responses**:
 
 - **200**: Xóa danh mục thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `DELETE` `/api/v1/admin/comments/{commentID}`
-
-**Summary**: Xóa bình luận community
-
-**Description**: Cho phép admin xóa bình luận community vi phạm
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `commentID` | path | string | Yes | ID bình luận |
-
-**Responses**:
-
-- **200**: Xóa bình luận thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `PATCH` `/api/v1/admin/comments/{commentID}/restore`
-
-**Summary**: Khôi phục bình luận community
-
-**Description**: Cho phép admin khôi phục bình luận community đã bị soft delete
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `commentID` | path | string | Yes | ID bình luận |
-
-**Responses**:
-
-- **200**: Khôi phục bình luận thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `GET` `/api/v1/admin/post-items`
-
-**Summary**: Lấy danh sách listing (Admin)
-
-**Description**: Cho phép admin lấy danh sách listing phân trang và lọc theo status, transfer state.
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
-| `status` | query | integer | No |  |
-| `transferState` | query | integer | No |  |
-
-**Responses**:
-
-- **200**: Lấy danh sách sản phẩm bài đăng thành công
-  - Data Schema: [AdminPostItemListRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtoadminpostitemlistres)
-    **Properties**:
-    - `items` (Array<PostItemRes>)
-    - `metadata` (ref: PaginationMetadata)
-
----
-
-### `DELETE` `/api/v1/admin/post-items/{postItemID}`
-
-**Summary**: Xóa listing community
-
-**Description**: Cho phép admin xóa listing hoặc post item vi phạm bằng cách xóa luôn bài đăng cha liên quan
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postItemID` | path | string | Yes | ID post item |
-
-**Responses**:
-
-- **200**: Xóa listing vi phạm thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `PATCH` `/api/v1/admin/post-items/{postItemID}/hide`
-
-**Summary**: Ẩn listing community
-
-**Description**: Cho phép admin ẩn listing hoặc post item vi phạm khỏi community và giữ nguyên bài đăng cha
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postItemID` | path | string | Yes | ID post item |
-
-**Responses**:
-
-- **200**: Ẩn listing thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `GET` `/api/v1/admin/posts`
-
-**Summary**: Lấy danh sách bài đăng (Admin)
-
-**Description**: Cho phép admin lấy danh sách bài đăng phân trang, tìm kiếm và lọc.
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `isDeleted` | query | boolean | No |  |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
-| `postType` | query | string | No |  |
-| `q` | query | string | No |  |
-
-**Responses**:
-
-- **200**: Lấy danh sách bài đăng thành công
-  - Data Schema: [AdminPostListRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtoadminpostlistres)
-    **Properties**:
-    - `items` (Array<PostRes>)
-    - `metadata` (ref: PaginationMetadata)
-
----
-
-### `DELETE` `/api/v1/admin/posts/{postPublicID}`
-
-**Summary**: Xóa bài đăng community
-
-**Description**: Cho phép admin xóa bài đăng community vi phạm
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Responses**:
-
-- **200**: Xóa bài đăng thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `PATCH` `/api/v1/admin/posts/{postPublicID}/restore`
-
-**Summary**: Khôi phục bài đăng community
-
-**Description**: Cho phép admin khôi phục bài đăng community đã bị soft delete
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Responses**:
-
-- **200**: Khôi phục bài đăng thành công
   - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
     **Properties**:
     - `data` (object)
@@ -439,6 +355,7 @@ Thông tin cập nhật
 - **200**: Thông tin trang phục mẫu sau cập nhật
   - Data Schema: [WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)
     **Properties**:
+    - `brandItem` (ref: BrandItemBriefRes)
     - `category` (ref: CategoryRes)
     - `color` (string)
     - `colorHex` (string)
@@ -451,6 +368,7 @@ Thông tin cập nhật
     - `imagePublicId` (string)
     - `imageUrl` (string)
     - `isLocked` (boolean)
+    - `itemContext` (string)
     - `material` (string)
     - `pattern` (string)
     - `price` (number)
@@ -690,6 +608,7 @@ Yêu cầu gợi ý phối đồ
     **Properties**:
     - `colorTone` (string) - Tông màu phối đồ (Gợi ý: light, dark, pastel, earthy, neon... hoặc nhập tông màu tùy ý)
     - `details` (string) - Ghi chú thêm bằng tay (free text)
+    - `include_brand_items` (boolean) - Cho phép phối đồ của brand (tỷ lệ tối đa 30%)
     - `occasion` (string) - Dịp phối đồ (Gợi ý: casual, work, date, party, sport, hoặc nhập dịp tùy ý)
     - `season` (string) - Mùa phối đồ @enums spring,summer,autumn,winter,all
     - `styleTarget` (string) - Phong cách hướng tới (Gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant, hoặc nhập phong cách tùy ý)
@@ -849,7 +768,7 @@ Thông tin đăng ký
 
 - Schema: [RegisterReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoregisterreq)
     **Properties**:
-    - `address` (string) **(Required)**
+    - `address` (string)
     - `confirmPassword` (string) **(Required)**
     - `dateOfBirth` (string) **(Required)**
     - `email` (string) **(Required)**
@@ -941,6 +860,1671 @@ Mật khẩu mới và mật khẩu xác nhận
     **Properties**:
     - `data` (object)
     - `message` (string)
+
+---
+
+## Brand Benefit
+
+### `GET` `/api/v1/brand-benefits/{benefitId}`
+
+**Summary**: Lấy chi tiết quyền lợi brand đang hoạt động
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `benefitId` | path | string | Yes | ID benefit |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandBenefitRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres)
+    **Properties**:
+    - `benefitType` (string)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `featureCode` (string)
+    - `featureConfig` (object)
+    - `id` (string)
+    - `name` (string)
+    - `requiredPoints` (integer)
+    - `requiredTierId` (string)
+    - `status` (string)
+    - `unlockType` (string)
+    - `updatedAt` (string)
+
+---
+
+### `POST` `/api/v1/brand-benefits/{benefitId}/redeem`
+
+**Summary**: Đổi quyền lợi brand (User)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `benefitId` | path | string | Yes | ID quyền lợi |
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [BenefitRedemptionRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitredemptionres)
+    **Properties**:
+    - `benefitId` (string)
+    - `brandCustomerId` (string)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `expiresAt` (string)
+    - `id` (string)
+    - `pointsSpent` (integer)
+    - `redeemedAt` (string)
+    - `status` (string)
+    - `updatedAt` (string)
+    - `usedAt` (string)
+    - `userId` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/benefits`
+
+**Summary**: Lấy danh sách quyền lợi cho brand staff
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandBenefitRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres)>
+    **Properties**:
+    - `benefitType` (string)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `featureCode` (string)
+    - `featureConfig` (object)
+    - `id` (string)
+    - `name` (string)
+    - `requiredPoints` (integer)
+    - `requiredTierId` (string)
+    - `status` (string)
+    - `unlockType` (string)
+    - `updatedAt` (string)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/benefits`
+
+**Summary**: Tạo quyền lợi cho brand (Staff)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Request Body**:
+
+Thông tin quyền lợi
+
+- Schema: [CreateBrandBenefitReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandbenefitreq)
+    **Properties**:
+    - `benefitType` (string) **(Required)**
+    - `description` (string)
+    - `featureCode` (string)
+    - `featureConfig` (object)
+    - `name` (string) **(Required)**
+    - `requiredPoints` (integer)
+    - `requiredTierId` (string)
+    - `unlockType` (string) **(Required)**
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [BrandBenefitRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres)
+    **Properties**:
+    - `benefitType` (string)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `featureCode` (string)
+    - `featureConfig` (object)
+    - `id` (string)
+    - `name` (string)
+    - `requiredPoints` (integer)
+    - `requiredTierId` (string)
+    - `status` (string)
+    - `unlockType` (string)
+    - `updatedAt` (string)
+
+---
+
+### `PATCH` `/api/v1/brand-portal/brands/{brandId}/benefits/{benefitId}/status`
+
+**Summary**: Cập nhật trạng thái quyền lợi (Staff)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `benefitId` | path | string | Yes | ID quyền lợi |
+
+**Request Body**:
+
+Trạng thái mới
+
+- Schema: [UpdateBenefitStatusReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebenefitstatusreq)
+    **Properties**:
+    - `status` (string) **(Required)**
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandBenefitRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres)
+    **Properties**:
+    - `benefitType` (string)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `featureCode` (string)
+    - `featureConfig` (object)
+    - `id` (string)
+    - `name` (string)
+    - `requiredPoints` (integer)
+    - `requiredTierId` (string)
+    - `status` (string)
+    - `unlockType` (string)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/brands/{brandId}/benefits`
+
+**Summary**: Lấy danh sách quyền lợi đang hoạt động của brand (User)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandBenefitRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres)>
+    **Properties**:
+    - `benefitType` (string)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `featureCode` (string)
+    - `featureConfig` (object)
+    - `id` (string)
+    - `name` (string)
+    - `requiredPoints` (integer)
+    - `requiredTierId` (string)
+    - `status` (string)
+    - `unlockType` (string)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/me/benefit-redemptions`
+
+**Summary**: Lấy danh sách quyền lợi đã nhận của tôi
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BenefitRedemptionRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitredemptionres)>
+    **Properties**:
+    - `benefitId` (string)
+    - `brandCustomerId` (string)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `expiresAt` (string)
+    - `id` (string)
+    - `pointsSpent` (integer)
+    - `redeemedAt` (string)
+    - `status` (string)
+    - `updatedAt` (string)
+    - `usedAt` (string)
+    - `userId` (string)
+
+---
+
+## Brand
+
+### `GET` `/api/v1/brand-items/{itemId}`
+
+**Summary**: Lấy chi tiết sản phẩm brand đang hoạt động
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `itemId` | path | string | Yes | ID item |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandItemRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `fashionItem` (object) - Detailed fashion metadata
+    - `fashionItemId` (string)
+    - `id` (string)
+    - `itemType` (string)
+    - `name` (string)
+    - `price` (number)
+    - `productCode` (string)
+    - `status` (string)
+    - `updatedAt` (string)
+
+---
+
+### `POST` `/api/v1/brand-items/{itemId}/feedbacks`
+
+**Summary**: [User] Gửi phản hồi, đánh giá mẫu thử kỹ thuật số
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `itemId` | path | string | Yes | ID sản phẩm mẫu thử |
+
+**Request Body**:
+
+Nội dung phản hồi
+
+- Schema: [SubmitSampleFeedbackReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtosubmitsamplefeedbackreq)
+    **Properties**:
+    - `feedbackText` (string)
+    - `outfitId` (string)
+    - `rating` (integer)
+    - `voteType` (string) - like, dislike, would_buy, not_interested
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [DigitalSampleResponseRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtodigitalsampleresponseres)
+    **Properties**:
+    - `brandItemId` (string)
+    - `createdAt` (string)
+    - `feedbackText` (string)
+    - `id` (string)
+    - `outfitId` (string)
+    - `rating` (integer)
+    - `userId` (string)
+    - `voteType` (string)
+
+---
+
+### `GET` `/api/v1/brands`
+
+**Summary**: Lấy danh sách brand đang active
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres)>
+    **Properties**:
+    - `approvedAt` (string)
+    - `approvedByUserId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `description` (string)
+    - `id` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `name` (string)
+    - `slug` (string)
+    - `status` (ref: BrandStatus)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/brands/{brandId}`
+
+**Summary**: Lấy chi tiết brand active
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres)
+    **Properties**:
+    - `approvedAt` (string)
+    - `approvedByUserId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `description` (string)
+    - `id` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `name` (string)
+    - `slug` (string)
+    - `status` (ref: BrandStatus)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/brands/{brandId}/items`
+
+**Summary**: [User] Lấy danh sách sản phẩm hoặc mẫu thử hoạt động của Brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandItemRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemres)>
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `fashionItem` (object) - Detailed fashion metadata
+    - `fashionItemId` (string)
+    - `id` (string)
+    - `itemType` (string)
+    - `name` (string)
+    - `price` (number)
+    - `productCode` (string)
+    - `status` (string)
+    - `updatedAt` (string)
+
+---
+
+## Brand Portal
+
+### `POST` `/api/v1/brand-portal/brands`
+
+**Summary**: Gửi yêu cầu tạo brand
+
+**Request Body**:
+
+Thông tin brand
+
+- Schema: [CreateBrandReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandreq)
+    **Properties**:
+    - `description` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `name` (string) **(Required)**
+    - `slug` (string) **(Required)**
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres)
+    **Properties**:
+    - `approvedAt` (string)
+    - `approvedByUserId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `description` (string)
+    - `id` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `name` (string)
+    - `slug` (string)
+    - `status` (ref: BrandStatus)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/logo-upload-signature`
+
+**Summary**: Lấy chữ ký upload logo brand
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [UploadSignatureResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtouploadsignatureresult)
+    **Properties**:
+    - `apiKey` (string)
+    - `folder` (string)
+    - `publicId` (string)
+    - `signature` (string)
+    - `timestamp` (integer)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}`
+
+**Summary**: Lấy thông tin brand portal
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [PortalBrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoportalbrandres)
+    **Properties**:
+    - `approvedAt` (string)
+    - `approvedByUserId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `description` (string)
+    - `id` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `memberId` (string)
+    - `memberRole` (ref: BrandMemberRole)
+    - `memberStatus` (ref: BrandMemberStatus)
+    - `name` (string)
+    - `slug` (string)
+    - `status` (ref: BrandStatus)
+    - `updatedAt` (string)
+
+---
+
+### `PATCH` `/api/v1/brand-portal/brands/{brandId}/logo`
+
+**Summary**: Cập nhật logo brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Request Body**:
+
+Thông tin logo
+
+- Schema: [UpdateBrandLogoReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebrandlogoreq)
+    **Properties**:
+    - `logoPublicId` (string) **(Required)**
+    - `logoUrl` (string) **(Required)**
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres)
+    **Properties**:
+    - `approvedAt` (string)
+    - `approvedByUserId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `description` (string)
+    - `id` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `name` (string)
+    - `slug` (string)
+    - `status` (ref: BrandStatus)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/me/brands`
+
+**Summary**: Lấy danh sách brand của staff hiện tại
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[PortalBrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoportalbrandres)>
+    **Properties**:
+    - `approvedAt` (string)
+    - `approvedByUserId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `description` (string)
+    - `id` (string)
+    - `logoPublicId` (string)
+    - `logoUrl` (string)
+    - `memberId` (string)
+    - `memberRole` (ref: BrandMemberRole)
+    - `memberStatus` (ref: BrandMemberStatus)
+    - `name` (string)
+    - `slug` (string)
+    - `status` (ref: BrandStatus)
+    - `updatedAt` (string)
+
+---
+
+## Brand Chat
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/conversations`
+
+**Summary**: Lấy danh sách các cuộc hội thoại của brand (Staff)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandConversationRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationres)>
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `customerName` (string)
+    - `id` (string)
+    - `lastMessageAt` (string)
+    - `staffLastReadAt` (string)
+    - `staffUnreadCount` (integer)
+    - `status` (string)
+    - `updatedAt` (string)
+    - `userDisplayName` (string)
+    - `userId` (string)
+    - `userLastReadAt` (string)
+    - `userUnreadCount` (integer)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/conversations/{conversationId}/close`
+
+**Summary**: Đóng hội thoại brand (Staff)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `conversationId` | path | string | Yes | ID hội thoại |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandConversationRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `customerName` (string)
+    - `id` (string)
+    - `lastMessageAt` (string)
+    - `staffLastReadAt` (string)
+    - `staffUnreadCount` (integer)
+    - `status` (string)
+    - `updatedAt` (string)
+    - `userDisplayName` (string)
+    - `userId` (string)
+    - `userLastReadAt` (string)
+    - `userUnreadCount` (integer)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/conversations/{conversationId}/messages`
+
+**Summary**: Lấy danh sách tin nhắn trong cuộc hội thoại (Staff)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `conversationId` | path | string | Yes | ID cuộc hội thoại |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandConversationMessageRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessageres)>
+    **Properties**:
+    - `conversationId` (string)
+    - `createdAt` (string)
+    - `id` (string)
+    - `message` (string)
+    - `senderRole` (string)
+    - `senderUserId` (string)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/conversations/{conversationId}/messages`
+
+**Summary**: Gửi phản hồi của brand staff (Staff)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `conversationId` | path | string | Yes | ID cuộc hội thoại |
+
+**Request Body**:
+
+Nội dung phản hồi
+
+- Schema: [SendBrandChatMessageReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtosendbrandchatmessagereq)
+    **Properties**:
+    - `message` (string) **(Required)**
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [BrandConversationMessageRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessageres)
+    **Properties**:
+    - `conversationId` (string)
+    - `createdAt` (string)
+    - `id` (string)
+    - `message` (string)
+    - `senderRole` (string)
+    - `senderUserId` (string)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/conversations/{conversationId}/read`
+
+**Summary**: Đánh dấu đã đọc hội thoại brand (Staff)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `conversationId` | path | string | Yes | ID hội thoại |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandConversationRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `customerName` (string)
+    - `id` (string)
+    - `lastMessageAt` (string)
+    - `staffLastReadAt` (string)
+    - `staffUnreadCount` (integer)
+    - `status` (string)
+    - `updatedAt` (string)
+    - `userDisplayName` (string)
+    - `userId` (string)
+    - `userLastReadAt` (string)
+    - `userUnreadCount` (integer)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/conversations/{conversationId}/reopen`
+
+**Summary**: Mở lại hội thoại brand (Staff)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `conversationId` | path | string | Yes | ID hội thoại |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandConversationRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `customerName` (string)
+    - `id` (string)
+    - `lastMessageAt` (string)
+    - `staffLastReadAt` (string)
+    - `staffUnreadCount` (integer)
+    - `status` (string)
+    - `updatedAt` (string)
+    - `userDisplayName` (string)
+    - `userId` (string)
+    - `userLastReadAt` (string)
+    - `userUnreadCount` (integer)
+
+---
+
+### `GET` `/api/v1/brands/{brandId}/conversation`
+
+**Summary**: Lấy cuộc hội thoại hiện tại (User)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandConversationRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `customerName` (string)
+    - `id` (string)
+    - `lastMessageAt` (string)
+    - `staffLastReadAt` (string)
+    - `staffUnreadCount` (integer)
+    - `status` (string)
+    - `updatedAt` (string)
+    - `userDisplayName` (string)
+    - `userId` (string)
+    - `userLastReadAt` (string)
+    - `userUnreadCount` (integer)
+
+---
+
+### `POST` `/api/v1/brands/{brandId}/conversation/messages`
+
+**Summary**: Gửi tin nhắn đến brand (User)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Request Body**:
+
+Nội dung tin nhắn
+
+- Schema: [SendBrandChatMessageReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtosendbrandchatmessagereq)
+    **Properties**:
+    - `message` (string) **(Required)**
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [BrandConversationMessageRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessageres)
+    **Properties**:
+    - `conversationId` (string)
+    - `createdAt` (string)
+    - `id` (string)
+    - `message` (string)
+    - `senderRole` (string)
+    - `senderUserId` (string)
+
+---
+
+### `POST` `/api/v1/brands/{brandId}/conversation/read`
+
+**Summary**: Đánh dấu đã đọc hội thoại brand (User)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandConversationRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `customerName` (string)
+    - `id` (string)
+    - `lastMessageAt` (string)
+    - `staffLastReadAt` (string)
+    - `staffUnreadCount` (integer)
+    - `status` (string)
+    - `updatedAt` (string)
+    - `userDisplayName` (string)
+    - `userId` (string)
+    - `userLastReadAt` (string)
+    - `userUnreadCount` (integer)
+
+---
+
+## Brand Loyalty
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/customers`
+
+**Summary**: Lấy danh sách khách hàng của brand
+
+**Description**: Lấy danh sách các khách hàng đã liên kết với brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandCustomerRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerres)>
+    **Properties**:
+    - `brandId` (string)
+    - `claimedAt` (string)
+    - `createdAt` (string)
+    - `createdByMemberId` (string)
+    - `customerName` (string)
+    - `externalCustomerCode` (string)
+    - `id` (string)
+    - `joinedAt` (string)
+    - `joinedSource` (ref: BrandCustomerJoinedSource)
+    - `phoneE164` (string)
+    - `status` (ref: BrandCustomerStatus)
+    - `updatedAt` (string)
+    - `userId` (string)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/customers/offline-purchase`
+
+**Summary**: Tạo khách hàng offline cho brand
+
+**Description**: Cho phép nhân viên/chủ brand ghi nhận thông tin khách hàng mua hàng offline
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Request Body**:
+
+Thông tin khách hàng mua offline
+
+- Schema: [CreateOfflineBrandCustomerReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreateofflinebrandcustomerreq)
+    **Properties**:
+    - `customerName` (string)
+    - `externalCustomerCode` (string)
+    - `phoneE164` (string) **(Required)**
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [BrandCustomerRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerres)
+    **Properties**:
+    - `brandId` (string)
+    - `claimedAt` (string)
+    - `createdAt` (string)
+    - `createdByMemberId` (string)
+    - `customerName` (string)
+    - `externalCustomerCode` (string)
+    - `id` (string)
+    - `joinedAt` (string)
+    - `joinedSource` (ref: BrandCustomerJoinedSource)
+    - `phoneE164` (string)
+    - `status` (ref: BrandCustomerStatus)
+    - `updatedAt` (string)
+    - `userId` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/customers/{customerId}`
+
+**Summary**: Lấy chi tiết khách hàng brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `customerId` | path | string | Yes | ID customer |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandCustomerRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerres)
+    **Properties**:
+    - `brandId` (string)
+    - `claimedAt` (string)
+    - `createdAt` (string)
+    - `createdByMemberId` (string)
+    - `customerName` (string)
+    - `externalCustomerCode` (string)
+    - `id` (string)
+    - `joinedAt` (string)
+    - `joinedSource` (ref: BrandCustomerJoinedSource)
+    - `phoneE164` (string)
+    - `status` (ref: BrandCustomerStatus)
+    - `updatedAt` (string)
+    - `userId` (string)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/customers/{customerId}/claim-token`
+
+**Summary**: Tạo mã claim cho khách hàng offline
+
+**Description**: Tạo một mã claim ngẫu nhiên dùng để liên kết tài khoản offline của khách hàng với tài khoản online của người dùng. Hạn dùng 24 giờ.
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID của Brand |
+| `customerId` | path | string | Yes | ID của khách hàng cần tạo mã claim |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [CreateClaimTokenRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreateclaimtokenres)
+    **Properties**:
+    - `claimToken` (string)
+    - `expiresAt` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/customers/{customerId}/claim-tokens`
+
+**Summary**: Lấy danh sách mã claim của khách hàng offline
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID của Brand |
+| `customerId` | path | string | Yes | ID của khách hàng |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[ClaimTokenRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoclaimtokenres)>
+    **Properties**:
+    - `brandCustomerId` (string)
+    - `consumedAt` (string)
+    - `createdAt` (string)
+    - `expiresAt` (string)
+    - `id` (string)
+    - `revokedAt` (string)
+    - `revokedByUserId` (string)
+    - `revokedReason` (string)
+    - `status` (string)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/customers/{customerId}/claim-tokens/{claimId}/revoke`
+
+**Summary**: Thu hồi mã claim của khách hàng offline
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID của Brand |
+| `customerId` | path | string | Yes | ID của khách hàng |
+| `claimId` | path | string | Yes | ID của mã claim |
+
+**Request Body**:
+
+Thông tin thu hồi
+
+- Schema: [RevokeClaimTokenReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtorevokeclaimtokenreq)
+    **Properties**:
+    - `reason` (string)
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [ClaimTokenRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoclaimtokenres)
+    **Properties**:
+    - `brandCustomerId` (string)
+    - `consumedAt` (string)
+    - `createdAt` (string)
+    - `expiresAt` (string)
+    - `id` (string)
+    - `revokedAt` (string)
+    - `revokedByUserId` (string)
+    - `revokedReason` (string)
+    - `status` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/loyalty/accounts/{accountId}/lots`
+
+**Summary**: Lấy danh sách lô điểm của loyalty account
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `accountId` | path | string | Yes | ID loyalty account |
+| `status` | query | string | No | Trạng thái lô điểm |
+| `expiresAt` | query | string | No | Ngày hết hạn tối đa |
+| `page` | query | integer | No | Trang |
+| `limit` | query | integer | No | Số lượng |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[LoyaltyPointLotRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointlotres)>
+    **Properties**:
+    - `createdAt` (string)
+    - `earnTransactionId` (string)
+    - `earnedPoints` (integer)
+    - `expiresAt` (string)
+    - `id` (string)
+    - `remainingPoints` (integer)
+    - `status` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/loyalty/accounts/{accountId}/transactions`
+
+**Summary**: Lấy lịch sử điểm của loyalty account
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `accountId` | path | string | Yes | ID loyalty account |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[LoyaltyPointTransactionDetailRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointtransactiondetailres)>
+    **Properties**:
+    - `balanceAfter` (integer)
+    - `brandCustomerId` (string)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `expiresAt` (string)
+    - `id` (string)
+    - `idempotencyKey` (string)
+    - `loyaltyAccountId` (string)
+    - `pointsDelta` (integer)
+    - `reason` (string)
+    - `referenceId` (string)
+    - `referenceType` (string)
+    - `spendAmount` (number)
+    - `transactionType` (string)
+    - `userId` (string)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/loyalty/points`
+
+**Summary**: Ghi nhận cộng/trừ điểm loyalty cho brand customer
+
+**Description**: API thống nhất để brand staff ghi nhận điểm bằng userId, phone hoặc externalCustomerCode
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Request Body**:
+
+Thông tin giao dịch điểm
+
+- Schema: [GrantLoyaltyPointsReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtograntloyaltypointsreq)
+    **Properties**:
+    - `customerName` (string)
+    - `externalCustomerCode` (string)
+    - `idempotencyKey` (string)
+    - `phone` (string)
+    - `pointsDelta` (integer)
+    - `purchaseAmount` (number)
+    - `reason` (string)
+    - `referenceId` (string)
+    - `referenceType` (string)
+    - `transactionType` (ref: LoyaltyTransactionType) **(Required)**
+    - `userId` (string)
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [LoyaltyPointsTransactionRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointstransactionres)
+    **Properties**:
+    - `balanceAfter` (integer)
+    - `brandCustomerId` (string)
+    - `brandId` (string)
+    - `currentTier` (ref: LoyaltyTierBriefRes)
+    - `customerStatus` (ref: BrandCustomerStatus)
+    - `pointsDelta` (integer)
+    - `totalSpend` (number)
+    - `transactionId` (string)
+    - `userId` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/loyalty/program`
+
+**Summary**: Lấy chương trình loyalty hoạt động của brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [LoyaltyProgramRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltyprogramres)
+    **Properties**:
+    - `amountPerPoint` (number)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `id` (string)
+    - `isActive` (boolean)
+    - `name` (string)
+    - `pointExpiryDays` (integer)
+    - `roundingMode` (string)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/loyalty/tiers`
+
+**Summary**: Lấy danh sách hạng loyalty của brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[LoyaltyTierRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierres)>
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `id` (string)
+    - `minTotalSpend` (number)
+    - `name` (string)
+    - `rank` (integer)
+    - `updatedAt` (string)
+
+---
+
+### `POST` `/api/v1/brands/claim`
+
+**Summary**: Liên kết tài khoản khách hàng offline
+
+**Description**: Người dùng nhập mã claim nhận được để liên kết hồ sơ mua hàng offline của họ với tài khoản online.
+
+**Request Body**:
+
+Mã claim
+
+- Schema: [ClaimOfflineAccountReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoclaimofflineaccountreq)
+    **Properties**:
+    - `claimToken` (string) **(Required)**
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandCustomerRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerres)
+    **Properties**:
+    - `brandId` (string)
+    - `claimedAt` (string)
+    - `createdAt` (string)
+    - `createdByMemberId` (string)
+    - `customerName` (string)
+    - `externalCustomerCode` (string)
+    - `id` (string)
+    - `joinedAt` (string)
+    - `joinedSource` (ref: BrandCustomerJoinedSource)
+    - `phoneE164` (string)
+    - `status` (ref: BrandCustomerStatus)
+    - `updatedAt` (string)
+    - `userId` (string)
+
+---
+
+### `POST` `/api/v1/brands/{brandId}/join-loyalty`
+
+**Summary**: Tham gia chương trình khách hàng thân thiết
+
+**Description**: Đăng ký người dùng hiện tại tham gia chương trình loyalty của brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [BrandCustomerRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerres)
+    **Properties**:
+    - `brandId` (string)
+    - `claimedAt` (string)
+    - `createdAt` (string)
+    - `createdByMemberId` (string)
+    - `customerName` (string)
+    - `externalCustomerCode` (string)
+    - `id` (string)
+    - `joinedAt` (string)
+    - `joinedSource` (ref: BrandCustomerJoinedSource)
+    - `phoneE164` (string)
+    - `status` (ref: BrandCustomerStatus)
+    - `updatedAt` (string)
+    - `userId` (string)
+
+---
+
+### `GET` `/api/v1/me/brand-loyalties`
+
+**Summary**: Lấy danh sách loyalty brand của tôi
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandLoyaltyRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandloyaltyres)>
+    **Properties**:
+    - `brand` (ref: BrandRes)
+    - `brandCustomerId` (string)
+    - `brandId` (string)
+    - `currentPoints` (integer)
+    - `currentTier` (ref: LoyaltyTierBriefRes)
+    - `lifetimePoints` (integer)
+    - `loyaltyAccountId` (string)
+    - `nearestExpiringPointLot` (ref: LoyaltyPointLotRes)
+    - `totalSpend` (number)
+
+---
+
+### `GET` `/api/v1/me/brand-loyalties/{brandId}`
+
+**Summary**: Lấy chi tiết điểm loyalty của tôi theo brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandLoyaltyRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandloyaltyres)
+    **Properties**:
+    - `brand` (ref: BrandRes)
+    - `brandCustomerId` (string)
+    - `brandId` (string)
+    - `currentPoints` (integer)
+    - `currentTier` (ref: LoyaltyTierBriefRes)
+    - `lifetimePoints` (integer)
+    - `loyaltyAccountId` (string)
+    - `nearestExpiringPointLot` (ref: LoyaltyPointLotRes)
+    - `totalSpend` (number)
+
+---
+
+### `GET` `/api/v1/me/brand-loyalties/{brandId}/lots`
+
+**Summary**: Lấy danh sách lô điểm loyalty của tôi theo brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `status` | query | string | No | Trạng thái lô điểm |
+| `expiresAt` | query | string | No | Ngày hết hạn tối đa |
+| `page` | query | integer | No | Trang |
+| `limit` | query | integer | No | Số lượng |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[LoyaltyPointLotRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointlotres)>
+    **Properties**:
+    - `createdAt` (string)
+    - `earnTransactionId` (string)
+    - `earnedPoints` (integer)
+    - `expiresAt` (string)
+    - `id` (string)
+    - `remainingPoints` (integer)
+    - `status` (string)
+
+---
+
+### `GET` `/api/v1/me/brand-loyalties/{brandId}/transactions`
+
+**Summary**: Lấy lịch sử điểm loyalty của tôi theo brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[LoyaltyPointTransactionDetailRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointtransactiondetailres)>
+    **Properties**:
+    - `balanceAfter` (integer)
+    - `brandCustomerId` (string)
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `createdByUserId` (string)
+    - `expiresAt` (string)
+    - `id` (string)
+    - `idempotencyKey` (string)
+    - `loyaltyAccountId` (string)
+    - `pointsDelta` (integer)
+    - `reason` (string)
+    - `referenceId` (string)
+    - `referenceType` (string)
+    - `spendAmount` (number)
+    - `transactionType` (string)
+    - `userId` (string)
+
+---
+
+## Brand Item
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/items`
+
+**Summary**: [Staff] Lấy danh sách sản phẩm hoặc mẫu thử của Brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandItemRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemres)>
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `fashionItem` (object) - Detailed fashion metadata
+    - `fashionItemId` (string)
+    - `id` (string)
+    - `itemType` (string)
+    - `name` (string)
+    - `price` (number)
+    - `productCode` (string)
+    - `status` (string)
+    - `updatedAt` (string)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/items`
+
+**Summary**: [Staff] Tạo sản phẩm hoặc mẫu thử của Brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Request Body**:
+
+Thông tin sản phẩm
+
+- Schema: [CreateBrandItemReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebranditemreq)
+    **Properties**:
+    - `categoryId` (string)
+    - `description` (string)
+    - `imagePublicId` (string) **(Required)**
+    - `imageUrl` (string) **(Required)**
+    - `itemType` (string) **(Required)** - E.g. "BRAND_RETAIL" or "DIGITAL_SAMPLE"
+    - `name` (string) **(Required)**
+    - `price` (number)
+    - `productCode` (string)
+    - `status` (string) - DRAFT, ACTIVE, ARCHIVED
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [BrandItemRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `fashionItem` (object) - Detailed fashion metadata
+    - `fashionItemId` (string)
+    - `id` (string)
+    - `itemType` (string)
+    - `name` (string)
+    - `price` (number)
+    - `productCode` (string)
+    - `status` (string)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/items/upload-signature`
+
+**Summary**: Lấy chữ ký upload ảnh sản phẩm brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [UploadSignatureResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtouploadsignatureresult)
+    **Properties**:
+    - `apiKey` (string)
+    - `folder` (string)
+    - `publicId` (string)
+    - `signature` (string)
+    - `timestamp` (integer)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/items/{itemId}`
+
+**Summary**: Lấy chi tiết sản phẩm brand cho staff
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `itemId` | path | string | Yes | ID item |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandItemRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `fashionItem` (object) - Detailed fashion metadata
+    - `fashionItemId` (string)
+    - `id` (string)
+    - `itemType` (string)
+    - `name` (string)
+    - `price` (number)
+    - `productCode` (string)
+    - `status` (string)
+    - `updatedAt` (string)
+
+---
+
+### `PUT` `/api/v1/brand-portal/brands/{brandId}/items/{itemId}`
+
+**Summary**: [Staff] Cập nhật sản phẩm hoặc mẫu thử của Brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `itemId` | path | string | Yes | ID sản phẩm |
+
+**Request Body**:
+
+Thông tin cập nhật
+
+- Schema: [UpdateBrandItemReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebranditemreq)
+    **Properties**:
+    - `description` (string)
+    - `name` (string) **(Required)**
+    - `price` (number)
+    - `status` (string) **(Required)** - DRAFT, ACTIVE, ARCHIVED
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandItemRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `fashionItem` (object) - Detailed fashion metadata
+    - `fashionItemId` (string)
+    - `id` (string)
+    - `itemType` (string)
+    - `name` (string)
+    - `price` (number)
+    - `productCode` (string)
+    - `status` (string)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/items/{itemId}/feedbacks`
+
+**Summary**: [Staff] Lấy phản hồi/đóng góp ý kiến mẫu thử kỹ thuật số
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `itemId` | path | string | Yes | ID sản phẩm mẫu thử |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[DigitalSampleResponseRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtodigitalsampleresponseres)>
+    **Properties**:
+    - `brandItemId` (string)
+    - `createdAt` (string)
+    - `feedbackText` (string)
+    - `id` (string)
+    - `outfitId` (string)
+    - `rating` (integer)
+    - `userId` (string)
+    - `voteType` (string)
+
+---
+
+### `PATCH` `/api/v1/brand-portal/brands/{brandId}/items/{itemId}/status`
+
+**Summary**: Cập nhật trạng thái sản phẩm brand
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+| `itemId` | path | string | Yes | ID item |
+
+**Request Body**:
+
+Trang thai moi
+
+- Schema: [UpdateBrandItemStatusReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebranditemstatusreq)
+    **Properties**:
+    - `status` (string) **(Required)**
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: [BrandItemRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemres)
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `description` (string)
+    - `fashionItem` (object) - Detailed fashion metadata
+    - `fashionItemId` (string)
+    - `id` (string)
+    - `itemType` (string)
+    - `name` (string)
+    - `price` (number)
+    - `productCode` (string)
+    - `status` (string)
+    - `updatedAt` (string)
+
+---
+
+## Brand Member
+
+### `GET` `/api/v1/brand-portal/brands/{brandId}/members`
+
+**Summary**: Lấy danh sách thành viên của brand
+
+**Description**: Lấy danh sách tất cả các thành viên trực thuộc brand này
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Responses**:
+
+- **200**: OK
+  - Data Schema: Array<[BrandMemberRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandmemberres)>
+    **Properties**:
+    - `brandId` (string)
+    - `createdAt` (string)
+    - `id` (string)
+    - `role` (ref: BrandMemberRole)
+    - `status` (ref: BrandMemberStatus)
+    - `updatedAt` (string)
+    - `userId` (string)
+
+---
+
+### `POST` `/api/v1/brand-portal/brands/{brandId}/members`
+
+**Summary**: Thêm thành viên vào brand
+
+**Description**: Cho phép owner thêm nhiều thành viên với vai trò staff bằng email hoặc tên đăng nhập. API này không tạo owner mới.
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | path | string | Yes | ID brand |
+
+**Request Body**:
+
+Danh sách thành viên cần thêm
+
+- Schema: [AddBrandMembersReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmembersreq)
+    **Properties**:
+    - `members` (Array<AddBrandMemberItemReq>) **(Required)**
+
+**Responses**:
+
+- **201**: Created
+  - Data Schema: [AddBrandMembersRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmembersres)
+    **Properties**:
+    - `created` (Array<AddBrandMemberItemResult>)
+    - `failed` (Array<AddBrandMemberItemResult>)
+    - `updated` (Array<AddBrandMemberItemResult>)
 
 ---
 
@@ -1363,6 +2947,22 @@ Thông tin cập nhật
 
 ---
 
+### `GET` `/api/v1/me/wardrobe-items/stats`
+
+**Summary**: Lấy số liệu thống kê tủ đồ
+
+**Description**: Trả về số lượng active items và outfits đã lưu của user
+
+**Responses**:
+
+- **200**: Lấy số liệu thống kê tủ đồ thành công
+  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
+    **Properties**:
+    - `data` (object)
+    - `message` (string)
+
+---
+
 ### `GET` `/api/v1/system-catalog/wardrobe-items`
 
 **Summary**: Lấy danh sách trang phục hệ thống
@@ -1407,6 +3007,7 @@ Danh sách ảnh trang phục
 - **201**: Danh sách trang phục đang được xử lý ngầm
   - Data Schema: Array<[WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)>
     **Properties**:
+    - `brandItem` (ref: BrandItemBriefRes)
     - `category` (ref: CategoryRes)
     - `color` (string)
     - `colorHex` (string)
@@ -1419,6 +3020,7 @@ Danh sách ảnh trang phục
     - `imagePublicId` (string)
     - `imageUrl` (string)
     - `isLocked` (boolean)
+    - `itemContext` (string)
     - `material` (string)
     - `pattern` (string)
     - `price` (number)
@@ -1474,6 +3076,7 @@ Danh sách ID trang phục mẫu
 - **201**: Danh sách trang phục cá nhân được tạo
   - Data Schema: Array<[WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)>
     **Properties**:
+    - `brandItem` (ref: BrandItemBriefRes)
     - `category` (ref: CategoryRes)
     - `color` (string)
     - `colorHex` (string)
@@ -1486,6 +3089,7 @@ Danh sách ID trang phục mẫu
     - `imagePublicId` (string)
     - `imageUrl` (string)
     - `isLocked` (boolean)
+    - `itemContext` (string)
     - `material` (string)
     - `pattern` (string)
     - `price` (number)
@@ -1550,6 +3154,7 @@ Danh sách ID trang phục mẫu
 - **200**: Chi tiết trang phục
   - Data Schema: [WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)
     **Properties**:
+    - `brandItem` (ref: BrandItemBriefRes)
     - `category` (ref: CategoryRes)
     - `color` (string)
     - `colorHex` (string)
@@ -1562,6 +3167,7 @@ Danh sách ID trang phục mẫu
     - `imagePublicId` (string)
     - `imageUrl` (string)
     - `isLocked` (boolean)
+    - `itemContext` (string)
     - `material` (string)
     - `pattern` (string)
     - `price` (number)
@@ -1599,6 +3205,7 @@ Số lượng nhân bản
 - **201**: Danh sách trang phục được nhân bản
   - Data Schema: Array<[WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)>
     **Properties**:
+    - `brandItem` (ref: BrandItemBriefRes)
     - `category` (ref: CategoryRes)
     - `color` (string)
     - `colorHex` (string)
@@ -1611,6 +3218,7 @@ Số lượng nhân bản
     - `imagePublicId` (string)
     - `imageUrl` (string)
     - `isLocked` (boolean)
+    - `itemContext` (string)
     - `material` (string)
     - `pattern` (string)
     - `price` (number)
@@ -1655,6 +3263,7 @@ Thông tin phân loại thủ công
 - **200**: Chi tiết trang phục sau khi cập nhật
   - Data Schema: [WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)
     **Properties**:
+    - `brandItem` (ref: BrandItemBriefRes)
     - `category` (ref: CategoryRes)
     - `color` (string)
     - `colorHex` (string)
@@ -1667,6 +3276,7 @@ Thông tin phân loại thủ công
     - `imagePublicId` (string)
     - `imageUrl` (string)
     - `isLocked` (boolean)
+    - `itemContext` (string)
     - `material` (string)
     - `pattern` (string)
     - `price` (number)
@@ -1696,6 +3306,7 @@ Thông tin phân loại thủ công
 - **200**: Chi tiết trang phục sau khi đưa lại vào hàng đợi xử lý
   - Data Schema: [WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)
     **Properties**:
+    - `brandItem` (ref: BrandItemBriefRes)
     - `category` (ref: CategoryRes)
     - `color` (string)
     - `colorHex` (string)
@@ -1708,6 +3319,7 @@ Thông tin phân loại thủ công
     - `imagePublicId` (string)
     - `imageUrl` (string)
     - `isLocked` (boolean)
+    - `itemContext` (string)
     - `material` (string)
     - `pattern` (string)
     - `price` (number)
@@ -1717,466 +3329,6 @@ Thông tin phân loại thủ công
     - `status` (ref: WardrobeItemStatus)
     - `style` (string)
     - `userId` (string)
-
----
-
-## Community
-
-### `GET` `/api/v1/posts`
-
-**Summary**: Lấy danh sách bài đăng cộng đồng
-
-**Description**: Lấy feed danh sách bài đăng của cộng đồng sắp xếp theo thứ tự mới nhất hoặc hot nhất
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
-| `postType` | query | string | No |  |
-| `sort` | query | string | No |  |
-| `username` | query | string | No |  |
-
-**Responses**:
-
-- **200**: Lấy feed thành công
-  - Data Schema: [GetFeedRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtogetfeedres)
-    **Properties**:
-    - `items` (Array<PostRes>)
-    - `metadata` (ref: PaginationMetadata)
-
----
-
-### `POST` `/api/v1/posts`
-
-**Summary**: Tạo bài đăng cộng đồng mới
-
-**Description**: Đăng bài bán đồ hoặc khoe outfit lên bảng tin cộng đồng
-
-**Request Body**:
-
-Nội dung bài đăng
-
-- Schema: [CreatePostReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtocreatepostreq)
-    **Properties**:
-    - `contactInfo` (string)
-    - `content` (string) **(Required)**
-    - `items` (Array<PostItemInputReq>)
-    - `media` (Array<PostMediaReq>)
-    - `postType` (object) **(Required)**
-    - `title` (string)
-
-**Responses**:
-
-- **201**: Tạo bài đăng thành công
-  - Data Schema: [PostRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostres)
-    **Properties**:
-    - `avatarUrl` (string)
-    - `commentCount` (integer)
-    - `contactInfo` (string)
-    - `content` (string)
-    - `createdAt` (string)
-    - `finalFeedScore` (number)
-    - `firstName` (string)
-    - `globalHotnessScore` (number)
-    - `id` (string)
-    - `isDeleted` (boolean)
-    - `isLiked` (boolean)
-    - `items` (Array<PostItemRes>)
-    - `lastName` (string)
-    - `likeCount` (integer)
-    - `media` (Array<PostMediaRes>)
-    - `postType` (ref: PostType)
-    - `publicId` (string)
-    - `sharePath` (string)
-    - `title` (string)
-    - `totalPrice` (number)
-    - `updatedAt` (string)
-    - `userId` (string)
-    - `username` (string)
-
----
-
-### `GET` `/api/v1/posts/upload-signature`
-
-**Summary**: Lấy chữ ký tải media bài đăng
-
-**Description**: Lấy chữ ký bảo mật từ Cloudinary để client tải trực tiếp media bài đăng cộng đồng lên
-
-**Responses**:
-
-- **200**: Chữ ký và thông tin upload
-  - Data Schema: [UploadSignatureResult](#smart-wardrobe-beinternalsharedapplicationdtouploadsignatureresult)
-    **Properties**:
-    - `apiKey` (string)
-    - `folder` (string)
-    - `publicId` (string)
-    - `signature` (string)
-    - `timestamp` (integer)
-
----
-
-### `GET` `/api/v1/posts/{postPublicID}`
-
-**Summary**: Lấy chi tiết bài đăng
-
-**Description**: Lấy thông tin chi tiết của một bài đăng cụ thể không bao gồm danh sách bình luận và danh sách người thích
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Responses**:
-
-- **200**: Lấy chi tiết bài đăng thành công
-  - Data Schema: [PostRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostres)
-    **Properties**:
-    - `avatarUrl` (string)
-    - `commentCount` (integer)
-    - `contactInfo` (string)
-    - `content` (string)
-    - `createdAt` (string)
-    - `finalFeedScore` (number)
-    - `firstName` (string)
-    - `globalHotnessScore` (number)
-    - `id` (string)
-    - `isDeleted` (boolean)
-    - `isLiked` (boolean)
-    - `items` (Array<PostItemRes>)
-    - `lastName` (string)
-    - `likeCount` (integer)
-    - `media` (Array<PostMediaRes>)
-    - `postType` (ref: PostType)
-    - `publicId` (string)
-    - `sharePath` (string)
-    - `title` (string)
-    - `totalPrice` (number)
-    - `updatedAt` (string)
-    - `userId` (string)
-    - `username` (string)
-
----
-
-### `PUT` `/api/v1/posts/{postPublicID}`
-
-**Summary**: Cập nhật bài đăng cộng đồng
-
-**Description**: Cập nhật nội dung, media và danh sách món đồ của bài đăng
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Request Body**:
-
-Nội dung bài đăng
-
-- Schema: [UpdatePostReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtoupdatepostreq)
-    **Properties**:
-    - `contactInfo` (string)
-    - `content` (string) **(Required)**
-    - `items` (Array<PostItemInputReq>)
-    - `media` (Array<PostMediaReq>)
-    - `title` (string)
-
-**Responses**:
-
-- **200**: Cập nhật bài đăng thành công
-  - Data Schema: [PostRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostres)
-    **Properties**:
-    - `avatarUrl` (string)
-    - `commentCount` (integer)
-    - `contactInfo` (string)
-    - `content` (string)
-    - `createdAt` (string)
-    - `finalFeedScore` (number)
-    - `firstName` (string)
-    - `globalHotnessScore` (number)
-    - `id` (string)
-    - `isDeleted` (boolean)
-    - `isLiked` (boolean)
-    - `items` (Array<PostItemRes>)
-    - `lastName` (string)
-    - `likeCount` (integer)
-    - `media` (Array<PostMediaRes>)
-    - `postType` (ref: PostType)
-    - `publicId` (string)
-    - `sharePath` (string)
-    - `title` (string)
-    - `totalPrice` (number)
-    - `updatedAt` (string)
-    - `userId` (string)
-    - `username` (string)
-
----
-
-### `DELETE` `/api/v1/posts/{postPublicID}`
-
-**Summary**: Xóa bài đăng
-
-**Description**: Xóa bài đăng của chính người dùng hiện tại
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Responses**:
-
-- **200**: Xóa bài đăng thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `GET` `/api/v1/posts/{postPublicID}/comments`
-
-**Summary**: Lấy bình luận cấp đầu của bài đăng
-
-**Description**: Lấy danh sách bình luận F0 của bài đăng cụ thể
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Responses**:
-
-- **200**: Lấy danh sách bình luận thành công
-  - Data Schema: Array<[CommentRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtocommentres)>
-    **Properties**:
-    - `avatarUrl` (string)
-    - `content` (string)
-    - `createdAt` (string)
-    - `firstName` (string)
-    - `id` (string)
-    - `lastName` (string)
-    - `parentCommentId` (string)
-    - `userId` (string)
-    - `username` (string)
-
----
-
-### `POST` `/api/v1/posts/{postPublicID}/comments`
-
-**Summary**: Thêm bình luận vào bài viết
-
-**Description**: Tạo bình luận mới hoặc phản hồi trực tiếp vào bình luận cấp đầu của bài viết cộng đồng
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Request Body**:
-
-Nội dung bình luận
-
-- Schema: [AddCommentReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtoaddcommentreq)
-    **Properties**:
-    - `content` (string) **(Required)**
-    - `parentCommentId` (string)
-
-**Responses**:
-
-- **201**: Thêm bình luận thành công
-  - Data Schema: [CommentRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtocommentres)
-    **Properties**:
-    - `avatarUrl` (string)
-    - `content` (string)
-    - `createdAt` (string)
-    - `firstName` (string)
-    - `id` (string)
-    - `lastName` (string)
-    - `parentCommentId` (string)
-    - `userId` (string)
-    - `username` (string)
-
----
-
-### `PUT` `/api/v1/posts/{postPublicID}/comments/{commentID}`
-
-**Summary**: Cập nhật bình luận của bài viết
-
-**Description**: Chỉnh sửa nội dung bình luận thuộc bài viết cộng đồng
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-| `commentID` | path | string | Yes | ID bình luận |
-
-**Request Body**:
-
-Nội dung bình luận mới
-
-- Schema: [UpdateCommentReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtoupdatecommentreq)
-    **Properties**:
-    - `content` (string) **(Required)**
-
-**Responses**:
-
-- **200**: Cập nhật bình luận thành công
-  - Data Schema: [CommentRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtocommentres)
-    **Properties**:
-    - `avatarUrl` (string)
-    - `content` (string)
-    - `createdAt` (string)
-    - `firstName` (string)
-    - `id` (string)
-    - `lastName` (string)
-    - `parentCommentId` (string)
-    - `userId` (string)
-    - `username` (string)
-
----
-
-### `DELETE` `/api/v1/posts/{postPublicID}/comments/{commentID}`
-
-**Summary**: Xóa bình luận của bài viết
-
-**Description**: Xóa bình luận thuộc bài viết cộng đồng của chính người dùng hiện tại
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-| `commentID` | path | string | Yes | ID bình luận |
-
-**Responses**:
-
-- **200**: Xóa bình luận thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `GET` `/api/v1/posts/{postPublicID}/comments/{commentID}/replies`
-
-**Summary**: Lấy phản hồi của một bình luận cấp đầu
-
-**Description**: Lấy danh sách bình luận F1 của một bình luận F0 cụ thể
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-| `commentID` | path | string | Yes | ID bình luận cấp đầu |
-
-**Responses**:
-
-- **200**: Lấy danh sách phản hồi thành công
-  - Data Schema: Array<[CommentRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtocommentres)>
-    **Properties**:
-    - `avatarUrl` (string)
-    - `content` (string)
-    - `createdAt` (string)
-    - `firstName` (string)
-    - `id` (string)
-    - `lastName` (string)
-    - `parentCommentId` (string)
-    - `userId` (string)
-    - `username` (string)
-
----
-
-### `DELETE` `/api/v1/posts/{postPublicID}/items`
-
-**Summary**: Gỡ món đồ khỏi bài đăng
-
-**Description**: Gỡ một hoặc nhiều món đồ ra khỏi danh sách bán trong bài đăng
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Request Body**:
-
-Danh sách ID các món đồ cần gỡ
-
-- Schema: [RemovePostItemsReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtoremovepostitemsreq)
-    **Properties**:
-    - `postItemIds` (Array<string>) **(Required)**
-
-**Responses**:
-
-- **200**: Gỡ món đồ thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `PUT` `/api/v1/posts/{postPublicID}/like`
-
-**Summary**: Thích / Bỏ thích bài đăng
-
-**Description**: Like hoặc unlike một bài viết trên cộng đồng bằng cách gửi trạng thái rõ ràng
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Request Body**:
-
-Trạng thái thích
-
-- Schema: [LikePostReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtolikepostreq)
-    **Properties**:
-    - `isLiked` (boolean) **(Required)**
-
-**Responses**:
-
-- **200**: Cập nhật like thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `GET` `/api/v1/posts/{postPublicID}/likes`
-
-**Summary**: Lấy danh sách người thích bài đăng
-
-**Description**: Lấy danh sách người dùng đã thích bài đăng để hiển thị kiểu Facebook
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postPublicID` | path | string | Yes | Mã công khai bài đăng |
-
-**Responses**:
-
-- **200**: Lấy danh sách người thích thành công
-  - Data Schema: Array<[PostLikeUserRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostlikeuserres)>
-    **Properties**:
-    - `avatarUrl` (string)
-    - `firstName` (string)
-    - `id` (string)
-    - `lastName` (string)
-    - `username` (string)
 
 ---
 
@@ -2485,419 +3637,453 @@ Dữ liệu Webhook
 
 ---
 
-## Transfers
-
-### `POST` `/api/v1/transfers/accept`
-
-**Summary**: Chấp nhận nhận bàn giao danh sách trang phục
-
-**Description**: Đồng ý nhận danh sách trang phục đã mua về tủ đồ cá nhân
-
-**Request Body**:
-
-Danh sách sản phẩm bàn giao
-
-- Schema: [AcceptTransfersReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtoaccepttransfersreq)
-    **Properties**:
-    - `postItemIds` (Array<string>) **(Required)**
-
-**Responses**:
-
-- **200**: Nhận món đồ vào tủ thành công
-  - Data Schema: Array<[WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)>
-    **Properties**:
-    - `category` (ref: CategoryRes)
-    - `color` (string)
-    - `colorHex` (string)
-    - `colorHue` (number)
-    - `colorLightness` (number)
-    - `colorSaturation` (number)
-    - `createdAt` (string)
-    - `fit` (string)
-    - `id` (string)
-    - `imagePublicId` (string)
-    - `imageUrl` (string)
-    - `isLocked` (boolean)
-    - `material` (string)
-    - `pattern` (string)
-    - `price` (number)
-    - `processingErrorReason` (string)
-    - `reviewReason` (string)
-    - `seasonality` (string)
-    - `status` (ref: WardrobeItemStatus)
-    - `style` (string)
-    - `userId` (string)
-
----
-
-### `POST` `/api/v1/transfers/decline`
-
-**Summary**: Từ chối nhận bàn giao danh sách trang phục
-
-**Description**: Từ chối nhận bàn giao danh sách trang phục mua từ bài đăng cộng đồng
-
-**Request Body**:
-
-Danh sách sản phẩm bàn giao
-
-- Schema: [AcceptTransfersReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtoaccepttransfersreq)
-    **Properties**:
-    - `postItemIds` (Array<string>) **(Required)**
-
-**Responses**:
-
-- **200**: Từ chối nhận món đồ thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `GET` `/api/v1/transfers/items/{postItemID}/requests`
-
-**Summary**: Lấy danh sách người xin mua của một sản phẩm
-
-**Description**: Người bán xem danh sách những người mua đã gửi yêu cầu xin mua cho món đồ cụ thể
-
-**Request Parameters**:
-
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `postItemID` | path | string | Yes | ID chi tiết món đồ trong bài đăng |
-
-**Responses**:
-
-- **200**: Lấy danh sách người xin mua thành công
-  - Data Schema: Array<[TransferRequestRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtotransferrequestres)>
-    **Properties**:
-    - `avatarUrl` (string)
-    - `buyerId` (string)
-    - `createdAt` (string)
-    - `id` (string)
-    - `status` (ref: RequestStatus)
-    - `username` (string)
-
----
-
-### `POST` `/api/v1/transfers/mark-sold`
-
-**Summary**: Đánh dấu các món đồ đã bán (Bulk)
-
-**Description**: Đánh dấu danh sách các trang phục đã được bán cho một người dùng khác (qua buyerId) và kích hoạt trạng thái bàn giao
-
-**Request Body**:
-
-Thông tin người mua và danh sách sản phẩm
-
-- Schema: [MarkPostItemsSoldReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtomarkpostitemssoldreq)
-    **Properties**:
-    - `buyerId` (string) **(Required)**
-    - `postItemIds` (Array<string>) **(Required)**
-
-**Responses**:
-
-- **200**: Đánh dấu đã bán thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
-### `GET` `/api/v1/transfers/me/pending`
-
-**Summary**: Danh sách trang phục đang chờ nhận bàn giao
-
-**Description**: Lấy danh sách các trang phục do người khác đánh dấu bán cho bạn đang chờ xác nhận
-
-**Responses**:
-
-- **200**: Lấy danh sách đang chờ nhận thành công
-  - Data Schema: Array<[PendingTransferRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopendingtransferres)>
-    **Properties**:
-    - `item` (ref: WardrobeItemRes)
-    - `postItemId` (string)
-    - `sellerName` (string)
-
----
-
-### `GET` `/api/v1/transfers/me/posts`
-
-**Summary**: Danh sách bài đăng bàn giao của người bán
-
-**Description**: Lấy danh sách các bài đăng của người bán có món đồ đang chờ, được chấp nhận, bị từ chối hoặc đã bán trong luồng bàn giao
-
-**Responses**:
-
-- **200**: Lấy danh sách bài đăng bàn giao thành công
-  - Data Schema: Array<[SellerTransferPostRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtosellertransferpostres)>
-    **Properties**:
-    - `createdAt` (string)
-    - `items` (Array<SellerTransferPostItemRes>)
-    - `postId` (string)
-    - `postType` (ref: PostType)
-    - `title` (string)
-    - `updatedAt` (string)
-
----
-
-### `POST` `/api/v1/transfers/requests`
-
-**Summary**: Gửi yêu cầu xin mua trang phục (Bulk)
-
-**Description**: Người mua đăng ký muốn mua một hoặc nhiều món đồ trong bài đăng của người bán
-
-**Request Body**:
-
-Danh sách sản phẩm xin mua
-
-- Schema: [CreateTransferRequestsReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtocreatetransferrequestsreq)
-    **Properties**:
-    - `postItemIds` (Array<string>) **(Required)**
-
-**Responses**:
-
-- **200**: Gửi yêu cầu xin mua thành công
-  - Schema: [APIResponse](#smart-wardrobe-beinternalsharedpresentationapiresponse)
-    **Properties**:
-    - `data` (object)
-    - `message` (string)
-
----
-
 ## Models (Definitions)
 
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtoaccepttransfersreq"></a>`AcceptTransfersReq`
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemreq"></a>`AddBrandMemberItemReq`
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `postItemIds` | Array<string> | Yes |  |
+| `emailOrUsername` | string | Yes |  |
+| `role` | [BrandMemberRole](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandmemberrolebrandmemberrole) | Yes |  |
 
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtoaddcommentreq"></a>`AddCommentReq`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `content` | string | Yes |  |
-| `parentCommentId` | string | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtoadminpostitemlistres"></a>`AdminPostItemListRes`
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult"></a>`AddBrandMemberItemResult`
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `items` | Array<[PostItemRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostitemres)> | No |  |
+| `emailOrUsername` | string | No |  |
+| `member` | [BrandMemberRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandmemberres) | No |  |
+| `message` | string | No |  |
+| `reasonCode` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmembersreq"></a>`AddBrandMembersReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `members` | Array<[AddBrandMemberItemReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemreq)> | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmembersres"></a>`AddBrandMembersRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `created` | Array<[AddBrandMemberItemResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult)> | No |  |
+| `failed` | Array<[AddBrandMemberItemResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult)> | No |  |
+| `updated` | Array<[AddBrandMemberItemResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult)> | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoadminbrandlistres"></a>`AdminBrandListRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `items` | Array<[BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres)> | No |  |
 | `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
 
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtoadminpostlistres"></a>`AdminPostListRes`
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitredemptionres"></a>`BenefitRedemptionRes`
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `items` | Array<[PostRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtocommentres"></a>`CommentRes`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `avatarUrl` | string | No |  |
-| `content` | string | No |  |
+| `benefitId` | string | No |  |
+| `brandCustomerId` | string | No |  |
+| `brandId` | string | No |  |
 | `createdAt` | string | No |  |
-| `firstName` | string | No |  |
+| `expiresAt` | string | No |  |
 | `id` | string | No |  |
-| `lastName` | string | No |  |
-| `parentCommentId` | string | No |  |
-| `userId` | string | No |  |
-| `username` | string | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtocreatepostreq"></a>`CreatePostReq`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `contactInfo` | string | No |  |
-| `content` | string | Yes |  |
-| `items` | Array<[PostItemInputReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostiteminputreq)> | No |  |
-| `media` | Array<[PostMediaReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostmediareq)> | No |  |
-| `postType` | object | Yes |  |
-| `title` | string | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtocreatetransferrequestsreq"></a>`CreateTransferRequestsReq`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `postItemIds` | Array<string> | Yes |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtogetfeedres"></a>`GetFeedRes`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[PostRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtolikepostreq"></a>`LikePostReq`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `isLiked` | boolean | Yes |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtomarkpostitemssoldreq"></a>`MarkPostItemsSoldReq`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `buyerId` | string | Yes |  |
-| `postItemIds` | Array<string> | Yes |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtopendingtransferres"></a>`PendingTransferRes`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `item` | [WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres) | No |  |
-| `postItemId` | string | No |  |
-| `sellerName` | string | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtopostiteminputreq"></a>`PostItemInputReq`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `itemCondition` | [ItemCondition](#smart-wardrobe-beinternalshareddomainconstantsitemconditionitemcondition) | No |  |
-| `itemId` | string | Yes |  |
-| `price` | number | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtopostitemres"></a>`PostItemRes`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `buyerUserId` | string | No |  |
-| `declinedAt` | string | No |  |
-| `id` | string | No |  |
-| `item` | [WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres) | No |  |
-| `itemCondition` | [ItemCondition](#smart-wardrobe-beinternalshareddomainconstantsitemconditionitemcondition) | No |  |
-| `price` | number | No |  |
-| `soldAt` | string | No |  |
-| `status` | [PostItemStatus](#smart-wardrobe-beinternalshareddomainconstantspostitemstatuspostitemstatus) | No |  |
-| `transferState` | [TransferState](#smart-wardrobe-beinternalshareddomainconstantstransferstatetransferstate) | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtopostlikeuserres"></a>`PostLikeUserRes`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `avatarUrl` | string | No |  |
-| `firstName` | string | No |  |
-| `id` | string | No |  |
-| `lastName` | string | No |  |
-| `username` | string | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtopostmediareq"></a>`PostMediaReq`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `mediaType` | string | Yes |  |
-| `mediaUrl` | string | Yes |  |
-| `publicId` | string | No |  |
-| `sortOrder` | integer | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtopostmediares"></a>`PostMediaRes`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `id` | string | No |  |
-| `mediaType` | string | No |  |
-| `mediaUrl` | string | No |  |
-| `publicId` | string | No |  |
-| `sortOrder` | integer | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtopostres"></a>`PostRes`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `avatarUrl` | string | No |  |
-| `commentCount` | integer | No |  |
-| `contactInfo` | string | No |  |
-| `content` | string | No |  |
-| `createdAt` | string | No |  |
-| `finalFeedScore` | number | No |  |
-| `firstName` | string | No |  |
-| `globalHotnessScore` | number | No |  |
-| `id` | string | No |  |
-| `isDeleted` | boolean | No |  |
-| `isLiked` | boolean | No |  |
-| `items` | Array<[PostItemRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostitemres)> | No |  |
-| `lastName` | string | No |  |
-| `likeCount` | integer | No |  |
-| `media` | Array<[PostMediaRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostmediares)> | No |  |
-| `postType` | [PostType](#smart-wardrobe-beinternalshareddomainconstantsposttypeposttype) | No |  |
-| `publicId` | string | No |  |
-| `sharePath` | string | No |  |
-| `title` | string | No |  |
-| `totalPrice` | number | No |  |
+| `pointsSpent` | integer | No |  |
+| `redeemedAt` | string | No |  |
+| `status` | string | No |  |
 | `updatedAt` | string | No |  |
+| `usedAt` | string | No |  |
 | `userId` | string | No |  |
-| `username` | string | No |  |
 
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtoremovepostitemsreq"></a>`RemovePostItemsReq`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `postItemIds` | Array<string> | Yes |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtosellertransferpostitemres"></a>`SellerTransferPostItemRes`
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres"></a>`BrandBenefitRes`
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `buyer` | [TransferBuyerSummaryRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtotransferbuyersummaryres) | No |  |
-| `declinedAt` | string | No |  |
-| `item` | [WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres) | No |  |
-| `itemCondition` | [ItemCondition](#smart-wardrobe-beinternalshareddomainconstantsitemconditionitemcondition) | No |  |
-| `postItemId` | string | No |  |
-| `price` | number | No |  |
-| `soldAt` | string | No |  |
-| `status` | [PostItemStatus](#smart-wardrobe-beinternalshareddomainconstantspostitemstatuspostitemstatus) | No |  |
-| `transferState` | [TransferState](#smart-wardrobe-beinternalshareddomainconstantstransferstatetransferstate) | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtosellertransferpostres"></a>`SellerTransferPostRes`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
+| `benefitType` | string | No |  |
+| `brandId` | string | No |  |
 | `createdAt` | string | No |  |
-| `items` | Array<[SellerTransferPostItemRes](#smart-wardrobe-beinternalmodulescommunityapplicationdtosellertransferpostitemres)> | No |  |
-| `postId` | string | No |  |
-| `postType` | [PostType](#smart-wardrobe-beinternalshareddomainconstantsposttypeposttype) | No |  |
-| `title` | string | No |  |
+| `description` | string | No |  |
+| `featureCode` | string | No |  |
+| `featureConfig` | object | No |  |
+| `id` | string | No |  |
+| `name` | string | No |  |
+| `requiredPoints` | integer | No |  |
+| `requiredTierId` | string | No |  |
+| `status` | string | No |  |
+| `unlockType` | string | No |  |
 | `updatedAt` | string | No |  |
 
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtotransferbuyersummaryres"></a>`TransferBuyerSummaryRes`
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessageres"></a>`BrandConversationMessageRes`
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `avatarUrl` | string | No |  |
-| `id` | string | No |  |
-| `username` | string | No |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtotransferrequestres"></a>`TransferRequestRes`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `avatarUrl` | string | No |  |
-| `buyerId` | string | No |  |
+| `conversationId` | string | No |  |
 | `createdAt` | string | No |  |
 | `id` | string | No |  |
-| `status` | [RequestStatus](#smart-wardrobe-beinternalshareddomainconstantsrequeststatusrequeststatus) | No |  |
-| `username` | string | No |  |
+| `message` | string | No |  |
+| `senderRole` | string | No |  |
+| `senderUserId` | string | No |  |
 
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtoupdatecommentreq"></a>`UpdateCommentReq`
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `content` | string | Yes |  |
-
-### <a id="smart-wardrobe-beinternalmodulescommunityapplicationdtoupdatepostreq"></a>`UpdatePostReq`
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationres"></a>`BrandConversationRes`
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `contactInfo` | string | No |  |
-| `content` | string | Yes |  |
-| `items` | Array<[PostItemInputReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostiteminputreq)> | No |  |
-| `media` | Array<[PostMediaReq](#smart-wardrobe-beinternalmodulescommunityapplicationdtopostmediareq)> | No |  |
-| `title` | string | No |  |
+| `brandId` | string | No |  |
+| `createdAt` | string | No |  |
+| `customerName` | string | No |  |
+| `id` | string | No |  |
+| `lastMessageAt` | string | No |  |
+| `staffLastReadAt` | string | No |  |
+| `staffUnreadCount` | integer | No |  |
+| `status` | string | No |  |
+| `updatedAt` | string | No |  |
+| `userDisplayName` | string | No |  |
+| `userId` | string | No |  |
+| `userLastReadAt` | string | No |  |
+| `userUnreadCount` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerres"></a>`BrandCustomerRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `claimedAt` | string | No |  |
+| `createdAt` | string | No |  |
+| `createdByMemberId` | string | No |  |
+| `customerName` | string | No |  |
+| `externalCustomerCode` | string | No |  |
+| `id` | string | No |  |
+| `joinedAt` | string | No |  |
+| `joinedSource` | [BrandCustomerJoinedSource](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandcustomerjoinedsourcebrandcustomerjoinedsource) | No |  |
+| `phoneE164` | string | No |  |
+| `status` | [BrandCustomerStatus](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandcustomerstatusbrandcustomerstatus) | No |  |
+| `updatedAt` | string | No |  |
+| `userId` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemres"></a>`BrandItemRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `createdAt` | string | No |  |
+| `description` | string | No |  |
+| `fashionItem` | object | No | Detailed fashion metadata |
+| `fashionItemId` | string | No |  |
+| `id` | string | No |  |
+| `itemType` | string | No |  |
+| `name` | string | No |  |
+| `price` | number | No |  |
+| `productCode` | string | No |  |
+| `status` | string | No |  |
+| `updatedAt` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandloyaltyres"></a>`BrandLoyaltyRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brand` | [BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres) | No |  |
+| `brandCustomerId` | string | No |  |
+| `brandId` | string | No |  |
+| `currentPoints` | integer | No |  |
+| `currentTier` | [LoyaltyTierBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres) | No |  |
+| `lifetimePoints` | integer | No |  |
+| `loyaltyAccountId` | string | No |  |
+| `nearestExpiringPointLot` | [LoyaltyPointLotRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointlotres) | No |  |
+| `totalSpend` | number | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandmemberres"></a>`BrandMemberRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `createdAt` | string | No |  |
+| `id` | string | No |  |
+| `role` | [BrandMemberRole](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandmemberrolebrandmemberrole) | No |  |
+| `status` | [BrandMemberStatus](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandmemberstatusbrandmemberstatus) | No |  |
+| `updatedAt` | string | No |  |
+| `userId` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres"></a>`BrandRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `approvedAt` | string | No |  |
+| `approvedByUserId` | string | No |  |
+| `createdAt` | string | No |  |
+| `createdByUserId` | string | No |  |
+| `description` | string | No |  |
+| `id` | string | No |  |
+| `logoPublicId` | string | No |  |
+| `logoUrl` | string | No |  |
+| `name` | string | No |  |
+| `slug` | string | No |  |
+| `status` | [BrandStatus](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandstatusbrandstatus) | No |  |
+| `updatedAt` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoclaimofflineaccountreq"></a>`ClaimOfflineAccountReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `claimToken` | string | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoclaimtokenres"></a>`ClaimTokenRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandCustomerId` | string | No |  |
+| `consumedAt` | string | No |  |
+| `createdAt` | string | No |  |
+| `expiresAt` | string | No |  |
+| `id` | string | No |  |
+| `revokedAt` | string | No |  |
+| `revokedByUserId` | string | No |  |
+| `revokedReason` | string | No |  |
+| `status` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandbenefitreq"></a>`CreateBrandBenefitReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `benefitType` | string | Yes |  |
+| `description` | string | No |  |
+| `featureCode` | string | No |  |
+| `featureConfig` | object | No |  |
+| `name` | string | Yes |  |
+| `requiredPoints` | integer | No |  |
+| `requiredTierId` | string | No |  |
+| `unlockType` | string | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebranditemreq"></a>`CreateBrandItemReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `categoryId` | string | No |  |
+| `description` | string | No |  |
+| `imagePublicId` | string | Yes |  |
+| `imageUrl` | string | Yes |  |
+| `itemType` | string | Yes | E.g. "BRAND_RETAIL" or "DIGITAL_SAMPLE" |
+| `name` | string | Yes |  |
+| `price` | number | No |  |
+| `productCode` | string | No |  |
+| `status` | string | No | DRAFT, ACTIVE, ARCHIVED |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandreq"></a>`CreateBrandReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `description` | string | No |  |
+| `logoPublicId` | string | No |  |
+| `logoUrl` | string | No |  |
+| `name` | string | Yes |  |
+| `slug` | string | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreateclaimtokenres"></a>`CreateClaimTokenRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `claimToken` | string | No |  |
+| `expiresAt` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreateofflinebrandcustomerreq"></a>`CreateOfflineBrandCustomerReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customerName` | string | No |  |
+| `externalCustomerCode` | string | No |  |
+| `phoneE164` | string | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtodigitalsampleresponseres"></a>`DigitalSampleResponseRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandItemId` | string | No |  |
+| `createdAt` | string | No |  |
+| `feedbackText` | string | No |  |
+| `id` | string | No |  |
+| `outfitId` | string | No |  |
+| `rating` | integer | No |  |
+| `userId` | string | No |  |
+| `voteType` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtograntloyaltypointsreq"></a>`GrantLoyaltyPointsReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customerName` | string | No |  |
+| `externalCustomerCode` | string | No |  |
+| `idempotencyKey` | string | No |  |
+| `phone` | string | No |  |
+| `pointsDelta` | integer | No |  |
+| `purchaseAmount` | number | No |  |
+| `reason` | string | No |  |
+| `referenceId` | string | No |  |
+| `referenceType` | string | No |  |
+| `transactionType` | [LoyaltyTransactionType](#smart-wardrobe-beinternalshareddomainconstantsbrandloyaltytransactiontypeloyaltytransactiontype) | Yes |  |
+| `userId` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointlotres"></a>`LoyaltyPointLotRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `createdAt` | string | No |  |
+| `earnTransactionId` | string | No |  |
+| `earnedPoints` | integer | No |  |
+| `expiresAt` | string | No |  |
+| `id` | string | No |  |
+| `remainingPoints` | integer | No |  |
+| `status` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointtransactiondetailres"></a>`LoyaltyPointTransactionDetailRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `balanceAfter` | integer | No |  |
+| `brandCustomerId` | string | No |  |
+| `brandId` | string | No |  |
+| `createdAt` | string | No |  |
+| `createdByUserId` | string | No |  |
+| `expiresAt` | string | No |  |
+| `id` | string | No |  |
+| `idempotencyKey` | string | No |  |
+| `loyaltyAccountId` | string | No |  |
+| `pointsDelta` | integer | No |  |
+| `reason` | string | No |  |
+| `referenceId` | string | No |  |
+| `referenceType` | string | No |  |
+| `spendAmount` | number | No |  |
+| `transactionType` | string | No |  |
+| `userId` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointstransactionres"></a>`LoyaltyPointsTransactionRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `balanceAfter` | integer | No |  |
+| `brandCustomerId` | string | No |  |
+| `brandId` | string | No |  |
+| `currentTier` | [LoyaltyTierBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres) | No |  |
+| `customerStatus` | [BrandCustomerStatus](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandcustomerstatusbrandcustomerstatus) | No |  |
+| `pointsDelta` | integer | No |  |
+| `totalSpend` | number | No |  |
+| `transactionId` | string | No |  |
+| `userId` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltyprogramres"></a>`LoyaltyProgramRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `amountPerPoint` | number | No |  |
+| `brandId` | string | No |  |
+| `createdAt` | string | No |  |
+| `id` | string | No |  |
+| `isActive` | boolean | No |  |
+| `name` | string | No |  |
+| `pointExpiryDays` | integer | No |  |
+| `roundingMode` | string | No |  |
+| `updatedAt` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres"></a>`LoyaltyTierBriefRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | string | No |  |
+| `name` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierres"></a>`LoyaltyTierRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `createdAt` | string | No |  |
+| `description` | string | No |  |
+| `id` | string | No |  |
+| `minTotalSpend` | number | No |  |
+| `name` | string | No |  |
+| `rank` | integer | No |  |
+| `updatedAt` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoportalbrandres"></a>`PortalBrandRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `approvedAt` | string | No |  |
+| `approvedByUserId` | string | No |  |
+| `createdAt` | string | No |  |
+| `createdByUserId` | string | No |  |
+| `description` | string | No |  |
+| `id` | string | No |  |
+| `logoPublicId` | string | No |  |
+| `logoUrl` | string | No |  |
+| `memberId` | string | No |  |
+| `memberRole` | [BrandMemberRole](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandmemberrolebrandmemberrole) | No |  |
+| `memberStatus` | [BrandMemberStatus](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandmemberstatusbrandmemberstatus) | No |  |
+| `name` | string | No |  |
+| `slug` | string | No |  |
+| `status` | [BrandStatus](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandstatusbrandstatus) | No |  |
+| `updatedAt` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtorevokeclaimtokenreq"></a>`RevokeClaimTokenReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `reason` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtosendbrandchatmessagereq"></a>`SendBrandChatMessageReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `message` | string | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtosubmitsamplefeedbackreq"></a>`SubmitSampleFeedbackReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `feedbackText` | string | No |  |
+| `outfitId` | string | No |  |
+| `rating` | integer | No |  |
+| `voteType` | string | No | like, dislike, would_buy, not_interested |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebenefitstatusreq"></a>`UpdateBenefitStatusReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `status` | string | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebranditemreq"></a>`UpdateBrandItemReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `description` | string | No |  |
+| `name` | string | Yes |  |
+| `price` | number | No |  |
+| `status` | string | Yes | DRAFT, ACTIVE, ARCHIVED |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebranditemstatusreq"></a>`UpdateBrandItemStatusReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `status` | string | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebrandlogoreq"></a>`UpdateBrandLogoReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `logoPublicId` | string | Yes |  |
+| `logoUrl` | string | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebrandstatusreq"></a>`UpdateBrandStatusReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `status` | [BrandStatus](#smart-wardrobe-beinternalshareddomainconstantsbrandbrandstatusbrandstatus) | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtouploadsignatureresult"></a>`UploadSignatureResult`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `apiKey` | string | No |  |
+| `folder` | string | No |  |
+| `publicId` | string | No |  |
+| `signature` | string | No |  |
+| `timestamp` | integer | No |  |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoadminuserlistres"></a>`AdminUserListRes`
 
@@ -2947,7 +4133,7 @@ Danh sách sản phẩm xin mua
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `address` | string | Yes |  |
+| `address` | string | No |  |
 | `confirmPassword` | string | Yes |  |
 | `dateOfBirth` | string | Yes |  |
 | `email` | string | Yes |  |
@@ -3058,11 +4244,11 @@ Danh sách sản phẩm xin mua
 | `dateOfBirth` | string | No |  |
 | `email` | string | No |  |
 | `firstName` | string | No |  |
-| `gender` | [Gender](#smart-wardrobe-beinternalshareddomainconstantsgendergender) | No |  |
+| `gender` | [Gender](#smart-wardrobe-beinternalshareddomainconstantssharedgendergender) | No |  |
 | `id` | string | No |  |
 | `lastName` | string | No |  |
-| `roleSlug` | [RoleSlug](#smart-wardrobe-beinternalshareddomainconstantsroleslugroleslug) | No |  |
-| `status` | [UserStatus](#smart-wardrobe-beinternalshareddomainconstantsuserstatususerstatus) | No |  |
+| `roleSlug` | [RoleSlug](#smart-wardrobe-beinternalshareddomainconstantsidentityroleslugroleslug) | No |  |
+| `status` | [UserStatus](#smart-wardrobe-beinternalshareddomainconstantsidentityuserstatususerstatus) | No |  |
 | `subscription` | [UserSubscriptionRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtousersubscriptionres) | No |  |
 | `username` | string | No |  |
 
@@ -3117,7 +4303,7 @@ Danh sách sản phẩm xin mua
 | `expiresAt` | string | No |  |
 | `nextReconciliationAt` | string | No |  |
 | `orderCode` | integer | No |  |
-| `paymentStatus` | [DepositStatus](#smart-wardrobe-beinternalshareddomainconstantsdepositstatusdepositstatus) | No |  |
+| `paymentStatus` | [DepositStatus](#smart-wardrobe-beinternalshareddomainconstantssubscriptiondepositstatusdepositstatus) | No |  |
 | `paymentUrl` | string | No |  |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtosubscriptionplandto"></a>`SubscriptionPlanDTO`
@@ -3131,7 +4317,7 @@ Danh sách sản phẩm xin mua
 | `maxOutfits` | integer | No |  |
 | `maxWardrobeItems` | integer | No |  |
 | `name` | string | No |  |
-| `planKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantsplankindplankind) | No |  |
+| `planKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantssubscriptionplankindplankind) | No |  |
 | `price` | number | No |  |
 | `slug` | string | No |  |
 | `tierRank` | integer | No |  |
@@ -3146,7 +4332,7 @@ Danh sách sản phẩm xin mua
 | `id` | string | No |  |
 | `newBalance` | number | No |  |
 | `previousBalance` | number | No |  |
-| `transactionType` | [WalletStatementType](#smart-wardrobe-beinternalshareddomainconstantswalletstatementtypewalletstatementtype) | No |  |
+| `transactionType` | [WalletStatementType](#smart-wardrobe-beinternalshareddomainconstantssubscriptionwalletstatementtypewalletstatementtype) | No |  |
 | `userID` | string | No |  |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtowallettopupreq"></a>`WalletTopUpReq`
@@ -3166,7 +4352,7 @@ Danh sách sản phẩm xin mua
 | `aiUsageCount` | integer | No |  |
 | `expiresAt` | string | No |  |
 | `fallbackPlanCode` | string | No |  |
-| `fallbackPlanKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantsplankindplankind) | No |  |
+| `fallbackPlanKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantssubscriptionplankindplankind) | No |  |
 | `fallbackTierRank` | integer | No |  |
 | `isAutoRenewEnabled` | boolean | No |  |
 | `lastResetDate` | string | No |  |
@@ -3174,7 +4360,7 @@ Danh sách sản phẩm xin mua
 | `maxWardrobeItems` | integer | No |  |
 | `outfitRecommendCount` | integer | No |  |
 | `planID` | string | No |  |
-| `planKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantsplankindplankind) | No |  |
+| `planKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantssubscriptionplankindplankind) | No |  |
 | `planName` | string | No |  |
 | `planSlug` | string | No |  |
 | `tierRank` | integer | No |  |
@@ -3187,13 +4373,13 @@ Danh sách sản phẩm xin mua
 | `aiOutfitDailyQuota` | integer | No |  |
 | `expiresAt` | string | No |  |
 | `fallbackPlanCode` | string | No |  |
-| `fallbackPlanKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantsplankindplankind) | No |  |
+| `fallbackPlanKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantssubscriptionplankindplankind) | No |  |
 | `fallbackTierRank` | integer | No |  |
 | `isAutoRenewEnabled` | boolean | No |  |
 | `maxOutfits` | integer | No |  |
 | `maxWardrobeItems` | integer | No |  |
 | `planID` | string | No |  |
-| `planKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantsplankindplankind) | No |  |
+| `planKind` | [PlanKind](#smart-wardrobe-beinternalshareddomainconstantssubscriptionplankindplankind) | No |  |
 | `planName` | string | No |  |
 | `planSlug` | string | No |  |
 | `tierRank` | integer | No |  |
@@ -3209,6 +4395,17 @@ Danh sách sản phẩm xin mua
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
 | `items` | Array<[WardrobeBatchUploadItemReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobebatchuploaditemreq)> | Yes |  |
+
+### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres"></a>`BrandItemBriefRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `brandName` | string | No |  |
+| `id` | string | No |  |
+| `itemType` | string | No |  |
+| `name` | string | No |  |
+| `price` | number | No |  |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtobulkdeleteitemsreq"></a>`BulkDeleteItemsReq`
 
@@ -3232,7 +4429,7 @@ Danh sách sản phẩm xin mua
 | `content` | string | No |  |
 | `createdAt` | string | No |  |
 | `id` | string | No |  |
-| `sender` | [MessageSender](#smart-wardrobe-beinternalshareddomainconstantsmessagesendermessagesender) | No |  |
+| `sender` | [MessageSender](#smart-wardrobe-beinternalshareddomainconstantssharedmessagesendermessagesender) | No |  |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtochatsessionres"></a>`ChatSessionRes`
 
@@ -3288,7 +4485,10 @@ Danh sách sản phẩm xin mua
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
+| `brandItem` | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres) | No |  |
+| `fashionItemId` | string | No |  |
 | `id` | string | No |  |
+| `itemContext` | string | No |  |
 | `layerOrder` | integer | No |  |
 | `positionX` | number | No |  |
 | `positionY` | number | No |  |
@@ -3306,7 +4506,7 @@ Danh sách sản phẩm xin mua
 | `id` | string | No |  |
 | `items` | Array<[OutfitItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtooutfititemres)> | No |  |
 | `name` | string | No |  |
-| `status` | [OutfitStatus](#smart-wardrobe-beinternalshareddomainconstantsoutfitstatusoutfitstatus) | No |  |
+| `status` | [OutfitStatus](#smart-wardrobe-beinternalshareddomainconstantswardrobeoutfitstatusoutfitstatus) | No |  |
 | `updatedAt` | string | No |  |
 | `userId` | string | No |  |
 
@@ -3316,6 +4516,7 @@ Danh sách sản phẩm xin mua
 | --- | --- | --- | --- |
 | `colorTone` | string | No | Tông màu phối đồ (Gợi ý: light, dark, pastel, earthy, neon... hoặc nhập tông màu tùy ý) |
 | `details` | string | No | Ghi chú thêm bằng tay (free text) |
+| `include_brand_items` | boolean | No | Cho phép phối đồ của brand (tỷ lệ tối đa 30%) |
 | `occasion` | string | No | Dịp phối đồ (Gợi ý: casual, work, date, party, sport, hoặc nhập dịp tùy ý) |
 | `season` | string | No | Mùa phối đồ @enums spring,summer,autumn,winter,all |
 | `styleTarget` | string | No | Phong cách hướng tới (Gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant, hoặc nhập phong cách tùy ý) |
@@ -3343,11 +4544,11 @@ Danh sách sản phẩm xin mua
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
+| `fashionItemId` | string | Yes |  |
 | `layerOrder` | integer | Yes |  |
 | `positionX` | number | No |  |
 | `positionY` | number | No |  |
 | `scale` | number | Yes |  |
-| `wardrobeItemId` | string | Yes |  |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtosaveoutfitreq"></a>`SaveOutfitReq`
 
@@ -3425,6 +4626,7 @@ Danh sách sản phẩm xin mua
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
+| `brandItem` | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres) | No |  |
 | `category` | [CategoryRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtocategoryres) | No |  |
 | `color` | string | No |  |
 | `colorHex` | string | No |  |
@@ -3437,13 +4639,14 @@ Danh sách sản phẩm xin mua
 | `imagePublicId` | string | No |  |
 | `imageUrl` | string | No |  |
 | `isLocked` | boolean | No |  |
+| `itemContext` | string | No |  |
 | `material` | string | No |  |
 | `pattern` | string | No |  |
 | `price` | number | No |  |
 | `processingErrorReason` | string | No |  |
 | `reviewReason` | string | No |  |
 | `seasonality` | string | No |  |
-| `status` | [WardrobeItemStatus](#smart-wardrobe-beinternalshareddomainconstantswardrobestatuswardrobeitemstatus) | No |  |
+| `status` | [WardrobeItemStatus](#smart-wardrobe-beinternalshareddomainconstantswardrobewardrobestatuswardrobeitemstatus) | No |  |
 | `style` | string | No |  |
 | `userId` | string | No |  |
 
@@ -3501,7 +4704,87 @@ Danh sách sản phẩm xin mua
 | `signature` | string | No |  |
 | `timestamp` | integer | No |  |
 
-### <a id="smart-wardrobe-beinternalshareddomainconstantsdepositstatusdepositstatus"></a>`DepositStatus`
+### <a id="smart-wardrobe-beinternalshareddomainconstantsbrandbrandcustomerjoinedsourcebrandcustomerjoinedsource"></a>`BrandCustomerJoinedSource`
+
+*Enum values:*
+
+- `self_join` (**SelfJoin**)
+- `offline_purchase` (**OfflinePurchase**)
+- `import` (**Import**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantsbrandbrandcustomerstatusbrandcustomerstatus"></a>`BrandCustomerStatus`
+
+*Enum values:*
+
+- `active` (**Active**)
+- `blocked` (**Blocked**)
+- `left` (**Left**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantsbrandbrandmemberrolebrandmemberrole"></a>`BrandMemberRole`
+
+*Enum values:*
+
+- `owner` (**Owner**)
+- `staff` (**Staff**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantsbrandbrandmemberstatusbrandmemberstatus"></a>`BrandMemberStatus`
+
+*Enum values:*
+
+- `active` (**Active**)
+- `invited` (**Invited**)
+- `disabled` (**Disabled**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantsbrandbrandstatusbrandstatus"></a>`BrandStatus`
+
+*Enum values:*
+
+- `pending_review` (**PendingReview**)
+- `active` (**Active**)
+- `suspended` (**Suspended**)
+- `archived` (**Archived**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantsbrandloyaltytransactiontypeloyaltytransactiontype"></a>`LoyaltyTransactionType`
+
+*Enum values:*
+
+- `earn` (**Earn**)
+- `redeem` (**Redeem**)
+- `adjust` (**Adjust**)
+- `expire` (**Expire**)
+- `refund` (**Refund**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantsidentityroleslugroleslug"></a>`RoleSlug`
+
+*Enum values:*
+
+- `admin` (**Admin**)
+- `user` (**User**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantsidentityuserstatususerstatus"></a>`UserStatus`
+
+*Enum values:*
+
+- `0` (**Active**)
+- `1` (**Inactive**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantssharedgendergender"></a>`Gender`
+
+*Enum values:*
+
+- `0` (**Unknown**)
+- `1` (**Male**)
+- `2` (**Female**)
+- `3` (**Other**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantssharedmessagesendermessagesender"></a>`MessageSender`
+
+*Enum values:*
+
+- `user` (**User**)
+- `ai` (**AI**)
+
+### <a id="smart-wardrobe-beinternalshareddomainconstantssubscriptiondepositstatusdepositstatus"></a>`DepositStatus`
 
 *Enum values:*
 
@@ -3516,36 +4799,7 @@ Danh sách sản phẩm xin mua
 - `8` (**Expired**)
 - `9` (**InvestigationRequired**)
 
-### <a id="smart-wardrobe-beinternalshareddomainconstantsgendergender"></a>`Gender`
-
-*Enum values:*
-
-- `0` (**Unknown**)
-- `1` (**Male**)
-- `2` (**Female**)
-- `3` (**Other**)
-
-### <a id="smart-wardrobe-beinternalshareddomainconstantsitemconditionitemcondition"></a>`ItemCondition`
-
-*Enum values:*
-
-- `1` (**Standard**) - Default
-
-### <a id="smart-wardrobe-beinternalshareddomainconstantsmessagesendermessagesender"></a>`MessageSender`
-
-*Enum values:*
-
-- `user` (**User**)
-- `ai` (**AI**)
-
-### <a id="smart-wardrobe-beinternalshareddomainconstantsoutfitstatusoutfitstatus"></a>`OutfitStatus`
-
-*Enum values:*
-
-- `0` (**Draft**)
-- `1` (**Active**)
-
-### <a id="smart-wardrobe-beinternalshareddomainconstantsplankindplankind"></a>`PlanKind`
+### <a id="smart-wardrobe-beinternalshareddomainconstantssubscriptionplankindplankind"></a>`PlanKind`
 
 *Enum values:*
 
@@ -3553,64 +4807,24 @@ Danh sách sản phẩm xin mua
 - `1` (**Finite**)
 - `2` (**Lifetime**)
 
-### <a id="smart-wardrobe-beinternalshareddomainconstantspostitemstatuspostitemstatus"></a>`PostItemStatus`
+### <a id="smart-wardrobe-beinternalshareddomainconstantssubscriptionwalletstatementtypewalletstatementtype"></a>`WalletStatementType`
 
 *Enum values:*
 
-- `0` (**Hidden**)
-- `1` (**Available**)
-- `2` (**Sold**)
+- `topup` (**Topup**)
+- `subscription_purchase` (**SubscriptionPurchase**)
+- `subscription_renewal` (**SubscriptionRenewal**)
+- `lower_tier_payment_credit` (**LowerTierPaymentCredit**)
+- `same_lifetime_payment_credit` (**SameLifetimePaymentCredit**)
 
-### <a id="smart-wardrobe-beinternalshareddomainconstantsposttypeposttype"></a>`PostType`
-
-*Enum values:*
-
-- `SALE` (**Sale**)
-- `OUTFIT` (**Outfit**)
-
-### <a id="smart-wardrobe-beinternalshareddomainconstantsrequeststatusrequeststatus"></a>`RequestStatus`
+### <a id="smart-wardrobe-beinternalshareddomainconstantswardrobeoutfitstatusoutfitstatus"></a>`OutfitStatus`
 
 *Enum values:*
 
-- `0` (**Pending**)
-- `1` (**Accepted**)
-- `2` (**Rejected**)
-- `3` (**Canceled**)
+- `0` (**Draft**)
+- `1` (**Active**)
 
-### <a id="smart-wardrobe-beinternalshareddomainconstantsroleslugroleslug"></a>`RoleSlug`
-
-*Enum values:*
-
-- `admin` (**Admin**)
-- `user` (**User**)
-
-### <a id="smart-wardrobe-beinternalshareddomainconstantstransferstatetransferstate"></a>`TransferState`
-
-*Enum values:*
-
-- `0` (**None**) - Not transferred yet
-- `1` (**Pending**) - Pending receipt of item
-- `2` (**Accepted**) - Accepted receipt of item
-- `3` (**Declined**) - Declined receipt of item
-
-### <a id="smart-wardrobe-beinternalshareddomainconstantsuserstatususerstatus"></a>`UserStatus`
-
-*Enum values:*
-
-- `0` (**Active**)
-- `1` (**Inactive**)
-
-### <a id="smart-wardrobe-beinternalshareddomainconstantswalletstatementtypewalletstatementtype"></a>`WalletStatementType`
-
-*Enum values:*
-
-- `TOPUP` (**Topup**)
-- `SUBSCRIPTION_PURCHASE` (**SubscriptionPurchase**)
-- `SUBSCRIPTION_RENEWAL` (**SubscriptionRenewal**)
-- `LOWER_TIER_PAYMENT_CREDIT` (**LowerTierPaymentCredit**)
-- `SAME_LIFETIME_PAYMENT_CREDIT` (**SameLifetimePaymentCredit**)
-
-### <a id="smart-wardrobe-beinternalshareddomainconstantswardrobestatuswardrobeitemstatus"></a>`WardrobeItemStatus`
+### <a id="smart-wardrobe-beinternalshareddomainconstantswardrobewardrobestatuswardrobeitemstatus"></a>`WardrobeItemStatus`
 
 *Enum values:*
 

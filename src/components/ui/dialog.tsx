@@ -65,6 +65,14 @@ function DialogContent({
           className,
         )}
         {...props}
+        onInteractOutside={(e) => {
+          if (e.target instanceof Element && e.target.closest('[data-slot="select-content"]')) {
+            e.preventDefault();
+          }
+          if (props.onInteractOutside) {
+            props.onInteractOutside(e);
+          }
+        }}
       >
         {children}
         {showCloseButton && (

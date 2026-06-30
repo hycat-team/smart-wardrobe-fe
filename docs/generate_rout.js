@@ -4,7 +4,7 @@ const fs = require('fs');
 // const swaggerPath = 'C:/FPT/Project/smart-wardrobe/smart-wardrobe-be/docs/swagger.json';
 // const outputPath = 'C:/FPT/Project/smart-wardrobe/smart-wardrobe-fe/docs/ROUT.md';
 
-const swaggerPath = 'D:/Project/smart-wardrobe/smart-wardrobe-be/docs/swagger.json';
+const swaggerPath = 'D:/Project/smart-wardrobe/smart-wardrobe-be/api/swagger/swagger.json';
 const outputPath = 'D:/Project/smart-wardrobe/smart-wardrobe-fe/docs/ROUT.md';
 
 try {

@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: 'Quản lý Sản phẩm | Brand Workspace',
 };
 
-export default function BrandProductsPage() {
-  return <BrandProductsClient />;
+export default async function BrandProductsPage({ params }: { params: Promise<{ brandId: string }> }) {
+  const { brandId } = await params;
+  return <BrandProductsClient brandId={brandId} />;
 }

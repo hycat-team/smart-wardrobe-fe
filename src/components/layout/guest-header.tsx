@@ -70,6 +70,27 @@ export function GuestHeader() {
             {isLoggedIn ? (
               <>
                 <Link
+                  href="/brand-portal/select"
+                  className={`
+                    font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
+                    hover:opacity-100
+                    ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
+                  `}
+                >
+                  Kênh Thương Hiệu
+                </Link>
+                {user?.roleSlug === 'admin' && (
+                  <Link
+                    href="/admin/brands"
+                    className={`
+                      font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
+                      hover:opacity-100 text-red-500/80 hover:text-red-500
+                    `}
+                  >
+                    Quản trị hệ thống
+                  </Link>
+                )}
+                <Link
                   href="/community"
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
@@ -236,6 +257,10 @@ export function GuestHeader() {
 
             <MobileNavLink href="/wardrobe" onClick={() => setMobileMenuOpen(false)}>Tủ đồ</MobileNavLink>
             <MobileNavLink href="/ai-stylist" onClick={() => setMobileMenuOpen(false)}>AI Stylist</MobileNavLink>
+            <MobileNavLink href="/brand-portal/select" onClick={() => setMobileMenuOpen(false)}>Kênh Thương Hiệu</MobileNavLink>
+            {user?.roleSlug === 'admin' && (
+              <MobileNavLink href="/admin/brands" onClick={() => setMobileMenuOpen(false)}>Quản trị hệ thống</MobileNavLink>
+            )}
             <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Cộng đồng</MobileNavLink>
             <MobileNavLink href="/profile" onClick={() => setMobileMenuOpen(false)}>Hồ sơ</MobileNavLink>
 

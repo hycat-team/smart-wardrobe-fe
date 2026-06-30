@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, Suspense, useRef } from 'react';
+import React, { useState, Suspense, useRef } from 'react';
 import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
-import { mockProducts } from '@/lib/mock-data/b2b';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, UploadCloud, X } from 'lucide-react';
+import { ChevronLeft, UploadCloud, X, Loader2 } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useGetBrandItemDetail } from '@/features/brands/queries/user-brands.queries';
 
 interface ReturnRequestClientProps {
   orderId: string;
@@ -24,12 +24,21 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
   const { orders, submitReturnRequest } = useB2BDemoStore();
   const order = orders.find(o => o.id === orderId);
   const orderItem = order?.items.find(i => i.productId === productId);
-  const product = mockProducts.find(p => p.id === productId);
+  
+  const { data: product, isLoading: isProductLoading } = useGetBrandItemDetail(productId || "");
 
   const [type, setType] = useState('SIZE_EXCHANGE');
   const [reason, setReason] = useState('');
   const [preferredResolution, setPreferredResolution] = useState('');
   const [images, setImages] = useState<string[]>([]);
+
+  if (isProductLoading) {
+    return (
+      <div className="flex-1 bg-background flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!order || !orderItem || !product) {
     return (
