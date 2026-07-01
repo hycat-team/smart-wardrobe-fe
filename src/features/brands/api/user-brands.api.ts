@@ -1,11 +1,11 @@
 import api from '@/lib/axios';
-import { BrandInfo, Benefit, Conversation, ConversationMessage, BrandItemRes } from '@/features/brand-portal/types';
+import { BrandInfo, Benefit, Conversation, ConversationMessage, BrandItemRes, PaginationResult } from '@/features/brand-portal/types';
 
 export const userBrandsApi = {
   // Lấy danh sách brand đang hoạt động
   getActiveBrands: async () => {
-    const res = await api.get<{data: BrandInfo[]}>('/brands');
-    return res.data.data;
+    const res = await api.get<{data: PaginationResult<BrandInfo>}>('/brands');
+    return res.data.data.items;
   },
 
   // Lấy chi tiết brand (public)
