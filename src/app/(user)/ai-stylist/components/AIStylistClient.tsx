@@ -9,6 +9,7 @@ import { useOutfitCanvas } from "@/features/outfits/hooks/useOutfitCanvas";
 import { OutfitCanvasBoard } from "@/features/outfits/components/OutfitCanvasBoard";
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
 import { useCreateOutfit } from "@/features/outfits/queries/outfits.queries";
+import { useCreateSampleFeedback } from "@/features/brands/queries/user-brands.queries";
 import { toast } from "sonner";
 import { useB2BDemoStore } from "@/lib/mock-data/b2b/store";
 import { uploadToCloudinary } from "@/lib/cloudinary";
@@ -16,7 +17,6 @@ import * as htmlToImage from "html-to-image";
 import { Switch } from "@/components/ui/switch";
 import { useGhostCloset } from "@/features/ghost-closet/hooks/useGhostCloset";
 import { WardrobeImpactPanel } from "@/features/ghost-closet/components/WardrobeImpactPanel";
-import { MOCK_GHOST_ITEM } from "@/features/ghost-closet/mock/ghostClosetMock";
 import { GhostItem } from "@/features/ghost-closet/types";
 
 import { OCCASIONS, STYLES, SEASONS, WEATHERS, COLOR_TONES, occasionMap } from "@/features/ai-stylist/components/AIQuickOptions";
@@ -52,6 +52,9 @@ function AIStylistContent() {
   } = useOutfitCanvas();
 
   const createOutfitMutation = useCreateOutfit();
+  
+  // Loyalty and Sample Data
+  const createSampleFeedback = useCreateSampleFeedback();
 
   // Handle initialization from URL params if any
   useEffect(() => {
@@ -80,41 +83,8 @@ function AIStylistContent() {
         occasion: occasionMap[selectedOccasion] || selectedOccasion.trim(),
         season: selectedSeason ? selectedSeason.toLowerCase() : "",
         styleTarget: selectedStyle ? selectedStyle.toLowerCase() : "",
+        include_brand_items: ghostClosetEnabled ? true : undefined,
       });
-
-      // Inject ghost item if enabled
-      if (ghostClosetEnabled && res.items.length > 0) {
-        let primaryGhost: any = MOCK_GHOST_ITEM;
-        let altGhosts: any[] = [];
-        try {
-          const reportsStr = localStorage.getItem("digital_sample_lab_reports");
-          if (reportsStr) {
-            const reports = JSON.parse(reportsStr);
-            if (reports && reports.length > 0) {
-              const mappedGhosts = [...reports].reverse().map(r => ({
-                ...MOCK_GHOST_ITEM,
-                id: r.id,
-                brandName: "My Brand",
-                imageUrl: r.imageUrl || MOCK_GHOST_ITEM.imageUrl,
-                color: r.variants?.[0]?.name || "Mặc định",
-                colorHex: r.variants?.[0]?.color || "#000",
-                price: parseInt(r.price) || 0,
-              }));
-              primaryGhost = mappedGhosts[0];
-              altGhosts = mappedGhosts.slice(1);
-            }
-          }
-        } catch (e) {
-          console.error("Failed to load custom ghost item", e);
-        }
-
-        const ghostAsAIItem = {
-          role: `Món đồ mới`,
-          primary: primaryGhost,
-          alternatives: altGhosts,
-        };
-        res.items.splice(1, 0, ghostAsAIItem);
-      }
 
       setOutfitData(res);
 
@@ -587,7 +557,7 @@ function AIStylistContent() {
               <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-widest text-foreground">Phối đồ với các thương hiệu địa phương</p>
-                  {/* <p className="text-[9px] text-muted-foreground mt-1 tracking-widest uppercase">Thử đồ mới từ brand địa phương</p> */}
+                  <p className="text-[9px] text-muted-foreground mt-1 tracking-widest uppercase">Thử nghiệm các mẫu thiết kế ảo</p>
                 </div>
                 <Switch checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} />
               </div>
@@ -612,6 +582,9 @@ function AIStylistContent() {
         isOpen={isImpactPanelOpen}
         onClose={() => setIsImpactPanelOpen(false)}
         item={activeGhostItem}
+        onFeedback={(itemId, payload) => {
+          createSampleFeedback.mutate({ itemId, payload });
+        }}
         onKeep={() => {
           if (activeGhostItem) logGhostAction(activeGhostItem.id, 'keep');
           setIsImpactPanelOpen(false);

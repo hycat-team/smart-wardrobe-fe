@@ -7,6 +7,7 @@ export interface AIOutfitRecommendationReq {
   weather?: string;
   colorTone?: string;
   details?: string;
+  include_brand_items?: boolean;
 }
 
 export interface AIOutfitItem {

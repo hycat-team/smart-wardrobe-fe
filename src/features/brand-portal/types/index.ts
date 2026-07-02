@@ -238,3 +238,23 @@ export interface CreateBrandItemReq {
 }
 
 export interface UpdateBrandItemReq extends Partial<CreateBrandItemReq> {}
+
+export type VoteType = 'like' | 'dislike' | 'would_buy' | 'not_interested';
+
+export interface SampleFeedbackPayload {
+  outfitId?: string;
+  voteType: VoteType;
+  rating?: number;
+  feedbackText?: string;
+}
+
+export interface DigitalSampleResponseRes {
+  id: string;
+  itemId: string;
+  userId: string;
+  outfitId?: string;
+  voteType: VoteType;
+  rating?: number;
+  feedbackText?: string;
+  createdAt: string;
+}

@@ -1,22 +1,32 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { UploadCloud, Plus, X, Sparkles, SlidersHorizontal, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { useCreateBrandItem, useGetBrandItemUploadSignature } from "@/features/brand-portal/queries/brand-portal.queries";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 export function DigitalSampleLabClient() {
   const router = useRouter();
+  const params = useParams();
+  const brandId = params.brandId as string;
   const [productName, setProductName] = useState("");
   const [concept, setConcept] = useState("");
   const [variants, setVariants] = useState([{ name: "Black", color: "#1A1A1A" }]);
   const [price, setPrice] = useState("950000");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const createBrandItem = useCreateBrandItem(brandId);
+  const getUploadSignature = useGetBrandItemUploadSignature(brandId);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImageUrl(reader.result as string);
@@ -41,36 +51,50 @@ export function DigitalSampleLabClient() {
     setVariants(newVariants);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    const newSampleId = `sample-${Date.now()}`;
-    try {
-      const existingStr = localStorage.getItem("digital_sample_lab_reports");
-      const existing = existingStr ? JSON.parse(existingStr) : [];
-
-      const newReport = {
-        id: newSampleId,
-        productName,
-        concept,
-        variants,
-        price,
-        imageUrl,
-        createdAt: new Date().toISOString()
-      };
-
-      existing.push(newReport);
-      localStorage.setItem("digital_sample_lab_reports", JSON.stringify(existing));
-    } catch (e) {
-      console.error(e);
+    if (!imageFile) {
+      toast.error("Vui lòng tải lên hình ảnh bản vẽ/render");
+      return;
     }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // 1. Upload image
+      toast.loading("Đang tải ảnh lên...", { id: 'create_sample' });
+      const signatureResult = await getUploadSignature.mutateAsync();
+      
+      const uploadRes = await uploadToCloudinary({
+        file: imageFile,
+        signatureParams: {
+          apiKey: signatureResult.apiKey,
+          timestamp: signatureResult.timestamp,
+          signature: signatureResult.signature,
+          folder: signatureResult.folder,
+        },
+      });
 
-    // Giả lập tạo sample test
-    setTimeout(() => {
+      // 2. Create sample item
+      toast.loading("Đang tạo mẫu thử...", { id: 'create_sample' });
+      const newItem = await createBrandItem.mutateAsync({
+        name: productName,
+        description: concept,
+        price: Number(price.replace(/,/g, '')), // Assuming it could have commas
+        imageUrl: uploadRes.secure_url,
+        imagePublicId: uploadRes.public_id,
+        itemType: 'sample',
+        status: 'active'
+      });
+      
+      toast.success("Tạo mẫu thử thành công!", { id: 'create_sample' });
+      router.push(`/brand/${brandId}/digital-sample-lab/report/${newItem.id}`);
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Không thể tạo mẫu thử", { id: 'create_sample' });
+    } finally {
       setIsSubmitting(false);
-      router.push(`/brand/digital-sample-lab/report/${newSampleId}`);
-    }, 1500);
+    }
   };
 
   return (

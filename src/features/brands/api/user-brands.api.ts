@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import { BrandInfo, Benefit, Conversation, ConversationMessage, BrandItemRes, PaginationResult } from '@/features/brand-portal/types';
+import { BrandInfo, Benefit, Conversation, ConversationMessage, BrandItemRes, PaginationResult, SampleFeedbackPayload, DigitalSampleResponseRes } from '@/features/brand-portal/types';
 
 export const userBrandsApi = {
   // Lấy danh sách brand đang hoạt động
@@ -95,9 +95,14 @@ export const userBrandsApi = {
     return res.data.data;
   },
 
+  getBrandSamples: async (brandId: string, page = 1, limit = 20) => {
+    const res = await api.get<{data: PaginationResult<BrandItemRes>}>(`/brands/${brandId}/items/samples`, { params: { page, limit } });
+    return res.data.data;
+  },
+
   // Phản hồi/Đánh giá sản phẩm
-  createBrandItemFeedback: async (itemId: string, payload: { content: string, rating: number }) => {
-    const res = await api.post<{data: any}>(`/brand-items/${itemId}/feedbacks`, payload);
+  createBrandItemFeedback: async (itemId: string, payload: SampleFeedbackPayload) => {
+    const res = await api.post<{data: DigitalSampleResponseRes}>(`/brand-items/${itemId}/feedbacks`, payload);
     return res.data.data;
   },
   

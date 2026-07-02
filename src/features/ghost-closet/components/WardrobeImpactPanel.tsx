@@ -9,6 +9,8 @@ import { GhostItem } from "../types";
 import { Check, ArrowDown, ArrowUp, X, BookmarkPlus, ShoppingBag, EyeOff, ThumbsDown, RefreshCcw } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { SampleFeedbackPayload, VoteType } from "@/features/brand-portal/types";
 
 interface WardrobeImpactPanelProps {
   isOpen: boolean;
@@ -20,6 +22,7 @@ interface WardrobeImpactPanelProps {
   onWaitlist: () => void;
   onHideBrand: () => void;
   onNotMyStyle: () => void;
+  onFeedback?: (itemId: string, payload: SampleFeedbackPayload) => void;
 }
 
 export function WardrobeImpactPanel({
@@ -32,7 +35,23 @@ export function WardrobeImpactPanel({
   onWaitlist,
   onHideBrand,
   onNotMyStyle,
+  onFeedback,
 }: WardrobeImpactPanelProps) {
+  const [voteType, setVoteType] = useState<VoteType | null>(null);
+  const [rating, setRating] = useState<number>(0);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+
+  // Reset state when sheet opens/closes or item changes
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setVoteType(null);
+      setRating(0);
+      setFeedbackText("");
+      onClose();
+    }
+  };
+
   if (!item) return null;
 
   const formatPrice = (price?: number) => {
@@ -41,8 +60,11 @@ export function WardrobeImpactPanel({
   };
 
   return (
-    <Sheet modal={false} open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent showCloseButton={false} side="right" className="w-full sm:max-w-md bg-background p-0 overflow-hidden border-l border-border flex flex-col h-full sm:rounded-l-3xl shadow-2xl z-200">
+    <Sheet modal={false} open={isOpen} onOpenChange={handleOpenChange}>
+      <SheetContent aria-describedby={undefined} showCloseButton={false} side="right" className="w-full sm:max-w-md bg-background p-0 overflow-hidden border-l border-border flex flex-col h-full sm:rounded-l-3xl shadow-2xl z-200">
+        <SheetHeader className="sr-only">
+          <SheetTitle>Chi tiết món đồ</SheetTitle>
+        </SheetHeader>
         <div className="flex-1 overflow-y-auto w-full min-h-0">
           {/* Header Image */}
           <div className="relative aspect-[4/5] w-full bg-muted">
@@ -50,6 +72,7 @@ export function WardrobeImpactPanel({
               src={item.imageUrl}
               alt={item.brandName}
               fill
+              sizes="(max-width: 640px) 100vw, 400px"
               className="object-cover"
             />
             <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md text-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-border shadow-sm">
@@ -147,6 +170,81 @@ export function WardrobeImpactPanel({
                 </div>
               </div>
             </div> */}
+
+            {/* Feedback Section */}
+            {onFeedback && item.isGhost && (
+              <div className="space-y-4 bg-card border border-border rounded-2xl p-5 shadow-sm mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-foreground">
+                    Đánh giá mẫu thiết kế này
+                  </h3>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setVoteType('like')}
+                    className={cn("h-10 text-[10px] font-bold uppercase tracking-widest border-border hover:bg-muted", voteType === 'like' && "bg-primary text-primary-foreground border-primary hover:bg-primary/90")}
+                  >
+                    👍 Thích
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setVoteType('dislike')}
+                    className={cn("h-10 text-[10px] font-bold uppercase tracking-widest border-border hover:bg-muted", voteType === 'dislike' && "bg-primary text-primary-foreground border-primary hover:bg-primary/90")}
+                  >
+                    👎 Không thích
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setVoteType('would_buy')}
+                    className={cn("h-10 text-[10px] font-bold uppercase tracking-widest border-border hover:bg-muted", voteType === 'would_buy' && "bg-primary text-primary-foreground border-primary hover:bg-primary/90")}
+                  >
+                    🛒 Sẽ mua
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setVoteType('not_interested')}
+                    className={cn("h-10 text-[10px] font-bold uppercase tracking-widest border-border hover:bg-muted", voteType === 'not_interested' && "bg-primary text-primary-foreground border-primary hover:bg-primary/90")}
+                  >
+                    — Bỏ qua
+                  </Button>
+                </div>
+
+                <div>
+                   <textarea 
+                      placeholder="Chia sẻ ý kiến của bạn về thiết kế, chất liệu, màu sắc..."
+                      value={feedbackText}
+                      onChange={e => setFeedbackText(e.target.value)}
+                      maxLength={500}
+                      className="w-full min-h-[80px] text-sm p-3 border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-primary bg-background resize-none"
+                   />
+                </div>
+
+                <Button 
+                  onClick={async () => {
+                     if (!voteType) return;
+                     setIsSubmittingFeedback(true);
+                     try {
+                        await onFeedback(item.id, { voteType, feedbackText, rating });
+                        setVoteType(null);
+                        setFeedbackText("");
+                        setRating(0);
+                     } finally {
+                        setIsSubmittingFeedback(false);
+                     }
+                  }}
+                  disabled={!voteType || isSubmittingFeedback}
+                  className="w-full text-[10px] font-bold uppercase tracking-widest rounded-xl"
+                >
+                  {isSubmittingFeedback ? "Đang gửi..." : "Gửi đánh giá cho Brand"}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 

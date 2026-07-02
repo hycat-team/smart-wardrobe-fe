@@ -16,6 +16,7 @@ export const USER_BRANDS_KEYS = {
   myLoyaltyTransactions: (brandId: string) => [...USER_BRANDS_KEYS.all, 'myLoyaltyTransactions', brandId] as const,
   benefitDetail: (benefitId: string) => [...USER_BRANDS_KEYS.all, 'benefitDetail', benefitId] as const,
   myBenefitRedemptions: () => [...USER_BRANDS_KEYS.all, 'myBenefitRedemptions'] as const,
+  samples: (brandId: string) => [...USER_BRANDS_KEYS.all, 'samples', brandId] as const,
 };
 
 
@@ -184,6 +185,30 @@ export const useMarkConversationRead = () => {
     mutationFn: (brandId: string) => userBrandsApi.markConversationRead(brandId),
     onSuccess: (_, brandId) => {
       queryClient.invalidateQueries({ queryKey: USER_BRANDS_KEYS.conversation(brandId) });
+    }
+  });
+};
+
+export const useGetBrandSamples = (brandId: string) => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.samples(brandId),
+    queryFn: () => userBrandsApi.getBrandSamples(brandId),
+    enabled: !!brandId,
+    retry: false, // Don't retry on 403
+  });
+};
+
+import { SampleFeedbackPayload } from '@/features/brand-portal/types';
+
+export const useCreateSampleFeedback = () => {
+  return useMutation({
+    mutationFn: ({ itemId, payload }: { itemId: string, payload: SampleFeedbackPayload }) => 
+      userBrandsApi.createBrandItemFeedback(itemId, payload),
+    onSuccess: () => {
+      toast.success('Phản hồi của bạn đã được ghi nhận. Cảm ơn bạn!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể gửi phản hồi. Vui lòng thử lại.');
     }
   });
 };

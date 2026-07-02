@@ -347,3 +347,23 @@ export const useCreateBrandAdmin = () => {
     }
   });
 };
+
+export const useGetBrandItemUploadSignature = (brandId: string) => {
+  return useMutation({
+    mutationFn: () => brandPortalApi.getBrandItemUploadSignature(brandId),
+  });
+};
+
+export const useCreateBrandItem = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: any) => brandPortalApi.createBrandItem(brandId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId) });
+      toast.success('Tạo sản phẩm thành công');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Tạo sản phẩm thất bại');
+    }
+  });
+};
