@@ -14,7 +14,10 @@ export default function BrandChatWindow({ brandId, isOpen, onClose }: { brandId:
   const { mutate: sendMessage, isPending: isSending } = useSendConversationMessage();
   const { mutate: markRead } = useMarkConversationRead();
 
-  const isNotMember = error && (error as any)?.response?.status === 400;
+  const isNotMember = error && (
+    (error as any)?.response?.status === 400 || 
+    ((error as any)?.response?.status === 404 && (error as any)?.response?.data?.message === "User không tồn tại hoặc không active.")
+  );
 
   // Mark as read when opened
   useEffect(() => {
@@ -42,7 +45,7 @@ export default function BrandChatWindow({ brandId, isOpen, onClose }: { brandId:
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 w-[350px] h-[500px] max-h-[80vh] bg-background border border-border shadow-2xl rounded-2xl flex flex-col z-[100] overflow-hidden animate-in slide-in-from-bottom-5">
+    <div className="fixed bottom-[100px] right-6 w-[350px] h-[500px] max-h-[80vh] bg-background border border-border shadow-2xl rounded-2xl flex flex-col z-[100] overflow-hidden animate-in slide-in-from-bottom-5">
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-foreground text-background">
         <div className="flex items-center gap-3">
@@ -73,8 +76,8 @@ export default function BrandChatWindow({ brandId, isOpen, onClose }: { brandId:
             <p className="text-xs">Nhân viên sẽ phản hồi bạn sớm nhất có thể.</p>
           </div>
         ) : (
-          messages.map((msg, idx) => {
-            const isUser = msg.senderType === 'USER';
+          [...messages].reverse().map((msg, idx) => {
+            const isUser = msg.senderRole === 'customer';
             return (
               <div key={msg.id || idx} className={`flex flex-col max-w-[85%] ${isUser ? 'self-end items-end' : 'self-start items-start'}`}>
                 <div className={`px-4 py-2.5 rounded-2xl text-sm ${isUser ? 'bg-foreground text-background rounded-tr-sm' : 'bg-muted text-foreground border border-border rounded-tl-sm'}`}>

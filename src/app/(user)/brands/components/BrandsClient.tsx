@@ -50,7 +50,7 @@ export default function BrandsClient() {
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent z-10" />
                 {brand.logoUrl ? (
                   <img
-                    src={brand.logoUrl}
+                    src={brand.backgroundUrl}
                     alt={brand.name}
                     className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
                   />
@@ -66,6 +66,7 @@ export default function BrandsClient() {
                         src={brand.logoUrl}
                         alt={brand.name}
                         className="w-full h-full object-cover"
+                        
                       />
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center">

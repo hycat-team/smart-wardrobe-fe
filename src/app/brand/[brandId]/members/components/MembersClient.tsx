@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import AddMemberDialog from './AddMemberDialog';
+import { useBrandRole } from '@/features/brand-portal/context/BrandRoleContext';
 
 export default function MembersClient() {
   const params = useParams();
   const brandId = params.brandId as string;
   const [isAddMemberDialogOpen, setIsAddMemberDialogOpen] = useState(false);
+  const { isStaff } = useBrandRole();
 
   const { data: members, isLoading } = useGetBrandMembers(brandId);
 
@@ -27,10 +29,12 @@ export default function MembersClient() {
             <p className="text-xs text-muted-foreground">{members?.length || 0} thành viên</p>
           </div>
         </div>
-        <Button className="rounded-full" onClick={() => setIsAddMemberDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Thêm thành viên
-        </Button>
+        {!isStaff && (
+          <Button className="rounded-full" onClick={() => setIsAddMemberDialogOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Thêm thành viên
+          </Button>
+        )}
       </div>
 
       <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">

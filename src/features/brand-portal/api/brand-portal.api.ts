@@ -34,6 +34,16 @@ export const brandPortalApi = {
     return res.data.data;
   },
 
+  getLogoUploadSignature: async () => {
+    const res = await api.get<{data: { signature: string, timestamp: number, folder: string, apiKey: string }}>('/brand-portal/brands/profile-images/upload-signature');
+    return res.data.data;
+  },
+
+  updateBrandLogo: async (brandId: string, payload: { logoUrl?: string, logoPublicId?: string, backgroundUrl?: string, backgroundPublicId?: string }) => {
+    const res = await api.patch<{data: BrandInfo}>(`/brand-portal/brands/${brandId}/profile-images`, payload);
+    return res.data.data;
+  },
+
   createBrand: async (payload: CreateBrandPayload) => {
     const res = await api.post<{data: BrandInfo}>('/brand-portal/brands', payload);
     return res.data.data;
@@ -41,14 +51,26 @@ export const brandPortalApi = {
 
   // CRM
   getCustomers: async (brandId: string, search?: string) => {
-    const res = await api.get<{data: BrandCustomer[]}>(`/brand-portal/brands/${brandId}/customers`, {
+    const res = await api.get<{data: PaginationResult<BrandCustomer>}>(`/brand-portal/brands/${brandId}/customers`, {
       params: { search }
     });
-    return res.data.data || [];
+    return res.data.data.items || [];
   },
 
   getCustomerDetail: async (brandId: string, customerId: string) => {
     const res = await api.get<{data: CustomerDetail}>(`/brand-portal/brands/${brandId}/customers/${customerId}`);
+    return res.data.data;
+  },
+
+  // Lấy danh sách Claim Tokens của khách hàng
+  getCustomerClaimTokens: async (brandId: string, customerId: string) => {
+    const res = await api.get<{data: any[]}>(`/brand-portal/brands/${brandId}/customers/${customerId}/claim-tokens`);
+    return res.data.data;
+  },
+
+  // Thu hồi Claim Token
+  revokeCustomerClaimToken: async (brandId: string, customerId: string, tokenId: string) => {
+    const res = await api.post<{data: any}>(`/brand-portal/brands/${brandId}/customers/${customerId}/claim-tokens/${tokenId}/revoke`);
     return res.data.data;
   },
 
@@ -116,12 +138,27 @@ export const brandPortalApi = {
   },
 
   getConversationMessages: async (brandId: string, conversationId: string) => {
-    const res = await api.get<{data: ConversationMessage[]}>(`/brand-portal/brands/${brandId}/conversations/${conversationId}/messages`);
-    return res.data.data || [];
+    const res = await api.get<{data: { items: ConversationMessage[], metadata: any }}>(`/brand-portal/brands/${brandId}/conversations/${conversationId}/messages`);
+    return res.data.data?.items || [];
   },
 
   sendConversationMessage: async (brandId: string, conversationId: string, message: string) => {
     const res = await api.post<{data: ConversationMessage}>(`/brand-portal/brands/${brandId}/conversations/${conversationId}/messages`, { message });
+    return res.data.data;
+  },
+
+  closeConversation: async (brandId: string, conversationId: string) => {
+    const res = await api.post<{data: any}>(`/brand-portal/brands/${brandId}/conversations/${conversationId}/close`);
+    return res.data.data;
+  },
+
+  reopenConversation: async (brandId: string, conversationId: string) => {
+    const res = await api.post<{data: any}>(`/brand-portal/brands/${brandId}/conversations/${conversationId}/reopen`);
+    return res.data.data;
+  },
+
+  markConversationRead: async (brandId: string, conversationId: string) => {
+    const res = await api.post<{data: any}>(`/brand-portal/brands/${brandId}/conversations/${conversationId}/read`);
     return res.data.data;
   },
 

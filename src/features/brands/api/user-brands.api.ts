@@ -26,11 +26,67 @@ export const userBrandsApi = {
     return res.data.data;
   },
 
+  // Lấy chi tiết phúc lợi
+  getBenefitDetail: async (benefitId: string) => {
+    const res = await api.get<{data: Benefit}>(`/brand-benefits/${benefitId}`);
+    return res.data.data;
+  },
+
+  // Đổi ưu đãi
+  redeemBenefit: async (benefitId: string) => {
+    const res = await api.post<{data: any}>(`/brand-benefits/${benefitId}/redeem`);
+    return res.data.data;
+  },
+
+  // Lấy danh sách ưu đãi đã đổi của user
+  getMyBenefitRedemptions: async () => {
+    // Tạm thời mock api theo yêu cầu: dùng API lấy benefits của brand
+    const res = await api.get<{data: any[]}>(`/brands/45a4dff4-d65c-4d52-9e21-e3613c54d9fe/benefits`);
+    return res.data.data;
+  },
+
+  // Xem thẻ thành viên của user
+  getMyLoyalties: async () => {
+    const res = await api.get<{data: any[]}>(`/me/brand-loyalties`);
+    return res.data.data;
+  },
+
+  // Xem chi tiết thẻ thành viên tại 1 brand
+  getMyLoyaltyAtBrand: async (brandId: string) => {
+    try {
+      const res = await api.get<{data: any}>(`/me/brand-loyalties/${brandId}`);
+      return res.data.data;
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        return null;
+      }
+      throw error;
+    }
+  },
+
+  // Xem lịch sử lô điểm
+  getMyLoyaltyLots: async (brandId: string) => {
+    const res = await api.get<{data: any[]}>(`/me/brand-loyalties/${brandId}/lots`);
+    return res.data.data;
+  },
+
+  // Xem lịch sử tích/tiêu điểm
+  getMyLoyaltyTransactions: async (brandId: string) => {
+    const res = await api.get<{data: any[]}>(`/me/brand-loyalties/${brandId}/transactions`);
+    return res.data.data;
+  },
+
   // Lấy danh sách sản phẩm của brand (cho khách hàng xem)
   // Ghi chú: endpoint này là /brands/:brandId/items theo tài liệu backend router
   getBrandItems: async (brandId: string) => {
-    const res = await api.get<{data: BrandItemRes[]}>(`/brands/${brandId}/items`);
-    return res.data.data || [];
+    const res = await api.get<{data: any}>(`/brands/${brandId}/items`);
+    if (res.data.data && Array.isArray(res.data.data.items)) {
+      return res.data.data.items;
+    }
+    if (Array.isArray(res.data.data)) {
+      return res.data.data;
+    }
+    return [];
   },
 
   // Xem chi tiết sản phẩm của brand
@@ -54,7 +110,7 @@ export const userBrandsApi = {
 
   // Lấy thông tin phòng chat với brand
   getConversation: async (brandId: string) => {
-    const res = await api.get<{data: Conversation}>(`/brands/${brandId}/conversation`);
+    const res = await api.get<{data: Conversation}>(`/brands/${brandId}/conversation`, { silent: true } as any);
     return res.data.data;
   },
 

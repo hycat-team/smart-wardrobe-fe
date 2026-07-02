@@ -79,7 +79,7 @@ export function BrandProductsClient({ brandId }: { brandId: string }) {
         price: product.price.toString(),
         description: product.description || "",
         status: product.status || "draft",
-        imageUrl: product.imageUrl || product.imageUrls?.[0] || "",
+        imageUrl: product.fashionItem?.ImageUrl || product.imageUrl || product.imageUrls?.[0] || "",
         imagePublicId: "",
       });
     } else {
@@ -200,8 +200,8 @@ export function BrandProductsClient({ brandId }: { brandId: string }) {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-muted rounded-xl overflow-hidden shrink-0 border border-border">
-                      {product.imageUrl || product.imageUrls?.[0] ? (
-                        <img src={product.imageUrl || product.imageUrls?.[0]} alt={product.name} className="w-full h-full object-cover" />
+                      {product.fashionItem?.ImageUrl || product.imageUrl || product.imageUrls?.[0] ? (
+                        <img src={product.fashionItem?.ImageUrl || product.imageUrl || product.imageUrls?.[0]} alt={product.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                           <UploadCloud className="size-4" />

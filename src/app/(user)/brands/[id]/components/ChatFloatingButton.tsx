@@ -11,9 +11,14 @@ export default function ChatFloatingButton({ brandId }: { brandId: string }) {
   const [messageText, setMessageText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: conversation, isLoading } = useGetConversation(brandId);
+  const { data: conversation, isLoading, error } = useGetConversation(brandId);
   const { mutate: sendMessage, isPending: isSending } = useSendConversationMessage();
   const { mutate: markRead } = useMarkConversationRead();
+
+  const isNotMember = error && (
+    (error as any)?.response?.status === 400 || 
+    ((error as any)?.response?.status === 404 && (error as any)?.response?.data?.message === "User không tồn tại hoặc không active.")
+  );
 
   // Mark as read when opened
   useEffect(() => {
@@ -43,7 +48,7 @@ export default function ChatFloatingButton({ brandId }: { brandId: string }) {
       {/* Floating Button */}
       <button 
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 w-14 h-14 bg-foreground text-background rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform z-50 ${isOpen ? 'hidden' : 'flex'}`}
+        className={`fixed bottom-[100px] right-6 w-14 h-14 bg-foreground text-background rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform z-50 ${isOpen ? 'hidden' : 'flex'}`}
       >
         <MessageCircle className="w-6 h-6" />
         {conversation?.unreadCount ? (
@@ -55,7 +60,7 @@ export default function ChatFloatingButton({ brandId }: { brandId: string }) {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-[350px] h-[500px] max-h-[80vh] bg-background border border-border shadow-2xl rounded-2xl flex flex-col z-50 overflow-hidden animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-[100px] right-6 w-[350px] h-[500px] max-h-[80vh] bg-background border border-border shadow-2xl rounded-2xl flex flex-col z-50 overflow-hidden animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="flex items-center justify-between p-4 bg-foreground text-background">
             <div className="flex items-center gap-3">
@@ -73,6 +78,12 @@ export default function ChatFloatingButton({ brandId }: { brandId: string }) {
               <div className="flex-1 flex items-center justify-center">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
               </div>
+            ) : isNotMember ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-center px-4 text-muted-foreground gap-2">
+                <MessageCircle className="w-8 h-8 opacity-20" />
+                <p className="text-sm font-medium">Bạn chưa là thành viên</p>
+                <p className="text-xs">Vui lòng nhấn nút "Membership" trên trang nhãn hàng để tham gia và bắt đầu trò chuyện.</p>
+              </div>
             ) : messages.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center px-4 text-muted-foreground gap-2">
                 <MessageCircle className="w-8 h-8 opacity-20" />
@@ -80,8 +91,8 @@ export default function ChatFloatingButton({ brandId }: { brandId: string }) {
                 <p className="text-xs">Nhân viên sẽ phản hồi bạn sớm nhất có thể.</p>
               </div>
             ) : (
-              messages.map((msg, idx) => {
-                const isUser = msg.senderType === 'USER';
+              [...messages].reverse().map((msg, idx) => {
+                const isUser = msg.senderRole === 'customer';
                 return (
                   <div key={msg.id || idx} className={`flex flex-col max-w-[85%] ${isUser ? 'self-end items-end' : 'self-start items-start'}`}>
                     <div className={`px-4 py-2.5 rounded-2xl text-sm ${isUser ? 'bg-foreground text-background rounded-tr-sm' : 'bg-muted text-foreground border border-border rounded-tl-sm'}`}>
@@ -103,9 +114,10 @@ export default function ChatFloatingButton({ brandId }: { brandId: string }) {
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
               placeholder="Nhập tin nhắn..."
+              disabled={isNotMember}
               className="flex-1 rounded-full text-sm border-border focus-visible:ring-1 focus-visible:ring-foreground"
             />
-            <Button type="submit" size="icon" disabled={!messageText.trim() || isSending} className="rounded-full w-10 h-10 shrink-0">
+            <Button type="submit" size="icon" disabled={!messageText.trim() || isSending || isNotMember} className="rounded-full w-10 h-10 shrink-0">
               {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </Button>
           </form>

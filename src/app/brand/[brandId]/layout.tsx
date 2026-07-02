@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Package, LayoutDashboard, MessageSquareText, Settings, NotebookTabsIcon, Menu, X, Store, LogOut, ChevronRight, Users, ShoppingCart, MessageCircle, Award, Gift } from 'lucide-react';
+import { Package, LayoutDashboard, MessageSquareText, Settings, NotebookTabsIcon, Menu, X, Store, LogOut, ChevronRight, Users, ShoppingCart, MessageCircle, Award, Gift, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useParams, usePathname } from 'next/navigation';
 import {
   DropdownMenu,
@@ -11,24 +11,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useGetBrandProfile } from '@/features/brand-portal/queries/brand-portal.queries';
+import { BrandRoleProvider, useBrandRole } from '@/features/brand-portal/context/BrandRoleContext';
 
-const getNavItems = (brandId: string) => [
-  { href: `/brand/${brandId}/dashboard`, label: 'Bảng điều khiển', icon: LayoutDashboard },
-  { href: `/brand/${brandId}/customers`, label: 'CRM Khách hàng', icon: Users },
-  { href: `/brand/${brandId}/chat`, label: 'Chat Inbox', icon: MessageCircle },
-  { href: `/brand/${brandId}/members`, label: 'Thành viên', icon: Users },
-  { href: `/brand/${brandId}/loyalty`, label: 'Chương trình điểm', icon: Award },
-  { href: `/brand/${brandId}/benefits`, label: 'Phúc lợi', icon: Gift },
-  { href: `/brand/${brandId}/products`, label: 'Sản phẩm', icon: Package },
-  { href: `/brand/${brandId}/digital-sample-lab/report`, label: 'Báo cáo thử mẫu', icon: NotebookTabsIcon },
-  { href: `/brand/${brandId}/orders`, label: 'Đơn hàng', icon: ShoppingCart },
-  { href: `/brand/${brandId}/posts`, label: 'Bài viết', icon: MessageSquareText },
-];
+const getNavItems = (brandId: string, isStaff: boolean) => {
+  const items = [
+    { href: `/brand/${brandId}/dashboard`, label: 'Bảng điều khiển', icon: LayoutDashboard },
+    { href: `/brand/${brandId}/customers`, label: 'CRM Khách hàng', icon: Users },
+    { href: `/brand/${brandId}/chat`, label: 'Chat Inbox', icon: MessageCircle },
+    { href: `/brand/${brandId}/members`, label: 'Thành viên', icon: Users, hideForStaff: true },
+    { href: `/brand/${brandId}/loyalty`, label: 'Chương trình điểm', icon: Award, hideForStaff: true },
+    { href: `/brand/${brandId}/benefits`, label: 'Phúc lợi', icon: Gift, hideForStaff: true },
+    { href: `/brand/${brandId}/products`, label: 'Sản phẩm', icon: Package },
+    { href: `/brand/${brandId}/digital-sample-lab/report`, label: 'Báo cáo thử mẫu', icon: NotebookTabsIcon },
+    // { href: `/brand/${brandId}/orders`, label: 'Đơn hàng', icon: ShoppingCart },
+    // { href: `/brand/${brandId}/posts`, label: 'Bài viết', icon: MessageSquareText },
+  ];
+  return items.filter(item => !(isStaff && item.hideForStaff));
+};
 
 
 function SidebarNav({ brandId, onNavigate }: { brandId: string, onNavigate?: () => void }) {
   const pathname = usePathname();
-  const navItems = getNavItems(brandId);
+  const { isStaff } = useBrandRole();
+  const navItems = getNavItems(brandId, isStaff);
 
   return (
     <>
@@ -52,27 +57,37 @@ function SidebarNav({ brandId, onNavigate }: { brandId: string, onNavigate?: () 
 }
 
 function ProfileMenu({ brandId, brandName, onNavigate }: { brandId: string, brandName: string, onNavigate?: () => void }) {
+  const { isStaff, memberRole } = useBrandRole();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="flex items-center gap-3 p-3 bg-muted/30 border border-border hover:border-primary transition-all cursor-pointer group outline-none shadow-sm rounded-xl">
-          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">
-            {brandName.charAt(0).toUpperCase()}
+        <div className="flex flex-col">
+          <div className="flex items-center gap-3 p-3 bg-muted/30 border border-border hover:border-primary transition-all cursor-pointer group outline-none shadow-sm rounded-xl">
+            <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">
+              {brandName.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex flex-col flex-1 min-w-0">
+              <span className="font-bold text-sm text-foreground truncate">{brandName}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest truncate">Brand</span>
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
           </div>
-          <div className="flex flex-col flex-1 min-w-0">
-            <span className="font-bold text-sm text-foreground truncate">{brandName}</span>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest truncate">Brand</span>
+          {/* Role badge below the profile menu */}
+          <div className="mt-2 flex items-center justify-center gap-1.5 bg-muted/50 py-1.5 px-3 rounded-lg border border-border">
+            {isStaff ? <ShieldAlert className="size-3.5 text-orange-500" /> : <ShieldCheck className="size-3.5 text-green-500" />}
+            <span className="text-xs font-semibold capitalize tracking-wider text-muted-foreground">Vai trò: {memberRole || 'Đang tải...'}</span>
           </div>
-          <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side="top" className="w-[240px] rounded-2xl border border-border bg-card p-2 shadow-xl mb-2">
-        <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted focus:bg-muted">
-          <Link href={`/brand/${brandId}/profile`} className="flex items-center gap-3 w-full text-foreground" onClick={onNavigate}>
-            <Store className="size-4 text-muted-foreground" />
-            <span className="font-semibold text-[11px] uppercase tracking-widest">Hồ sơ thương hiệu</span>
-          </Link>
-        </DropdownMenuItem>
+        {!isStaff && (
+          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted focus:bg-muted">
+            <Link href={`/brand/${brandId}/profile`} className="flex items-center gap-3 w-full text-foreground" onClick={onNavigate}>
+              <Store className="size-4 text-muted-foreground" />
+              <span className="font-semibold text-[11px] uppercase tracking-widest">Hồ sơ thương hiệu</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted focus:bg-muted">
           <Link href={`/brand/brands`} className="flex items-center gap-3 w-full text-foreground" onClick={onNavigate}>
             <LayoutDashboard className="size-4 text-muted-foreground" />
@@ -91,7 +106,7 @@ function ProfileMenu({ brandId, brandName, onNavigate }: { brandId: string, bran
   );
 }
 
-export default function BrandLayout({ children }: { children: React.ReactNode }) {
+function BrandLayoutInner({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const params = useParams();
   const brandId = params.brandId as string;
@@ -156,5 +171,16 @@ export default function BrandLayout({ children }: { children: React.ReactNode })
         </div>
       </main>
     </div>
+  );
+}
+
+export default function BrandLayout({ children }: { children: React.ReactNode }) {
+  const params = useParams();
+  const brandId = params.brandId as string;
+
+  return (
+    <BrandRoleProvider brandId={brandId}>
+      <BrandLayoutInner>{children}</BrandLayoutInner>
+    </BrandRoleProvider>
   );
 }

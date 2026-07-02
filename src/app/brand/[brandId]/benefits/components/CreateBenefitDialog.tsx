@@ -27,22 +27,32 @@ import { Textarea } from '@/components/ui/textarea';
 const formSchema = z.object({
   name: z.string().min(1, 'Vui lòng nhập tên phúc lợi'),
   description: z.string().min(1, 'Vui lòng nhập mô tả'),
-  benefitType: z.enum(['POINT_REDEMPTION', 'TIER_PRIVILEGE', 'FEATURE_ACCESS']),
+  benefitType: z.enum(['voucher', 'discount', 'gift', 'free_shipping', 'early_access', 'feature_access']),
+  unlockType: z.enum(['point_redemption', 'tier_privilege', 'manual_grant']),
   requiredPoints: z.coerce.number().optional(),
   requiredTierId: z.string().optional(),
+  featureCode: z.string().optional(),
+  validDurationDays: z.coerce.number().optional(),
 }).superRefine((data, ctx) => {
-  if (data.benefitType === 'POINT_REDEMPTION' && (!data.requiredPoints || data.requiredPoints <= 0)) {
+  if (data.unlockType === 'point_redemption' && (!data.requiredPoints || data.requiredPoints <= 0)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'Vui lòng nhập số điểm hợp lệ',
       path: ['requiredPoints'],
     });
   }
-  if (data.benefitType === 'TIER_PRIVILEGE' && !data.requiredTierId) {
+  if (data.unlockType === 'tier_privilege' && !data.requiredTierId) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'Vui lòng chọn hạng yêu cầu',
       path: ['requiredTierId'],
+    });
+  }
+  if (data.benefitType === 'feature_access' && !data.featureCode) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Vui lòng chọn mã tính năng đặc quyền',
+      path: ['featureCode'],
     });
   }
 });
@@ -62,23 +72,34 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
     defaultValues: {
       name: '',
       description: '',
-      benefitType: 'POINT_REDEMPTION',
+      benefitType: 'gift',
+      unlockType: 'point_redemption',
       requiredPoints: 0,
       requiredTierId: '',
+      featureCode: '',
+      validDurationDays: 0,
     },
   });
 
+  const unlockType = form.watch('unlockType');
   const benefitType = form.watch('benefitType');
 
-  // Reset conditional fields when type changes
+  // Reset conditional fields when unlockType changes
   React.useEffect(() => {
-    if (benefitType === 'POINT_REDEMPTION') {
+    if (unlockType === 'point_redemption') {
       form.setValue('requiredTierId', '');
-    } else if (benefitType === 'TIER_PRIVILEGE') {
+    } else if (unlockType === 'tier_privilege') {
       form.setValue('requiredPoints', 0);
     } else {
       form.setValue('requiredPoints', 0);
       form.setValue('requiredTierId', '');
+    }
+  }, [unlockType, form]);
+
+  React.useEffect(() => {
+    if (benefitType !== 'feature_access') {
+      form.setValue('featureCode', '');
+      form.setValue('validDurationDays', 0);
     }
   }, [benefitType, form]);
 
@@ -88,8 +109,11 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
         name: values.name,
         description: values.description,
         benefitType: values.benefitType,
-        requiredPoints: values.benefitType === 'POINT_REDEMPTION' ? values.requiredPoints : undefined,
-        requiredTierId: values.benefitType === 'TIER_PRIVILEGE' ? values.requiredTierId : undefined,
+        unlockType: values.unlockType,
+        requiredPoints: values.unlockType === 'point_redemption' ? values.requiredPoints : undefined,
+        requiredTierId: values.unlockType === 'tier_privilege' ? values.requiredTierId : undefined,
+        featureCode: values.benefitType === 'feature_access' ? values.featureCode : undefined,
+        featureConfig: values.benefitType === 'feature_access' && values.validDurationDays ? { validDurationDays: values.validDurationDays } : undefined,
       });
       form.reset();
       onOpenChange(false);
@@ -100,7 +124,7 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
-      <DialogContent className="sm:max-w-[425px] rounded-3xl">
+      <DialogContent className="sm:max-w-[425px] rounded-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Tạo phúc lợi mới</DialogTitle>
           <DialogDescription>
@@ -149,20 +173,83 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Loại phúc lợi</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-full rounded-xl h-11">
-                        <SelectValue placeholder="Chọn loại phúc lợi">
-                          {field.value === 'POINT_REDEMPTION' ? 'Đổi điểm lấy quà' : 
-                           field.value === 'TIER_PRIVILEGE' ? 'Đặc quyền theo hạng' : 
-                           field.value === 'FEATURE_ACCESS' ? 'Quyền truy cập đặc biệt' : 'Chọn loại phúc lợi'}
-                        </SelectValue>
+                        <SelectValue placeholder="Chọn loại phúc lợi" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="POINT_REDEMPTION">Đổi điểm lấy quà</SelectItem>
-                      <SelectItem value="TIER_PRIVILEGE">Đặc quyền theo hạng</SelectItem>
-                      <SelectItem value="FEATURE_ACCESS">Quyền truy cập đặc biệt</SelectItem>
+                    <SelectContent className="rounded-xl">
+                      <SelectItem value="voucher" className="rounded-lg cursor-pointer py-2.5">Voucher giảm giá</SelectItem>
+                      <SelectItem value="discount" className="rounded-lg cursor-pointer py-2.5">Giảm giá trực tiếp</SelectItem>
+                      <SelectItem value="gift" className="rounded-lg cursor-pointer py-2.5">Quà tặng hiện vật</SelectItem>
+                      <SelectItem value="free_shipping" className="rounded-lg cursor-pointer py-2.5">Miễn phí vận chuyển</SelectItem>
+                      <SelectItem value="early_access" className="rounded-lg cursor-pointer py-2.5">Mua sớm BST mới</SelectItem>
+                      <SelectItem value="feature_access" className="rounded-lg cursor-pointer py-2.5">Quyền truy cập đặc biệt</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {benefitType === 'feature_access' && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="featureCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Mã tính năng</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full rounded-xl h-11">
+                            <SelectValue placeholder="Chọn tính năng" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="rounded-xl">
+                          <SelectItem value="sample_mix_access" className="rounded-lg cursor-pointer py-2.5">Thử đồ mẫu (Digital Sample Lab)</SelectItem>
+                          <SelectItem value="brand_item_recommendation" className="rounded-lg cursor-pointer py-2.5">Gợi ý phối đồ AI ưu tiên</SelectItem>
+                          <SelectItem value="priority_brand_chat" className="rounded-lg cursor-pointer py-2.5">Kênh chat hỗ trợ ưu tiên</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="validDurationDays"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Thời hạn hiệu lực (Ngày)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="30" className="rounded-xl" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
+            <FormField
+              control={form.control}
+              name="unlockType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Hình thức nhận</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full rounded-xl h-11">
+                        <SelectValue placeholder="Chọn hình thức nhận" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="rounded-xl">
+                      <SelectItem value="point_redemption" className="rounded-lg cursor-pointer py-2.5">Đổi điểm lấy quà</SelectItem>
+                      <SelectItem value="tier_privilege" className="rounded-lg cursor-pointer py-2.5">Đặc quyền theo hạng</SelectItem>
+                      <SelectItem value="manual_grant" className="rounded-lg cursor-pointer py-2.5">Cấp phát thủ công</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -170,7 +257,7 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
               )}
             />
 
-            {benefitType === 'POINT_REDEMPTION' && (
+            {unlockType === 'point_redemption' && (
               <FormField
                 control={form.control}
                 name="requiredPoints"
@@ -186,24 +273,22 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
               />
             )}
 
-            {benefitType === 'TIER_PRIVILEGE' && (
+            {unlockType === 'tier_privilege' && (
               <FormField
                 control={form.control}
                 name="requiredTierId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Hạng yêu cầu</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingTiers}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingTiers}>
                       <FormControl>
                         <SelectTrigger className="w-full rounded-xl h-11">
-                          <SelectValue placeholder={isLoadingTiers ? "Đang tải..." : "Chọn hạng"}>
-                            {field.value && tiers ? tiers.find(t => t.id === field.value)?.name : (isLoadingTiers ? "Đang tải..." : "Chọn hạng")}
-                          </SelectValue>
+                          <SelectValue placeholder={isLoadingTiers ? "Đang tải..." : "Chọn hạng"} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="rounded-xl">
                         {tiers?.map(tier => (
-                          <SelectItem key={tier.id} value={tier.id}>{tier.name}</SelectItem>
+                          <SelectItem key={tier.id} value={tier.id} className="rounded-lg cursor-pointer py-2.5">{tier.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>

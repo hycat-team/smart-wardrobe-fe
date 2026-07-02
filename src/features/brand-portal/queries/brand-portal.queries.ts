@@ -6,6 +6,8 @@ import { BrandStatus, UpsertLoyaltyProgramPayload } from '../types';
 const BRAND_PORTAL_KEYS = {
   all: ['brand-portal'] as const,
   myBrands: () => [...BRAND_PORTAL_KEYS.all, 'my-brands'] as const,
+  staffs: (brandId: string) => [...BRAND_PORTAL_KEYS.all, 'staffs', brandId] as const,
+  customerClaimTokens: (brandId: string, customerId: string) => [...BRAND_PORTAL_KEYS.all, 'customerClaimTokens', brandId, customerId] as const,
   profile: (brandId: string) => [...BRAND_PORTAL_KEYS.all, brandId, 'profile'] as const,
   customers: (brandId: string) => [...BRAND_PORTAL_KEYS.all, brandId, 'customers'] as const,
   customerDetail: (brandId: string, customerId: string) => [...BRAND_PORTAL_KEYS.customers(brandId), customerId] as const,
@@ -42,6 +44,18 @@ export const useCreateBrand = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
       toast.success('Đã gửi yêu cầu đăng ký thương hiệu thành công!');
+    },
+  });
+};
+
+export const useUpdateBrandLogo = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { logoUrl?: string, logoPublicId?: string, backgroundUrl?: string, backgroundPublicId?: string }) => brandPortalApi.updateBrandLogo(brandId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.profile(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
+      toast.success('Cập nhật thành công!');
     },
   });
 };
@@ -114,6 +128,28 @@ export const useRevokeClaimToken = (brandId: string) => {
 };
 
 // Loyalty
+export const useGetCustomerClaimTokens = (brandId: string, customerId: string) => {
+  return useQuery({
+    queryKey: BRAND_PORTAL_KEYS.customerClaimTokens(brandId, customerId),
+    queryFn: () => brandPortalApi.getCustomerClaimTokens(brandId, customerId),
+    enabled: !!brandId && !!customerId,
+  });
+};
+
+export const useRevokeCustomerClaimToken = (brandId: string, customerId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (tokenId: string) => brandPortalApi.revokeCustomerClaimToken(brandId, customerId, tokenId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.customerClaimTokens(brandId, customerId) });
+      toast.success('Thu hồi Claim Token thành công!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể thu hồi Claim Token');
+    }
+  });
+};
+
 export const useGetLoyaltyProgram = (brandId: string) => {
   return useQuery({
     queryKey: BRAND_PORTAL_KEYS.loyaltyProgram(brandId),
@@ -207,6 +243,44 @@ export const useSendConversationMessage = (brandId: string, conversationId: stri
     mutationFn: (message: string) => brandPortalApi.sendConversationMessage(brandId, conversationId, message),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.conversationMessages(brandId, conversationId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.conversations(brandId) });
+    },
+  });
+};
+
+export const useCloseConversation = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (conversationId: string) => brandPortalApi.closeConversation(brandId, conversationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.conversations(brandId) });
+      toast.success('Đã đóng hội thoại');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể đóng hội thoại');
+    }
+  });
+};
+
+export const useReopenConversation = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (conversationId: string) => brandPortalApi.reopenConversation(brandId, conversationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.conversations(brandId) });
+      toast.success('Đã mở lại hội thoại');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể mở lại hội thoại');
+    }
+  });
+};
+
+export const useMarkConversationRead = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (conversationId: string) => brandPortalApi.markConversationRead(brandId, conversationId),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.conversations(brandId) });
     },
   });

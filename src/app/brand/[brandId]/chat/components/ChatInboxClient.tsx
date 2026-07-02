@@ -1,10 +1,12 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { useGetConversations, useGetConversationMessages, useSendConversationMessage } from '@/features/brand-portal/queries/brand-portal.queries';
-import { Send, Loader2, MessageSquare, User } from 'lucide-react';
+import { useGetConversations, useGetConversationMessages, useSendConversationMessage, useGetCustomerDetail, useCloseConversation, useReopenConversation, useMarkConversationRead } from '@/features/brand-portal/queries/brand-portal.queries';
+import { Send, Loader2, MessageSquare, User, ExternalLink } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
 
 export default function ChatInboxClient() {
   const params = useParams();
@@ -17,6 +19,19 @@ export default function ChatInboxClient() {
   const { data: conversations, isLoading: isLoadingConvs } = useGetConversations(brandId);
   const { data: messages, isLoading: isLoadingMessages } = useGetConversationMessages(brandId, activeConversationId);
   const { mutateAsync: sendMessage, isPending: isSending } = useSendConversationMessage(brandId, activeConversationId || '');
+  const { mutate: closeConversation, isPending: isClosing } = useCloseConversation(brandId);
+  const { mutate: reopenConversation, isPending: isReopening } = useReopenConversation(brandId);
+  const { mutate: markAsRead } = useMarkConversationRead(brandId);
+
+  const activeConvDetails = conversations?.find(c => c.id === activeConversationId);
+  const { data: customerInfo } = useGetCustomerDetail(brandId, activeConvDetails?.customerId || '');
+
+  // Auto mark as read when selecting conversation
+  useEffect(() => {
+    if (activeConversationId && activeConvDetails && activeConvDetails.staffUnreadCount > 0) {
+      markAsRead(activeConversationId);
+    }
+  }, [activeConversationId, activeConvDetails?.staffUnreadCount, markAsRead]);
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -35,7 +50,6 @@ export default function ChatInboxClient() {
     }
   };
 
-  const activeConvDetails = conversations?.find(c => c.id === activeConversationId);
 
   return (
     <div className="w-full flex h-[calc(100vh-8rem)] bg-background overflow-hidden border-t border-border">
@@ -95,15 +109,60 @@ export default function ChatInboxClient() {
         ) : (
           <>
             {/* Chat Header */}
-            <div className="h-16 border-b border-border bg-card flex items-center px-6 shrink-0 shadow-sm z-10">
+            <div className="h-16 border-b border-border bg-card flex items-center px-6 shrink-0 shadow-sm z-10 justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center overflow-hidden">
                   <User className="w-5 h-5 text-muted-foreground/50" />
                 </div>
-                <div>
-                  <h2 className="font-bold text-sm">{activeConvDetails?.customerName || activeConvDetails?.userDisplayName || 'Khách hàng'}</h2>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-bold text-sm">{activeConvDetails?.customerName || activeConvDetails?.userDisplayName || 'Khách hàng'}</h2>
+                    {customerInfo?.tier && (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                        {customerInfo.tier.name}
+                      </Badge>
+                    )}
+                    {customerInfo?.loyaltyAccount && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-primary text-primary">
+                        {customerInfo.loyaltyAccount.pointsBalance} điểm
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">ID: {activeConvDetails?.userId}</p>
                 </div>
+              </div>
+              
+              <div className="flex gap-2">
+                {activeConvDetails?.customerId && (
+                  <Link href={`/brand/${brandId}/customers/${activeConvDetails.customerId}`}>
+                    <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                      Xem hồ sơ
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </Button>
+                  </Link>
+                )}
+                {activeConvDetails?.status === 'open' && (
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    className="h-8 text-xs" 
+                    disabled={isClosing}
+                    onClick={() => closeConversation(activeConvDetails.id)}
+                  >
+                    Đóng hội thoại
+                  </Button>
+                )}
+                {activeConvDetails?.status === 'closed' && (
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="h-8 text-xs" 
+                    disabled={isReopening}
+                    onClick={() => reopenConversation(activeConvDetails.id)}
+                  >
+                    Mở lại hội thoại
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -113,8 +172,8 @@ export default function ChatInboxClient() {
                 <div className="flex justify-center py-10">
                   <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                 </div>
-              ) : messages?.map((msg) => {
-                const isBrand = msg.senderRole === 'staff';
+              ) : [...messages].reverse().map((msg) => {
+                const isBrand = msg.senderRole === 'brand_staff';
                 return (
                   <div key={msg.id} className={`flex flex-col max-w-[75%] ${isBrand ? 'self-end items-end' : 'self-start items-start'}`}>
                     <div className={`px-4 py-2.5 rounded-2xl text-sm ${
@@ -135,22 +194,24 @@ export default function ChatInboxClient() {
 
             {/* Input Area */}
             <div className="p-4 border-t border-border bg-card shrink-0">
-              <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-                <Input
-                  className="flex-1 rounded-full bg-muted/50 border-transparent focus-visible:ring-1 focus-visible:bg-background"
-                  placeholder="Nhập tin nhắn..."
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                />
-                <Button 
-                  type="submit" 
-                  size="icon" 
-                  className="rounded-full shrink-0" 
-                  disabled={!messageInput.trim() || isSending}
-                >
-                  {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                </Button>
-              </form>
+              {activeConvDetails?.status === 'closed' ? (
+                <div className="flex items-center justify-center p-3 text-sm text-muted-foreground bg-muted rounded-md border border-border">
+                  Hội thoại đã đóng. Vui lòng mở lại để tiếp tục trò chuyện.
+                </div>
+              ) : (
+                <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                  <Input
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                    placeholder="Nhập tin nhắn..."
+                    className="flex-1"
+                    disabled={isSending}
+                  />
+                  <Button type="submit" size="icon" disabled={!messageInput.trim() || isSending}>
+                    {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  </Button>
+                </form>
+              )}
             </div>
           </>
         )}

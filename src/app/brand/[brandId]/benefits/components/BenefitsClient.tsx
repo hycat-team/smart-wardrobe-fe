@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useGetBenefits, useUpdateBenefitStatus } from '@/features/brand-portal/queries/brand-portal.queries';
-import { Gift, Loader2, Plus, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
+import { Gift, Loader2, Plus, ArrowRight, ShieldCheck, Tag, Ticket, Percent, Truck, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -19,7 +19,8 @@ export default function BenefitsClient() {
   const { mutateAsync: updateStatus, isPending: isUpdating } = useUpdateBenefitStatus(brandId);
 
   const handleToggleStatus = async (benefitId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'ACTIVE' ? 'ARCHIVED' : 'ACTIVE';
+    const isCurrentlyActive = currentStatus.toLowerCase() === 'active';
+    const newStatus = isCurrentlyActive ? 'archived' : 'active';
     try {
       await updateStatus({ benefitId, status: newStatus });
     } catch (error) {
@@ -28,20 +29,45 @@ export default function BenefitsClient() {
   };
 
   const getBenefitIcon = (type: string) => {
-    switch (type) {
-      case 'POINT_REDEMPTION': return <Tag className="w-5 h-5 text-amber-500" />;
-      case 'TIER_PRIVILEGE': return <ShieldCheck className="w-5 h-5 text-emerald-500" />;
-      case 'FEATURE_ACCESS': return <Gift className="w-5 h-5 text-blue-500" />;
-      default: return <Gift className="w-5 h-5" />;
+    switch (type?.toLowerCase()) {
+      case 'voucher': return <Ticket className="w-5 h-5 text-amber-500" />;
+      // case 'discount': return <Percent className="w-5 h-5 text-emerald-500" />;
+      // case 'free_shipping': return <Truck className="w-5 h-5 text-blue-500" />;
+      // case 'early_access': return <Star className="w-5 h-5 text-purple-500" />;
+      case 'feature_access': return <ShieldCheck className="w-5 h-5 text-rose-500" />;
+      case 'gift':
+      default: return <Gift className="w-5 h-5 text-indigo-500" />;
     }
   };
 
   const getBenefitTypeName = (type: string) => {
-    switch (type) {
-      case 'POINT_REDEMPTION': return 'Đổi điểm lấy quà';
-      case 'TIER_PRIVILEGE': return 'Đặc quyền theo hạng';
-      case 'FEATURE_ACCESS': return 'Quyền truy cập tính năng';
+    switch (type?.toLowerCase()) {
+      case 'voucher': return 'Voucher giảm giá';
+      // case 'discount': return 'Giảm giá trực tiếp';
+      // case 'gift': return 'Quà tặng hiện vật';
+      // case 'free_shipping': return 'Miễn phí vận chuyển';
+      // case 'early_access': return 'Mua sớm BST mới';
+      case 'feature_access': return 'Quyền truy cập đặc biệt';
       default: return type;
+    }
+  };
+  
+  const getUnlockTypeName = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case 'point_redemption': return 'Đổi điểm';
+      case 'tier_privilege': return 'Đặc quyền hạng';
+      case 'manual_grant': return 'Trao tặng thủ công';
+      default: return type;
+    }
+  };
+
+  const getFeatureCodeName = (code?: string) => {
+    if (!code) return null;
+    switch (code) {
+      case 'sample_mix_access': return 'Digital Sample Lab';
+      case 'brand_item_recommendation': return 'AI Recommendation';
+      case 'priority_brand_chat': return 'Priority Chat';
+      default: return code;
     }
   };
 
@@ -74,58 +100,74 @@ export default function BenefitsClient() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {benefits.map((benefit) => (
-            <Card key={benefit.id} className="rounded-3xl border-border bg-card shadow-sm hover:border-primary/50 transition-colors group overflow-hidden">
-              <CardContent className="p-0">
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                      {getBenefitIcon(benefit.benefitType)}
+          {benefits.map((benefit) => {
+            const isActive = benefit.status.toLowerCase() === 'active';
+            const isArchived = benefit.status.toLowerCase() === 'archived';
+            
+            return (
+              <Card key={benefit.id} className="rounded-3xl border-border bg-card shadow-sm hover:border-primary/50 transition-colors group overflow-hidden flex flex-col">
+                <CardContent className="p-0 flex flex-col h-full">
+                  <div className="p-6 flex-1">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                        {getBenefitIcon(benefit.benefitType)}
+                      </div>
+                      <Badge variant="outline" className={`rounded-full font-bold uppercase tracking-widest text-[9px] ${
+                        isActive ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
+                        isArchived ? 'bg-muted text-muted-foreground border-transparent' : 
+                        'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                      }`}>
+                        {benefit.status}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className={`rounded-full font-bold uppercase tracking-widest text-[9px] ${
-                      benefit.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 
-                      benefit.status === 'ARCHIVED' ? 'bg-muted text-muted-foreground border-transparent' : 
-                      'bg-amber-500/10 text-amber-600 border-amber-500/20'
-                    }`}>
-                      {benefit.status}
-                    </Badge>
+                    <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">{benefit.name}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 min-h-[40px] mb-4">
+                      {benefit.description}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      <Badge variant="secondary" className="rounded-md font-medium text-xs bg-muted/50">
+                        {getBenefitTypeName(benefit.benefitType)}
+                      </Badge>
+                      <Badge variant="outline" className="rounded-md font-medium text-xs">
+                        {getUnlockTypeName(benefit.unlockType)}
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {benefit.unlockType?.toLowerCase() === 'point_redemption' && benefit.requiredPoints ? (
+                        <Badge variant="outline" className="rounded-md font-medium text-xs border-amber-500/30 text-amber-600">
+                          {benefit.requiredPoints.toLocaleString('vi-VN')} điểm
+                        </Badge>
+                      ) : null}
+                      {benefit.unlockType?.toLowerCase() === 'tier_privilege' && benefit.requiredTierId ? (
+                        <Badge variant="outline" className="rounded-md font-medium text-xs border-primary/30 text-primary">
+                          Tier ID: {benefit.requiredTierId}
+                        </Badge>
+                      ) : null}
+                      {benefit.benefitType?.toLowerCase() === 'feature_access' && benefit.featureCode ? (
+                        <Badge variant="outline" className="rounded-md font-medium text-xs border-indigo-500/30 text-indigo-600">
+                          {getFeatureCodeName(benefit.featureCode)}
+                        </Badge>
+                      ) : null}
+                    </div>
                   </div>
-                  <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">{benefit.name}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2 min-h-[40px] mb-4">
-                    {benefit.description}
-                  </p>
                   
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    <Badge variant="secondary" className="rounded-md font-medium text-xs bg-muted/50">
-                      {getBenefitTypeName(benefit.benefitType)}
-                    </Badge>
-                    {benefit.requiredPoints ? (
-                      <Badge variant="outline" className="rounded-md font-medium text-xs border-amber-500/30 text-amber-600">
-                        {benefit.requiredPoints.toLocaleString('vi-VN')} điểm
-                      </Badge>
-                    ) : null}
-                    {benefit.requiredTierId ? (
-                      <Badge variant="outline" className="rounded-md font-medium text-xs border-primary/30 text-primary">
-                        Tier ID: {benefit.requiredTierId}
-                      </Badge>
-                    ) : null}
+                  <div className="p-4 bg-muted/20 border-t border-border flex items-center justify-between mt-auto">
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Trạng thái hoạt động</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-medium">{isActive ? 'Bật' : 'Tắt'}</span>
+                      <Switch 
+                        checked={isActive}
+                        disabled={isUpdating || benefit.status.toLowerCase() === 'draft'}
+                        onCheckedChange={() => handleToggleStatus(benefit.id, benefit.status)}
+                      />
+                    </div>
                   </div>
-                </div>
-                
-                <div className="p-4 bg-muted/20 border-t border-border flex items-center justify-between">
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Trạng thái hoạt động</span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-medium">{benefit.status === 'ACTIVE' ? 'Bật' : 'Tắt'}</span>
-                    <Switch 
-                      checked={benefit.status === 'ACTIVE'}
-                      disabled={isUpdating || benefit.status === 'DRAFT'}
-                      onCheckedChange={() => handleToggleStatus(benefit.id, benefit.status)}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 

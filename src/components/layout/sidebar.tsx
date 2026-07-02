@@ -52,7 +52,7 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
-  { icon: Globe, label: "Cộng Đồng", path: "/community" },
+  // { icon: Globe, label: "Cộng Đồng", path: "/community" },
   { icon: Compass, label: "Khám Phá", path: "/brands" },
   { icon: Shirt, label: "Tủ Quần Áo", path: "/wardrobe" },
   { icon: Sparkles, label: "AI Phối Đồ", path: "/ai-stylist" },
@@ -267,7 +267,7 @@ export function Sidebar() {
       </nav>
 
       {/* Cart Button */}
-      <div className="mb-4 mt-2">
+      {/* <div className="mb-4 mt-2">
         {isCollapsed ? (
           <Tooltip>
             <TooltipTrigger
@@ -305,7 +305,7 @@ export function Sidebar() {
             </div>
           </button>
         )}
-      </div>
+      </div> */}
 
       {/* Premium Upgrade (Minimal Style) */}
       {!user?.isPremium && (

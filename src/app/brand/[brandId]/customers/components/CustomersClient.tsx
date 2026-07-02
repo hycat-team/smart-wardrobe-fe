@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import CreateOfflineCustomerDialog from './CreateOfflineCustomerDialog';
 import AddPointsDialog from './AddPointsDialog';
+import Image from 'next/image';
 
 export default function CustomersClient() {
   const params = useParams();
@@ -90,20 +91,24 @@ export default function CustomersClient() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0">
-                          {user.userAvatarUrl ? (
-                            <img src={user.userAvatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                          {user.claimedAt && user.user?.avatarUrl ? (
+                            <Image src={user.user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold">
-                              {((user.userFullName || user.customerName || 'K')[0]).toUpperCase()}
+                              {user.claimedAt && user.user 
+                                ? user.user.firstName[0].toUpperCase()
+                                : ((user.customerName || 'K')[0]).toUpperCase()}
                             </div>
                           )}
                         </div>
                         <div className="flex flex-col">
                           <span className="font-bold text-foreground group-hover:text-primary transition-colors">
-                            {user.userFullName || user.customerName || 'Khách hàng'}
+                            {user.claimedAt && user.user
+                              ? `${user.user.firstName} ${user.user.lastName || ''}`.trim() || user.user.username
+                              : user.customerName || 'Khách hàng'}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {user.userId ? `User ID: ${user.userId.slice(0, 8)}...` : 'Khách Offline'}
+                            {user.claimedAt && user.user?.id ? `User ID: ${user.user.id.slice(0, 8)}...` : 'Khách Offline'}
                           </span>
                         </div>
                       </div>

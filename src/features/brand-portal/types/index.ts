@@ -1,3 +1,19 @@
+export interface BrandCustomerUser {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName?: string;
+  gender: number;
+  avatarUrl?: string;
+}
+
+export interface LoyaltyAccount {
+  id: string,
+  currentPoints: number,
+  lifetimePoints: number,
+  totalSpend: number
+}
+
 export interface BrandCustomer {
   id: string;
   brandId: string;
@@ -11,6 +27,8 @@ export interface BrandCustomer {
   claimedAt?: string;
   createdAt?: string;
   updatedAt?: string;
+  user?: BrandCustomerUser;
+  loyaltyAccount?: LoyaltyAccount
 }
 
 export interface CustomerDetail extends BrandCustomer {
@@ -28,10 +46,21 @@ export interface Benefit {
   id: string;
   name: string;
   description: string;
-  benefitType: 'POINT_REDEMPTION' | 'TIER_PRIVILEGE' | 'FEATURE_ACCESS';
-  status: 'ACTIVE' | 'ARCHIVED' | 'DRAFT';
+  benefitType: 'voucher' | 'discount' | 'gift' | 'free_shipping' | 'early_access' | 'feature_access';
+  unlockType: 'tier_privilege' | 'point_redemption' | 'manual_grant';
+  status: 'active' | 'inactive' | 'archived' | 'DRAFT' | 'ACTIVE' | 'ARCHIVED'; // allow both for transition
   requiredPoints?: number;
   requiredTierId?: string;
+  requiredTier?: {
+    id: string;
+    name: string;
+    rank: number;
+  };
+  featureCode?: 'sample_mix_access' | 'brand_item_recommendation' | 'priority_brand_chat';
+  featureConfig?: {
+    validDurationDays?: number;
+    [key: string]: any;
+  };
 }
 
 export interface LoyaltyTier {
@@ -74,6 +103,7 @@ export interface Conversation {
   id: string;
   brandId: string;
   userId: string;
+  customerId?: string;
   customerName?: string;
   userDisplayName?: string;
   status: string;
@@ -119,8 +149,13 @@ export interface BrandInfo {
   description?: string;
   logoUrl?: string;
   logoPublicId?: string;
+  backgroundUrl?: string;
+  backgroundPublicId?: string;
   status: BrandStatus;
   createdAt?: string;
+  memberId?: string;
+  memberRole?: 'owner' | 'staff';
+  memberStatus?: 'active' | 'inactive';
 }
 
 export interface CreateOfflineCustomerPayload {
@@ -142,9 +177,14 @@ export interface AddPointsPayload {
 export interface CreateBenefitPayload {
   name: string;
   description: string;
-  benefitType: 'POINT_REDEMPTION' | 'TIER_PRIVILEGE' | 'FEATURE_ACCESS';
+  benefitType: 'voucher' | 'discount' | 'gift' | 'free_shipping' | 'early_access' | 'feature_access';
+  unlockType: 'tier_privilege' | 'point_redemption' | 'manual_grant';
   requiredPoints?: number;
   requiredTierId?: string;
+  featureCode?: string;
+  featureConfig?: {
+    validDurationDays?: number;
+  };
 }
 
 export interface CreateBrandPayload {
@@ -167,6 +207,13 @@ export interface BrandItemRes {
   currency?: string;
   imageUrl?: string;
   imageUrls?: string[];
+  itemType?: string;
+  fashionItemId?: string;
+  fashionItem?: {
+    ImageUrl?: string;
+    Name?: string;
+    [key: string]: any;
+  };
   status: 'ACTIVE' | 'INACTIVE' | 'DRAFT' | 'active' | 'archived' | 'draft';
   stockStatus?: 'IN_STOCK' | 'OUT_OF_STOCK';
   category?: string;

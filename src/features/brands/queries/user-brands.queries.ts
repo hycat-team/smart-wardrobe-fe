@@ -10,6 +10,12 @@ export const USER_BRANDS_KEYS = {
   items: (brandId: string) => [...USER_BRANDS_KEYS.all, 'items', brandId] as const,
   itemDetail: (itemId: string) => [...USER_BRANDS_KEYS.all, 'itemDetail', itemId] as const,
   conversation: (brandId: string) => [...USER_BRANDS_KEYS.all, 'conversation', brandId] as const,
+  myLoyalties: () => [...USER_BRANDS_KEYS.all, 'myLoyalties'] as const,
+  myLoyaltyAtBrand: (brandId: string) => [...USER_BRANDS_KEYS.all, 'myLoyaltyAtBrand', brandId] as const,
+  myLoyaltyLots: (brandId: string) => [...USER_BRANDS_KEYS.all, 'myLoyaltyLots', brandId] as const,
+  myLoyaltyTransactions: (brandId: string) => [...USER_BRANDS_KEYS.all, 'myLoyaltyTransactions', brandId] as const,
+  benefitDetail: (benefitId: string) => [...USER_BRANDS_KEYS.all, 'benefitDetail', benefitId] as const,
+  myBenefitRedemptions: () => [...USER_BRANDS_KEYS.all, 'myBenefitRedemptions'] as const,
 };
 
 
@@ -59,6 +65,69 @@ export const useGetBrandBenefits = (brandId: string) => {
   });
 };
 
+export const useGetBenefitDetail = (benefitId: string) => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.benefitDetail(benefitId),
+    queryFn: () => userBrandsApi.getBenefitDetail(benefitId),
+    enabled: !!benefitId,
+  });
+};
+
+export const useRedeemBenefit = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (benefitId: string) => userBrandsApi.redeemBenefit(benefitId),
+    onSuccess: (_, benefitId) => {
+      toast.success('Đổi ưu đãi thành công!');
+      // Invalidate related queries
+      queryClient.invalidateQueries({ queryKey: USER_BRANDS_KEYS.myBenefitRedemptions() });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể đổi ưu đãi. Vui lòng thử lại sau.');
+    }
+  });
+};
+
+export const useGetMyBenefitRedemptions = () => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.myBenefitRedemptions(),
+    queryFn: () => userBrandsApi.getMyBenefitRedemptions(),
+  });
+};
+
+export const useGetMyLoyalties = () => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.myLoyalties(),
+    queryFn: () => userBrandsApi.getMyLoyalties(),
+  });
+};
+
+export const useGetMyLoyaltyAtBrand = (brandId: string) => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.myLoyaltyAtBrand(brandId),
+    queryFn: () => userBrandsApi.getMyLoyaltyAtBrand(brandId),
+    enabled: !!brandId,
+    retry: false,
+  });
+};
+
+export const useGetMyLoyaltyLots = (brandId: string) => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.myLoyaltyLots(brandId),
+    queryFn: () => userBrandsApi.getMyLoyaltyLots(brandId),
+    enabled: !!brandId,
+  });
+};
+
+export const useGetMyLoyaltyTransactions = (brandId: string) => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.myLoyaltyTransactions(brandId),
+    queryFn: () => userBrandsApi.getMyLoyaltyTransactions(brandId),
+    enabled: !!brandId,
+  });
+};
+
 export const useGetBrandItems = (brandId: string) => {
   return useQuery({
     queryKey: USER_BRANDS_KEYS.items(brandId),
@@ -87,7 +156,7 @@ export const useGetConversation = (brandId: string) => {
     enabled: !!brandId,
     refetchInterval: 10000,
     retry: (failureCount, error: any) => {
-      if (error?.response?.status === 400) return false;
+      if (error?.response?.status === 400 || error?.response?.status === 404) return false;
       return failureCount < 3;
     },
   });
