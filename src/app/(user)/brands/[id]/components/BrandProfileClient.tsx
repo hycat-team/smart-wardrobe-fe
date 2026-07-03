@@ -51,7 +51,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
   const { data: brandItems } = useGetBrandItems(brandId);
   const { data: loyaltyData } = useGetMyLoyaltyAtBrand(brandId);
   const { data: brandBenefits } = useGetBrandBenefits(brandId);
-  const { data: myRedemptions } = useGetMyBenefitRedemptions();
+  const { data: myRedemptions } = useGetMyBenefitRedemptions(brandId);
   const { mutateAsync: joinLoyalty, isPending: isJoining } = useJoinLoyalty();
 
   const [isChatOpen, setIsChatOpen] = useState(false);

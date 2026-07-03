@@ -39,10 +39,13 @@ export const userBrandsApi = {
   },
 
   // Lấy danh sách ưu đãi đã đổi của user
-  getMyBenefitRedemptions: async () => {
+  getMyBenefitRedemptions: async (brandId?: string) => {
     // Tạm thời mock api theo yêu cầu: dùng API lấy benefits của brand
-    const res = await api.get<{data: any[]}>(`/brands/45a4dff4-d65c-4d52-9e21-e3613c54d9fe/benefits`);
-    return res.data.data;
+    if (brandId) {
+      const res = await api.get<{data: any[]}>(`/brands/${brandId}/benefits`);
+      return res.data.data;
+    }
+    return [];
   },
 
   // Xem thẻ thành viên của user

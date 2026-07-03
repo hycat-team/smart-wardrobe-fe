@@ -51,6 +51,7 @@ export interface Benefit {
   status: 'active' | 'inactive' | 'archived' | 'DRAFT' | 'ACTIVE' | 'ARCHIVED'; // allow both for transition
   requiredPoints?: number;
   requiredTierId?: string;
+  requiredTierName?: string;
   requiredTier?: {
     id: string;
     name: string;

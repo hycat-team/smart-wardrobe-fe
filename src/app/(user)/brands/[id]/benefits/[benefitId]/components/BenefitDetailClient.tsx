@@ -6,9 +6,9 @@ import { ArrowLeft, Sparkles, AlertCircle, CheckCircle2, Crown, ShieldAlert, Gif
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { 
-  useGetActiveBrandDetail, 
-  useGetBenefitDetail, 
+import {
+  useGetActiveBrandDetail,
+  useGetBenefitDetail,
   useRedeemBenefit,
   useGetMyLoyaltyAtBrand
 } from '@/features/brands/queries/user-brands.queries';
@@ -16,12 +16,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function BenefitDetailClient({ brandId, benefitId }: { brandId: string, benefitId: string }) {
   const router = useRouter();
-  
+
   // Queries
   const { data: brandData, isLoading: isLoadingBrand } = useGetActiveBrandDetail(brandId);
   const { data: benefit, isLoading: isLoadingBenefit } = useGetBenefitDetail(benefitId);
   const { data: loyaltyData } = useGetMyLoyaltyAtBrand(brandId);
-  
+
   const { mutateAsync: redeemBenefit, isPending: isRedeeming } = useRedeemBenefit();
 
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -40,7 +40,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
   if (isLoadingBrand || isLoadingBenefit) {
     return (
       <div className="min-h-[100dvh] flex items-center justify-center bg-zinc-50">
-        <motion.div 
+        <motion.div
           animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
           className="w-12 h-12 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"
@@ -51,12 +51,12 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
 
   const currentPoints = loyaltyData?.currentPoints || 0;
   const currentTierRank = loyaltyData?.currentTier?.rank || 0;
-  
+
   const unlockType = benefit?.unlockType?.toLowerCase();
-  
+
   let canAccess = false;
   let reasonBlocked = '';
-  
+
   if (unlockType === 'point_redemption') {
     const requiredPoints = benefit?.requiredPoints || 0;
     canAccess = currentPoints >= requiredPoints;
@@ -119,17 +119,17 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
         <div className="bg-white rounded-[2.5rem] border border-slate-200/50 shadow-sm p-6 md:p-10 overflow-hidden relative">
           {/* Subtle top decoration */}
           <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-emerald-50/50 to-transparent pointer-events-none" />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 relative z-10">
             {/* LEFT COL: Visual representation */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", stiffness: 100, damping: 20 }}
               className="flex flex-col items-center justify-center p-8 bg-zinc-50 rounded-[2rem] border border-zinc-100 relative overflow-hidden group"
             >
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-100/50 blur-[60px] rounded-full group-hover:bg-emerald-200/50 transition-colors duration-700" />
-              
+
               <div className="w-20 h-20 bg-white shadow-md rounded-2xl flex items-center justify-center mb-6 relative z-10 border border-slate-100">
                 {benefit?.benefitType === 'gift' ? (
                   <Gift className="w-10 h-10 text-emerald-500" />
@@ -137,7 +137,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
                   <Sparkles className="w-10 h-10 text-emerald-500" />
                 )}
               </div>
-              
+
               <div className="text-center relative z-10">
                 <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">
                   PHẦN THƯỞNG TỪ
@@ -157,11 +157,11 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   <span className="text-xs font-bold uppercase tracking-wider">{getLabelTag()}</span>
                 </div>
-                
+
                 <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900 mb-4 leading-tight">
                   {benefit?.name}
                 </h1>
-                
+
                 <p className="text-base text-zinc-500 leading-relaxed mb-8">
                   {benefit?.description}
                 </p>
@@ -184,7 +184,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
                       <p className="text-sm font-semibold text-zinc-500 mb-2">Hạng yêu cầu</p>
                       <div className="flex items-center gap-2">
                         <Crown className="w-7 h-7 text-amber-500" />
-                        <span className="text-2xl font-bold text-zinc-900">{benefit?.requiredTier?.name || benefit?.requiredTierId}</span>
+                        <span className="text-2xl font-bold text-zinc-900">{benefit?.requiredTierName || benefit?.requiredTierId}</span>
                       </div>
                     </div>
                   )}
@@ -203,11 +203,10 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
                   size="lg"
                   onClick={handleRedeem}
                   disabled={!canAccess || isRedeeming}
-                  className={`w-full h-14 rounded-2xl text-base font-semibold shadow-sm transition-all active:scale-[0.98] ${
-                    canAccess 
-                      ? 'bg-zinc-900 hover:bg-zinc-800 text-white' 
-                      : 'bg-zinc-100 text-zinc-400 cursor-not-allowed shadow-none'
-                  }`}
+                  className={`w-full h-14 rounded-2xl text-base font-semibold shadow-sm transition-all active:scale-[0.98] ${canAccess
+                    ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
+                    : 'bg-zinc-100 text-zinc-400 cursor-not-allowed shadow-none'
+                    }`}
                 >
                   {getButtonText()}
                 </Button>
@@ -226,14 +225,14 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, y: 20, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               transition={{ type: "spring", stiffness: 100, damping: 20 }}
               className="w-full max-w-md bg-white rounded-[2.5rem] p-8 md:p-10 text-center relative overflow-hidden shadow-2xl border border-slate-200/50"
             >
               <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-emerald-50 to-transparent pointer-events-none" />
-              
+
               <div className="relative z-10 flex flex-col items-center">
                 <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6 text-emerald-600">
                   <Check className="w-10 h-10" />
@@ -244,7 +243,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
                 </h2>
 
                 <p className="text-base text-zinc-500 mb-8">
-                  {unlockType === 'point_redemption' 
+                  {unlockType === 'point_redemption'
                     ? `Bạn đã sử dụng ${(benefit?.requiredPoints || 0).toLocaleString()} pts để đổi ưu đãi này.`
                     : `Đặc quyền hạng thành viên đã được kích hoạt.`
                   }
@@ -259,7 +258,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
                   </div>
                 )}
 
-                <Button 
+                <Button
                   size="lg"
                   className="w-full h-14 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-semibold transition-colors"
                   onClick={() => {

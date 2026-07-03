@@ -42,7 +42,7 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
   const { data: transactions } = useGetMyLoyaltyTransactions(brandId);
   const { data: lots } = useGetMyLoyaltyLots(brandId);
   const { data: benefits } = useGetBrandBenefits(brandId);
-  const { data: redemptions } = useGetMyBenefitRedemptions();
+  const { data: redemptions } = useGetMyBenefitRedemptions(brandId);
   
   const { mutateAsync: joinLoyalty, isPending: isJoining } = useJoinLoyalty();
 

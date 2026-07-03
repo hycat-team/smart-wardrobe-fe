@@ -90,10 +90,10 @@ export const useRedeemBenefit = () => {
   });
 };
 
-export const useGetMyBenefitRedemptions = () => {
+export const useGetMyBenefitRedemptions = (brandId?: string) => {
   return useQuery({
-    queryKey: USER_BRANDS_KEYS.myBenefitRedemptions(),
-    queryFn: () => userBrandsApi.getMyBenefitRedemptions(),
+    queryKey: brandId ? [...USER_BRANDS_KEYS.myBenefitRedemptions(), brandId] : USER_BRANDS_KEYS.myBenefitRedemptions(),
+    queryFn: () => userBrandsApi.getMyBenefitRedemptions(brandId),
   });
 };
 
