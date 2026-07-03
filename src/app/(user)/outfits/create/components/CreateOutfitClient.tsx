@@ -79,6 +79,12 @@ function CreateOutfitContent() {
       return;
     }
 
+    const invalidItems = selectedItems.filter(item => !(item.fashionItem?.id || (item as any).fashionItemId || item.clothingItemId));
+    if (invalidItems.length > 0) {
+      toast.error("Một số trang phục không hợp lệ hoặc thiếu thông tin sản phẩm thời trang. Vui lòng chọn lại!");
+      return;
+    }
+
     if (!canvasRef.current) return;
 
     try {
@@ -124,7 +130,7 @@ function CreateOutfitContent() {
         description: customOccasion || occasion,
         coverImageUrl: coverImageUrl,
         items: selectedItems.map((item) => ({
-          wardrobeItemId: item.id,
+          fashionItemId: item.fashionItem?.id || (item as any).fashionItemId || item.clothingItemId,
           positionX: Math.max(1, Math.abs(item.x || 0)),
           positionY: Math.max(1, Math.abs(item.y || 0)),
           scale: (item.scale || 100) / 100,
@@ -253,7 +259,7 @@ function CreateOutfitContent() {
                               : "border-border hover:border-foreground"
                           )}
                         >
-                          <img src={applyCloudinaryTrim(item.imageUrl)} alt={getWardrobeItemName(item)} className="w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" />
+                          <img src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl)} alt={getWardrobeItemName(item)} className="w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" />
                           {isSelected && (
                             <div className="absolute inset-0 border-[3px] border-foreground flex flex-col items-end justify-start p-1 pointer-events-none rounded-xl">
                               <div className="bg-foreground size-4 flex items-center justify-center rounded-sm">

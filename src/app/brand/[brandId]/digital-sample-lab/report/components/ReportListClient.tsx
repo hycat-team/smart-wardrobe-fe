@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Plus, ChevronLeft, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function ReportListClient() {
+  const params = useParams();
+  const brandId = params.brandId as string;
   const [reports, setReports] = useState<any[]>([]);
 
   useEffect(() => {
@@ -22,7 +25,7 @@ export function ReportListClient() {
     <div className="max-w-6xl mx-auto py-12 px-6 space-y-10">
       {/* Header */}
       <div>
-        <Link href="/brand/digital-sample-lab" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground flex items-center gap-1 mb-6 w-fit">
+        <Link href={`/brand/${brandId}/digital-sample-lab`} className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground flex items-center gap-1 mb-6 w-fit">
           <ChevronLeft className="size-3" /> Quay lại Tạo Mẫu
         </Link>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-6">
@@ -32,7 +35,7 @@ export function ReportListClient() {
               Danh sách các chiến dịch thử nghiệm mẫu số
             </p>
           </div>
-          <Link href="/brand/digital-sample-lab">
+          <Link href={`/brand/${brandId}/digital-sample-lab`}>
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-[11px] uppercase tracking-widest rounded-full flex items-center gap-2">
               <Plus className="size-4" /> Khởi tạo mới
             </Button>
@@ -44,7 +47,7 @@ export function ReportListClient() {
         {reports.length === 0 ? (
           <div className="col-span-full py-12 text-center border border-dashed border-border bg-muted/50 rounded-3xl">
             <p className="text-sm tracking-widest uppercase text-muted-foreground mb-4">Chưa có báo cáo nào</p>
-            <Link href="/brand/digital-sample-lab">
+            <Link href={`/brand/${brandId}/digital-sample-lab`}>
               <Button variant="outline" className="font-bold text-[11px] uppercase tracking-widest rounded-full border-border">
                 Tạo Digital Sample đầu tiên
               </Button>
@@ -52,7 +55,7 @@ export function ReportListClient() {
           </div>
         ) : (
           reports.map((report) => (
-            <Link key={report.id} href={`/brand/digital-sample-lab/report/${report.id}`}>
+            <Link key={report.id} href={`/brand/${brandId}/digital-sample-lab/report/${report.id}`}>
               <div className="bg-card p-6 border border-border shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col group rounded-3xl">
                 <div className="flex-1">
                   {report.imageUrl && (

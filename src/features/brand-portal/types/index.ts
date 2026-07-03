@@ -63,12 +63,24 @@ export interface Benefit {
   };
 }
 
-export interface LoyaltyTier {
+export interface LoyaltyTierRes {
   id: string;
+  brandId: string;
   name: string;
-  requiredPoints: number;
-  multiplier: number;
+  rank: number;
+  minTotalSpend: number;
+  description?: string;
+  createdAt: string;
 }
+
+export interface CreateLoyaltyTierPayload {
+  name: string;
+  rank: number;
+  minTotalSpend: number;
+  description?: string;
+}
+
+export interface UpdateLoyaltyTierPayload extends Partial<CreateLoyaltyTierPayload> {}
 
 export interface LoyaltyProgram {
   id: string;
@@ -147,6 +159,10 @@ export interface BrandInfo {
   name: string;
   slug?: string;
   description?: string;
+  story?: string;
+  location?: string;
+  website?: string;
+  instagram?: string;
   logoUrl?: string;
   logoPublicId?: string;
   backgroundUrl?: string;
@@ -195,31 +211,65 @@ export interface CreateBrandPayload {
   logoPublicId?: string;
 }
 
+// export interface BrandItemRes {
+//   id: string;
+//   brandId: string;
+//   name: string;
+//   sku?: string;
+//   productCode?: string;
+//   description?: string;
+//   price: number;
+//   salePrice?: number;
+//   currency?: string;
+//   imageUrl?: string;
+//   imageUrls?: string[];
+//   itemType?: string;
+//   fashionItemId?: string;
+//   fashionItem?: {
+//     imageUrl?: string;
+//     name?: string;
+//     [key: string]: any;
+//   };
+//   status: 'ACTIVE' | 'INACTIVE' | 'DRAFT' | 'active' | 'archived' | 'draft';
+//   stockStatus?: 'IN_STOCK' | 'OUT_OF_STOCK';
+//   category?: string;
+//   tags?: string[];
+//   createdAt?: string;
+//   updatedAt?: string;
+// }
+
 export interface BrandItemRes {
-  id: string;
-  brandId: string;
-  name: string;
-  sku?: string;
-  productCode?: string;
-  description?: string;
-  price: number;
-  salePrice?: number;
-  currency?: string;
-  imageUrl?: string;
-  imageUrls?: string[];
-  itemType?: string;
-  fashionItemId?: string;
+  id: string,
+  brandId: string,
+  fashionItemId?: string,
+  productCode?: string,
+  name?: string,
+  description?: string,
+  price: number,
+  itemType?: string, 
+  status: string,
   fashionItem?: {
-    ImageUrl?: string;
-    Name?: string;
-    [key: string]: any;
-  };
-  status: 'ACTIVE' | 'INACTIVE' | 'DRAFT' | 'active' | 'archived' | 'draft';
-  stockStatus?: 'IN_STOCK' | 'OUT_OF_STOCK';
-  category?: string;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
+    id: string,
+    categoryId: string,
+    categoryName?: string,
+    imageUrl?: string,
+    imagePublicId?: string,
+    color: string,
+    colorHex: string,
+    colorHue: number,
+    colorSaturation: number,
+    colorLightness: number,
+    style?: string,
+    material?: string,
+    pattern?: string,
+    fit?: string,
+    seasonality?: string,
+    description?: string,
+    createdAt?: string,
+    updatedAt?: string
+  },
+  createdAt?: string,
+  updatedAt?: string
 }
 
 export interface CreateBrandItemReq {

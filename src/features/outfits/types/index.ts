@@ -1,7 +1,7 @@
 import { WardrobeItemRes } from '../../wardrobe/types';
 
 export interface SaveOutfitItemReq {
-  wardrobeItemId: string;
+  fashionItemId: string;
   positionX: number;
   positionY: number;
   scale: number;

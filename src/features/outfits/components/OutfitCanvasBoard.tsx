@@ -132,7 +132,7 @@ export function OutfitCanvasBoard({
                     }}
                   >
                     <img
-                      src={item.isGhost ? item.imageUrl : applyCloudinaryTrim(item.imageUrl)}
+                      src={item.isGhost ? (item.fashionItem?.imageUrl || item.imageUrl) : applyCloudinaryTrim(item.fashionItem?.imageUrl || item.imageUrl)}
                       alt="Outfit Item"
                       className="w-full h-auto object-contain filter drop-shadow-md"
                       draggable={false}

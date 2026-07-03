@@ -52,7 +52,7 @@ export default function ChatInboxClient() {
 
 
   return (
-    <div className="w-full flex h-[calc(100vh-8rem)] bg-background overflow-hidden border-t border-border">
+    <div className="w-full flex h-[calc(100vh-8rem)] bg-background overflow-hidden rounded-3xl border border-border shadow-sm">
       {/* Sidebar - Conversations */}
       <div className="w-1/3 min-w-[300px] border-r border-border bg-card flex flex-col h-full">
         <div className="p-4 border-b border-border bg-muted/20 shrink-0">
@@ -117,14 +117,14 @@ export default function ChatInboxClient() {
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <h2 className="font-bold text-sm">{activeConvDetails?.customerName || activeConvDetails?.userDisplayName || 'Khách hàng'}</h2>
-                    {customerInfo?.tier && (
+                    {(customerInfo as any)?.tier && (
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-                        {customerInfo.tier.name}
+                        {(customerInfo as any).tier.name}
                       </Badge>
                     )}
-                    {customerInfo?.loyaltyAccount && (
+                    {(customerInfo as any)?.loyaltyAccount && (
                       <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-primary text-primary">
-                        {customerInfo.loyaltyAccount.pointsBalance} điểm
+                        {(customerInfo as any).loyaltyAccount.pointsBalance} điểm
                       </Badge>
                     )}
                   </div>
@@ -141,7 +141,7 @@ export default function ChatInboxClient() {
                     </Button>
                   </Link>
                 )}
-                {activeConvDetails?.status === 'open' && (
+                {/* {activeConvDetails?.status === 'open' && (
                   <Button 
                     variant="destructive" 
                     size="sm" 
@@ -151,7 +151,7 @@ export default function ChatInboxClient() {
                   >
                     Đóng hội thoại
                   </Button>
-                )}
+                )} */}
                 {activeConvDetails?.status === 'closed' && (
                   <Button 
                     variant="default" 
@@ -172,14 +172,14 @@ export default function ChatInboxClient() {
                 <div className="flex justify-center py-10">
                   <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                 </div>
-              ) : [...messages].reverse().map((msg) => {
+              ) : [...(messages || [])].reverse().map((msg: any) => {
                 const isBrand = msg.senderRole === 'brand_staff';
                 return (
                   <div key={msg.id} className={`flex flex-col max-w-[75%] ${isBrand ? 'self-end items-end' : 'self-start items-start'}`}>
-                    <div className={`px-4 py-2.5 rounded-2xl text-sm ${
+                    <div className={`px-5 py-3 text-[14px] leading-relaxed shadow-sm border ${
                       isBrand 
-                        ? 'bg-primary text-primary-foreground rounded-br-sm' 
-                        : 'bg-muted text-foreground border border-border rounded-bl-sm'
+                        ? 'bg-primary text-primary-foreground border-primary rounded-3xl rounded-br-[4px]' 
+                        : 'bg-card text-foreground border-border rounded-3xl rounded-bl-[4px]'
                     }`}>
                       {msg.message}
                     </div>
@@ -199,16 +199,16 @@ export default function ChatInboxClient() {
                   Hội thoại đã đóng. Vui lòng mở lại để tiếp tục trò chuyện.
                 </div>
               ) : (
-                <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                <form onSubmit={handleSendMessage} className="flex items-center gap-3">
                   <Input
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     placeholder="Nhập tin nhắn..."
-                    className="flex-1"
+                    className="flex-1 h-12 rounded-full border-border bg-muted/30 focus-visible:ring-1 focus-visible:ring-ring px-6 shadow-sm text-[14px]"
                     disabled={isSending}
                   />
-                  <Button type="submit" size="icon" disabled={!messageInput.trim() || isSending}>
-                    {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  <Button type="submit" size="icon" className="h-12 w-12 rounded-full shadow-sm shrink-0" disabled={!messageInput.trim() || isSending}>
+                    {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-1" />}
                   </Button>
                 </form>
               )}

@@ -52,7 +52,7 @@ export function WardrobeCard({
             !isProcessing && "group-hover:scale-105",
             isProcessing && "blur-md opacity-60",
           )}
-          src={applyCloudinaryTrim(item.imageUrl || undefined)}
+          src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl || undefined)}
         />
         {isProcessing && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
@@ -78,12 +78,12 @@ export function WardrobeCard({
         )}
 
         {/* Top-Right Color Indicator */}
-        {item.colorHex && (
+        {(item.fashionItem?.colorHex || (item as any).colorHex) && (
           <div className="absolute top-4 right-4 z-10 transition-opacity duration-300 group-hover:opacity-0">
             <div
               className="h-[14px] w-[14px] rounded-full border border-border shadow-sm"
-              style={{ backgroundColor: item.colorHex }}
-              title={item.color || "Màu sắc"}
+              style={{ backgroundColor: item.fashionItem?.colorHex || (item as any).colorHex }}
+              title={item.fashionItem?.color || (item as any).color || "Màu sắc"}
             />
           </div>
         )}

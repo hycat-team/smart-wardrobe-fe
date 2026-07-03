@@ -87,6 +87,23 @@ export function DigitalSampleLabClient() {
         status: 'active'
       });
       
+      // Save mock report for testing locally
+      try {
+        const existingStr = localStorage.getItem("digital_sample_lab_reports");
+        const reports = existingStr ? JSON.parse(existingStr) : [];
+        reports.push({
+          id: newItem.id,
+          productName: productName,
+          concept: concept,
+          imageUrl: uploadRes.secure_url,
+          variants: [{ name: 'Default', color: '#000' }],
+          createdAt: new Date().toISOString()
+        });
+        localStorage.setItem("digital_sample_lab_reports", JSON.stringify(reports));
+      } catch (e) {
+        console.error("Failed to save to localStorage", e);
+      }
+
       toast.success("Tạo mẫu thử thành công!", { id: 'create_sample' });
       router.push(`/brand/${brandId}/digital-sample-lab/report/${newItem.id}`);
     } catch (error: any) {

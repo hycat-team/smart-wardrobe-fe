@@ -19,6 +19,8 @@ const BRAND_PORTAL_KEYS = {
   conversationMessages: (brandId: string, conversationId: string) => [...BRAND_PORTAL_KEYS.conversations(brandId), conversationId, 'messages'] as const,
   members: (brandId: string) => [...BRAND_PORTAL_KEYS.all, brandId, 'members'] as const,
   adminBrands: () => [...BRAND_PORTAL_KEYS.all, 'admin-brands'] as const,
+  items: (brandId: string) => [...BRAND_PORTAL_KEYS.all, brandId, 'items'] as const,
+  itemFeedbacks: (brandId: string, itemId: string) => [...BRAND_PORTAL_KEYS.items(brandId), itemId, 'feedbacks'] as const,
 };
 
 // Brand
@@ -174,6 +176,29 @@ export const useUpsertLoyaltyProgram = (brandId: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.loyaltyProgram(brandId) });
       toast.success('Cập nhật chương trình thành công');
+    },
+  });
+};
+
+export const useCreateLoyaltyTier = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: any) => brandPortalApi.createLoyaltyTier(brandId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.loyaltyTiers(brandId) });
+      toast.success('Tạo hạng thành viên thành công');
+    },
+  });
+};
+
+export const useUpdateLoyaltyTier = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ tierId, payload }: { tierId: string; payload: any }) => 
+      brandPortalApi.updateLoyaltyTier(brandId, tierId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.loyaltyTiers(brandId) });
+      toast.success('Cập nhật hạng thành viên thành công');
     },
   });
 };
@@ -365,5 +390,13 @@ export const useCreateBrandItem = (brandId: string) => {
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Tạo sản phẩm thất bại');
     }
+  });
+};
+
+export const useGetBrandItemFeedbacks = (brandId: string, itemId: string) => {
+  return useQuery({
+    queryKey: BRAND_PORTAL_KEYS.itemFeedbacks(brandId, itemId),
+    queryFn: () => brandPortalApi.getBrandItemFeedbacks(brandId, itemId),
+    enabled: !!brandId && !!itemId,
   });
 };

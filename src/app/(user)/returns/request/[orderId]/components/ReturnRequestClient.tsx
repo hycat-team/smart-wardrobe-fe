@@ -113,7 +113,7 @@ function ReturnRequestForm({ orderId }: ReturnRequestClientProps) {
 
         <div className="flex gap-4 p-4 border border-border bg-muted/50 rounded-3xl mb-10">
           <div className="w-20 aspect-[3/4] bg-secondary/20 rounded-2xl overflow-hidden flex-shrink-0">
-            <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.fashionItem?.imageUrl || ''} alt={product.name} className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col justify-center gap-1">
             <span className="font-bold text-sm">{product.name}</span>

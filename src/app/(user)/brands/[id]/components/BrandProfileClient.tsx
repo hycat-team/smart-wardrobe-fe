@@ -39,6 +39,7 @@ import {
 } from '@/features/brands/queries/user-brands.queries';
 import { toast } from 'sonner';
 import BrandChatWindow from './BrandChatWindow';
+import Image from 'next/image';
 
 interface BrandProfileClientProps {
   brandId: string;
@@ -125,7 +126,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
             <div className="flex flex-col gap-2 w-full">
               <div className="flex items-center justify-center lg:justify-start gap-3">
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-medium text-foreground tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">{brand.name}</h1>
-                {brand.isVerified && <BadgeCheck className="w-6 h-6 lg:w-8 lg:h-8 text-blue-500 bg-background rounded-full p-0.5" />}
+                {(brand as any).isVerified && <BadgeCheck className="w-6 h-6 lg:w-8 lg:h-8 text-blue-500 bg-background rounded-full p-0.5" />}
               </div>
               {brand.description && (
                 <p className="text-muted-foreground font-semibold text-sm sm:text-base max-w-[800px] leading-relaxed mx-auto lg:mx-0">
@@ -161,7 +162,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
             {/* Members count pill */}
             <div className="flex items-center justify-center gap-8 px-6 lg:px-8 py-3 bg-muted rounded-3xl border border-border shadow-sm w-full sm:w-auto">
               <div className="flex flex-col items-center">
-                <span className="font-bold text-foreground text-lg font-semibold">{(brand.totalCustomer || brand.memberCount || 0).toLocaleString()}</span>
+                <span className="font-bold text-foreground text-lg font-semibold">{((brand as any).totalCustomer || (brand as any).memberCount || 0).toLocaleString()}</span>
                 <span className="text-muted-foreground text-[10px] uppercase tracking-widest">Members</span>
               </div>
             </div>
@@ -239,7 +240,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                   <Link key={product.id} href={`/products/${product.id}`} className="group flex flex-col gap-3 lg:gap-4">
                     <div className="relative aspect-[3/4] bg-zinc-50 overflow-hidden rounded-2xl isolate">
                       <img
-                        src={product.fashionItem?.ImageUrl || product.imageUrls?.[0] || 'https://placehold.co/300x400?text=No+Image'}
+                        src={product.fashionItem?.imageUrl || product.imageUrls?.[0]}
                         alt={product.name}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                       />

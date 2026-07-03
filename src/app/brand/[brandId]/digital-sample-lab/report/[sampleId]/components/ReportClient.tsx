@@ -3,8 +3,14 @@ import { useState, useEffect } from "react";
 import { MOCK_FIT_REPORT } from "@/features/ghost-closet/mock/ghostClosetMock";
 import { Users, Layers, ArrowRight, ArrowUpRight, TrendingUp, ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useGetBrandItemFeedbacks } from "@/features/brand-portal/queries/brand-portal.queries";
 
 export function ReportClient({ sampleId }: { sampleId: string }) {
+  const params = useParams();
+  const brandId = params.brandId as string;
+  const { data: feedbacks, isLoading: isLoadingFeedbacks } = useGetBrandItemFeedbacks(brandId, sampleId);
+console.log('feedbacks', feedbacks)
   const [report, setReport] = useState(MOCK_FIT_REPORT);
   const [productName, setProductName] = useState("Wardrobe Fit Report");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -71,7 +77,7 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
     <div className="max-w-6xl mx-auto py-12 px-6 space-y-10">
       {/* Header */}
       <div>
-        <Link href="/brand/digital-sample-lab/report" className="text-[10px] font-mono uppercase tracking-widest text-ink-muted hover:text-ink flex items-center gap-1 mb-6 w-fit">
+        <Link href={`/brand/${brandId}/digital-sample-lab/report`} className="text-[10px] font-mono uppercase tracking-widest text-ink-muted hover:text-ink flex items-center gap-1 mb-6 w-fit">
           <ChevronLeft className="size-3" /> Tất cả Reports
         </Link>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-ink/10 pb-6">
@@ -248,6 +254,41 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
                 ))}
               </ul>
             </div>
+          </div>
+
+          <div className="bg-white p-6 border border-ink/10 shadow-sm space-y-6 mt-8">
+            <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-2 border-b border-ink/10">Ý Kiến Khách Hàng (Feedbacks)</h3>
+            {isLoadingFeedbacks ? (
+              <div className="text-sm text-ink-muted py-4">Đang tải...</div>
+            ) : (!feedbacks || feedbacks.length === 0) ? (
+              <div className="text-sm text-ink-muted py-4">Chưa có ý kiến nào.</div>
+            ) : (
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {feedbacks.map((fb: any, i: number) => (
+                  <div key={fb.id || i} className="p-4 bg-[#F4F1EE]/50 border border-ink/5">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-ink text-sm uppercase tracking-wider text-[11px] px-2 py-1 bg-white border border-ink/10 shadow-sm">{
+                          fb.voteType === 'like' ? '❤️ Thích' :
+                          fb.voteType === 'dislike' ? '👎 Không thích' :
+                          fb.voteType === 'would_buy' ? '🛍️ Sẽ mua' :
+                          fb.voteType === 'not_interested' ? '🤷 Không quan tâm' : fb.voteType
+                        }</span>
+                        {fb.rating && (
+                          <span className="text-[11px] font-mono bg-ink text-white px-2 py-1 uppercase">{fb.rating} / 5 ⭐</span>
+                        )}
+                      </div>
+                      <span className="text-[10px] font-mono uppercase text-ink-muted">{new Date(fb.createdAt).toLocaleDateString('vi-VN')}</span>
+                    </div>
+                    {fb.feedbackText && (
+                      <p className="text-sm text-ink-muted mt-3 border-l-2 border-[#A0522D] pl-3 italic">
+                        "{fb.feedbackText}"
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

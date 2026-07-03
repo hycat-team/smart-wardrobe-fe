@@ -141,7 +141,7 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 backdrop-blur-md">
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
                     <span className="text-xs font-bold text-white uppercase tracking-wider">
-                      {loyaltyData?.tier?.name || 'Thành Viên'}
+                      {loyaltyData?.currentTier?.name || 'Thành Viên'}
                     </span>
                   </div>
                   

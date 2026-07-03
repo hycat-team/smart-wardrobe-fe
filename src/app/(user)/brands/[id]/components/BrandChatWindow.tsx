@@ -21,10 +21,10 @@ export default function BrandChatWindow({ brandId, isOpen, onClose }: { brandId:
 
   // Mark as read when opened
   useEffect(() => {
-    if (isOpen && conversation?.unreadCount && conversation.unreadCount > 0) {
+    if (isOpen && (conversation as any)?.unreadCount && (conversation as any).unreadCount > 0) {
       markRead(brandId);
     }
-  }, [isOpen, conversation?.unreadCount, brandId, markRead]);
+  }, [isOpen, (conversation as any)?.unreadCount, brandId, markRead]);
 
   // Scroll to bottom when new messages arrive or when opened
   useEffect(() => {

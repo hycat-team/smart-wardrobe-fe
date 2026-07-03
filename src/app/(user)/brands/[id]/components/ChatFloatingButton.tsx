@@ -22,10 +22,10 @@ export default function ChatFloatingButton({ brandId }: { brandId: string }) {
 
   // Mark as read when opened
   useEffect(() => {
-    if (isOpen && conversation?.unreadCount && conversation.unreadCount > 0) {
+    if (isOpen && (conversation as any)?.unreadCount && (conversation as any).unreadCount > 0) {
       markRead(brandId);
     }
-  }, [isOpen, conversation?.unreadCount, brandId, markRead]);
+  }, [isOpen, (conversation as any)?.unreadCount, brandId, markRead]);
 
   // Scroll to bottom when new messages arrive or when opened
   useEffect(() => {
@@ -51,9 +51,9 @@ export default function ChatFloatingButton({ brandId }: { brandId: string }) {
         className={`fixed bottom-[100px] right-6 w-14 h-14 bg-foreground text-background rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform z-50 ${isOpen ? 'hidden' : 'flex'}`}
       >
         <MessageCircle className="w-6 h-6" />
-        {conversation?.unreadCount ? (
+        {(conversation as any)?.unreadCount ? (
           <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold border-2 border-background">
-            {conversation.unreadCount}
+            {(conversation as any).unreadCount}
           </span>
         ) : null}
       </button>

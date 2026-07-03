@@ -25,7 +25,7 @@ export default function CustomerDetailClient() {
   const { data: customer, isLoading } = useGetCustomerDetail(brandId, customerId);
   const { data: transactions, isLoading: isLoadingTx } = useGetLoyaltyAccountTransactions(
     brandId, 
-    customer?.loyaltyAccountId || ''
+    (customer as any)?.loyaltyAccount?.id || ''
   );
   const { data: claimTokens, isLoading: isLoadingTokens } = useGetCustomerClaimTokens(brandId, customerId);
   const { mutate: revokeToken, isPending: isRevoking } = useRevokeCustomerClaimToken(brandId, customerId);
@@ -87,7 +87,7 @@ export default function CustomerDetailClient() {
               Tạo mã Claim
             </Button>
           )}
-          {customer.loyaltyAccount && customer.loyaltyAccount.currentPoints > 0 && (
+          {(customer as any).loyaltyAccount && (customer as any).loyaltyAccount.currentPoints > 0 && (
             <Button variant="outline" className="rounded-full text-amber-600 border-amber-200 hover:bg-amber-50" onClick={() => setIsDeductDialogOpen(true)}>
               <Gift className="w-4 h-4 mr-2" /> Đổi quà
             </Button>
@@ -140,14 +140,14 @@ export default function CustomerDetailClient() {
             <CardContent className="p-6 flex flex-col items-center justify-center text-center h-full gap-2">
               <CreditCard className="w-8 h-8 text-primary mb-2" />
               <span className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Tổng chi tiêu</span>
-              <span className="text-3xl font-bold">{formatCurrency(customer?.loyaltyAccount?.totalSpend ?? 0)}</span>
+              <span className="text-3xl font-bold">{formatCurrency((customer as any)?.loyaltyAccount?.totalSpend ?? 0)}</span>
             </CardContent>
           </Card>
           <Card className="rounded-3xl border-border bg-card shadow-sm">
             <CardContent className="p-6 flex flex-col items-center justify-center text-center h-full gap-2">
               <ShoppingBag className="w-8 h-8 text-primary mb-2" />
               <span className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Tổng đơn hàng</span>
-              <span className="text-3xl font-bold">{customer?.totalOrder ?? 0}</span>
+              <span className="text-3xl font-bold">{(customer as any)?.totalOrder ?? 0}</span>
             </CardContent>
           </Card>
         </div>
@@ -169,8 +169,7 @@ export default function CustomerDetailClient() {
                 <TableHeader>
                   <TableRow className="bg-muted/50 hover:bg-muted/50">
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Mã GD</TableHead>
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest">Loại</TableHead>
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Điểm</TableHead>
+                    <TableHead className="font-bold text-[10px] uppercase tracking-widest">Điểm</TableHead>
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Lý do</TableHead>
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Thời gian</TableHead>
                   </TableRow>
@@ -178,13 +177,13 @@ export default function CustomerDetailClient() {
                 <TableBody>
                   {isLoadingTx ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-20">
+                      <TableCell colSpan={4} className="text-center py-20">
                         <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
                       </TableCell>
                     </TableRow>
                   ) : !transactions || transactions.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-20 text-muted-foreground">
+                      <TableCell colSpan={4} className="text-center py-20 text-muted-foreground">
                         <History className="w-12 h-12 opacity-50 mx-auto mb-4" />
                         Chưa có lịch sử giao dịch điểm.
                       </TableCell>
@@ -193,16 +192,7 @@ export default function CustomerDetailClient() {
                     transactions.map((tx) => (
                       <TableRow key={tx.id}>
                         <TableCell className="font-medium text-xs text-muted-foreground">{tx.id.slice(0, 8)}...</TableCell>
-                        <TableCell>
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${
-                            tx.transactionType === 'earn' ? 'bg-emerald-500/10 text-emerald-600' :
-                            tx.transactionType === 'redeem' ? 'bg-amber-500/10 text-amber-600' :
-                            'bg-muted text-muted-foreground'
-                          }`}>
-                            {tx.transactionType}
-                          </span>
-                        </TableCell>
-                        <TableCell className={`text-right font-bold ${tx.transactionType === 'earn' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                        <TableCell className={`font-bold pl-4 ${tx.transactionType === 'earn' ? 'text-emerald-600' : 'text-amber-600'}`}>
                           {tx.transactionType === 'earn' ? '+' : '-'}{tx.points}
                         </TableCell>
                         <TableCell>{tx.reason}</TableCell>
@@ -294,7 +284,7 @@ export default function CustomerDetailClient() {
         onOpenChange={setIsDeductDialogOpen}
         defaultUserId={customer.user?.id}
         defaultPhone={customer.phoneE164}
-        currentPoints={customer.loyaltyAccount?.currentPoints || 0}
+        currentPoints={(customer as any).loyaltyAccount?.currentPoints || 0}
       />
       <GenerateClaimDialog
         brandId={brandId}

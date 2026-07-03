@@ -97,9 +97,9 @@ const getSearchableText = (item: WardrobeItem) => {
     getWardrobeItemName(item).toLowerCase(),
     getCategoryName(item).toLowerCase(),
     (itemRecord.name || "").toLowerCase(),
-    (item.color || "").toLowerCase(),
-    (item.material || "").toLowerCase(),
-    (item.style || "").toLowerCase(),
+    (item.fashionItem?.color || (item as any).color || "").toLowerCase(),
+    (item.fashionItem?.material || (item as any).material || "").toLowerCase(),
+    (item.fashionItem?.style || (item as any).style || "").toLowerCase(),
     (itemRecord.brand || "").toLowerCase(),
   ].join(" ");
 };
@@ -244,17 +244,17 @@ export default function WardrobeClient({
       categoryParam === "Tất cả" || itemCatName === categoryParam;
 
     const matchesColor =
-      !colorParam || getColorValue(item.color || "") === colorParam;
+      !colorParam || getColorValue(item.fashionItem?.color || (item as any).color || "") === colorParam;
 
     // Tag filter (for mock tags backward compatibility, or matching backend style/material)
     const mockTags = (
       (item as WardrobeItem & { tags?: string[] }).tags || []
     ).filter(Boolean);
     const backendTags = [
-      item.style,
-      item.material,
-      item.pattern,
-      item.seasonality,
+      item.fashionItem?.style || (item as any).style,
+      item.fashionItem?.material || (item as any).material,
+      item.fashionItem?.pattern || (item as any).pattern,
+      item.fashionItem?.seasonality || (item as any).seasonality,
     ].filter(Boolean);
     const matchesTag =
       !tagParam ||
@@ -269,9 +269,9 @@ export default function WardrobeClient({
       itemName,
       itemCatName.toLowerCase(),
       ((item as any).name || "").toLowerCase(),
-      (item.color || "").toLowerCase(),
-      (item.material || "").toLowerCase(),
-      (item.style || "").toLowerCase(),
+      (item.fashionItem?.color || (item as any).color || "").toLowerCase(),
+      (item.fashionItem?.material || (item as any).material || "").toLowerCase(),
+      (item.fashionItem?.style || (item as any).style || "").toLowerCase(),
       ((item as any).brand || "").toLowerCase(),
     ].join(" ");
 

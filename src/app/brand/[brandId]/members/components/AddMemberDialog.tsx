@@ -55,7 +55,7 @@ export default function AddMemberDialog({ brandId, open, onOpenChange }: Props) 
           </div>
           <div className="grid gap-2">
             <Label htmlFor="role" className="font-semibold text-xs uppercase tracking-widest text-muted-foreground">Vai trò</Label>
-            <Select value={role} onValueChange={setRole}>
+            <Select value={role} onValueChange={(val) => setRole(val as string)}>
               <SelectTrigger className="w-full rounded-xl h-11 bg-muted/50">
                 <SelectValue placeholder="Chọn vai trò">
                   {role === 'staff' ? 'Nhân viên (Staff)' : role === 'owner' ? 'Quản trị viên (Owner)' : 'Chọn vai trò'}

@@ -13,7 +13,7 @@ function ProductCell({ productId }: { productId: string }) {
   return (
     <div className="flex items-center gap-3">
       <div className="w-12 h-12 bg-muted rounded-2xl overflow-hidden shrink-0 border border-border">
-        {(product?.fashionItem?.ImageUrl || product?.imageUrls?.[0]) && <img src={product.fashionItem?.ImageUrl || product.imageUrls?.[0]} alt={product.name} className="w-full h-full object-cover" />}
+        {product?.fashionItem?.imageUrl && <img src={product.fashionItem.imageUrl} alt={product.name} className="w-full h-full object-cover" />}
       </div>
       <span className="font-bold text-sm text-foreground line-clamp-2 min-w-[150px]">{product?.name || "Đang tải..."}</span>
     </div>

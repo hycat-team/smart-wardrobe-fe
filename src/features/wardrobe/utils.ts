@@ -12,8 +12,10 @@ export function getWardrobeItemName(item: any) {
   if (!item) return "Trang phục";
   if (item.name) return item.name;
   const categoryName = item.category?.name || "Trang phục";
-  const colorStr = item.color ? `màu ${item.color}` : "";
-  const styleStr = item.style ? `phong cách ${item.style}` : "";
+  const itemColor = item.fashionItem?.color || item.color;
+  const itemStyle = item.fashionItem?.style || item.style;
+  const colorStr = itemColor ? `màu ${itemColor}` : "";
+  const styleStr = itemStyle ? `phong cách ${itemStyle}` : "";
   return [categoryName, colorStr, styleStr].filter(Boolean).join(" ");
 }
 

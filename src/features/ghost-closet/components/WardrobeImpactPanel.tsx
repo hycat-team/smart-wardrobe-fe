@@ -69,7 +69,7 @@ export function WardrobeImpactPanel({
           {/* Header Image */}
           <div className="relative aspect-[4/5] w-full bg-muted">
             <Image
-              src={item.imageUrl}
+              src={item.fashionItem?.imageUrl || (item as any).imageUrl}
               alt={item.brandName}
               fill
               sizes="(max-width: 640px) 100vw, 400px"
@@ -91,7 +91,7 @@ export function WardrobeImpactPanel({
             <div className="flex flex-col items-center text-center">
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">{item.brandName}</p>
               <h2 className="text-2xl font-bold text-foreground mb-2 uppercase tracking-tight">
-                {item.category?.name || "Sản phẩm"} {item.color}
+                {item.category?.name || "Sản phẩm"} {item.fashionItem?.color || (item as any).color}
               </h2>
               <p className="font-semibold text-lg text-primary">{formatPrice(item.price)}</p>
             </div>

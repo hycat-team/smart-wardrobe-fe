@@ -45,7 +45,7 @@ export default function UpsertLoyaltyProgramDialog({ brandId, open, onOpenChange
   const { mutateAsync: upsertProgram, isPending } = useUpsertLoyaltyProgram(brandId);
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       name: '',
       amountPerPoint: 10000,
@@ -75,7 +75,7 @@ export default function UpsertLoyaltyProgramDialog({ brandId, open, onOpenChange
     }
   }, [program, open, form]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: any) => {
     try {
       await upsertProgram({
         name: values.name,
@@ -103,9 +103,9 @@ export default function UpsertLoyaltyProgramDialog({ brandId, open, onOpenChange
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-4 py-4">
             <FormField
-              control={form.control}
+              control={form.control as any}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -120,7 +120,7 @@ export default function UpsertLoyaltyProgramDialog({ brandId, open, onOpenChange
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="amountPerPoint"
                 render={({ field }) => (
                   <FormItem>
@@ -135,7 +135,7 @@ export default function UpsertLoyaltyProgramDialog({ brandId, open, onOpenChange
               />
 
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="pointExpiryDays"
                 render={({ field }) => (
                   <FormItem>
@@ -151,7 +151,7 @@ export default function UpsertLoyaltyProgramDialog({ brandId, open, onOpenChange
             </div>
 
             <FormField
-              control={form.control}
+              control={form.control as any}
               name="roundingMode"
               render={({ field }) => (
                 <FormItem>
@@ -178,7 +178,7 @@ export default function UpsertLoyaltyProgramDialog({ brandId, open, onOpenChange
             />
 
             <FormField
-              control={form.control}
+              control={form.control as any}
               name="isActive"
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-xl border border-border/50 p-4 shadow-sm bg-muted/20">

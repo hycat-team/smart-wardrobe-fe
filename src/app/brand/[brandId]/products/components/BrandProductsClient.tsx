@@ -74,12 +74,12 @@ export function BrandProductsClient({ brandId }: { brandId: string }) {
     if (product) {
       setEditingId(product.id);
       setFormData({
-        name: product.name,
+        name: product.name || "",
         productCode: product.productCode || "",
         price: product.price.toString(),
         description: product.description || "",
         status: product.status || "draft",
-        imageUrl: product.fashionItem?.ImageUrl || product.imageUrl || product.imageUrls?.[0] || "",
+        imageUrl: product.fashionItem?.imageUrl || (product as any).imageUrl || (product as any).imageUrls?.[0] || "",
         imagePublicId: "",
       });
     } else {
@@ -200,8 +200,8 @@ export function BrandProductsClient({ brandId }: { brandId: string }) {
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-muted rounded-xl overflow-hidden shrink-0 border border-border">
-                      {product.fashionItem?.ImageUrl || product.imageUrl || product.imageUrls?.[0] ? (
-                        <img src={product.fashionItem?.ImageUrl || product.imageUrl || product.imageUrls?.[0]} alt={product.name} className="w-full h-full object-cover" />
+                      {product.fashionItem?.imageUrl || (product as any).imageUrl || (product as any).imageUrls?.[0] ? (
+                        <img src={product.fashionItem?.imageUrl || (product as any).imageUrl || (product as any).imageUrls?.[0]} alt={product.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                           <UploadCloud className="size-4" />

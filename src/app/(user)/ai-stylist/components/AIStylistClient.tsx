@@ -135,8 +135,8 @@ function AIStylistContent() {
 
         return {
           id: crypto.randomUUID(),
-          clothingItemId: item.primary.id,
-          imageUrl: item.primary.imageUrl,
+          clothingItemId: item.primary.fashionItem?.id || (item.primary as any).fashionItemId, // We use this as fashionItemId
+          imageUrl: item.primary.fashionItem?.imageUrl || (item.primary as any).imageUrl,
           category: item.primary.category,
           _role: item.role,
           isGhost: (item.primary as any).isGhost,
@@ -196,8 +196,8 @@ function AIStylistContent() {
       const newItems = [...prev];
       newItems[existingItemIndex] = {
         ...newItems[existingItemIndex],
-        clothingItemId: nextItem.id,
-        imageUrl: nextItem.imageUrl,
+        clothingItemId: nextItem.fashionItem?.id || (nextItem as any).fashionItemId,
+        imageUrl: nextItem.fashionItem?.imageUrl || (nextItem as any).imageUrl,
         category: nextItem.category,
       };
 
@@ -211,6 +211,12 @@ function AIStylistContent() {
     if (!outfitData || selectedItems.length === 0 || !canvasRef.current) return;
 
     try {
+      const invalidItems = selectedItems.filter(item => !item.clothingItemId);
+      if (invalidItems.length > 0) {
+        toast.error("Một số trang phục không hợp lệ hoặc thiếu thông tin sản phẩm thời trang. Vui lòng chọn lại!");
+        return;
+      }
+
       setIsSaving(true);
       toast.loading("Đang tạo ảnh preview...", { id: "save_outfit" });
 
@@ -251,7 +257,7 @@ function AIStylistContent() {
         description: outfitData.title || "Gợi ý từ AI",
         coverImageUrl: uploadedUrl,
         items: selectedItems.map((item) => ({
-          wardrobeItemId: item.clothingItemId,
+          fashionItemId: item.clothingItemId,
           positionX: Math.max(1, Math.abs(item.x || 0)),
           positionY: Math.max(1, Math.abs(item.y || 0)),
           scale: (item.scale || 100) / 100,
@@ -324,7 +330,7 @@ function AIStylistContent() {
                       const outfitItem = outfitData.items.find(i => i.role === item._role);
                       if (outfitItem) {
                         const allOptions = [outfitItem.primary, ...(outfitItem.alternatives || [])];
-                        const realGhostItem = allOptions.find(i => i.id === item.clothingItemId);
+                        const realGhostItem = allOptions.find(i => (i.fashionItem?.id || (i as any).fashionItemId) === item.clothingItemId);
                         if (realGhostItem) {
                           setActiveGhostItem(realGhostItem as any);
                           setIsImpactPanelOpen(true);
@@ -591,7 +597,8 @@ function AIStylistContent() {
         }}
         onSwap={() => {
           if (activeGhostItem) {
-            const canvasItem = selectedItems.find(x => x.clothingItemId === activeGhostItem.id);
+            const activeFashionId = activeGhostItem.fashionItem?.id || (activeGhostItem as any).fashionItemId;
+            const canvasItem = selectedItems.find(x => x.clothingItemId === activeFashionId);
             if (canvasItem) handleSwap(canvasItem._role);
             logGhostAction(activeGhostItem.id, 'swap');
             setIsImpactPanelOpen(false);
@@ -613,12 +620,12 @@ function AIStylistContent() {
             const { addToCart } = useB2BDemoStore.getState();
             addToCart({
               productId: activeGhostItem.id,
-              name: `${activeGhostItem.category?.name || "Sản phẩm"} ${activeGhostItem.color}`,
+              name: `${activeGhostItem.category?.name || "Sản phẩm"} ${activeGhostItem.fashionItem?.color || (activeGhostItem as any).color}`,
               price: activeGhostItem.price || 500000,
               quantity: 1,
               size: "M", // Default size for mock
-              color: activeGhostItem.color || "Basic",
-              imageUrl: activeGhostItem.imageUrl,
+              color: activeGhostItem.fashionItem?.color || (activeGhostItem as any).color || "Basic",
+              imageUrl: activeGhostItem.fashionItem?.imageUrl || (activeGhostItem as any).imageUrl,
               brandId: activeGhostItem.brandId,
               brandName: activeGhostItem.brandName,
               selected: true,
@@ -630,7 +637,8 @@ function AIStylistContent() {
         onHideBrand={() => {
           if (activeGhostItem) {
             hideBrand(activeGhostItem.brandId);
-            setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeGhostItem.id));
+            const activeFashionId = activeGhostItem.fashionItem?.id || (activeGhostItem as any).fashionItemId;
+            setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeFashionId));
             setIsImpactPanelOpen(false);
             toast.success("Sẽ không đề xuất brand này nữa.");
           }
@@ -638,7 +646,8 @@ function AIStylistContent() {
         onNotMyStyle={() => {
           if (activeGhostItem) {
             logGhostAction(activeGhostItem.id, 'notMyStyle');
-            setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeGhostItem.id));
+            const activeFashionId = activeGhostItem.fashionItem?.id || (activeGhostItem as any).fashionItemId;
+            setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeFashionId));
             setIsImpactPanelOpen(false);
             toast.success("Đã ghi nhận, sẽ cải thiện đề xuất.");
           }

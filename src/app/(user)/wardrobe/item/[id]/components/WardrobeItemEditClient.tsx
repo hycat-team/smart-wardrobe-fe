@@ -53,12 +53,12 @@ export function WardrobeItemEditClient({
     if (item) {
       reset({
         categoryId: item.category?.id || "",
-        color: item.color || "",
-        fit: item.fit || "",
-        material: item.material || "",
-        pattern: item.pattern || "",
-        seasonality: item.seasonality || "",
-        style: item.style || "",
+        color: item.fashionItem?.color || (item as any).color || "",
+        fit: item.fashionItem?.fit || (item as any).fit || "",
+        material: item.fashionItem?.material || (item as any).material || "",
+        pattern: item.fashionItem?.pattern || (item as any).pattern || "",
+        seasonality: item.fashionItem?.seasonality || (item as any).seasonality || "",
+        style: item.fashionItem?.style || (item as any).style || "",
         price: item.price || undefined,
       });
     }
@@ -129,7 +129,7 @@ export function WardrobeItemEditClient({
           {/* Left Column: Minimal Image Area */}
           <div className="image-frame lg:col-span-5 relative w-full aspect-[3/4] p-8 md:p-12 transition-all duration-200">
             <Image
-              src={applyCloudinaryTrim(item.imageUrl)}
+              src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl)}
               alt="Preview"
               fill
               sizes="(max-width: 1024px) 100vw, 42vw"

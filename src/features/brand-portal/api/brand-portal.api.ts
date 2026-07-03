@@ -10,7 +10,6 @@ import {
   CreateOfflineCustomerPayload,
   CustomerDetail,
   LoyaltyProgram,
-  LoyaltyTier,
   LoyaltyTransaction,
   Benefit,
   BrandStatus,
@@ -19,7 +18,11 @@ import {
   BrandItemRes,
   CreateBrandItemReq,
   UpdateBrandItemReq,
-  UpsertLoyaltyProgramPayload
+  UpsertLoyaltyProgramPayload,
+  LoyaltyTierRes,
+  CreateLoyaltyTierPayload,
+  UpdateLoyaltyTierPayload,
+  DigitalSampleResponseRes
 } from '../types';
 
 export const brandPortalApi = {
@@ -106,13 +109,23 @@ export const brandPortalApi = {
   },
 
   getLoyaltyTiers: async (brandId: string) => {
-    const res = await api.get<{data: LoyaltyTier[]}>(`/brand-portal/brands/${brandId}/loyalty/tiers`);
+    const res = await api.get<{data: LoyaltyTierRes[]}>(`/brand-portal/brands/${brandId}/loyalty/tiers`);
     return res.data.data || [];
   },
 
+  createLoyaltyTier: async (brandId: string, payload: CreateLoyaltyTierPayload) => {
+    const res = await api.post<{data: LoyaltyTierRes}>(`/brand-portal/brands/${brandId}/loyalty/tiers`, payload);
+    return res.data.data;
+  },
+
+  updateLoyaltyTier: async (brandId: string, tierId: string, payload: UpdateLoyaltyTierPayload) => {
+    const res = await api.put<{data: LoyaltyTierRes}>(`/brand-portal/brands/${brandId}/loyalty/tiers/${tierId}`, payload);
+    return res.data.data;
+  },
+
   getLoyaltyAccountTransactions: async (brandId: string, accountId: string) => {
-    const res = await api.get<{data: LoyaltyTransaction[]}>(`/brand-portal/brands/${brandId}/loyalty/accounts/${accountId}/transactions`);
-    return res.data.data || [];
+    const res = await api.get<{data: { items: LoyaltyTransaction[], metadata: any }}>(`/brand-portal/brands/${brandId}/loyalty/accounts/${accountId}/transactions`);
+    return res.data.data?.items || [];
   },
 
   // Benefits
@@ -205,7 +218,7 @@ export const brandPortalApi = {
   },
 
   getBrandItemFeedbacks: async (brandId: string, itemId: string) => {
-    const res = await api.get<{data: any[]}>(`/brand-portal/brands/${brandId}/items/${itemId}/feedbacks`);
+    const res = await api.get<{data: DigitalSampleResponseRes[]}>(`/brand-portal/brands/${brandId}/items/${itemId}/feedbacks`);
     return res.data.data || [];
   },
 
@@ -224,5 +237,5 @@ export const brandPortalApi = {
   updateBrandStatusAdmin: async (brandId: string, status: BrandStatus) => {
     const res = await api.patch<{data: BrandInfo}>(`/admin/brands/${brandId}/status`, { status });
     return res.data.data;
-  }
+  },
 };

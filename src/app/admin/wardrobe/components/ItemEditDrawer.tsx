@@ -17,17 +17,17 @@ export function ItemEditDrawer({ item, isOpen, onClose }: ItemEditDrawerProps) {
 
   useEffect(() => {
     if (item) {
-      setFormData({
-        name: item.name || item.title || "",
-        color: item.color || "",
-        material: item.material || "",
-        fit: item.fit || "",
-        style: item.style || "",
-        seasonality: item.seasonality || "",
-        pattern: item.pattern || "",
-        price: item.price || 0,
-        categoryId: item.category?.id || item.categoryId || "",
-      });
+        setFormData({
+          name: item.name || item.title || "",
+          color: item.fashionItem?.color || item.color || "",
+          material: item.fashionItem?.material || item.material || "",
+          fit: item.fashionItem?.fit || item.fit || "",
+          style: item.fashionItem?.style || item.style || "",
+          seasonality: item.fashionItem?.seasonality || item.seasonality || "",
+          pattern: item.fashionItem?.pattern || item.pattern || "",
+          price: item.price || 0,
+          categoryId: item.category?.id || item.categoryId || "",
+        });
     }
   }, [item]);
 
@@ -75,7 +75,7 @@ export function ItemEditDrawer({ item, isOpen, onClose }: ItemEditDrawerProps) {
               
               <div className="flex gap-4 mb-8">
                 <div className="size-24 bg-muted rounded-2xl overflow-hidden">
-                  {item.imageUrl && <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={item.imageUrl} alt="" className="w-full h-full object-cover mix-blend-multiply opacity-80" />}
+                  {(item.fashionItem?.imageUrl || item.imageUrl) && <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={item.fashionItem?.imageUrl || item.imageUrl} alt="" className="w-full h-full object-cover mix-blend-multiply opacity-80" />}
                 </div>
                 <div className="flex flex-col justify-center gap-1">
                   <span className="font-semibold text-[10px] text-muted-foreground uppercase tracking-widest">ID: {item.id}</span>

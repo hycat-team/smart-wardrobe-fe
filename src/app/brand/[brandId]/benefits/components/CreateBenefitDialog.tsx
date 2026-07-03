@@ -63,6 +63,27 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
+const BENEFIT_TYPE_LABELS = {
+  voucher: 'Voucher giảm giá',
+  discount: 'Giảm giá trực tiếp',
+  gift: 'Quà tặng hiện vật',
+  free_shipping: 'Miễn phí vận chuyển',
+  early_access: 'Mua sớm BST mới',
+  feature_access: 'Quyền truy cập đặc biệt'
+};
+
+const UNLOCK_TYPE_LABELS = {
+  point_redemption: 'Đổi điểm lấy quà',
+  tier_privilege: 'Đặc quyền theo hạng',
+  manual_grant: 'Cấp phát thủ công'
+};
+
+const FEATURE_CODE_LABELS = {
+  sample_mix_access: 'Thử đồ mẫu (Digital Sample Lab)',
+  brand_item_recommendation: 'Gợi ý phối đồ AI ưu tiên',
+  priority_brand_chat: 'Kênh chat hỗ trợ ưu tiên'
+};
+
 export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Props) {
   const { mutateAsync: createBenefit, isPending } = useCreateBenefit(brandId);
   const { data: tiers, isLoading: isLoadingTiers } = useGetLoyaltyTiers(brandId);
@@ -176,7 +197,9 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-full rounded-xl h-11">
-                        <SelectValue placeholder="Chọn loại phúc lợi" />
+                        <SelectValue placeholder="Chọn loại phúc lợi">
+                          {field.value ? BENEFIT_TYPE_LABELS[field.value as keyof typeof BENEFIT_TYPE_LABELS] : undefined}
+                        </SelectValue>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="rounded-xl">
@@ -204,7 +227,9 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="w-full rounded-xl h-11">
-                            <SelectValue placeholder="Chọn tính năng" />
+                            <SelectValue placeholder="Chọn tính năng">
+                              {field.value ? FEATURE_CODE_LABELS[field.value as keyof typeof FEATURE_CODE_LABELS] : undefined}
+                            </SelectValue>
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="rounded-xl">
@@ -243,7 +268,9 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-full rounded-xl h-11">
-                        <SelectValue placeholder="Chọn hình thức nhận" />
+                        <SelectValue placeholder="Chọn hình thức nhận">
+                          {field.value ? UNLOCK_TYPE_LABELS[field.value as keyof typeof UNLOCK_TYPE_LABELS] : undefined}
+                        </SelectValue>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="rounded-xl">
@@ -283,7 +310,9 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
                     <Select onValueChange={field.onChange} value={field.value} disabled={isLoadingTiers}>
                       <FormControl>
                         <SelectTrigger className="w-full rounded-xl h-11">
-                          <SelectValue placeholder={isLoadingTiers ? "Đang tải..." : "Chọn hạng"} />
+                          <SelectValue placeholder={isLoadingTiers ? "Đang tải..." : "Chọn hạng"}>
+                            {field.value && tiers ? tiers.find(t => t.id === field.value)?.name : undefined}
+                          </SelectValue>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="rounded-xl">
