@@ -39,10 +39,7 @@ export interface WardrobeItemRes {
   isLocked?: boolean;
   fashionItem?: FashionItemRes;
   category?: CategoryRes;
-
-
   price?: number;
-
   createdAt: string;
 }
 

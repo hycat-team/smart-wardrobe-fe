@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useMemo, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Plus, Sparkles, Shirt, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -38,28 +38,33 @@ import {
   PaginationLink,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { PaginationResult } from "@/types/api";
 
 gsap.registerPlugin(useGSAP);
 
 interface OutfitsClientProps {
-  initialOutfits?: Outfit[];
+  initialData?: PaginationResult<Outfit> | null;
 }
 
-type SortOption = "Mới Nhất" | "Cũ Nhất"
+type SortOption = "Mới Nhất" | "Cũ Nhất";
 
-export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
+export function OutfitsClient({ initialData }: OutfitsClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const filterParam = searchParams.get("filter") || "all";
 
+  const filterParam = searchParams.get("filter") || "all";
+  const searchParam = searchParams.get("q") || "";
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
-  const { data, isLoading } = useMyOutfits(pageParam);
-  const rawInitialOutfits = Array.isArray(initialOutfits) ? initialOutfits : ((initialOutfits as any)?.items || []);
-  const outfits = data ? data.items : rawInitialOutfits;
-  const metadata = data?.metadata;
+  
+  const { data, isLoading, isFetching } = useMyOutfits(pageParam);
+  
+  const currentData = data || initialData;
+  const outfits = currentData?.items || [];
+  const metadata = currentData?.metadata;
+
   const deleteOutfitMutation = useDeleteOutfit();
 
-  const searchParam = searchParams.get("q") || "";
   const [searchInput, setSearchInput] = useState(searchParam);
   const lastPushedQ = useRef(searchParam);
 
@@ -85,23 +90,28 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
     }
   }, [searchParam]);
 
+  const updateParams = (newParams: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === null || value === "") {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   // Debounced Search effect
   useEffect(() => {
     const handler = setTimeout(() => {
       if (searchInput !== searchParam && searchInput !== lastPushedQ.current) {
         lastPushedQ.current = searchInput;
-        const params = new URLSearchParams(searchParams);
-        if (searchInput) {
-          params.set("q", searchInput);
-        } else {
-          params.delete("q");
-        }
-        params.set("page", "1");
-        router.push("?" + params.toString(), { scroll: false });
+        updateParams({ q: searchInput, page: "1" });
       }
     }, 500);
     return () => clearTimeout(handler);
-  }, [searchInput, searchParam, searchParams, router]);
+  }, [searchInput, searchParam]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -129,23 +139,15 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   };
 
   const handleFilterChange = (filter: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (filter === "all") {
-      params.delete("filter");
-    } else {
-      params.set("filter", filter);
-    }
-    params.set("page", "1");
-    router.push("?" + params.toString(), { scroll: false });
+    updateParams({ filter: filter === "all" ? null : filter, page: "1" });
   };
 
   const filteredAndSortedOutfits = useMemo(() => {
     const filtered = outfits.filter((o: Outfit) => {
       const isFavorite = favorites[o.id] || false;
-      if (filterParam === "all") { }
-      else if (filterParam === "ai" && o.status !== 1) return false;
-      else if (filterParam === "manual" && o.status !== 0 && o.status !== 2) return false;
-      else if (filterParam === "saved" && !isFavorite) return false;
+      if (filterParam === "ai" && o.status !== 1) return false;
+      if (filterParam === "manual" && o.status !== 0 && o.status !== 2) return false;
+      if (filterParam === "saved" && !isFavorite) return false;
 
       if (searchParam) {
         const q = searchParam.toLowerCase();
@@ -164,25 +166,20 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
   }, [outfits, filterParam, favorites, sortParam, searchParam]);
 
   useGSAP(() => {
-    if (filteredAndSortedOutfits.length > 0) {
+    if (filteredAndSortedOutfits.length > 0 && !isFetching) {
       gsap.fromTo(
         ".outfit-card",
         { opacity: 0, y: 30 },
         { opacity: 1, y: 0, stagger: 0.05, ease: "power3.out", duration: 0.6, clearProps: "all" }
       );
     }
-  }, { dependencies: [filteredAndSortedOutfits], scope: containerRef });
+  }, { dependencies: [filteredAndSortedOutfits.length, isFetching], scope: containerRef });
 
   const renderActions = () => (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
-      {/* Search Input */}
       <form onSubmit={(e) => {
         e.preventDefault();
-        const params = new URLSearchParams(searchParams);
-        if (searchInput) params.set("q", searchInput);
-        else params.delete("q");
-        params.set("page", "1");
-        router.push("?" + params.toString(), { scroll: false });
+        updateParams({ q: searchInput, page: "1" });
       }} className="relative w-full sm:w-[240px]">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
         <input
@@ -212,7 +209,6 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
 
   return (
     <>
-      {/* Sticky Top Action Bar */}
       <div
         className={cn(
           "fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
@@ -233,33 +229,26 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
       </div>
 
       <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-foreground">
-        {/* High-end Editorial Header */}
         <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-border pb-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-4 max-w-2xl">
-              {/* <h1 className="text-5xl md:text-6xl lg:text-[100px] font-heading font-medium tracking-tighter text-ink leading-[0.85] uppercase">
-              Curations
-            </h1> */}
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase whitespace-nowrap">
                 TRANG PHỤC
               </h1>
               <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-border pl-4">
                 Kho lưu trữ phong cách cá nhân của bạn. <br />
-                {outfits.length > 0 ? ` Đang lưu trữ ${outfits.length} bộ phối.` : " Hãy bắt đầu tạo bộ phối của bạn."}
+                {outfits.length > 0 ? ` Đang lưu trữ ${metadata?.totalItems || outfits.length} bộ phối.` : " Hãy bắt đầu tạo bộ phối của bạn."}
               </p>
             </div>
-
             {renderActions()}
           </div>
 
-          {/* Filters Row */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mt-4">
             <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
               {[
                 { label: "Tất cả", value: "all" },
                 { label: "Tạo bởi AI", value: "ai" },
                 { label: "Thủ công", value: "manual" },
-                // { label: "Đã lưu", value: "saved" }
               ].map(tab => {
                 const isActive = filterParam === tab.value;
                 return (
@@ -282,7 +271,6 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
             </div>
 
             <div className="flex items-center gap-6">
-              {/* Sort Dropdown */}
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">Sort:</span>
                 <Select value={sortParam} onValueChange={(value) => setSortParam(value as SortOption)}>
@@ -299,7 +287,6 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
           </div>
         </div>
 
-        {/* Outfits Grid */}
         {isLoading && !outfits.length ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8">
             {[...Array(8)].map((_, i) => (
@@ -321,7 +308,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
         ) : filteredAndSortedOutfits.length > 0 ? (
           <div
             ref={gridRef}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8"
+            className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8 transition-all duration-300", isFetching && "opacity-60 blur-[1px]")}
           >
             {filteredAndSortedOutfits.map((outfit: Outfit, index: number) => (
               <div key={outfit.id} className="outfit-card h-full">
@@ -336,7 +323,6 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
             ))}
           </div>
         ) : (
-          /* Empty State */
           <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
             <div className="size-20 bg-muted border border-border rounded-2xl flex items-center justify-center text-muted-foreground">
               <Shirt className="size-8 stroke-1" />
@@ -364,24 +350,16 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (pageParam > 1) {
-                      const params = new URLSearchParams(searchParams);
-                      params.set("page", (pageParam - 1).toString());
-                      router.push("?" + params.toString(), { scroll: false });
-                    }
+                    if (pageParam > 1) updateParams({ page: (pageParam - 1).toString() });
                   }}
-                  className={pageParam <= 1 ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest"}
+                  className={pageParam <= 1 ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest transition-colors hover:text-foreground"}
                   text="TRƯỚC"
                 />
               </PaginationItem>
 
               {[...Array(metadata.totalPages)].map((_, i) => {
                 const pageNum = i + 1;
-                if (
-                  pageNum === 1 ||
-                  pageNum === metadata.totalPages ||
-                  (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)
-                ) {
+                if (pageNum === 1 || pageNum === metadata.totalPages || (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)) {
                   return (
                     <PaginationItem key={pageNum}>
                       <PaginationLink
@@ -389,9 +367,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                         isActive={pageParam === pageNum}
                         onClick={(e) => {
                           e.preventDefault();
-                          const params = new URLSearchParams(searchParams);
-                          params.set("page", pageNum.toString());
-                          router.push("?" + params.toString(), { scroll: false });
+                          updateParams({ page: pageNum.toString() });
                         }}
                         className="font-semibold text-[11px] uppercase tracking-widest rounded-full border-border"
                       >
@@ -400,15 +376,7 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                     </PaginationItem>
                   );
                 }
-
-                if (pageNum === pageParam - 2 || pageNum === pageParam + 2) {
-                  return (
-                    <PaginationItem key={pageNum}>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  );
-                }
-
+                if (pageNum === pageParam - 2 || pageNum === pageParam + 2) return <PaginationItem key={pageNum}><PaginationEllipsis /></PaginationItem>;
                 return null;
               })}
 
@@ -417,13 +385,9 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (pageParam < metadata.totalPages) {
-                      const params = new URLSearchParams(searchParams);
-                      params.set("page", (pageParam + 1).toString());
-                      router.push("?" + params.toString(), { scroll: false });
-                    }
+                    if (pageParam < metadata.totalPages) updateParams({ page: (pageParam + 1).toString() });
                   }}
-                  className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest"}
+                  className={pageParam >= metadata.totalPages ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest transition-colors hover:text-foreground"}
                   text="SAU"
                 />
               </PaginationItem>
@@ -431,7 +395,6 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
           </Pagination>
         )}
 
-        {/* Delete Confirmation Popup */}
         <AlertDialog open={!!outfitToDelete} onOpenChange={(open) => !open && setOutfitToDelete(null)}>
           <AlertDialogContent className="rounded-2xl border border-border bg-card">
             <AlertDialogHeader>
@@ -451,7 +414,6 @@ export function OutfitsClient({ initialOutfits }: OutfitsClientProps) {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
       </div>
     </>
   );

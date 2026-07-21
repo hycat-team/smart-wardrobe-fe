@@ -9,10 +9,12 @@ export const MOCK_GHOST_ITEM: GhostItem = {
   // imageUrl: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1000&auto=format&fit=crop",
   fashionItem: {
     id: "fashion-001",
-    categoryId: "cat-tshirt",
-    categoryName: "Áo thun ADLV",
+    category: {
+      id: "cat-tshirt",
+      name: "Áo thun ADLV",
+      slug: "ao-thun",
+    },
     imageUrl: "https://cdn.hstatic.net/products/1000295889/26ss-tp-ss-co-blf-blk-006_37b2596ccf024913b968dea5890789b0_master.jpg",
-    imagePublicId: "ghost/001",
     color: "Đen",
     colorHex: "#1A1A1A",
     colorHue: 0,

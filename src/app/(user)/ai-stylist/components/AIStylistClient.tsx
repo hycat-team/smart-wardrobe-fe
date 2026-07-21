@@ -19,7 +19,11 @@ import { useGhostCloset } from "@/features/ghost-closet/hooks/useGhostCloset";
 import { WardrobeImpactPanel } from "@/features/ghost-closet/components/WardrobeImpactPanel";
 import { GhostItem } from "@/features/ghost-closet/types";
 
-import { OCCASIONS, STYLES, SEASONS, WEATHERS, COLOR_TONES, occasionMap } from "@/features/ai-stylist/components/AIQuickOptions";
+import { OCCASIONS, STYLES, occasionMap } from "@/features/ai-stylist/components/AIQuickOptions";
+
+function isGhostItem(item: any): item is GhostItem {
+  return item && item.isGhost === true;
+}
 
 function AIStylistContent() {
   const searchParams = useSearchParams();
@@ -28,9 +32,6 @@ function AIStylistContent() {
 
   const [selectedOccasion, setSelectedOccasion] = useState<string>("");
   const [selectedStyle, setSelectedStyle] = useState<string>("");
-  const [selectedSeason, setSelectedSeason] = useState<string>("");
-  const [selectedWeather, setSelectedWeather] = useState<string>("");
-  const [selectedColorTone, setSelectedColorTone] = useState<string>("");
   const [detailsInput, setDetailsInput] = useState("");
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -52,68 +53,52 @@ function AIStylistContent() {
   } = useOutfitCanvas();
 
   const createOutfitMutation = useCreateOutfit();
-  
-  // Loyalty and Sample Data
   const createSampleFeedback = useCreateSampleFeedback();
 
-  // Handle initialization from URL params if any
   useEffect(() => {
     const detailsParam = searchParams.get('details');
     if (detailsParam) {
       setDetailsInput(detailsParam);
-      // Auto-generate could be triggered here if desired, but waiting for user to review and click is safer.
     }
   }, [searchParams]);
 
   const handleGenerate = async () => {
     try {
-      let safeDetails = detailsInput.trim();
-      if (safeDetails) {
-        let normalized = safeDetails.normalize('NFC');
-        if (normalized.length > 1000) {
-          safeDetails = normalized.substring(0, 1000);
-        }
-      }
-
+      const safeDetails = detailsInput.trim().normalize('NFC').substring(0, 1000);
       setIsGenerating(true);
 
       const res = await aiApi.getOutfitRecommendation({
-        colorTone: selectedColorTone ? selectedColorTone.toLowerCase() : "",
         details: safeDetails,
         occasion: occasionMap[selectedOccasion] || selectedOccasion.trim(),
-        season: selectedSeason ? selectedSeason.toLowerCase() : "",
         styleTarget: selectedStyle ? selectedStyle.toLowerCase() : "",
         include_brand_items: ghostClosetEnabled ? true : undefined,
       });
 
       setOutfitData(res);
 
-      // Initialize selected items from the main items
-      const canvasW = canvasRef.current?.clientWidth || 800;
-      const canvasH = canvasRef.current?.clientHeight || 600;
-
-      let brandYOffset = -150; // Start higher for brand items on the right
-      let accessoryYOffset = -150; // Start higher for accessories on the left
+      let brandYOffset = -150;
+      let accessoryYOffset = -150;
 
       const initialItems = res.items.map(item => {
-        const isBrand = (item.primary as any).isGhost || (item.primary as any).brandName;
+        const primary = item.primary;
+        const isBrand = isGhostItem(primary) || !!(primary as GhostItem).brandName;
         let x = 0;
         let y = 0;
         let zIndex = 1;
 
         if (isBrand) {
-          x = 280; // Offset to the right side of the canvas
+          x = 280;
           y = brandYOffset;
-          brandYOffset += 240; // Stack vertically
+          brandYOffset += 240;
           zIndex = 10;
         } else {
-          const slug = (item.primary.category?.slug || '').toLowerCase();
+          const slug = (primary.category?.slug || '').toLowerCase();
           const role = (item.role || '').toLowerCase();
 
-          if (slug === 'phu-kien' || slug.startsWith('phu-kien-') || slug.includes('accessory') || role.includes('phụ kiện')) {
-            x = -280; // Offset to the left side of the canvas
+          if (slug.includes('phu-kien') || slug.includes('accessory') || role.includes('phụ kiện')) {
+            x = -280;
             y = accessoryYOffset;
-            accessoryYOffset += 240; // Stack vertically
+            accessoryYOffset += 240;
             zIndex = 5;
           } else if (slug === 'mu' || slug === 'non' || slug.includes('hat') || role.includes('mũ') || role.includes('nón')) {
             y = -350;
@@ -133,16 +118,18 @@ function AIStylistContent() {
           }
         }
 
+        const ghostData = isGhostItem(primary) ? primary : undefined;
+
         return {
           id: crypto.randomUUID(),
-          clothingItemId: item.primary.fashionItem?.id || (item.primary as any).fashionItemId, // We use this as fashionItemId
-          imageUrl: item.primary.fashionItem?.imageUrl || (item.primary as any).imageUrl,
-          category: item.primary.category,
+          clothingItemId: primary.fashionItem?.id || primary.id,
+          imageUrl: primary.fashionItem?.imageUrl || "",
+          category: primary.category,
           _role: item.role,
-          isGhost: (item.primary as any).isGhost,
-          brandName: (item.primary as any).brandName,
-          wardrobeImpact: (item.primary as any).wardrobeImpact,
-          price: item.primary.price,
+          isGhost: ghostData?.isGhost,
+          brandName: ghostData?.brandName,
+          wardrobeImpact: ghostData?.wardrobeImpact,
+          price: primary.price,
           x,
           y,
           scale: isBrand ? 80 : 100,
@@ -163,23 +150,16 @@ function AIStylistContent() {
   const handleSwap = (role: string) => {
     if (!outfitData) return;
 
-    // Find the item by role
     const outfitItem = outfitData.items.find(i => i.role === role);
-
     if (!outfitItem || !outfitItem.alternatives || outfitItem.alternatives.length === 0) {
       toast.error("Không có lựa chọn thay thế cho món đồ này");
       return;
     }
 
     const currentIndex = alternativeIndices[outfitItem.role] || 0;
-
-    // The items array to cycle through: [mainItem, ...alternatives]
     const allOptions = [outfitItem.primary, ...outfitItem.alternatives];
-
-    // Calculate next index
     const nextIndex = (currentIndex + 1) % allOptions.length;
 
-    // Update the state
     setAlternativeIndices(prev => ({
       ...prev,
       [outfitItem.role]: nextIndex
@@ -187,24 +167,20 @@ function AIStylistContent() {
 
     const nextItem = allOptions[nextIndex];
 
-    // Replace the item in the canvas
     setSelectedItems(prev => {
       const existingItemIndex = prev.findIndex(item => item._role === role);
-
       if (existingItemIndex === -1) return prev;
 
       const newItems = [...prev];
       newItems[existingItemIndex] = {
         ...newItems[existingItemIndex],
-        clothingItemId: nextItem.fashionItem?.id || (nextItem as any).fashionItemId,
-        imageUrl: nextItem.fashionItem?.imageUrl || (nextItem as any).imageUrl,
+        clothingItemId: nextItem.fashionItem?.id || nextItem.id,
+        imageUrl: nextItem.fashionItem?.imageUrl || "",
         category: nextItem.category,
       };
 
       return newItems;
     });
-
-    // toast.success("Đã đổi sang món đồ khác");
   };
 
   const handleSaveOutfit = async () => {
@@ -232,9 +208,7 @@ function AIStylistContent() {
 
       elementsToHide.forEach(el => (el as HTMLElement).style.display = '');
 
-      if (!blob) {
-        throw new Error("Không thể tạo ảnh từ Canvas");
-      }
+      if (!blob) throw new Error("Không thể tạo ảnh từ Canvas");
 
       toast.loading("Đang lưu hình ảnh...", { id: "save_outfit" });
 
@@ -248,8 +222,8 @@ function AIStylistContent() {
           folder: signatureResult.folder,
         },
       });
-      const uploadedUrl = uploadResData.secure_url;
 
+      const uploadedUrl = uploadResData.secure_url;
       toast.loading("Đang lưu tủ đồ...", { id: "save_outfit" });
 
       await createOutfitMutation.mutateAsync({
@@ -265,7 +239,6 @@ function AIStylistContent() {
         })),
       });
 
-      // toast.success("Đã lưu bộ phối đồ thành công!", { id: "save_outfit" });
       router.push("/outfits");
     } catch (error: any) {
       console.error(error);
@@ -278,31 +251,12 @@ function AIStylistContent() {
     }
   };
 
-
-
-  const hasSelectedOptions = !!(selectedOccasion || selectedStyle || selectedSeason || selectedWeather || selectedColorTone || detailsInput.trim());
+  const hasSelectedOptions = !!(selectedOccasion || selectedStyle || detailsInput.trim());
 
   return (
     <div className="min-h-full flex flex-col pt-4 md:pt-8 bg-background max-w-[1600px] w-full mx-auto pb-10">
       <div className="flex flex-col h-full gap-6">
-
-        {/* Header Section */}
-        {/* <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-border pb-6">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tighter text-foreground uppercase flex items-center gap-3 mb-2">
-              <Sparkles className="w-8 h-8" strokeWidth={1.5} />
-              AI STYLIST
-            </h1>
-            <p className="text-[13px] text-muted-foreground font-bold uppercase tracking-widest leading-relaxed border-l-2 border-foreground pl-3">
-              CẤU HÌNH SỞ THÍCH CỦA BẠN ĐỂ KHÁM PHÁ BỘ PHỐI ĐỒ HÔM NAY
-            </p>
-          </div>
-        </div> */}
-
-        {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-1 items-start">
-
-          {/* Left Column: Canvas (Span 8) */}
           <div className="lg:col-span-8 flex flex-col gap-0 relative min-h-[600px] h-[600px] lg:h-[800px] border border-border bg-card shadow-sm rounded-2xl overflow-hidden">
             {outfitData ? (
               <>
@@ -312,7 +266,6 @@ function AIStylistContent() {
                   </span>
                 </div>
 
-                {/* THE DRAG & DROP CANVAS */}
                 <OutfitCanvasBoard
                   canvasRef={canvasRef}
                   selectedItems={selectedItems}
@@ -330,16 +283,14 @@ function AIStylistContent() {
                       const outfitItem = outfitData.items.find(i => i.role === item._role);
                       if (outfitItem) {
                         const allOptions = [outfitItem.primary, ...(outfitItem.alternatives || [])];
-                        const realGhostItem = allOptions.find(i => (i.fashionItem?.id || (i as any).fashionItemId) === item.clothingItemId);
-                        if (realGhostItem) {
-                          setActiveGhostItem(realGhostItem as any);
+                        const realGhostItem = allOptions.find(i => (i.fashionItem?.id || i.id) === item.clothingItemId);
+                        if (realGhostItem && isGhostItem(realGhostItem)) {
+                          setActiveGhostItem(realGhostItem);
                           setIsImpactPanelOpen(true);
                           return;
                         }
                       }
                     }
-                    setActiveGhostItem(item as any);
-                    setIsImpactPanelOpen(true);
                   }}
                   emptyState={
                     <div className="text-center p-12">
@@ -348,7 +299,6 @@ function AIStylistContent() {
                   }
                 />
 
-                {/* Action Footer */}
                 <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center border-t border-border bg-card z-20">
                   <button
                     onClick={() => { setOutfitData(null); setSelectedItems([]); }}
@@ -385,17 +335,13 @@ function AIStylistContent() {
             )}
           </div>
 
-          {/* Right Column: Configuration Form (Span 4) */}
           <div className="lg:col-span-4 h-auto lg:h-[800px] border border-border bg-card flex flex-col relative shadow-sm overflow-hidden rounded-2xl">
-
-            {/* Form Header */}
             <div className="p-5 border-b border-border bg-muted flex items-center gap-3">
               <SlidersHorizontal className="w-4 h-4 text-foreground" />
               <h3 className="font-bold text-[13px] text-foreground uppercase tracking-widest">THÔNG SỐ THIẾT KẾ</h3>
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 md:p-6 space-y-6">
-
               <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
                 <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
                   DỊP (OCCASION)
@@ -456,96 +402,6 @@ function AIStylistContent() {
                 </div>
               </div>
 
-              {/* <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
-                <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
-                  MÙA (SEASON)
-                </label>
-                <input
-                  type="text"
-                  placeholder="Mùa hiện tại hoặc sắp tới?"
-                  value={selectedSeason}
-                  onChange={(e) => setSelectedSeason(e.target.value)}
-                  disabled={isGenerating}
-                  className="w-full bg-transparent outline-none text-[15px] font-medium text-foreground placeholder:text-muted-foreground/50 placeholder:font-normal"
-                />
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  <span className="text-[9px] text-muted-foreground uppercase tracking-widest mr-1 self-center">Gợi ý:</span>
-                  {SEASONS.map(s => (
-                    <button
-                      key={s}
-                      onClick={() => setSelectedSeason(s)}
-                      disabled={isGenerating}
-                      className={cn(
-                        "px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border rounded-full",
-                        selectedSeason === s ? "bg-foreground text-background border-foreground" : "bg-transparent text-foreground border-border hover:border-foreground"
-                      )}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div> */}
-
-              {/* <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
-                <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
-                  THỜI TIẾT (WEATHER)
-                </label>
-                <input
-                  type="text"
-                  placeholder="Thời tiết hôm nay thế nào?"
-                  value={selectedWeather}
-                  onChange={(e) => setSelectedWeather(e.target.value)}
-                  disabled={isGenerating}
-                  className="w-full bg-transparent outline-none text-[15px] font-medium text-foreground placeholder:text-muted-foreground/50 placeholder:font-normal"
-                />
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  <span className="text-[9px] text-muted-foreground uppercase tracking-widest mr-1 self-center">Gợi ý:</span>
-                  {WEATHERS.map(w => (
-                    <button
-                      key={w}
-                      onClick={() => setSelectedWeather(w)}
-                      disabled={isGenerating}
-                      className={cn(
-                        "px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border rounded-full",
-                        selectedWeather === w ? "bg-foreground text-background border-foreground" : "bg-transparent text-foreground border-border hover:border-foreground"
-                      )}
-                    >
-                      {w}
-                    </button>
-                  ))}
-                </div>
-              </div> */}
-
-              {/* <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
-                <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
-                  TÔNG MÀU (COLOR TONE)
-                </label>
-                <input
-                  type="text"
-                  placeholder="Màu sắc chủ đạo bạn thích?"
-                  value={selectedColorTone}
-                  onChange={(e) => setSelectedColorTone(e.target.value)}
-                  disabled={isGenerating}
-                  className="w-full bg-transparent outline-none text-[15px] font-medium text-foreground placeholder:text-muted-foreground/50 placeholder:font-normal"
-                />
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  <span className="text-[9px] text-muted-foreground uppercase tracking-widest mr-1 self-center">Gợi ý:</span>
-                  {COLOR_TONES.map(c => (
-                    <button
-                      key={c}
-                      onClick={() => setSelectedColorTone(c)}
-                      disabled={isGenerating}
-                      className={cn(
-                        "px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors border rounded-full",
-                        selectedColorTone === c ? "bg-foreground text-background border-foreground" : "bg-transparent text-foreground border-border hover:border-foreground"
-                      )}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
-              </div> */}
-
               <div className="group flex flex-col gap-2 pt-2 focus-within:border-foreground transition-colors border-b border-transparent">
                 <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
                   GHI CHÚ THÊM (OPTIONAL)
@@ -567,7 +423,6 @@ function AIStylistContent() {
                 </div>
                 <Switch checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} />
               </div>
-
             </div>
 
             <div className="p-4 border-t border-border bg-card">
@@ -579,7 +434,6 @@ function AIStylistContent() {
                 <Sparkles className="w-4 h-4" /> TẠO TRANG PHỤC
               </button>
             </div>
-
           </div>
         </div>
       </div>
@@ -588,16 +442,14 @@ function AIStylistContent() {
         isOpen={isImpactPanelOpen}
         onClose={() => setIsImpactPanelOpen(false)}
         item={activeGhostItem}
-        onFeedback={(itemId, payload) => {
-          createSampleFeedback.mutate({ itemId, payload });
-        }}
+        onFeedback={(itemId, payload) => createSampleFeedback.mutate({ itemId, payload })}
         onKeep={() => {
           if (activeGhostItem) logGhostAction(activeGhostItem.id, 'keep');
           setIsImpactPanelOpen(false);
         }}
         onSwap={() => {
           if (activeGhostItem) {
-            const activeFashionId = activeGhostItem.fashionItem?.id || (activeGhostItem as any).fashionItemId;
+            const activeFashionId = activeGhostItem.fashionItem?.id || activeGhostItem.id;
             const canvasItem = selectedItems.find(x => x.clothingItemId === activeFashionId);
             if (canvasItem) handleSwap(canvasItem._role);
             logGhostAction(activeGhostItem.id, 'swap');
@@ -615,29 +467,25 @@ function AIStylistContent() {
           if (activeGhostItem) {
             joinWaitlist(activeGhostItem.id);
             logGhostAction(activeGhostItem.id, 'waitlist');
-
-            // Add to mock cart
             const { addToCart } = useB2BDemoStore.getState();
             addToCart({
               productId: activeGhostItem.id,
-              name: `${activeGhostItem.category?.name || "Sản phẩm"} ${activeGhostItem.fashionItem?.color || (activeGhostItem as any).color}`,
+              name: `${activeGhostItem.category?.name || "Sản phẩm"} ${activeGhostItem.fashionItem?.color || "Basic"}`,
               price: activeGhostItem.price || 500000,
               quantity: 1,
-              size: "M", // Default size for mock
-              color: activeGhostItem.fashionItem?.color || (activeGhostItem as any).color || "Basic",
-              imageUrl: activeGhostItem.fashionItem?.imageUrl || (activeGhostItem as any).imageUrl,
+              size: "M",
+              color: activeGhostItem.fashionItem?.color || "Basic",
+              imageUrl: activeGhostItem.fashionItem?.imageUrl || "",
               brandId: activeGhostItem.brandId,
               brandName: activeGhostItem.brandName,
               selected: true,
             });
-
-            // toast.success("Đã thêm vào giỏ hàng!");
           }
         }}
         onHideBrand={() => {
           if (activeGhostItem) {
             hideBrand(activeGhostItem.brandId);
-            const activeFashionId = activeGhostItem.fashionItem?.id || (activeGhostItem as any).fashionItemId;
+            const activeFashionId = activeGhostItem.fashionItem?.id || activeGhostItem.id;
             setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeFashionId));
             setIsImpactPanelOpen(false);
             toast.success("Sẽ không đề xuất brand này nữa.");
@@ -646,7 +494,7 @@ function AIStylistContent() {
         onNotMyStyle={() => {
           if (activeGhostItem) {
             logGhostAction(activeGhostItem.id, 'notMyStyle');
-            const activeFashionId = activeGhostItem.fashionItem?.id || (activeGhostItem as any).fashionItemId;
+            const activeFashionId = activeGhostItem.fashionItem?.id || activeGhostItem.id;
             setSelectedItems(prev => prev.filter(x => x.clothingItemId !== activeFashionId));
             setIsImpactPanelOpen(false);
             toast.success("Đã ghi nhận, sẽ cải thiện đề xuất.");

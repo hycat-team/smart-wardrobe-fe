@@ -53,6 +53,7 @@ export function WardrobeCard({
             isProcessing && "blur-md opacity-60",
           )}
           src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl || undefined)}
+          unoptimized // Giúp Next.js load thẳng từ Cloudinary CDN, chạy cực nhanh và không dính lỗi /_next/image
         />
         {isProcessing && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
