@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useMyWardrobe } from "@/features/wardrobe/queries/wardrobe.queries";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
+import Image from "next/image";
 
 // No mock data
 
@@ -46,9 +47,9 @@ export function SearchClient() {
       itemName,
       (item.category?.name || "").toLowerCase(),
       ((item as any).name || "").toLowerCase(),
-      (item.color || "").toLowerCase(),
-      (item.material || "").toLowerCase(),
-      (item.style || "").toLowerCase(),
+      (item.fashionItem?.color || item.color || "").toLowerCase(),
+      (item.fashionItem?.material || item.material || "").toLowerCase(),
+      (item.fashionItem?.style || item.style || "").toLowerCase(),
       (item.brand || "").toLowerCase()
     ].join(" ");
 
@@ -62,8 +63,8 @@ export function SearchClient() {
         name: item.name || getWardrobeItemName(item),
         brand: item.brand || "Smart Wardrobe",
         category: item.category?.name || "",
-        tags: [item.style, item.material, item.seasonality].filter(Boolean),
-        img: item.imageUrl,
+        tags: [item.fashionItem?.style || item.style, item.fashionItem?.material || item.material, item.fashionItem?.seasonality || item.seasonality].filter(Boolean),
+        img: item.fashionItem?.imageUrl || item.imageUrl,
         timesWorn: 0
       }))
     : [];
@@ -156,7 +157,7 @@ export function SearchClient() {
                         className="group bg-cream-dark/20 hover:bg-cream-dark/30 rounded-xl overflow-hidden border border-cream-dark/50 hover:border-ink-subtle transition-all duration-300 cursor-pointer"
                       >
                         <div className="aspect-[4/5] bg-cream-dark/40 overflow-hidden relative">
-                          <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                           <div className="absolute inset-0 bg-ink/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <span className="bg-cream text-ink text-xs font-mono px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm font-semibold">
                               <Eye className="size-3.5" /> CHI TIẾT

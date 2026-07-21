@@ -96,7 +96,7 @@ export function applyCloudinaryTrim(url: string | undefined): string {
   if (url.startsWith("http")) {
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
     // Thêm f_png và e_trim:20 để xử lý triệt để các URL không có đuôi mở rộng và bóng mờ
-    return `https://res.cloudinary.com/${cloudName}/image/fetch/f_png,e_trim:20/${url}`;
+    return `https://res.cloudinary.com/${cloudName}/image/fetch/f_png,e_trim:20/${encodeURIComponent(url)}`;
   }
 
   return url;

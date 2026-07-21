@@ -8,9 +8,16 @@ export const metadata: Metadata = {
   description: "Chỉnh sửa thông tin chi tiết trang phục của bạn.",
 };
 
+import { Suspense } from 'react';
+import { WardrobeItemEditData } from './components/WardrobeItemEditData';
+import Loading from './loading';
+
 export default async function WardrobeItemEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const item = await serverFetch<WardrobeItem>(`/wardrobe-items/${id}`);
   
-  return <WardrobeItemEditClient itemId={id} initialItem={item || undefined} />;
+  return (
+    <Suspense fallback={<Loading />}>
+      <WardrobeItemEditData id={id} />
+    </Suspense>
+  );
 }

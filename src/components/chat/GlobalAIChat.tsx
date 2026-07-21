@@ -23,7 +23,7 @@ export function GlobalAIChat() {
   const router = useRouter();
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const { data: chatSessionsData, isLoading: isLoadingSessions } = useChatSessions();
+  const { data: chatSessionsData, isLoading: isLoadingSessions } = useChatSessions(isOpen);
 
   const [isChatting, setIsChatting] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -51,7 +51,7 @@ export function GlobalAIChat() {
   useEffect(() => {
     if (!chatContainerRef.current) return;
     if (isOpen) {
-      gsap.fromTo(chatContainerRef.current, 
+      gsap.fromTo(chatContainerRef.current,
         { y: 50, opacity: 0, scale: 0.95, transformOrigin: "bottom right", display: "flex" },
         { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.2)" }
       );
@@ -69,7 +69,7 @@ export function GlobalAIChat() {
     setIsHistoryOpen(false);
     setContextID(session.id);
     setChatMessages([]);
-    
+
     try {
       toast.loading("Đang tải lịch sử...", { id: "load_history" });
       const res = await aiApi.getChatMessages(session.id, { limit: 100 });
@@ -85,7 +85,7 @@ export function GlobalAIChat() {
         if (timeDiff !== 0) return timeDiff;
         return b._originalIndex - a._originalIndex;
       });
-      
+
       setChatMessages(formattedMessages);
       toast.success("Đã tải lịch sử trò chuyện", { id: "load_history" });
     } catch (error: any) {
@@ -188,9 +188,9 @@ export function GlobalAIChat() {
 
   return (
     <div ref={containerRef} className="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[100] flex flex-col items-end justify-end pointer-events-none gap-4">
-      
+
       {/* Chat Window */}
-      <div 
+      <div
         ref={chatContainerRef}
         className={cn(
           "w-[350px] md:w-[400px] h-[600px] max-h-[80vh] bg-white border border-[#E5E5E5] shadow-2xl flex flex-col overflow-hidden pointer-events-auto relative origin-bottom-right mb-4 rounded-xl",
@@ -223,7 +223,7 @@ export function GlobalAIChat() {
           {chatMessages.length === 0 ? (
             <div className="flex flex-col gap-2 items-start mt-4">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#A3A3A3]">CLOSY AI</span>
-              <div className="bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] p-3 rounded-lg text-[13px] leading-relaxed">
+              <div className="bg-[#F9F9F9] text-[#1A1A1A] border border-[#E5E5E5] p-4 rounded-2xl rounded-tl-sm shadow-sm text-[13px] leading-relaxed mr-6 md:mr-12">
                 Xin chào! Tôi có thể giúp gì cho bạn hôm nay?
               </div>
             </div>
@@ -263,7 +263,7 @@ export function GlobalAIChat() {
               <MoveRight className="w-4 h-4" />
             </button>
           </div>
-          <button 
+          <button
             onClick={() => setIsHistoryOpen(!isHistoryOpen)}
             className="text-[10px] font-bold text-[#A3A3A3] hover:text-[#1A1A1A] uppercase tracking-widest mt-2 self-start px-1"
           >

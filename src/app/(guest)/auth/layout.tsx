@@ -6,7 +6,7 @@ import SplitText from "./SplitText";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen relative flex w-full font-inter overflow-hidden bg-ethos-surface-low">
+    <div className="min-h-screen relative flex w-full font-inter overflow-hidden bg-background">
       {/* Back to Home Button */}
       <Link 
         href="/" 

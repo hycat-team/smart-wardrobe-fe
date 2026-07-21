@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery, keepPreviousDa
 import { wardrobeApi } from '../api/wardrobe.api';
 import { WardrobeItemStatus } from '../types';
 import { toast } from 'sonner';
+import { handleApiError } from '@/lib/api-error';
 
 export const WARDROBE_QUERY_KEYS = {
   all: ['wardrobe'] as const,
@@ -51,6 +52,9 @@ export const useBatchUploadWardrobeItems = () => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
       toast.success(res?.message || 'Bắt đầu phân tách và số hóa trang phục!');
     },
+    onError: (error) => {
+      handleApiError(error, 'Thêm trang phục thất bại.');
+    }
   });
 };
 
@@ -62,6 +66,9 @@ export const useInitClosetFromCatalog = () => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
       toast.success(res?.message || 'Khởi tạo nhanh tủ đồ cá nhân thành công!');
     },
+    onError: (error) => {
+      handleApiError(error, 'Khởi tạo tủ đồ thất bại.');
+    }
   });
 };
 
@@ -74,6 +81,9 @@ export const useCloneWardrobeItem = () => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
       toast.success(res?.message || 'Nhân bản trang phục thành công!');
     },
+    onError: (error) => {
+      handleApiError(error, 'Nhân bản thất bại.');
+    }
   });
 };
 
@@ -87,6 +97,9 @@ export const useUpdateWardrobeItem = () => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.detail(variables.id) });
       toast.success(res?.message || 'Cập nhật trang phục thành công!');
     },
+    onError: (error) => {
+      handleApiError(error, 'Cập nhật thất bại.');
+    }
   });
 };
 
@@ -98,6 +111,9 @@ export const useDeleteWardrobeItem = () => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
       toast.success(res?.message || 'Xóa trang phục thành công!');
     },
+    onError: (error) => {
+      handleApiError(error, 'Xóa thất bại.');
+    }
   });
 };
 
@@ -109,6 +125,9 @@ export const useBulkDeleteWardrobeItems = () => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
       toast.success(res?.message || 'Xóa trang phục hàng loạt thành công!');
     },
+    onError: (error) => {
+      handleApiError(error, 'Xóa hàng loạt thất bại.');
+    }
   });
 };
 

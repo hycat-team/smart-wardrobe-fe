@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { outfitsApi } from '../api/outfits.api';
 import { toast } from 'sonner';
+import { handleApiError } from '@/lib/api-error';
 
 export const OUTFIT_QUERY_KEYS = {
   all: ['outfits'] as const,
@@ -32,6 +33,9 @@ export const useCreateOutfit = () => {
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.lists() });
       toast.success(res?.message || 'Lưu bộ phối đồ thành công!');
     },
+    onError: (error) => {
+      handleApiError(error, 'Lưu bộ phối đồ thất bại.');
+    }
   });
 };
 
@@ -44,6 +48,9 @@ export const useUpdateOutfit = () => {
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.detail(variables.id) });
       toast.success(res?.message || 'Cập nhật bộ phối đồ thành công!');
     },
+    onError: (error) => {
+      handleApiError(error, 'Cập nhật thất bại.');
+    }
   });
 };
 
@@ -55,5 +62,8 @@ export const useDeleteOutfit = () => {
       queryClient.invalidateQueries({ queryKey: OUTFIT_QUERY_KEYS.lists() });
       toast.success(res?.message || 'Đã xóa bộ phối đồ!');
     },
+    onError: (error) => {
+      handleApiError(error, 'Xóa thất bại.');
+    }
   });
 };

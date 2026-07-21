@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '../api/admin.api';
 import { toast } from 'sonner';
+import { handleApiError } from '@/lib/api-error';
 
 export const ADMIN_USERS_KEY = ['admin-users'];
 export const ADMIN_POSTS_KEY = ['admin-posts'];
@@ -15,6 +16,13 @@ export const useAdminCategories = () => {
   });
 };
 
+export const useUserCategories = () => {
+  return useQuery({
+    queryKey: ['user-categories'],
+    queryFn: () => adminApi.getUserCategories(),
+  });
+};
+
 export const useCreateCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -23,7 +31,7 @@ export const useCreateCategory = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_CATEGORIES_KEY });
       toast.success('Thêm danh mục thành công');
     },
-    onError: () => toast.error('Thêm danh mục thất bại'),
+    onError: (error) => handleApiError(error, 'Thêm danh mục thất bại'),
   });
 };
 
@@ -35,7 +43,7 @@ export const useUpdateCategory = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_CATEGORIES_KEY });
       toast.success('Cập nhật danh mục thành công');
     },
-    onError: () => toast.error('Cập nhật danh mục thất bại'),
+    onError: (error) => handleApiError(error, 'Cập nhật danh mục thất bại'),
   });
 };
 
@@ -47,7 +55,7 @@ export const useDeleteCategory = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_CATEGORIES_KEY });
       toast.success('Xóa danh mục thành công');
     },
-    onError: () => toast.error('Xóa danh mục thất bại'),
+    onError: (error) => handleApiError(error, 'Xóa danh mục thất bại'),
   });
 };
 
@@ -66,8 +74,8 @@ export const useUpdateUserStatus = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_USERS_KEY });
       toast.success('Cập nhật trạng thái thành công');
     },
-    onError: () => {
-      toast.error('Có lỗi xảy ra khi cập nhật trạng thái');
+    onError: (error) => {
+      handleApiError(error, 'Có lỗi xảy ra khi cập nhật trạng thái');
     }
   });
 };
@@ -87,8 +95,8 @@ export const useDeletePost = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_POSTS_KEY });
       toast.success('Xóa bài viết thành công');
     },
-    onError: () => {
-      toast.error('Xóa bài viết thất bại');
+    onError: (error) => {
+      handleApiError(error, 'Xóa bài viết thất bại');
     }
   });
 };
@@ -101,8 +109,8 @@ export const useRestorePost = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_POSTS_KEY });
       toast.success('Khôi phục bài viết thành công');
     },
-    onError: () => {
-      toast.error('Khôi phục bài viết thất bại');
+    onError: (error) => {
+      handleApiError(error, 'Khôi phục bài viết thất bại');
     }
   });
 };
@@ -122,8 +130,8 @@ export const useHidePostItem = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_POST_ITEMS_KEY });
       toast.success('Ẩn sản phẩm thành công');
     },
-    onError: () => {
-      toast.error('Ẩn sản phẩm thất bại');
+    onError: (error) => {
+      handleApiError(error, 'Ẩn sản phẩm thất bại');
     }
   });
 };
@@ -136,8 +144,8 @@ export const useDeletePostItem = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_POST_ITEMS_KEY });
       toast.success('Xóa sản phẩm thành công');
     },
-    onError: () => {
-      toast.error('Xóa sản phẩm thất bại');
+    onError: (error) => {
+      handleApiError(error, 'Xóa sản phẩm thất bại');
     }
   });
 };
@@ -157,8 +165,8 @@ export const useBatchUploadSystemWardrobeItems = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_CATALOG_KEY });
       toast.success('Upload trang phục hệ thống thành công');
     },
-    onError: () => {
-      toast.error('Upload thất bại');
+    onError: (error) => {
+      handleApiError(error, 'Upload thất bại');
     }
   });
 };
@@ -171,8 +179,8 @@ export const useUpdateSystemWardrobeItem = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_CATALOG_KEY });
       toast.success('Cập nhật trang phục hệ thống thành công');
     },
-    onError: () => {
-      toast.error('Cập nhật thất bại');
+    onError: (error) => {
+      handleApiError(error, 'Cập nhật thất bại');
     }
   });
 };
@@ -185,8 +193,8 @@ export const useDeleteSystemWardrobeItem = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_CATALOG_KEY });
       toast.success('Xóa trang phục hệ thống thành công');
     },
-    onError: () => {
-      toast.error('Xóa thất bại');
+    onError: (error) => {
+      handleApiError(error, 'Xóa thất bại');
     }
   });
 };
@@ -209,7 +217,7 @@ export const useDeleteComment = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_POSTS_KEY });
       toast.success('Đã xóa bình luận');
     },
-    onError: () => toast.error('Lỗi khi xóa bình luận'),
+    onError: (error) => handleApiError(error, 'Lỗi khi xóa bình luận'),
   });
 };
 
@@ -222,6 +230,6 @@ export const useRestoreComment = () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_POSTS_KEY });
       toast.success('Đã khôi phục bình luận');
     },
-    onError: () => toast.error('Lỗi khi khôi phục bình luận'),
+    onError: (error) => handleApiError(error, 'Lỗi khi khôi phục bình luận'),
   });
 };

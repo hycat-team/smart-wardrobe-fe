@@ -7,10 +7,11 @@ export const aiKeys = {
   chatMessages: (contextID: string) => [...aiKeys.all, "chatMessages", contextID] as const,
 };
 
-export const useChatSessions = () => {
+export const useChatSessions = (enabled: boolean = true) => {
   return useQuery({
     queryKey: aiKeys.chatSessions(),
     queryFn: () => aiApi.getChatSessions(),
+    enabled,
   });
 };
 

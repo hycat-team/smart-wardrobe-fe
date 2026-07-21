@@ -24,9 +24,11 @@ import {
   METRICS, BEFORE_ITEMS, AFTER_ITEMS, TESTIMONIALS,
   FEED_CARDS, NON_OUTFIT_CARDS, OUTFIT_CARDS,
 } from "./data/landing-data";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export function LandingClient() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuthStore();
 
   // All GSAP animations in custom hook (mobile-aware + a11y)
   useScrollytelling(containerRef);
@@ -243,7 +245,7 @@ export function LandingClient() {
           <CopyBlock className="copy-1" badge={<><Sparkles className="size-3" /> Tủ đồ kỹ thuật số</>} heading="Số hoá tủ đồ." body="Chụp 1 lần. AI tự động bóc tách nền, phân loại màu sắc và chất liệu." />
           <CopyBlock className="copy-2" badge={<><Check className="size-3" /> Gợi ý từ AI</>} heading="Stylist Cá Nhân." body="Hàng ngàn gợi ý phối đồ từ chính tủ đồ của bạn. Đổi món cực nhanh chỉ với 1 chạm." />
           <CopyBlock className="copy-3" badge={<><MessageCircle className="size-3" /> Trợ lý AI</>} heading="Hiểu gu của bạn." body="Closy phân tích thời tiết, hoàn cảnh và thấu hiểu phong cách riêng để tư vấn mỗi ngày." />
-          <CopyBlock className="copy-4" badge={<><Share2 className="size-3" /> Cộng đồng</>} heading="Chia sẻ & Pass đồ." body="Tìm nguồn cảm hứng mới. Chuyển nhượng đồ ít mặc dễ dàng chỉ với một nút bấm." />
+          <CopyBlock className="copy-4" badge={<><Share2 className="size-3" /> Cộng đồng</>} heading="Chia sẻ & Bán đồ." body="Tìm nguồn cảm hứng mới. Chuyển nhượng đồ ít mặc dễ dàng chỉ với một nút bấm." />
         </div>
       </section>
 
@@ -359,9 +361,9 @@ export function LandingClient() {
             Không cần thẻ tín dụng. 30 giây.
           </p>
 
-          <Link href="/auth/register" className="cta-button opacity-0 mt-8 md:mt-10">
+          <Link href={user ? "/wardrobe" : "/auth/register"} className="cta-button opacity-0 mt-8 md:mt-10">
             <Button className="bg-white text-[#1A1A1A] rounded-full px-10 md:px-12 py-6 md:py-7 text-base md:text-lg font-bold hover:scale-[1.03] shadow-[0_0_40px_rgba(217,197,178,0.3)] hover:bg-white transition-all duration-300">
-              Bắt Đầu Miễn Phí →
+              {user ? "Vào Tủ Đồ →" : "Bắt Đầu Miễn Phí →"}
             </Button>
           </Link>
         </div>

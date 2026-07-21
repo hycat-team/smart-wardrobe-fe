@@ -17,6 +17,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Image from "next/image";
 
 const CATEGORIES = ["Tất cả", "Áo", "Quần", "Váy", "Giày", "Phụ kiện"];
 
@@ -481,8 +482,7 @@ export function SellClient({ itemId, initialItem }: { itemId: string; initialIte
                   isPremium ? "bg-muted" : "bg-cream-dark/40"
                 )}
               >
-                <img 
-                  src={item.img} 
+                <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={item.img} 
                   alt={item.name} 
                   className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" 
                 />

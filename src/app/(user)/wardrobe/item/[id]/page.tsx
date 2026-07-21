@@ -14,21 +14,28 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 
   const itemName = item.category?.name 
-    ? `${item.category.name} ${item.color || ""} ${item.style || ""}`.trim()
+    ? `${item.category.name} ${item.fashionItem?.color || (item as any).color || ""} ${item.fashionItem?.style || (item as any).style || ""}`.trim()
     : "Trang phục chưa phân loại";
 
   return {
     title: `${itemName} | Chi tiết tủ đồ`,
     description: `Chi tiết trang phục ${itemName} trong tủ đồ của bạn.`,
     openGraph: {
-      images: [item.imageUrl],
+      images: [item.fashionItem?.imageUrl || (item as any).imageUrl],
     }
   };
 }
 
+import { Suspense } from 'react';
+import { WardrobeItemData } from './components/WardrobeItemData';
+import Loading from './loading';
+
 export default async function WardrobeItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const item = await serverFetch<WardrobeItem>(`/wardrobe-items/${id}`);
   
-  return <WardrobeItemDetailClient itemId={id} initialItem={item || undefined} />;
+  return (
+    <Suspense fallback={<Loading />}>
+      <WardrobeItemData id={id} />
+    </Suspense>
+  );
 }

@@ -1,11 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const fs = require('fs');
 
-// const swaggerPath = 'C:/FPT/Project/smart-wardrobe/smart-wardrobe-be/docs/swagger.json';
-// const outputPath = 'C:/FPT/Project/smart-wardrobe/smart-wardrobe-fe/docs/ROUT.md';
+const swaggerPath = 'C:\\FPT\\Project\\smart-wardrobe\\smart-wardrobe-be\\api\\swagger\\swagger.json';
+const outputPath = 'C:\\FPT\\Project\\smart-wardrobe\\smart-wardrobe-fe\\docs\\ROUTE.md';
 
-const swaggerPath = 'D:/Project/smart-wardrobe/smart-wardrobe-be/docs/swagger.json';
-const outputPath = 'D:/Project/smart-wardrobe/smart-wardrobe-fe/docs/ROUT.md';
+// const swaggerPath = 'D:/Project/smart-wardrobe/smart-wardrobe-be/api/swagger/swagger.json';
+// const outputPath = 'D:/Project/smart-wardrobe/smart-wardrobe-fe/docs/ROUT.md';
 
 try {
   const data = JSON.parse(fs.readFileSync(swaggerPath, 'utf8'));
@@ -46,7 +46,7 @@ try {
     if (!schema) return '';
     let res = '';
     const indent = '  '.repeat(depth + 2); // Adjust indent based on markdown list nesting
-    
+
     if (schema.$ref) {
       if (visited.has(schema.$ref)) return '';
       visited.add(schema.$ref);
@@ -54,33 +54,33 @@ try {
       const def = data.definitions[refName];
       if (def && def.properties) {
         for (const [key, prop] of Object.entries(def.properties)) {
-           let type = prop.type || 'object';
-           if (prop.$ref) type = `ref: ${prop.$ref.split('/').pop().split('.').pop()}`;
-           if (prop.type === 'array' && prop.items) {
-             if (prop.items.$ref) type = `Array<${prop.items.$ref.split('/').pop().split('.').pop()}>`;
-             else type = `Array<${prop.items.type}>`;
-           }
-           let reqMark = (def.required && def.required.includes(key)) ? ' **(Required)**' : '';
-           let desc = prop.description ? ' - ' + prop.description.replace(/\n/g, ' ') : '';
-           res += `${indent}- \`${key}\` (${type})${reqMark}${desc}\n`;
+          let type = prop.type || 'object';
+          if (prop.$ref) type = `ref: ${prop.$ref.split('/').pop().split('.').pop()}`;
+          if (prop.type === 'array' && prop.items) {
+            if (prop.items.$ref) type = `Array<${prop.items.$ref.split('/').pop().split('.').pop()}>`;
+            else type = `Array<${prop.items.type}>`;
+          }
+          let reqMark = (def.required && def.required.includes(key)) ? ' **(Required)**' : '';
+          let desc = prop.description ? ' - ' + prop.description.replace(/\n/g, ' ') : '';
+          res += `${indent}- \`${key}\` (${type})${reqMark}${desc}\n`;
         }
       } else if (def && def.allOf) {
-         res += `${indent}- *(Complex composed object)*\n`;
+        res += `${indent}- *(Complex composed object)*\n`;
       } else if (def && def.enum) {
-         const vals = def.enum.map((e, i) => {
-             return def['x-enum-varnames'] ? `${def['x-enum-varnames'][i]}=${e}` : e;
-         }).join(', ');
-         res += `${indent}- *(Enum: ${vals})*\n`;
+        const vals = def.enum.map((e, i) => {
+          return def['x-enum-varnames'] ? `${def['x-enum-varnames'][i]}=${e}` : e;
+        }).join(', ');
+        res += `${indent}- *(Enum: ${vals})*\n`;
       }
       visited.delete(schema.$ref);
     } else if (schema.type === 'array' && schema.items) {
       res += formatSchemaTree(schema.items, depth, visited);
     } else if (schema.properties) {
       for (const [key, prop] of Object.entries(schema.properties)) {
-         let type = prop.type || 'object';
-         let reqMark = (schema.required && schema.required.includes(key)) ? ' **(Required)**' : '';
-         let desc = prop.description ? ' - ' + prop.description.replace(/\n/g, ' ') : '';
-         res += `${indent}- \`${key}\` (${type})${reqMark}${desc}\n`;
+        let type = prop.type || 'object';
+        let reqMark = (schema.required && schema.required.includes(key)) ? ' **(Required)**' : '';
+        let desc = prop.description ? ' - ' + prop.description.replace(/\n/g, ' ') : '';
+        res += `${indent}- \`${key}\` (${type})${reqMark}${desc}\n`;
       }
     }
     return res;
@@ -133,11 +133,11 @@ try {
             if (resDetails.schema.allOf) {
               const dataProp = resDetails.schema.allOf.find(item => item.properties && item.properties.data);
               if (dataProp && dataProp.properties && dataProp.properties.data) {
-                 markdown += `  - Data Schema: ${formatSchemaType(dataProp.properties.data)}\n`;
-                 const tree = formatSchemaTree(dataProp.properties.data);
-                 if (tree) markdown += `    **Properties**:\n${tree}`;
+                markdown += `  - Data Schema: ${formatSchemaType(dataProp.properties.data)}\n`;
+                const tree = formatSchemaTree(dataProp.properties.data);
+                if (tree) markdown += `    **Properties**:\n${tree}`;
               } else {
-                 markdown += `  - Schema: Complex allOf schema\n`;
+                markdown += `  - Schema: Complex allOf schema\n`;
               }
             } else {
               markdown += `  - Schema: ${formatSchemaType(resDetails.schema)}\n`;
@@ -159,7 +159,7 @@ try {
       const shortName = defName.split('.').pop();
       markdown += `### <a id="${getAnchorId(defName)}"></a>\`${shortName}\`\n\n`;
       if (defDetails.description) markdown += `${defDetails.description}\n\n`;
-      
+
       if (defDetails.properties) {
         markdown += `| Property | Type | Required | Description |\n`;
         markdown += `| --- | --- | --- | --- |\n`;
@@ -172,7 +172,7 @@ try {
       } else if (defDetails.allOf) {
         markdown += `*Composed of multiple schemas (allOf):*\n`;
         defDetails.allOf.forEach(item => {
-           markdown += `- ${formatSchemaType(item)}\n`;
+          markdown += `- ${formatSchemaType(item)}\n`;
         });
         markdown += `\n`;
       } else if (defDetails.enum) {
@@ -180,12 +180,12 @@ try {
         const varnames = defDetails['x-enum-varnames'] || [];
         const descriptions = defDetails['x-enum-comments'] || {};
         defDetails.enum.forEach((val, i) => {
-           let name = varnames[i] ? ` (**${varnames[i]}**)` : '';
-           let desc = '';
-           if (varnames[i] && descriptions[varnames[i]]) {
-             desc = ` - ${descriptions[varnames[i]]}`;
-           }
-           markdown += `- \`${val}\`${name}${desc}\n`;
+          let name = varnames[i] ? ` (**${varnames[i]}**)` : '';
+          let desc = '';
+          if (varnames[i] && descriptions[varnames[i]]) {
+            desc = ` - ${descriptions[varnames[i]]}`;
+          }
+          markdown += `- \`${val}\`${name}${desc}\n`;
         });
         markdown += `\n`;
       } else {

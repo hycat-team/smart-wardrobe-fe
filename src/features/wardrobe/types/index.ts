@@ -12,25 +12,37 @@ export interface CategoryRes {
   slug: string;
 }
 
+export interface FashionItemRes {
+  id: string;
+  category: CategoryRes;
+  imageUrl: string;
+  color: string;
+  colorHex: string;
+  colorHue: number;
+  colorSaturation: number;
+  colorLightness: number;
+  // imagePublicId: string;
+  style: string;
+  material: string;
+  pattern: string;
+  fit: string;
+  seasonality: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface WardrobeItemRes {
   id: string;
   userId: string;
-  category?: CategoryRes;
-  color?: string;
-  colorHex?: string;
-  colorHue?: number;
-  colorLightness?: number;
-  colorSaturation?: number;
-  fit?: string;
-  imagePublicId?: string;
-  imageUrl: string;
-  isLocked?: boolean;
-  material?: string;
-  pattern?: string;
-  seasonality?: string;
   status: WardrobeItemStatus;
-  style?: string;
+  isLocked?: boolean;
+  fashionItem?: FashionItemRes;
+  category?: CategoryRes;
+
+
   price?: number;
+
   createdAt: string;
 }
 

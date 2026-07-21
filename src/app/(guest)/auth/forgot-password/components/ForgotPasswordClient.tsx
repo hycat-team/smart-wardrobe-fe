@@ -136,6 +136,21 @@ export function ForgotPasswordClient() {
     }
   };
 
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text/plain").trim().slice(0, 6);
+    if (!/^[0-9]+$/.test(pastedData)) return;
+
+    const newOtp = [...otpCode];
+    for (let i = 0; i < pastedData.length; i++) {
+      newOtp[i] = pastedData[i];
+    }
+    setOtpCode(newOtp);
+
+    const nextFocusIndex = pastedData.length < 6 ? pastedData.length : 5;
+    otpRefs[nextFocusIndex].current?.focus();
+  };
+
   const handleResend = () => {
     if (!canResend) return;
     setOtpCode(["", "", "", "", "", ""]);
@@ -149,14 +164,14 @@ export function ForgotPasswordClient() {
     return (
       <div className="w-full px-6 py-10 sm:px-10 flex flex-col items-center animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="text-center w-full mb-10">
-          <h1 className="font-playfair text-[32px] md:text-[36px] font-semibold text-ethos-primary mb-2">Nhập mã xác thực</h1>
-          <p className="font-inter text-[14px] text-ethos-on-surface-variant max-w-[280px] mx-auto">
+          <h1 className="font-playfair text-[32px] md:text-[36px] font-semibold text-primary mb-2">Nhập mã xác thực</h1>
+          <p className="font-inter text-[14px] text-muted-foreground max-w-[280px] mx-auto">
             Vui lòng nhập mã OTP đã được gửi đến email <strong>{resetEmail}</strong>
           </p>
         </div>
 
         <form className="w-full flex flex-col items-center" onSubmit={onVerifyOtp}>
-          <div className="flex justify-between items-center w-full max-w-[340px] gap-2 mb-12">
+          <div className="flex justify-center items-center w-full gap-2 sm:gap-4 mb-12">
             {[0, 1, 2, 3, 4, 5].map((index) => (
               <input
                 key={index}
@@ -164,8 +179,9 @@ export function ForgotPasswordClient() {
                 value={otpCode[index]}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                onPaste={handleOtpPaste}
                 onFocus={(e) => e.target.select()}
-                className="w-12 h-14 md:w-14 md:h-16 text-center font-playfair text-[32px] font-medium bg-transparent border-b border-ethos-outline text-ethos-primary focus:bg-ethos-surface-low focus:border-ethos-primary focus:border-b-2 outline-none transition-all duration-300 rounded-none placeholder:text-ethos-surface-dim"
+                className="w-12 h-14 sm:w-14 sm:h-16 text-center font-playfair text-[28px] sm:text-[32px] font-medium bg-muted/50 border border-border text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 rounded-2xl placeholder:text-muted-foreground/30 shadow-sm"
                 inputMode="numeric"
                 maxLength={1}
                 placeholder="·"
@@ -177,18 +193,18 @@ export function ForgotPasswordClient() {
           <button
             type="submit"
             disabled={isConfirming || otpCode.join("").length !== 6}
-            className="w-full max-w-[340px] h-12 bg-ethos-primary text-ethos-on-primary font-inter text-[15px] font-medium flex items-center justify-center hover:bg-ethos-primary-container transition-all duration-300 group mb-8 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full max-w-[340px] h-12 bg-primary text-primary-foreground font-inter text-[15px] font-medium flex items-center justify-center rounded-full hover:bg-primary/90 transition-all duration-300 group mb-8 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isConfirming ? "Đang xác thực..." : "Xác Nhận"}
           </button>
 
-          <div className="flex items-center justify-center font-inter text-[14px] text-ethos-on-surface-variant mb-6">
+          <div className="flex items-center justify-center font-inter text-[14px] text-muted-foreground mb-6">
             <span>Chưa nhận được mã?</span>
             <button
               type="button"
               onClick={handleResend}
               disabled={!canResend || isSending}
-              className="ml-1 text-ethos-primary font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:underline"
+              className="ml-1 text-primary font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:underline"
             >
               <span>{canResend ? "Gửi lại ngay" : `Gửi lại (00:${timeLeft < 10 ? `0${timeLeft}` : timeLeft})`}</span>
             </button>
@@ -197,7 +213,7 @@ export function ForgotPasswordClient() {
           <button
             type="button"
             onClick={() => setStep("email")}
-            className="text-ethos-on-surface-variant hover:text-ethos-primary transition-colors flex items-center gap-1 font-inter text-[14px]"
+            className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 font-inter text-[14px]"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -213,13 +229,13 @@ export function ForgotPasswordClient() {
     return (
       <div className="w-full px-6 py-8 sm:px-10 sm:py-10 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="mb-10 text-center">
-          <h1 className="font-playfair text-[32px] md:text-[36px] font-semibold text-ethos-primary mb-2">Tạo mật khẩu mới</h1>
-          <p className="font-inter text-[14px] text-ethos-on-surface-variant">Vui lòng thiết lập mật khẩu mới cho tài khoản của bạn.</p>
+          <h1 className="font-playfair text-[32px] md:text-[36px] font-semibold text-primary mb-2">Tạo mật khẩu mới</h1>
+          <p className="font-inter text-[14px] text-muted-foreground">Vui lòng thiết lập mật khẩu mới cho tài khoản của bạn.</p>
         </div>
 
         <form noValidate className="space-y-6" onSubmit={handlePasswordSubmit(onPasswordSubmit)}>
           <div className="space-y-2 relative group">
-            <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="password">Mật khẩu mới</label>
+            <label className="block font-inter text-[12px] font-bold text-muted-foreground uppercase tracking-[0.1em]" htmlFor="password">Mật khẩu mới</label>
             <div className="relative flex items-center">
               <input
                 id="password"
@@ -228,9 +244,9 @@ export function ForgotPasswordClient() {
                 {...registerPassword("password")}
                 onFocus={() => setFocusedInput('new-password')}
                 onBlur={() => setFocusedInput(null)}
-                className={`w-full block font-inter text-[16px] text-ethos-primary placeholder:text-ethos-outline-variant py-3 focus:outline-none focus:ring-0 border-0 border-b border-ethos-primary bg-transparent transition-all duration-300 pr-10 ${focusedInput === 'new-password' ? 'bg-ethos-surface-low border-b-2 px-4 rounded-none' : 'px-0'} ${passwordErrors.password ? 'border-red-500' : ''}`}
+                className={`w-full block font-inter text-[16px] text-foreground placeholder:text-muted-foreground/60 px-4 py-3 pr-10 focus:outline-none focus:ring-1 focus:ring-primary border bg-muted/50 transition-all duration-300 rounded-2xl ${focusedInput === 'new-password' ? 'border-primary' : 'border-border'} ${passwordErrors.password ? 'border-red-500' : ''}`}
               />
-              <button type="button" onClick={() => setPasswordVisible(!passwordVisible)} className="absolute right-2 flex items-center justify-center p-1 text-ethos-on-surface-variant hover:text-ethos-primary transition-colors focus:outline-none">
+              <button type="button" onClick={() => setPasswordVisible(!passwordVisible)} className="absolute right-2 flex items-center justify-center p-1 text-muted-foreground hover:text-primary transition-colors focus:outline-none">
                 <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   {passwordVisible ? (
                     <>
@@ -247,7 +263,7 @@ export function ForgotPasswordClient() {
           </div>
 
           <div className="space-y-2 relative group">
-            <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="confirmPassword">Xác nhận mật khẩu mới</label>
+            <label className="block font-inter text-[12px] font-bold text-muted-foreground uppercase tracking-[0.1em]" htmlFor="confirmPassword">Xác nhận mật khẩu mới</label>
             <div className="relative flex items-center">
               <input
                 id="confirmPassword"
@@ -256,9 +272,9 @@ export function ForgotPasswordClient() {
                 {...registerPassword("confirmPassword")}
                 onFocus={() => setFocusedInput('confirm-password')}
                 onBlur={() => setFocusedInput(null)}
-                className={`w-full block font-inter text-[16px] text-ethos-primary placeholder:text-ethos-outline-variant py-3 focus:outline-none focus:ring-0 border-0 border-b border-ethos-primary bg-transparent transition-all duration-300 pr-10 ${focusedInput === 'confirm-password' ? 'bg-ethos-surface-low border-b-2 px-4 rounded-none' : 'px-0'} ${passwordErrors.confirmPassword ? 'border-red-500' : ''}`}
+                className={`w-full block font-inter text-[16px] text-foreground placeholder:text-muted-foreground/60 px-4 py-3 pr-10 focus:outline-none focus:ring-1 focus:ring-primary border bg-muted/50 transition-all duration-300 rounded-2xl ${focusedInput === 'confirm-password' ? 'border-primary' : 'border-border'} ${passwordErrors.confirmPassword ? 'border-red-500' : ''}`}
               />
-              <button type="button" onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)} className="absolute right-2 flex items-center justify-center p-1 text-ethos-on-surface-variant hover:text-ethos-primary transition-colors focus:outline-none">
+              <button type="button" onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)} className="absolute right-2 flex items-center justify-center p-1 text-muted-foreground hover:text-primary transition-colors focus:outline-none">
                 <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   {confirmPasswordVisible ? (
                     <>
@@ -278,7 +294,7 @@ export function ForgotPasswordClient() {
             <button
               type="submit"
               disabled={isResetting}
-              className="w-full h-12 bg-ethos-primary text-ethos-on-primary font-inter text-[15px] font-medium flex items-center justify-center hover:bg-ethos-primary-container hover:shadow-[0_10px_30px_rgba(45,45,45,0.15)] transition-all duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full h-12 bg-primary text-primary-foreground font-inter text-[15px] font-medium flex items-center justify-center rounded-full hover:bg-primary/90 hover:shadow-lg transition-all duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isResetting ? "Đang xử lý..." : "Đặt Lại Mật Khẩu"}
             </button>
@@ -292,13 +308,13 @@ export function ForgotPasswordClient() {
   return (
     <div className="w-full px-6 py-8 sm:px-10 sm:py-10 animate-in fade-in duration-500">
       <div className="mb-10 text-center">
-        <h1 className="font-playfair text-[32px] md:text-[36px] font-semibold text-ethos-primary mb-2">Khôi phục mật khẩu</h1>
-        <p className="font-inter text-[14px] text-ethos-on-surface-variant">Nhập email đã đăng ký để nhận mã khôi phục.</p>
+        <h1 className="font-playfair text-[32px] md:text-[36px] font-semibold text-primary mb-2">Khôi phục mật khẩu</h1>
+        <p className="font-inter text-[14px] text-muted-foreground">Nhập email đã đăng ký để nhận mã khôi phục.</p>
       </div>
 
       <form noValidate className="space-y-6" onSubmit={handleEmailSubmit(onEmailSubmit)}>
         <div className="space-y-2">
-          <label className="block font-inter text-[12px] font-bold text-ethos-on-surface-variant uppercase tracking-[0.1em]" htmlFor="email">Email</label>
+          <label className="block font-inter text-[12px] font-bold text-muted-foreground uppercase tracking-[0.1em]" htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
@@ -306,7 +322,7 @@ export function ForgotPasswordClient() {
             {...registerEmail("email")}
             onFocus={() => setFocusedInput('email')}
             onBlur={() => setFocusedInput(null)}
-            className={`w-full block font-inter text-[16px] text-ethos-primary placeholder:text-ethos-outline-variant py-3 focus:outline-none focus:ring-0 border-0 border-b border-ethos-primary bg-transparent transition-all duration-300 ${focusedInput === 'email' ? 'bg-ethos-surface-low border-b-2 px-4 rounded-none' : 'px-0'} ${emailErrors.email ? 'border-red-500' : ''}`}
+            className={`w-full block font-inter text-[16px] text-foreground placeholder:text-muted-foreground/60 px-4 py-3 focus:outline-none focus:ring-1 focus:ring-primary border bg-muted/50 transition-all duration-300 rounded-2xl ${focusedInput === 'email' ? 'border-primary' : 'border-border'} ${emailErrors.email ? 'border-red-500' : ''}`}
           />
           {emailErrors.email && <p className="text-red-500 text-xs mt-1">{emailErrors.email.message}</p>}
         </div>
@@ -315,7 +331,7 @@ export function ForgotPasswordClient() {
           <button
             type="submit"
             disabled={isSending}
-            className="w-full h-12 bg-ethos-primary text-ethos-on-primary font-inter text-[15px] font-medium flex items-center justify-center hover:bg-ethos-primary-container hover:shadow-[0_10px_30px_rgba(45,45,45,0.15)] transition-all duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full h-12 bg-primary text-primary-foreground font-inter text-[15px] font-medium flex items-center justify-center rounded-full hover:bg-primary/90 hover:shadow-lg transition-all duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSending ? "Đang gửi..." : "Gửi Mã Xác Nhận"}
           </button>
@@ -325,7 +341,7 @@ export function ForgotPasswordClient() {
       <div className="text-center mt-4">
         <Link 
           href="/auth/login"
-          className="text-ethos-on-surface-variant hover:text-ethos-primary transition-colors flex items-center justify-center gap-1 font-inter text-[14px]"
+          className="text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-1 font-inter text-[14px]"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />

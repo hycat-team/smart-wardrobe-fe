@@ -3,6 +3,7 @@ import { authApi } from '../api/auth.api';
 import { toast } from 'sonner';
 import { PROFILE_QUERY_KEY } from '@/features/profile/queries/profile.queries';
 import { profileApi } from '@/features/profile/api/profile.api';
+import { handleApiError } from '@/lib/api-error';
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -28,6 +29,9 @@ export const useLogin = () => {
         (res as any).isAdmin = isAdmin;
       }
     },
+    onError: (error) => {
+      handleApiError(error, 'Email hoặc mật khẩu không chính xác.');
+    }
   });
 };
 
@@ -37,6 +41,9 @@ export const useRegister = () => {
     onSuccess: (res) => {
       toast.success(res?.message || 'Đăng ký thành công. Vui lòng kiểm tra email để nhận mã OTP.');
     },
+    onError: (error) => {
+      handleApiError(error, 'Đăng ký thất bại. Vui lòng thử lại.');
+    }
   });
 };
 
@@ -46,6 +53,9 @@ export const useConfirmRegisterOtp = () => {
     onSuccess: (res) => {
       toast.success(res?.message || 'Xác thực tài khoản thành công. Bạn có thể đăng nhập ngay.');
     },
+    onError: (error) => {
+      handleApiError(error, 'Mã xác thực không hợp lệ.');
+    }
   });
 };
 
@@ -55,6 +65,9 @@ export const useResendRegisterOtp = () => {
     onSuccess: (res) => {
       toast.success(res?.message || 'Đã gửi lại mã OTP. Vui lòng kiểm tra email của bạn.');
     },
+    onError: (error) => {
+      handleApiError(error, 'Không thể gửi lại mã OTP.');
+    }
   });
 };
 
@@ -80,6 +93,9 @@ export const useForgotPassword = () => {
     onSuccess: (res) => {
       toast.success(res?.message || 'Đã gửi mã OTP khôi phục đến email của bạn.');
     },
+    onError: (error) => {
+      handleApiError(error, 'Không thể gửi mã khôi phục.');
+    }
   });
 };
 
@@ -89,6 +105,9 @@ export const useConfirmForgotPasswordOtp = () => {
     onSuccess: (res) => {
       toast.success(res?.message || 'Xác thực OTP thành công. Vui lòng đặt mật khẩu mới.');
     },
+    onError: (error) => {
+      handleApiError(error, 'Mã xác thực không hợp lệ.');
+    }
   });
 };
 
@@ -98,5 +117,8 @@ export const useResetPassword = () => {
     onSuccess: (res) => {
       toast.success(res?.message || 'Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.');
     },
+    onError: (error) => {
+      handleApiError(error, 'Đặt lại mật khẩu thất bại.');
+    }
   });
 };
