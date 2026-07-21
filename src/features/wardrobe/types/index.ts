@@ -14,15 +14,14 @@ export interface CategoryRes {
 
 export interface FashionItemRes {
   id: string;
-  categoryId: string;
-  categoryName: string;
+  category: CategoryRes;
   imageUrl: string;
-  imagePublicId: string;
   color: string;
   colorHex: string;
   colorHue: number;
   colorSaturation: number;
   colorLightness: number;
+  // imagePublicId: string;
   style: string;
   material: string;
   pattern: string;
@@ -36,11 +35,14 @@ export interface FashionItemRes {
 export interface WardrobeItemRes {
   id: string;
   userId: string;
-  category?: CategoryRes;
-  isLocked?: boolean;
   status: WardrobeItemStatus;
-  price?: number;
+  isLocked?: boolean;
   fashionItem?: FashionItemRes;
+  category?: CategoryRes;
+
+
+  price?: number;
+
   createdAt: string;
 }
 

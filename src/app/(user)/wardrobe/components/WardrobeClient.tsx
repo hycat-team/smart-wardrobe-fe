@@ -119,7 +119,7 @@ export default function WardrobeClient({
   const { data: category } = useCategories()
 
   // Sync Search state with query params
-  const categoryParam = searchParams.get("category") || "Tất cả";
+  const categoryParam = searchParams.get("categorySlug") || "";
   const colorParam = searchParams.get("color") || "";
   const tagParam = searchParams.get("tag") || "";
   const sortParam = searchParams.get("sort") || "Mới nhất";
@@ -146,11 +146,7 @@ export default function WardrobeClient({
 
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
 
-  let slugToFetch: string | undefined = undefined;
-  if (categoryParam !== "Tất cả") {
-    const found = category?.find((c: any) => c.name === categoryParam);
-    slugToFetch = found ? found.slug : categoryParam;
-  }
+  const slugToFetch = categoryParam || undefined;
   // Load real wardrobe items
   const {
     data,
@@ -179,7 +175,7 @@ export default function WardrobeClient({
       if (searchInput !== searchParam && searchInput !== lastPushedQ.current) {
         lastPushedQ.current = searchInput;
         // If the user starts typing a new search, clear the category to search all items
-        updateParams({ q: searchInput, category: null });
+        updateParams({ q: searchInput, categorySlug: null });
       }
     }, 500);
     return () => clearTimeout(handler);
@@ -207,8 +203,8 @@ export default function WardrobeClient({
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const handleCategoryChange = (cat: string) => {
-    updateParams({ category: cat === "Tất cả" ? null : cat, page: "1" });
+  const handleCategoryChange = (slug: string) => {
+    updateParams({ categorySlug: slug === "" ? null : slug, page: "1" });
   };
 
   const handleColorChange = (color: string) => {
@@ -225,7 +221,7 @@ export default function WardrobeClient({
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateParams({ q: searchInput, category: null, page: "1" });
+    updateParams({ q: searchInput, categorySlug: null, page: "1" });
   };
 
   const handleResetFilters = () => {
@@ -237,11 +233,19 @@ export default function WardrobeClient({
   const activeFiltersCount =
     (colorParam ? 1 : 0) + (tagParam ? 1 : 0) + (searchParam ? 1 : 0);
 
-  // Filter & Sort Logic
   const filteredItems = realItems.filter((item) => {
     const itemCatName = getCategoryName(item);
+    
+    // Extract slug from either root category or fashionItem.category
+    let itemCatSlug = "";
+    if (typeof item.category === "object" && item.category !== null && "slug" in item.category) {
+      itemCatSlug = item.category.slug;
+    } else if (item.fashionItem?.category && "slug" in item.fashionItem.category) {
+      itemCatSlug = item.fashionItem.category.slug;
+    }
+
     const matchesCategory =
-      categoryParam === "Tất cả" || itemCatName === categoryParam;
+      !categoryParam || itemCatSlug === categoryParam;
 
     const matchesColor =
       !colorParam || getColorValue(item.fashionItem?.color || (item as any).color || "") === colorParam;
@@ -482,15 +486,32 @@ export default function WardrobeClient({
           {/* Categories / Tabs - Magazine Index Style */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
             <div className="flex flex-wrap gap-x-8 gap-y-4">
+              <button
+                onClick={() => handleCategoryChange("")}
+                className={cn(
+                  "text-xs font-semibold uppercase tracking-[0.2em] relative transition-colors duration-200 group pb-2",
+                  !categoryParam
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Tất cả
+                <span
+                  className={cn(
+                    "absolute bottom-0 left-0 h-[2px] bg-primary transition-all duration-300",
+                    !categoryParam ? "w-full" : "w-0 group-hover:w-full",
+                  )}
+                />
+              </button>
               {category?.map((cat) => {
                 const label = cat.name;
                 return (
                   <button
                     key={cat.id}
-                    onClick={() => handleCategoryChange(cat.name)}
+                    onClick={() => handleCategoryChange(cat.slug)}
                     className={cn(
                       "text-xs font-semibold uppercase tracking-[0.2em] relative transition-colors duration-200 group pb-2",
-                      categoryParam === cat.name
+                      categoryParam === cat.slug
                         ? "text-foreground font-semibold"
                         : "text-muted-foreground hover:text-foreground",
                     )}
@@ -499,7 +520,7 @@ export default function WardrobeClient({
                     <span
                       className={cn(
                         "absolute bottom-0 left-0 h-[2px] bg-primary transition-all duration-300",
-                        categoryParam === cat.name
+                        categoryParam === cat.slug
                           ? "w-full"
                           : "w-0 group-hover:w-full",
                       )}

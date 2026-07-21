@@ -18,7 +18,7 @@ export function OutfitCard({ outfit, isFavorite, onToggleFavorite, onDelete, ind
   const router = useRouter();
 
   const itemsInOutfit = outfit.items || [];
-  const coverImage = outfit.coverImageUrl || itemsInOutfit[0]?.wardrobeItem?.fashionItem?.imageUrl || (itemsInOutfit[0]?.wardrobeItem as any)?.imageUrl;
+  const coverImage = outfit.coverImageUrl || itemsInOutfit[0]?.fashionItem?.imageUrl || itemsInOutfit[0]?.wardrobeItem?.fashionItem?.imageUrl || (itemsInOutfit[0]?.wardrobeItem as any)?.imageUrl;
 
   return (
     <div

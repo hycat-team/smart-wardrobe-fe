@@ -18,7 +18,9 @@ export interface SaveOutfitReq {
 
 export interface OutfitItemRes {
   id: string;
+  itemContext?: string;
   wardrobeItem?: WardrobeItemRes;
+  fashionItem?: any;
   positionX: number;
   positionY: number;
   scale: number;

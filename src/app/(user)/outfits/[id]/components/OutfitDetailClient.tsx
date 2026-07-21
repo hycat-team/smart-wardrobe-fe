@@ -105,7 +105,11 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
       let accessoryYOffset = -150;
       
       const initialItems = (outfit.items || []).map((item: any) => {
-        const wardrobeItem = item.wardrobeItem || {};
+        const wardrobeItem = item.wardrobeItem || (item.fashionItem ? {
+          ...item,
+          id: item.fashionItem.id || item.id,
+          category: item.fashionItem.category,
+        } : {});
         let x = item.positionX || 0;
         let y = item.positionY || 0;
         let zIndex = item.layerOrder || 1;
