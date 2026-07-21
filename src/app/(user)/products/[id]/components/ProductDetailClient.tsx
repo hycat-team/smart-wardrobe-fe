@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { mockProducts, mockBrands } from '@/lib/mock-data/b2b';
 import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
 import { Button } from '@/components/ui/button';
-import { Heart, Share2, Sparkles, ShoppingBag, ChevronLeft } from 'lucide-react';
+import { Heart, Share2, Sparkles, ShoppingBag, ChevronLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useGetBrandItemDetail, useGetActiveBrandDetail } from '@/features/brands/queries/user-brands.queries';
 
 interface ProductDetailClientProps {
   productId: string;
@@ -16,30 +16,24 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ productId }: ProductDetailClientProps) {
   const router = useRouter();
   
-  const [product, setProduct] = useState<any>(mockProducts.find(p => p.id === productId));
-  const [brand, setBrand] = useState<any>(mockBrands.find(b => b.id === product?.brandId));
-
-  useEffect(() => {
-    if (!product) {
-      try {
-        const stored = localStorage.getItem("brand_custom_products");
-        if (stored) {
-          const customProducts = JSON.parse(stored);
-          const customProduct = customProducts.find((p: any) => p.id === productId);
-          if (customProduct) {
-            setProduct(customProduct);
-            setBrand(mockBrands.find(b => b.id === customProduct.brandId));
-          }
-        }
-      } catch (e) {}
-    }
-  }, [productId, product]);
+  const { data: product, isLoading: isProductLoading } = useGetBrandItemDetail(productId);
+  const { data: brand, isLoading: isBrandLoading } = useGetActiveBrandDetail(product?.brandId || "");
 
   const addToCart = useB2BDemoStore(state => state.addToCart);
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
+
+  const prod = product as any;
+
+  if (isProductLoading || isBrandLoading) {
+    return (
+      <div className="flex-1 bg-background text-foreground min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!product || !brand) return null;
 
@@ -55,12 +49,12 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
 
     addToCart({
       productId: product.id,
-      name: product.name,
-      price: product.discountPrice || product.price,
+      name: product.name || 'Sản phẩm',
+      price: prod.discountPrice || product.price,
       quantity,
       size: selectedSize,
       color: selectedColor,
-      imageUrl: product.imageUrls[0],
+      imageUrl: product.fashionItem?.imageUrl || 'https://placehold.co/600x800?text=No+Image',
       brandId: brand.id,
       brandName: brand.name,
       selected: true
@@ -85,18 +79,18 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
           {/* Left Column: Images */}
           <div className="flex flex-col gap-4">
             <div className="aspect-[3/4] bg-secondary/20 overflow-hidden rounded-3xl relative">
-              <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover" />
-              {product.discountPrice && (
+              <img src={product.fashionItem?.imageUrl || ''} alt={`${product.name || 'Sản phẩm'} - Thumbnail`} className="w-full h-full object-cover" />
+              {prod.discountPrice && (
                 <div className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 uppercase tracking-wider rounded-full">
                   Sale
                 </div>
               )}
             </div>
-            {product.imageUrls.length > 1 && (
+            {(prod.imageUrls?.length || 0) > 1 && (
               <div className="grid grid-cols-2 gap-4">
-                {product.imageUrls.slice(1).map((url: string, idx: number) => (
+                {prod.imageUrls?.slice(1).map((imgUrl: string, idx: number) => (
                   <div key={idx} className="aspect-[3/4] bg-secondary/20 overflow-hidden rounded-2xl">
-                    <img src={url} alt={`${product.name} view ${idx + 2}`} className="w-full h-full object-cover" />
+                    <img src={imgUrl} alt={`${product.name || 'Sản phẩm'} - Thumbnail ${idx + 2}`} className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>
@@ -111,9 +105,9 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-4">{product.name}</h1>
             
             <div className="flex items-center gap-4 mb-8">
-              {product.discountPrice ? (
+              {prod.discountPrice ? (
                 <>
-                  <span className="text-2xl font-bold text-red-600">{product.discountPrice.toLocaleString('vi-VN')}đ</span>
+                  <span className="text-2xl font-bold text-red-600">{prod.discountPrice.toLocaleString('vi-VN')}đ</span>
                   <span className="text-lg text-muted-foreground line-through">{product.price.toLocaleString('vi-VN')}đ</span>
                 </>
               ) : (
@@ -131,7 +125,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
             <div className="flex flex-col gap-4 mb-8">
               <span className="font-bold text-sm uppercase tracking-widest">Màu sắc</span>
               <div className="flex flex-wrap gap-3">
-                {(product.colors || ['Mặc định']).map((color: string) => (
+                {(prod.colors || ['Mặc định']).map((color: string) => (
                   <button 
                     key={color}
                     onClick={() => setSelectedColor(color)}
@@ -154,7 +148,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
                 <button className="text-xs font-bold underline decoration-1 underline-offset-2 text-muted-foreground hover:text-foreground">Hướng dẫn chọn size</button>
               </div>
               <div className="flex flex-wrap gap-3">
-                {(product.sizes || ['Freesize']).map((size: string) => (
+                {(prod.sizes || ['Freesize']).map((size: string) => (
                   <button 
                     key={size}
                     onClick={() => setSelectedSize(size)}

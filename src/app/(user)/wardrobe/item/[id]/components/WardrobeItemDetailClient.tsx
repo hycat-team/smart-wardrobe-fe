@@ -99,7 +99,7 @@ export function WardrobeItemDetailClient({
       : item.category;
 
   const itemName = categoryName
-    ? `${categoryName} ${item.color || ""} ${item.style || ""}`.trim()
+    ? `${categoryName} ${item.fashionItem?.color || (item as any).color || ""} ${item.fashionItem?.style || (item as any).style || ""}`.trim()
     : "Trang phục chưa phân loại";
 
   return (
@@ -178,7 +178,7 @@ export function WardrobeItemDetailClient({
             <Image
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              src={applyCloudinaryTrim(item.imageUrl)}
+              src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl)}
               alt={itemName}
               className="h-full w-full object-contain drop-shadow-sm"
             />
@@ -206,15 +206,15 @@ export function WardrobeItemDetailClient({
               </h1>
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                <span>{item.brand || categoryName || "ACNE STUDIOS"}</span>
+                <span>{(item as any).brand || categoryName || "ACNE STUDIOS"}</span>
                 <span className="w-1 h-1 rounded-full bg-border" />
                 <div className="flex items-center gap-2">
                   <div
                     className="h-[14px] w-[14px] rounded-full border border-border shadow-sm"
-                    style={{ backgroundColor: item.colorHex }}
-                    title={item.color || "Màu sắc"}
+                    style={{ backgroundColor: item.fashionItem?.colorHex || (item as any).colorHex }}
+                    title={item.fashionItem?.color || (item as any).color || "Màu sắc"}
                   />
-                  <span>{item.color || "No Color"}</span>
+                  <span>{item.fashionItem?.color || (item as any).color || "No Color"}</span>
                 </div>
                 <span className="w-1 h-1 rounded-full bg-border" />
                 {/* <span>Size {item.size || "S"}</span> */}
@@ -239,7 +239,7 @@ export function WardrobeItemDetailClient({
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
                   <span className="text-muted-foreground uppercase">Vải</span>
                   <span className="col-span-2 sm:col-span-3 text-foreground">
-                    {item.material || "—"}
+                    {item.fashionItem?.material || (item as any).material || "—"}
                   </span>
                 </div>
                 <div className="h-px w-full bg-border" />
@@ -249,7 +249,7 @@ export function WardrobeItemDetailClient({
                     Kiểu dáng
                   </span>
                   <span className="col-span-2 sm:col-span-3 text-foreground">
-                    {item.fit || "—"}
+                    {item.fashionItem?.fit || (item as any).fit || "—"}
                   </span>
                 </div>
                 <div className="h-px w-full bg-border" />
@@ -259,7 +259,7 @@ export function WardrobeItemDetailClient({
                     Họa tiết
                   </span>
                   <span className="col-span-2 sm:col-span-3 text-foreground">
-                    {item.pattern || "—"}
+                    {item.fashionItem?.pattern || (item as any).pattern || "—"}
                   </span>
                 </div>
                 <div className="h-px w-full bg-border" />
@@ -269,20 +269,20 @@ export function WardrobeItemDetailClient({
                     Thời tiết
                   </span>
                   <span className="col-span-2 sm:col-span-3 text-foreground">
-                    {item.seasonality || "—"}
+                    {item.fashionItem?.seasonality || (item as any).seasonality || "—"}
                   </span>
                 </div>
               </div>
             </div>
 
             {/* Tags / Style */}
-            {item.style && (
+            {(item.fashionItem?.style || (item as any).style) && (
               <div className="pt-4 flex flex-col gap-4">
                 <p className="font-semibold text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
                   Phong cách
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {item.style.split(",").map((styleTag: string) => (
+                  {(item.fashionItem?.style || (item as any).style).split(",").map((styleTag: string) => (
                     <span
                       key={styleTag.trim()}
                       className="rounded-full border border-border px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"

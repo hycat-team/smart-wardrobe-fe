@@ -1,7 +1,7 @@
 import { WardrobeItemRes } from '../../wardrobe/types';
 
 export interface SaveOutfitItemReq {
-  wardrobeItemId: string;
+  fashionItemId: string;
   positionX: number;
   positionY: number;
   scale: number;
@@ -18,7 +18,9 @@ export interface SaveOutfitReq {
 
 export interface OutfitItemRes {
   id: string;
+  itemContext?: string;
   wardrobeItem?: WardrobeItemRes;
+  fashionItem?: any;
   positionX: number;
   positionY: number;
   scale: number;

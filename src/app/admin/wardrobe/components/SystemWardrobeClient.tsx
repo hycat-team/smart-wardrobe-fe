@@ -131,8 +131,8 @@ export function SystemWardrobeClient() {
               <div key={item.id} className="catalog-row grid grid-cols-[80px_2fr_1.5fr_1fr_120px] gap-4 p-4 items-center hover:bg-muted/50 transition-colors group">
                 {/* Visual */}
                 <div className="size-16 bg-muted relative overflow-hidden group-hover:border-primary transition-colors rounded-2xl">
-                  {item.imageUrl ? (
-                    <Image src={item.imageUrl} alt="Item" fill sizes="64px" className="w-full h-full object-cover mix-blend-multiply opacity-80 group-hover:opacity-100 transition-all duration-500" />
+                  {(item.fashionItem?.imageUrl || item.imageUrl) ? (
+                    <Image src={item.fashionItem?.imageUrl || item.imageUrl} alt="Item" fill sizes="64px" className="w-full h-full object-cover mix-blend-multiply opacity-80 group-hover:opacity-100 transition-all duration-500" />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-[8px] font-semibold text-muted-foreground uppercase">N/A</div>
                   )}
@@ -140,8 +140,8 @@ export function SystemWardrobeClient() {
 
                 {/* Identifier */}
                 <div className="flex flex-col gap-1 min-w-0">
-                  <span className="font-semibold text-base font-medium text-foreground truncate uppercase" title={item.name || item.title || [item.category?.name || item.category || item.type, item.color, item.material].filter(Boolean).join(' - ') || 'Sản phẩm'}>
-                    {item.name || item.title || [item.category?.name || item.category || item.type, item.color, item.material].filter(Boolean).join(' - ') || 'Sản phẩm'}
+                  <span className="font-semibold text-base font-medium text-foreground truncate uppercase" title={item.name || item.title || [item.category?.name || item.category || item.type, item.fashionItem?.color || item.color, item.fashionItem?.material || item.material].filter(Boolean).join(' - ') || 'Sản phẩm'}>
+                    {item.name || item.title || [item.category?.name || item.category || item.type, item.fashionItem?.color || item.color, item.fashionItem?.material || item.material].filter(Boolean).join(' - ') || 'Sản phẩm'}
                   </span>
                   <span className="font-semibold text-[10px] text-muted-foreground truncate uppercase tracking-widest">ID: {item.id}</span>
                 </div>
@@ -155,8 +155,8 @@ export function SystemWardrobeClient() {
 
                 {/* Properties */}
                 <div className="flex flex-col gap-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-widest min-w-0">
-                  <span className="truncate" title={`C: ${item.color || '--'}`}>C: {item.color || '--'}</span>
-                  <span className="truncate" title={`M: ${item.material || '--'}`}>M: {item.material || '--'}</span>
+                  <span className="truncate" title={`C: ${item.fashionItem?.color || item.color || '--'}`}>C: {item.fashionItem?.color || item.color || '--'}</span>
+                  <span className="truncate" title={`M: ${item.fashionItem?.material || item.material || '--'}`}>M: {item.fashionItem?.material || item.material || '--'}</span>
                 </div>
 
                 {/* Actions */}

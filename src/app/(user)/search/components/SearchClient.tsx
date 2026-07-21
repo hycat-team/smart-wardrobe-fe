@@ -47,9 +47,9 @@ export function SearchClient() {
       itemName,
       (item.category?.name || "").toLowerCase(),
       ((item as any).name || "").toLowerCase(),
-      (item.color || "").toLowerCase(),
-      (item.material || "").toLowerCase(),
-      (item.style || "").toLowerCase(),
+      (item.fashionItem?.color || item.color || "").toLowerCase(),
+      (item.fashionItem?.material || item.material || "").toLowerCase(),
+      (item.fashionItem?.style || item.style || "").toLowerCase(),
       (item.brand || "").toLowerCase()
     ].join(" ");
 
@@ -63,8 +63,8 @@ export function SearchClient() {
         name: item.name || getWardrobeItemName(item),
         brand: item.brand || "Smart Wardrobe",
         category: item.category?.name || "",
-        tags: [item.style, item.material, item.seasonality].filter(Boolean),
-        img: item.imageUrl,
+        tags: [item.fashionItem?.style || item.style, item.fashionItem?.material || item.material, item.fashionItem?.seasonality || item.seasonality].filter(Boolean),
+        img: item.fashionItem?.imageUrl || item.imageUrl,
         timesWorn: 0
       }))
     : [];
