@@ -192,8 +192,8 @@ export function GuestHeader() {
                 <Link
                   href="/auth/login"
                   className={`
-                    font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
-                    ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
+                    font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300 px-5 py-2.5 rounded-full
+                    ${scrolled ? "text-white/80 hover:text-white hover:bg-white/10" : "text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-black/5"}
                   `}
                 >
                   Đăng nhập
@@ -201,7 +201,7 @@ export function GuestHeader() {
                 <Link href="/auth/register">
                   <button
                     className={`
-                      font-semibold text-[11px] uppercase tracking-[0.15em] px-7 py-2.5 transition-all duration-500 border
+                      font-semibold text-[11px] uppercase tracking-[0.15em] px-7 py-2.5 rounded-full transition-all duration-500 border
                       ${scrolled
                         ? "bg-white text-[#1A1A1A] border-white hover:bg-[#D9C5B2] hover:border-[#D9C5B2] hover:text-white"
                         : "bg-[#1A1A1A] text-white border-[#1A1A1A] hover:bg-[#D9C5B2] hover:border-[#D9C5B2]"
@@ -286,7 +286,7 @@ export function GuestHeader() {
             <MobileNavLink href="/auth/login" onClick={() => setMobileMenuOpen(false)}>Đăng nhập</MobileNavLink>
 
             <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)}>
-              <button className="font-semibold text-[11px] uppercase tracking-[0.15em] px-10 py-3 bg-white text-[#1A1A1A] hover:bg-[#D9C5B2] hover:text-white transition-all duration-300 mt-4">
+              <button className="font-semibold text-[11px] uppercase tracking-[0.15em] px-10 py-3 rounded-full bg-white text-[#1A1A1A] hover:bg-[#D9C5B2] hover:text-white transition-all duration-300 mt-4">
                 Bắt Đầu Miễn Phí
               </button>
             </Link>

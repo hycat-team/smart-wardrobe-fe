@@ -34,7 +34,7 @@ export default function RootLayout({
               <TooltipProvider>
                 <Suspense fallback={null}>{children}</Suspense>
               </TooltipProvider>
-              <Toaster position="bottom-right" />
+              <Toaster position="bottom-right" duration={2000} />
             </AuthProvider>
           </ThemeController>
         </QueryProvider>

@@ -29,7 +29,7 @@ import { useLogout } from '@/features/auth/queries/auth.queries';
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboardIcon },
   { href: '/admin/users', label: 'Người dùng', icon: UsersIcon },
-  { href: '/admin/moderation', label: 'Kiểm duyệt', icon: MessageSquareIcon },
+  // { href: '/admin/moderation', label: 'Kiểm duyệt', icon: MessageSquareIcon },
   { href: '/admin/wardrobe', label: 'Trang phục', icon: Shirt },
   { href: '/admin/category', label: 'Danh mục', icon: GridIcon },
   // { href: '/admin/trends', label: 'Xu hướng', icon: TrendingUp },
