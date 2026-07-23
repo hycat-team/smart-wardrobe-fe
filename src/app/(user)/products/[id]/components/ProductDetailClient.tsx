@@ -15,7 +15,7 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ productId }: ProductDetailClientProps) {
   const router = useRouter();
-  
+
   const { data: product, isLoading: isProductLoading } = useGetBrandItemDetail(productId);
   const { data: brand, isLoading: isBrandLoading } = useGetActiveBrandDetail(product?.brandId || "");
 
@@ -66,7 +66,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
   return (
     <div className="flex-1 bg-background text-foreground min-h-screen pb-24">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <button 
+        <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-8 group transition-colors"
         >
@@ -75,7 +75,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          
+
           {/* Left Column: Images */}
           <div className="flex flex-col gap-4">
             <div className="aspect-[3/4] bg-secondary/20 overflow-hidden rounded-3xl relative">
@@ -103,7 +103,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
               {brand.name}
             </Link>
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-4">{product.name}</h1>
-            
+
             <div className="flex items-center gap-4 mb-8">
               {prod.discountPrice ? (
                 <>
@@ -125,13 +125,13 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
             <div className="flex flex-col gap-4 mb-8">
               <span className="font-bold text-sm uppercase tracking-widest">Màu sắc</span>
               <div className="flex flex-wrap gap-3">
-                {(prod.colors || ['Mặc định']).map((color: string) => (
-                  <button 
+                {(prod.colors || ['Xanh', 'Đỏ', 'Vàng', 'Đen', 'Trắng']).map((color: string) => (
+                  <button
                     key={color}
                     onClick={() => setSelectedColor(color)}
                     className={`h-12 px-6 border font-bold text-sm rounded-full uppercase tracking-widest transition-colors
-                      ${selectedColor === color 
-                        ? 'border-primary bg-primary text-primary-foreground' 
+                      ${selectedColor === color
+                        ? 'border-primary bg-primary text-primary-foreground'
                         : 'border-border text-foreground hover:border-primary'}
                     `}
                   >
@@ -148,15 +148,14 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
                 <button className="text-xs font-bold underline decoration-1 underline-offset-2 text-muted-foreground hover:text-foreground">Hướng dẫn chọn size</button>
               </div>
               <div className="flex flex-wrap gap-3">
-                {(prod.sizes || ['Freesize']).map((size: string) => (
-                  <button 
+                {(prod.sizes || ['S', 'M', 'L', 'XL']).map((size: string) => (
+                  <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-16 h-16 flex items-center justify-center rounded-full border text-sm font-bold transition-all ${
-                      selectedSize === size 
-                        ? 'border-primary bg-primary text-primary-foreground' 
-                        : 'border-border text-foreground hover:border-primary/50'
-                    }`}
+                    className={`w-16 h-16 flex items-center justify-center rounded-full border text-sm font-bold transition-all ${selectedSize === size
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border text-foreground hover:border-primary/50'
+                      }`}
                   >
                     {size}
                   </button>
@@ -172,38 +171,38 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
                   <span className="font-bold w-6 text-center">{quantity}</span>
                   <button onClick={() => setQuantity(quantity + 1)} className="px-4 text-muted-foreground hover:text-foreground transition-colors">+</button>
                 </div>
-                <Button 
+                <Button
                   onClick={handleAddToCart}
                   className="flex-1 h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-widest flex items-center justify-center gap-2 shadow-sm"
                 >
                   <ShoppingBag className="w-5 h-5" />
                   Thêm vào giỏ
                 </Button>
-                <Button variant="outline" className="h-14 w-14 p-0 rounded-full border-border hover:bg-muted flex-shrink-0">
+                {/* <Button variant="outline" className="h-14 w-14 p-0 rounded-full border-border hover:bg-muted flex-shrink-0">
                   <Heart className="w-5 h-5" />
-                </Button>
+                </Button> */}
               </div>
 
               {/* Style with My Wardrobe CTA */}
-              <Button 
+              {/* <Button
                 variant="outline"
                 className="w-full h-14 rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold tracking-wide flex items-center justify-center gap-2 group transition-all"
                 onClick={() => toast('Tính năng AI Styling đang phát triển')}
               >
                 <Sparkles className="w-5 h-5 text-primary group-hover:text-primary-foreground transition-colors" />
                 Style with My Wardrobe
-              </Button>
+              </Button> */}
             </div>
 
             {/* Accordion Info */}
-            <div className="flex flex-col border-t border-border">
+            {/* <div className="flex flex-col border-t border-border">
               {['Chi tiết chất liệu', 'Giao hàng & Đổi trả', 'Hướng dẫn bảo quản'].map((item) => (
                 <div key={item} className="flex items-center justify-between py-4 border-b border-border cursor-pointer group">
                   <span className="font-bold text-sm tracking-wide group-hover:text-muted-foreground transition-colors">{item}</span>
                   <span className="text-muted-foreground text-xl font-light">+</span>
                 </div>
               ))}
-            </div>
+            </div> */}
 
           </div>
         </div>

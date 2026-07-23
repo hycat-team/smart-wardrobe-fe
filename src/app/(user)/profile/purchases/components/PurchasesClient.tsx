@@ -33,13 +33,13 @@ function OrderBrandHeader({ brandId, order }: { brandId: string, order: any }) {
         <div className="flex items-center gap-3">
           <span className="font-bold text-sm uppercase tracking-widest">{brand?.name || brandId}</span>
           <div className="w-1 h-1 bg-foreground rounded-full"></div>
-          <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</span>
+          <span suppressHydrationWarning className="text-xs text-muted-foreground font-bold uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</span>
         </div>
         <span className="text-xs text-muted-foreground">Mã đơn: {order.id}</span>
       </div>
       <div className="flex items-center gap-4">
         {getOrderStatusDisplay(order.status)}
-        <span className="font-bold text-lg">{order.totalAmount.toLocaleString()}đ</span>
+        <span suppressHydrationWarning className="font-bold text-lg">{order.totalAmount.toLocaleString('vi-VN')}đ</span>
       </div>
     </div>
   );
@@ -59,7 +59,7 @@ function OrderProductItem({ item, order, returnReq }: { item: any, order: any, r
           <div className="text-xs text-muted-foreground mt-1">
             Size: <span className="font-bold text-foreground">{item.size}</span> | Màu: <span className="font-bold text-foreground">{item.color}</span>
           </div>
-          <span className="text-sm font-bold mt-2">{(item.price * item.quantity).toLocaleString()}đ</span>
+          <span suppressHydrationWarning className="text-sm font-bold mt-2">{(item.price * item.quantity).toLocaleString('vi-VN')}đ</span>
           <span className="text-xs text-muted-foreground mt-1">SL: {item.quantity}</span>
         </div>
       </div>

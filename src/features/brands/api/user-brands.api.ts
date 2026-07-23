@@ -1,5 +1,6 @@
 import api from '@/lib/axios';
 import { BrandInfo, Benefit, Conversation, ConversationMessage, BrandItemRes, PaginationResult, SampleFeedbackPayload, DigitalSampleResponseRes } from '@/features/brand-portal/types';
+import { mockBrands } from '@/lib/mock-data/b2b';
 
 export const userBrandsApi = {
   // Lấy danh sách brand đang hoạt động
@@ -10,6 +11,12 @@ export const userBrandsApi = {
 
   // Lấy chi tiết brand (public)
   getBrandDetail: async (brandId: string) => {
+    if (brandId.startsWith('brand_')) {
+      const mockBrand = mockBrands.find(b => b.id === brandId);
+      if (mockBrand) {
+        return mockBrand as unknown as BrandInfo;
+      }
+    }
     const res = await api.get<{data: BrandInfo}>(`/brands/${brandId}`);
     return res.data.data;
   },
@@ -94,6 +101,51 @@ export const userBrandsApi = {
 
   // Xem chi tiết sản phẩm của brand
   getBrandItemDetail: async (itemId: string) => {
+    if (itemId.startsWith('product_')) {
+      const idx = parseInt(itemId.split('_')[1]) || 1;
+      const images = [
+        "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400",
+        "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=400",
+        "https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=400",
+        "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400",
+        "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400",
+      ];
+      const imageUrl = images[idx % images.length];
+      const names = [
+        "Áo Blazer Cao Cấp",
+        "Đầm Lụa Dáng Dài",
+        "Áo Hoodie Midnight",
+        "Quần Shorts Casual",
+        "Linen Crop Top",
+        "Tech Cargo Pants",
+        "Váy Midi Hoa Cúc",
+        "Áo Thun Cotton Organic",
+        "Quần Jean Vintage",
+        "Áo Khoác Parka Đi Tuyết",
+        "Đầm Dạ Hội Velvet",
+        "Balo Du Lịch Đa Năng"
+      ];
+      const name = names[idx % names.length] + ` #${idx}`;
+
+      return {
+        id: itemId,
+        brandId: `brand_00${(idx % 5) + 1}`,
+        name,
+        price: 500000,
+        status: "ACTIVE",
+        fashionItem: {
+          id: `fashion_${idx}`,
+          categoryId: "cat_mock",
+          categoryName: "Thời trang",
+          imageUrl,
+          color: "Đen",
+          colorHex: "#000000",
+          colorHue: 0,
+          colorSaturation: 0,
+          colorLightness: 0
+        }
+      } as BrandItemRes;
+    }
     const res = await api.get<{data: BrandItemRes}>(`/brand-items/${itemId}`);
     return res.data.data;
   },
