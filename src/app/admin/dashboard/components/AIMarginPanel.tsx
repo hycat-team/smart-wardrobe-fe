@@ -97,7 +97,7 @@ export function AIMarginPanel({
       <div className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
-            AI economics
+            Kinh tế AI
           </p>
           <h2 id="ai-margin-heading" className="mt-2 text-2xl font-semibold">
             Hiệu quả chi phí AI

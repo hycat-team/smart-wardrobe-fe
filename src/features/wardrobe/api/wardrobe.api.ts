@@ -2,6 +2,7 @@ import api from '@/lib/axios';
 import { AxiosInstance } from 'axios';
 import { APIResponse, PaginationResult } from '@/types/api';
 import {
+  WardrobeCategoryDistribution,
   WardrobeItemRes,
   UploadSignatureResult,
   BatchCropWardrobeItemsReq,
@@ -18,6 +19,14 @@ export const wardrobeApi = {
     return res.data.data!;
   },
 
+  getWardrobeCategoryDistribution: async (
+    axiosInstance: AxiosInstance = api,
+  ): Promise<WardrobeCategoryDistribution> => {
+    const res = await axiosInstance.get<APIResponse<WardrobeCategoryDistribution>>(
+      '/me/dashboard/wardrobe/category-distribution',
+    );
+    return res.data.data!;
+  },
   getSystemCatalogItems: async (params?: { page?: number; limit?: number; categorySlug?: string, q?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<WardrobeItemRes>> => {
     const res = await axiosInstance.get<APIResponse<PaginationResult<WardrobeItemRes>>>('/system-catalog/wardrobe-items', { params });
     return res.data.data!;
@@ -31,14 +40,14 @@ export const wardrobeApi = {
 
   batchUploadWardrobeItems: async (data: BatchCropWardrobeItemsReq): Promise<WardrobeItemRes[] & { message?: string }> => {
     const res = await api.post<APIResponse<WardrobeItemRes[]>>('/wardrobe-items/batch-upload', data);
-    const result = res.data.data as any;
+    const result = res.data.data! as WardrobeItemRes[] & { message?: string };
     if (result) result.message = res.data.message;
     return result;
   },
 
   initClosetFromCatalog: async (data: InitClosetFromCatalogReq): Promise<WardrobeItemRes[] & { message?: string }> => {
     const res = await api.post<APIResponse<WardrobeItemRes[]>>('/wardrobe-items/catalog-init', data);
-    const result = res.data.data as any;
+    const result = res.data.data! as WardrobeItemRes[] & { message?: string };
     if (result) result.message = res.data.message;
     return result;
   },
@@ -50,14 +59,14 @@ export const wardrobeApi = {
 
   cloneWardrobeItem: async (id: string, data: CloneWardrobeItemReq): Promise<WardrobeItemRes[] & { message?: string }> => {
     const res = await api.post<APIResponse<WardrobeItemRes[]>>(`/wardrobe-items/${id}/clone`, data);
-    const result = res.data.data as any;
+    const result = res.data.data! as WardrobeItemRes[] & { message?: string };
     if (result) result.message = res.data.message;
     return result;
   },
 
   updateWardrobeItem: async (id: string, data: UpdateWardrobeItemReq): Promise<WardrobeItemRes & { message?: string }> => {
     const res = await api.put<APIResponse<WardrobeItemRes>>(`/wardrobe-items/${id}/manual-classify`, data);
-    const result = res.data.data as any;
+    const result = res.data.data! as WardrobeItemRes & { message?: string };
     if (result) result.message = res.data.message;
     return result;
   },

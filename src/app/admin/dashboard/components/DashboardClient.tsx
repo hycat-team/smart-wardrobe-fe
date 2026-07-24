@@ -6,10 +6,15 @@ import type {
   DashboardInitialData,
 } from '@/features/admin/types';
 import {
+  useDashboardAIErrorBreakdown,
   useDashboardAIEvents,
   useDashboardAIMargin,
+  useDashboardAIUsageByOperation,
   useDashboardAnalytics,
   useDashboardOverview,
+  useDashboardRenewalStats,
+  useDashboardRevenueBreakdown,
+  useDashboardSubscriptionDistribution,
 } from '@/features/admin/queries/dashboard.queries';
 import { DashboardToolbar } from './DashboardToolbar';
 import { DashboardKpiGrid } from './DashboardKpiGrid';
@@ -17,6 +22,7 @@ import { AIMarginPanel } from './AIMarginPanel';
 import { PayOSPanel } from './PayOSPanel';
 import { DashboardTrendChart } from './DashboardTrendChart';
 import { AIEventsTable } from './AIEventsTable';
+import { DashboardInsights } from './DashboardInsights';
 
 export function DashboardClient({
   filters,
@@ -42,6 +48,27 @@ export function DashboardClient({
   );
   const aiEventsQuery = useDashboardAIEvents(filters, initialData.aiEvents);
 
+  const isSubscriptionTab = filters.insightTab === 'subscriptions';
+  const subscriptionDistributionQuery = useDashboardSubscriptionDistribution({
+    enabled: isSubscriptionTab,
+    initialData: initialData.subscriptionDistribution,
+  });
+  const revenueBreakdownQuery = useDashboardRevenueBreakdown(filters, {
+    enabled: isSubscriptionTab,
+    initialData: initialData.revenueBreakdown,
+  });
+  const renewalStatsQuery = useDashboardRenewalStats({
+    enabled: isSubscriptionTab,
+    initialData: initialData.renewalStats,
+  });
+  const aiUsageByOperationQuery = useDashboardAIUsageByOperation(filters, {
+    enabled: !isSubscriptionTab,
+    initialData: initialData.aiUsageByOperation,
+  });
+  const aiErrorBreakdownQuery = useDashboardAIErrorBreakdown({
+    enabled: !isSubscriptionTab,
+    initialData: initialData.aiErrorBreakdown,
+  });
   const overview = overviewQuery.data;
   const aiMargin = hasCustomDateRange
     ? aiMarginQuery.data
@@ -69,6 +96,18 @@ export function DashboardClient({
     if (hasCustomDateRange) {
       requests.push(aiMarginQuery.refetch());
     }
+    if (isSubscriptionTab) {
+      requests.push(
+        subscriptionDistributionQuery.refetch(),
+        revenueBreakdownQuery.refetch(),
+        renewalStatsQuery.refetch(),
+      );
+    } else {
+      requests.push(
+        aiUsageByOperationQuery.refetch(),
+        aiErrorBreakdownQuery.refetch(),
+      );
+    }
     await Promise.allSettled(requests);
   };
 
@@ -76,7 +115,12 @@ export function DashboardClient({
     overviewQuery.isFetching ||
     analyticsQuery.isFetching ||
     aiEventsQuery.isFetching ||
-    (hasCustomDateRange && aiMarginQuery.isFetching);
+    (hasCustomDateRange && aiMarginQuery.isFetching) ||
+    (isSubscriptionTab
+      ? subscriptionDistributionQuery.isFetching ||
+        revenueBreakdownQuery.isFetching ||
+        renewalStatsQuery.isFetching
+      : aiUsageByOperationQuery.isFetching || aiErrorBreakdownQuery.isFetching);
 
   const aiMarginIsLoading = hasCustomDateRange
     ? aiMarginQuery.isLoading
@@ -140,6 +184,15 @@ export function DashboardClient({
         onRetry={() => void analyticsQuery.refetch()}
       />
 
+      <DashboardInsights
+        tab={filters.insightTab}
+        onTabChange={(insightTab) => updateParams({ insightTab })}
+        subscriptionDistribution={subscriptionDistributionQuery}
+        revenueBreakdown={revenueBreakdownQuery}
+        renewalStats={renewalStatsQuery}
+        aiUsageByOperation={aiUsageByOperationQuery}
+        aiErrorBreakdown={aiErrorBreakdownQuery}
+      />
       <AIEventsTable
         filters={filters}
         data={aiEventsQuery.data}

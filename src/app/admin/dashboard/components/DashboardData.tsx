@@ -1,11 +1,16 @@
 import { serverFetch } from '@/lib/server-fetch';
 import type {
+  AIErrorBreakdown,
   AIEventList,
   AIMarginAnalytics,
+  AIUsageByOperation,
   AdminOverview,
   DashboardInitialData,
   DashboardSearchParams,
   DynamicQueryResponse,
+  RenewalStats,
+  RevenueBreakdown,
+  SubscriptionDistribution,
 } from '@/features/admin/types';
 import {
   buildAdminAnalyticsRequest,
@@ -59,6 +64,40 @@ export default async function DashboardData({
       : Promise.resolve(null),
   ]);
 
+  let subscriptionDistribution: SubscriptionDistribution | null | undefined;
+  let revenueBreakdown: RevenueBreakdown | null | undefined;
+  let renewalStats: RenewalStats | null | undefined;
+  let aiUsageByOperation: AIUsageByOperation | null | undefined;
+  let aiErrorBreakdown: AIErrorBreakdown | null | undefined;
+
+  if (filters.insightTab === 'subscriptions') {
+    [subscriptionDistribution, revenueBreakdown, renewalStats] =
+      await Promise.all([
+        serverFetch<SubscriptionDistribution>(
+          '/admin/dashboard/subscriptions/distribution',
+          { cache: 'no-store' },
+        ),
+        serverFetch<RevenueBreakdown>(
+          `/admin/dashboard/subscriptions/revenue-breakdown?${marginParams.toString()}`,
+          { cache: 'no-store' },
+        ),
+        serverFetch<RenewalStats>(
+          '/admin/dashboard/subscriptions/renewal-stats',
+          { cache: 'no-store' },
+        ),
+      ]);
+  } else {
+    [aiUsageByOperation, aiErrorBreakdown] = await Promise.all([
+      serverFetch<AIUsageByOperation>(
+        `/admin/dashboard/ai/usage-by-operation?${marginParams.toString()}`,
+        { cache: 'no-store' },
+      ),
+      serverFetch<AIErrorBreakdown>(
+        '/admin/dashboard/ai/error-breakdown',
+        { cache: 'no-store' },
+      ),
+    ]);
+  }
   const initialData: DashboardInitialData = {
     overview,
     aiMargin: shouldFetchCustomMargin
@@ -66,6 +105,11 @@ export default async function DashboardData({
       : overview?.aiMargin ?? null,
     analytics,
     aiEvents,
+    subscriptionDistribution,
+    revenueBreakdown,
+    renewalStats,
+    aiUsageByOperation,
+    aiErrorBreakdown,
   };
 
   return (

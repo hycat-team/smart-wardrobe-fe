@@ -104,7 +104,7 @@ export function DashboardKpiGrid({
       icon: CircleDollarSign,
     },
     {
-      label: 'Net AI margin',
+      label: 'Biên lợi nhuận AI',
       value: formatVND(data.netAiMarginVnd),
       helper: 'Doanh thu trừ chi phí AI',
       icon: TrendingUp,

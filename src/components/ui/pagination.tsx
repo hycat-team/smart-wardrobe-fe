@@ -39,12 +39,14 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 
 type PaginationLinkProps = {
   isActive?: boolean;
+  scrollToTop?: boolean;
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
   React.ComponentProps<"a">;
 
 function PaginationLink({
   className,
   isActive,
+  scrollToTop = true,
   size = "icon",
   onClick,
   ...props
@@ -66,7 +68,9 @@ function PaginationLink({
           data-active={isActive}
           onClick={(event) => {
             onClick?.(event);
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            if (scrollToTop) {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
           }}
           {...props}
         />

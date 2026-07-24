@@ -17,6 +17,12 @@ const mockRefetchAnalytics = jest.fn().mockResolvedValue({});
 const mockRefetchSamples = jest.fn().mockResolvedValue({});
 const mockRefetchSampleAnalytics = jest.fn().mockResolvedValue({});
 const mockRefetchFeedbacks = jest.fn().mockResolvedValue({});
+const mockRefetchAcquisition = jest.fn().mockResolvedValue({});
+const mockRefetchSpend = jest.fn().mockResolvedValue({});
+const mockRefetchTiers = jest.fn().mockResolvedValue({});
+const mockRefetchExpiry = jest.fn().mockResolvedValue({});
+const mockRefetchBenefits = jest.fn().mockResolvedValue({});
+const mockRefetchCatalog = jest.fn().mockResolvedValue({});
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -123,8 +129,19 @@ jest.mock('@/features/brand-portal/queries/brand-dashboard.queries', () => ({
     error: null,
     refetch: mockRefetchFeedbacks,
   }),
+  useBrandDashboardCustomerAcquisition: () => ({ data: null, isLoading: false, isFetching: false, error: null, refetch: mockRefetchAcquisition }),
+  useBrandDashboardSpendSegmentation: () => ({ data: null, isLoading: false, isFetching: false, error: null, refetch: mockRefetchSpend }),
+  useBrandDashboardTierDistribution: () => ({ data: null, isLoading: false, isFetching: false, error: null, refetch: mockRefetchTiers }),
+  useBrandDashboardPointExpiryForecast: () => ({ data: null, isLoading: false, isFetching: false, error: null, refetch: mockRefetchExpiry }),
+  useBrandDashboardBenefitRedemptionAnalytics: () => ({ data: null, isLoading: false, isFetching: false, error: null, refetch: mockRefetchBenefits }),
+  useBrandDashboardCatalogStats: () => ({ data: null, isLoading: false, isFetching: false, error: null, refetch: mockRefetchCatalog }),
 }));
 
+jest.mock('./BrandDashboardInsights', () => ({
+  BrandDashboardInsights: ({ onTabChange }: { onTabChange: (tab: 'loyalty') => void }) => (
+    <button type="button" onClick={() => onTabChange('loyalty')}>Tab Loyalty test</button>
+  ),
+}));
 jest.mock('./DashboardKpiGrid', () => ({
   DashboardKpiGrid: () => <div>KPI widget</div>,
 }));
@@ -184,6 +201,7 @@ const filters: BrandDashboardFilters = {
   toDate: '2026-07-24',
   sampleId: 'sample-1',
   feedbackPage: 1,
+  insightTab: 'customers',
 };
 
 const initialData: BrandDashboardInitialData = {
@@ -208,6 +226,12 @@ beforeEach(() => {
     mockRefetchSamples,
     mockRefetchSampleAnalytics,
     mockRefetchFeedbacks,
+    mockRefetchAcquisition,
+    mockRefetchSpend,
+    mockRefetchTiers,
+    mockRefetchExpiry,
+    mockRefetchBenefits,
+    mockRefetchCatalog,
   ].forEach((mockRefetch) => mockRefetch.mockClear());
 });
 
@@ -281,6 +305,8 @@ describe('DashboardClient', () => {
       expect(mockRefetchSamples).toHaveBeenCalled();
       expect(mockRefetchSampleAnalytics).toHaveBeenCalled();
       expect(mockRefetchFeedbacks).toHaveBeenCalled();
+      expect(mockRefetchAcquisition).toHaveBeenCalled();
+      expect(mockRefetchSpend).toHaveBeenCalled();
     });
   });
 

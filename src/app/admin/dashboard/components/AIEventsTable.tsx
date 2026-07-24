@@ -93,17 +93,17 @@ export function AIEventsTable({
       <div className="flex flex-col gap-4 border-b border-border p-6 md:flex-row md:items-end md:justify-between md:p-8">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
-            Traceability
+            Truy xuất
           </p>
           <h2 id="ai-events-heading" className="mt-2 text-2xl font-semibold">
             Truy vết sự kiện AI
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Theo dõi request, provider, model và lỗi trả về từ dịch vụ AI.
+            Theo dõi lượt, nhà cung cấp, loại và lỗi trả về từ dịch vụ AI.
           </p>
         </div>
         <Select
-          value={filters.aiStatus || 'all'}
+          value={filters.aiStatus || 'Tất cả'}
           onValueChange={(value) =>
             onStatusChange(value === 'all' ? '' : String(value))
           }
@@ -114,8 +114,12 @@ export function AIEventsTable({
           >
             <SelectValue placeholder="Tất cả lỗi" />
           </SelectTrigger>
-          <SelectContent align="end">
-            <SelectItem value="all">Tất cả lỗi</SelectItem>
+          <SelectContent
+            align="end"
+            alignItemWithTrigger={false}
+            sideOffset={8}
+          >
+            <SelectItem value="all">Tất cả</SelectItem>
             <SelectItem value="FAILED">FAILED</SelectItem>
           </SelectContent>
         </Select>
@@ -134,9 +138,9 @@ export function AIEventsTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="pl-6 md:pl-8">Request ID</TableHead>
-                <TableHead>Provider</TableHead>
-                <TableHead>Model</TableHead>
+                <TableHead className="pl-6 md:pl-8">Mã yêu cầu</TableHead>
+                <TableHead>Nhà cung cấp</TableHead>
+                <TableHead>Loại</TableHead>
                 <TableHead>HTTP</TableHead>
                 <TableHead>Thông báo lỗi</TableHead>
                 <TableHead className="pr-6 text-right md:pr-8">
@@ -190,6 +194,7 @@ export function AIEventsTable({
               <PaginationItem>
                 <PaginationPrevious
                   href="#"
+                  scrollToTop={false}
                   text="Trước"
                   onClick={(event) => {
                     event.preventDefault();
@@ -210,6 +215,7 @@ export function AIEventsTable({
                     ) : null}
                     <PaginationLink
                       href="#"
+                      scrollToTop={false}
                       isActive={page === currentPage}
                       onClick={(event) => {
                         event.preventDefault();
@@ -225,6 +231,7 @@ export function AIEventsTable({
               <PaginationItem>
                 <PaginationNext
                   href="#"
+                  scrollToTop={false}
                   text="Sau"
                   onClick={(event) => {
                     event.preventDefault();

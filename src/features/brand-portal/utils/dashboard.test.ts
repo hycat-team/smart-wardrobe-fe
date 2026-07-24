@@ -18,6 +18,7 @@ describe('Brand Dashboard utilities', () => {
           toDate: '2026-07-24',
           sampleId: ' sample-1 ',
           feedbackPage: '3',
+          insightTab: 'operations',
         },
         now,
       ),
@@ -26,6 +27,7 @@ describe('Brand Dashboard utilities', () => {
       toDate: '2026-07-24',
       sampleId: 'sample-1',
       feedbackPage: 3,
+      insightTab: 'operations',
     });
   });
 
@@ -60,6 +62,11 @@ describe('Brand Dashboard utilities', () => {
         'points_issued',
         'points_redeemed',
         'active_vouchers',
+        'new_customers',
+        'customer_claim_rate',
+        'benefit_redemption_count',
+        'brand_item_count',
+        'brand_item_count_by_type',
       ],
       timeframe: {
         fromDate: '2026-07-01',

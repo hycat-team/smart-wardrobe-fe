@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { wardrobeApi } from '../api/wardrobe.api';
-import { WardrobeItemStatus } from '../types';
+import { WardrobeCategoryDistribution, WardrobeItemRes } from '../types';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/api-error';
 
@@ -10,6 +10,8 @@ export const WARDROBE_QUERY_KEYS = {
   detail: (id: string) => [...WARDROBE_QUERY_KEYS.all, 'detail', id] as const,
   search: (query: string) => [...WARDROBE_QUERY_KEYS.all, 'search', query] as const,
   categories: () => [...WARDROBE_QUERY_KEYS.all, 'categories'] as const,
+  categoryDistribution: () =>
+    [...WARDROBE_QUERY_KEYS.all, 'category-distribution'] as const,
 };
 
 export const useMyWardrobe = (categorySlug?: string, page: number = 1) => {
@@ -20,6 +22,16 @@ export const useMyWardrobe = (categorySlug?: string, page: number = 1) => {
   });
 };
 
+export const useWardrobeCategoryDistribution = (
+  initialData?: WardrobeCategoryDistribution | null,
+) =>
+  useQuery({
+    queryKey: WARDROBE_QUERY_KEYS.categoryDistribution(),
+    queryFn: () => wardrobeApi.getWardrobeCategoryDistribution(),
+    initialData: initialData ?? undefined,
+    staleTime: 60_000,
+    refetchOnWindowFocus: 'always',
+  });
 export const useSystemCatalogItems = (categorySlug?: string, q?: string, page: number = 1) => {
   return useQuery({
     queryKey: [...WARDROBE_QUERY_KEYS.all, 'system-catalog', categorySlug, q, page],
@@ -35,7 +47,7 @@ export const useCategories = () => {
   });
 };
 
-export const useWardrobeItemDetail = (id: string, initialData?: any) => {
+export const useWardrobeItemDetail = (id: string, initialData?: WardrobeItemRes) => {
   return useQuery({
     queryKey: WARDROBE_QUERY_KEYS.detail(id),
     queryFn: () => wardrobeApi.getWardrobeItemDetail(id),
@@ -50,6 +62,9 @@ export const useBatchUploadWardrobeItems = () => {
     mutationFn: wardrobeApi.batchUploadWardrobeItems,
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+      queryClient.invalidateQueries({
+        queryKey: WARDROBE_QUERY_KEYS.categoryDistribution(),
+      });
       toast.success(res?.message || 'Bắt đầu phân tách và số hóa trang phục!');
     },
     onError: (error) => {
@@ -64,6 +79,9 @@ export const useInitClosetFromCatalog = () => {
     mutationFn: wardrobeApi.initClosetFromCatalog,
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+      queryClient.invalidateQueries({
+        queryKey: WARDROBE_QUERY_KEYS.categoryDistribution(),
+      });
       toast.success(res?.message || 'Khởi tạo nhanh tủ đồ cá nhân thành công!');
     },
     onError: (error) => {
@@ -79,6 +97,9 @@ export const useCloneWardrobeItem = () => {
       wardrobeApi.cloneWardrobeItem(id, { quantity }),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+      queryClient.invalidateQueries({
+        queryKey: WARDROBE_QUERY_KEYS.categoryDistribution(),
+      });
       toast.success(res?.message || 'Nhân bản trang phục thành công!');
     },
     onError: (error) => {
@@ -94,6 +115,9 @@ export const useUpdateWardrobeItem = () => {
       wardrobeApi.updateWardrobeItem(id, data),
     onSuccess: (res, variables) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+      queryClient.invalidateQueries({
+        queryKey: WARDROBE_QUERY_KEYS.categoryDistribution(),
+      });
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.detail(variables.id) });
       toast.success(res?.message || 'Cập nhật trang phục thành công!');
     },
@@ -109,6 +133,9 @@ export const useDeleteWardrobeItem = () => {
     mutationFn: (id: string) => wardrobeApi.deleteWardrobeItem(id),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+      queryClient.invalidateQueries({
+        queryKey: WARDROBE_QUERY_KEYS.categoryDistribution(),
+      });
       toast.success(res?.message || 'Xóa trang phục thành công!');
     },
     onError: (error) => {
@@ -123,6 +150,9 @@ export const useBulkDeleteWardrobeItems = () => {
     mutationFn: (data: { ids: string[] }) => wardrobeApi.bulkDeleteWardrobeItems(data),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+      queryClient.invalidateQueries({
+        queryKey: WARDROBE_QUERY_KEYS.categoryDistribution(),
+      });
       toast.success(res?.message || 'Xóa trang phục hàng loạt thành công!');
     },
     onError: (error) => {

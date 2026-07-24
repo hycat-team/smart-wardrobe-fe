@@ -1,12 +1,18 @@
 import api from '@/lib/axios';
 import type { APIResponse } from '@/types/api';
 import type {
+  BenefitRedemptionAnalytics,
   BrandDynamicQueryRequest,
   BrandKPICards,
   BrandPointsLiability,
+  CatalogStats,
+  CustomerAcquisition,
   DigitalSampleLabAnalytics,
   DynamicQueryResponse,
+  PointExpiryForecast,
   SampleFeedbackList,
+  SpendSegmentation,
+  TierDistribution,
 } from '../types';
 
 export const brandDashboardApi = {
@@ -38,6 +44,63 @@ export const brandDashboardApi = {
     return response.data.data ?? null;
   },
 
+  getCustomerAcquisition: async (
+    brandId: string,
+  ): Promise<CustomerAcquisition | null> => {
+    const response = await api.get<APIResponse<CustomerAcquisition>>(
+      '/brand/dashboard/customers/acquisition',
+      { params: { brandId } },
+    );
+    return response.data.data ?? null;
+  },
+
+  getTierDistribution: async (
+    brandId: string,
+  ): Promise<TierDistribution | null> => {
+    const response = await api.get<APIResponse<TierDistribution>>(
+      '/brand/dashboard/loyalty/tier-distribution',
+      { params: { brandId } },
+    );
+    return response.data.data ?? null;
+  },
+
+  getPointExpiryForecast: async (
+    brandId: string,
+  ): Promise<PointExpiryForecast | null> => {
+    const response = await api.get<APIResponse<PointExpiryForecast>>(
+      '/brand/dashboard/loyalty/point-expiry-forecast',
+      { params: { brandId } },
+    );
+    return response.data.data ?? null;
+  },
+
+  getBenefitRedemptionAnalytics: async (
+    brandId: string,
+  ): Promise<BenefitRedemptionAnalytics | null> => {
+    const response = await api.get<APIResponse<BenefitRedemptionAnalytics>>(
+      '/brand/dashboard/benefits/redemption-analytics',
+      { params: { brandId } },
+    );
+    return response.data.data ?? null;
+  },
+
+  getCatalogStats: async (brandId: string): Promise<CatalogStats | null> => {
+    const response = await api.get<APIResponse<CatalogStats>>(
+      '/brand/dashboard/operations/catalog-stats',
+      { params: { brandId } },
+    );
+    return response.data.data ?? null;
+  },
+
+  getSpendSegmentation: async (
+    brandId: string,
+  ): Promise<SpendSegmentation | null> => {
+    const response = await api.get<APIResponse<SpendSegmentation>>(
+      '/brand/dashboard/customers/spend-segmentation',
+      { params: { brandId } },
+    );
+    return response.data.data ?? null;
+  },
   getSampleAnalytics: async ({
     brandId,
     itemId,

@@ -12,6 +12,17 @@ export interface CategoryRes {
   slug: string;
 }
 
+export interface WardrobeCategoryDistributionItem {
+  categoryId: string;
+  categoryName: string;
+  itemCount: number;
+  percentage: number;
+}
+
+export interface WardrobeCategoryDistribution {
+  totalItems: number;
+  categories: WardrobeCategoryDistributionItem[];
+}
 export interface FashionItemRes {
   id: string;
   category: CategoryRes;

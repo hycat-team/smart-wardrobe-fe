@@ -8,11 +8,17 @@ import { Button } from '@/components/ui/button';
 import { useBrandRole } from '@/features/brand-portal/context/BrandRoleContext';
 import {
   useBrandDashboardAnalytics,
+  useBrandDashboardBenefitRedemptionAnalytics,
+  useBrandDashboardCatalogStats,
+  useBrandDashboardCustomerAcquisition,
   useBrandDashboardKPICards,
+  useBrandDashboardPointExpiryForecast,
   useBrandDashboardPointsLiability,
   useBrandDashboardSampleAnalytics,
   useBrandDashboardSampleFeedbacks,
   useBrandDashboardSamples,
+  useBrandDashboardSpendSegmentation,
+  useBrandDashboardTierDistribution,
 } from '@/features/brand-portal/queries/brand-dashboard.queries';
 import type {
   BrandDashboardFilters,
@@ -28,6 +34,7 @@ import { DashboardTrendChart } from './DashboardTrendChart';
 import { PointsLiabilityPanel } from './PointsLiabilityPanel';
 import { SampleAnalyticsPanel } from './SampleAnalyticsPanel';
 import { SampleFeedbackTable } from './SampleFeedbackTable';
+import { BrandDashboardInsights } from './BrandDashboardInsights';
 
 export function DashboardClient({
   brandId,
@@ -61,6 +68,40 @@ export function DashboardClient({
     initialData.samples ?? undefined,
   );
 
+  const isCustomersTab = filters.insightTab === 'customers';
+  const isLoyaltyTab = filters.insightTab === 'loyalty';
+  const isOperationsTab = filters.insightTab === 'operations';
+  const customerAcquisitionQuery = useBrandDashboardCustomerAcquisition(
+    brandId,
+    {
+      enabled: isCustomersTab,
+      initialData: initialData.customerAcquisition,
+    },
+  );
+  const spendSegmentationQuery = useBrandDashboardSpendSegmentation(brandId, {
+    enabled: isCustomersTab,
+    initialData: initialData.spendSegmentation,
+  });
+  const tierDistributionQuery = useBrandDashboardTierDistribution(brandId, {
+    enabled: isLoyaltyTab,
+    initialData: initialData.tierDistribution,
+  });
+  const pointExpiryForecastQuery = useBrandDashboardPointExpiryForecast(
+    brandId,
+    {
+      enabled: isLoyaltyTab,
+      initialData: initialData.pointExpiryForecast,
+    },
+  );
+  const benefitRedemptionQuery =
+    useBrandDashboardBenefitRedemptionAnalytics(brandId, {
+      enabled: isLoyaltyTab,
+      initialData: initialData.benefitRedemptionAnalytics,
+    });
+  const catalogStatsQuery = useBrandDashboardCatalogStats(brandId, {
+    enabled: isOperationsTab,
+    initialData: initialData.catalogStats,
+  });
   const samples = samplesQuery.data ?? initialData.samples ?? [];
   const activeSampleId = selectEffectiveSampleId(filters.sampleId, samples);
   const activeFilters: BrandDashboardFilters = {
@@ -139,7 +180,20 @@ export function DashboardClient({
       analyticsQuery.refetch(),
       samplesQuery.refetch(),
     ];
-    if (activeSampleId) {
+    if (isCustomersTab) {
+      requests.push(
+        customerAcquisitionQuery.refetch(),
+        spendSegmentationQuery.refetch(),
+      );
+    } else if (isLoyaltyTab) {
+      requests.push(
+        tierDistributionQuery.refetch(),
+        pointExpiryForecastQuery.refetch(),
+        benefitRedemptionQuery.refetch(),
+      );
+    } else {
+      requests.push(catalogStatsQuery.refetch());
+    }    if (activeSampleId) {
       requests.push(
         sampleAnalyticsQuery.refetch(),
         sampleFeedbacksQuery.refetch(),
@@ -155,6 +209,12 @@ export function DashboardClient({
     samplesQuery.error,
     sampleAnalyticsQuery.error,
     sampleFeedbacksQuery.error,
+    customerAcquisitionQuery.error,
+    spendSegmentationQuery.error,
+    tierDistributionQuery.error,
+    pointExpiryForecastQuery.error,
+    benefitRedemptionQuery.error,
+    catalogStatsQuery.error,
   ];
   const isForbidden = allErrors.some(isBrandDashboardForbiddenError);
   const isRefreshing =
@@ -163,7 +223,14 @@ export function DashboardClient({
     analyticsQuery.isFetching ||
     samplesQuery.isFetching ||
     sampleAnalyticsQuery.isFetching ||
-    sampleFeedbacksQuery.isFetching;
+    sampleFeedbacksQuery.isFetching ||
+    (isCustomersTab
+      ? customerAcquisitionQuery.isFetching || spendSegmentationQuery.isFetching
+      : isLoyaltyTab
+        ? tierDistributionQuery.isFetching ||
+          pointExpiryForecastQuery.isFetching ||
+          benefitRedemptionQuery.isFetching
+        : catalogStatsQuery.isFetching);
 
   if (isForbidden) {
     return (
@@ -231,6 +298,16 @@ export function DashboardClient({
         />
       </div>
 
+      <BrandDashboardInsights
+        tab={filters.insightTab}
+        onTabChange={(insightTab) => pushParams({ insightTab })}
+        customerAcquisition={customerAcquisitionQuery}
+        spendSegmentation={spendSegmentationQuery}
+        tierDistribution={tierDistributionQuery}
+        pointExpiryForecast={pointExpiryForecastQuery}
+        benefitRedemptionAnalytics={benefitRedemptionQuery}
+        catalogStats={catalogStatsQuery}
+      />
       <SampleAnalyticsPanel
         brandId={brandId}
         samples={samples}

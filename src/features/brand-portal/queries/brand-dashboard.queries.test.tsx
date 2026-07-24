@@ -7,6 +7,8 @@ import type { BrandDashboardFilters, BrandKPICards } from '../types';
 import {
   brandDashboardQueryKeys,
   useBrandDashboardAnalytics,
+  useBrandDashboardCatalogStats,
+  useBrandDashboardCustomerAcquisition,
   useBrandDashboardKPICards,
   useBrandDashboardSampleAnalytics,
   useBrandDashboardSampleFeedbacks,
@@ -20,6 +22,12 @@ jest.mock('../api/brand-dashboard.api', () => ({
     queryAnalytics: jest.fn(),
     getSampleAnalytics: jest.fn(),
     getSampleFeedbacks: jest.fn(),
+    getCustomerAcquisition: jest.fn(),
+    getSpendSegmentation: jest.fn(),
+    getTierDistribution: jest.fn(),
+    getPointExpiryForecast: jest.fn(),
+    getBenefitRedemptionAnalytics: jest.fn(),
+    getCatalogStats: jest.fn(),
   },
 }));
 
@@ -34,6 +42,7 @@ const filters: BrandDashboardFilters = {
   toDate: '2026-07-24',
   sampleId: 'sample-1',
   feedbackPage: 2,
+  insightTab: 'customers',
 };
 
 const createHarness = () => {
@@ -254,5 +263,19 @@ describe('Brand Dashboard query hooks', () => {
         itemType: 'SAMPLE',
       },
     ]);
+  });
+  it('không gọi query của nhóm insight chưa được bật', () => {
+    const { wrapper } = createHarness();
+    renderHook(
+      () => useBrandDashboardCustomerAcquisition('brand-a', { enabled: false }),
+      { wrapper },
+    );
+    renderHook(
+      () => useBrandDashboardCatalogStats('brand-a', { enabled: false }),
+      { wrapper },
+    );
+
+    expect(brandDashboardApi.getCustomerAcquisition).not.toHaveBeenCalled();
+    expect(brandDashboardApi.getCatalogStats).not.toHaveBeenCalled();
   });
 });

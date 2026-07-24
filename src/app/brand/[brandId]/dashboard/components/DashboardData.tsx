@@ -1,12 +1,18 @@
 import { serverFetch } from '@/lib/server-fetch';
 import type {
+  BenefitRedemptionAnalytics,
   BrandDashboardInitialData,
   BrandDashboardSearchParams,
   BrandItemRes,
   BrandKPICards,
   BrandPointsLiability,
   BrandSampleOption,
+  CatalogStats,
+  CustomerAcquisition,
   DigitalSampleLabAnalytics,
+  PointExpiryForecast,
+  SpendSegmentation,
+  TierDistribution,
 } from '@/features/brand-portal/types';
 import {
   normalizeBrandDashboardFilters,
@@ -50,6 +56,49 @@ export default async function DashboardData({
     }),
   ]);
 
+  let customerAcquisition: CustomerAcquisition | null | undefined;
+  let spendSegmentation: SpendSegmentation | null | undefined;
+  let tierDistribution: TierDistribution | null | undefined;
+  let pointExpiryForecast: PointExpiryForecast | null | undefined;
+  let benefitRedemptionAnalytics:
+    | BenefitRedemptionAnalytics
+    | null
+    | undefined;
+  let catalogStats: CatalogStats | null | undefined;
+
+  if (normalizedFilters.insightTab === 'customers') {
+    [customerAcquisition, spendSegmentation] = await Promise.all([
+      serverFetch<CustomerAcquisition>(
+        `/brand/dashboard/customers/acquisition?${brandQuery.toString()}`,
+        { cache: 'no-store' },
+      ),
+      serverFetch<SpendSegmentation>(
+        `/brand/dashboard/customers/spend-segmentation?${brandQuery.toString()}`,
+        { cache: 'no-store' },
+      ),
+    ]);
+  } else if (normalizedFilters.insightTab === 'loyalty') {
+    [tierDistribution, pointExpiryForecast, benefitRedemptionAnalytics] =
+      await Promise.all([
+        serverFetch<TierDistribution>(
+          `/brand/dashboard/loyalty/tier-distribution?${brandQuery.toString()}`,
+          { cache: 'no-store' },
+        ),
+        serverFetch<PointExpiryForecast>(
+          `/brand/dashboard/loyalty/point-expiry-forecast?${brandQuery.toString()}`,
+          { cache: 'no-store' },
+        ),
+        serverFetch<BenefitRedemptionAnalytics>(
+          `/brand/dashboard/benefits/redemption-analytics?${brandQuery.toString()}`,
+          { cache: 'no-store' },
+        ),
+      ]);
+  } else {
+    catalogStats = await serverFetch<CatalogStats>(
+      `/brand/dashboard/operations/catalog-stats?${brandQuery.toString()}`,
+      { cache: 'no-store' },
+    );
+  }
   const samples = toSampleOptions(rawItems);
   const effectiveSampleId = selectEffectiveSampleId(
     normalizedFilters.sampleId,
@@ -82,6 +131,12 @@ export default async function DashboardData({
     samples,
     sampleAnalytics,
     sampleFeedbacks: null,
+    customerAcquisition,
+    spendSegmentation,
+    tierDistribution,
+    pointExpiryForecast,
+    benefitRedemptionAnalytics,
+    catalogStats,
   };
 
   return (

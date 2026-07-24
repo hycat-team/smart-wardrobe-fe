@@ -5,7 +5,9 @@ import { dashboardApi } from '../api/dashboard.api';
 import {
   dashboardQueryKeys,
   useDashboardAIMargin,
+  useDashboardAIUsageByOperation,
   useDashboardAnalytics,
+  useDashboardSubscriptionDistribution,
 } from './dashboard.queries';
 import type { DashboardFilters } from '../types';
 
@@ -15,6 +17,11 @@ jest.mock('../api/dashboard.api', () => ({
     getAIMargin: jest.fn(),
     queryAnalytics: jest.fn(),
     getAIEvents: jest.fn(),
+    getSubscriptionDistribution: jest.fn(),
+    getRevenueBreakdown: jest.fn(),
+    getAIUsageByOperation: jest.fn(),
+    getAIErrorBreakdown: jest.fn(),
+    getRenewalStats: jest.fn(),
   },
 }));
 
@@ -23,6 +30,7 @@ const filters: DashboardFilters = {
   toDate: '2026-07-23',
   aiStatus: '',
   aiPage: 1,
+  insightTab: 'subscriptions',
 };
 
 const createWrapper = () => {
@@ -65,6 +73,20 @@ describe('dashboard queries', () => {
     expect(dashboardApi.getAIMargin).not.toHaveBeenCalled();
   });
 
+  it('không gọi query của tab chưa được bật', () => {
+    const wrapper = createWrapper();
+    renderHook(
+      () => useDashboardSubscriptionDistribution({ enabled: false }),
+      { wrapper },
+    );
+    renderHook(
+      () => useDashboardAIUsageByOperation(filters, { enabled: false }),
+      { wrapper },
+    );
+
+    expect(dashboardApi.getSubscriptionDistribution).not.toHaveBeenCalled();
+    expect(dashboardApi.getAIUsageByOperation).not.toHaveBeenCalled();
+  });
   it('dùng request admin hợp lệ cho analytics', async () => {
     (dashboardApi.queryAnalytics as jest.Mock).mockResolvedValue({
       targetDashboard: 'admin',

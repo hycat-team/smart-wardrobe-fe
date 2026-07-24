@@ -23,6 +23,7 @@ describe('dashboard utils', () => {
           toDate: '2026-07-23',
           aiStatus: 'FAILED',
           aiPage: '3',
+          insightTab: 'ai',
         },
         now,
       ),
@@ -31,6 +32,7 @@ describe('dashboard utils', () => {
       toDate: '2026-07-23',
       aiStatus: 'FAILED',
       aiPage: 3,
+      insightTab: 'ai',
     });
   });
 
@@ -53,8 +55,11 @@ describe('dashboard utils', () => {
       targetDashboard: 'admin',
       metrics: [
         'total_users',
+        'new_users',
         'active_users_dau',
         'ai_requests_count',
+        'ai_error_count',
+        'ai_error_rate',
         'subscription_revenue_vnd',
         'net_ai_margin_vnd',
       ],

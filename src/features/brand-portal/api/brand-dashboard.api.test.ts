@@ -93,4 +93,18 @@ describe('brandDashboardApi', () => {
       brandDashboardApi.getPointsLiability('brand-1'),
     ).resolves.toBeNull();
   });
+  it.each([
+    ['acquisition', '/brand/dashboard/customers/acquisition', () => brandDashboardApi.getCustomerAcquisition('brand-1')],
+    ['spend segmentation', '/brand/dashboard/customers/spend-segmentation', () => brandDashboardApi.getSpendSegmentation('brand-1')],
+    ['tier distribution', '/brand/dashboard/loyalty/tier-distribution', () => brandDashboardApi.getTierDistribution('brand-1')],
+    ['point expiry', '/brand/dashboard/loyalty/point-expiry-forecast', () => brandDashboardApi.getPointExpiryForecast('brand-1')],
+    ['benefit redemption', '/brand/dashboard/benefits/redemption-analytics', () => brandDashboardApi.getBenefitRedemptionAnalytics('brand-1')],
+    ['catalog stats', '/brand/dashboard/operations/catalog-stats', () => brandDashboardApi.getCatalogStats('brand-1')],
+  ])('gửi brandId cho endpoint %s', async (_label, endpoint, request) => {
+    mock.onGet(endpoint).reply((config) => {
+      expect(config.params).toEqual({ brandId: 'brand-1' });
+      return [200, { data: { brandId: 'brand-1' } }];
+    });
+    await expect(request()).resolves.toEqual({ brandId: 'brand-1' });
+  });
 });

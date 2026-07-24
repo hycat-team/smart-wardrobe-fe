@@ -62,6 +62,11 @@ export const normalizeBrandDashboardFilters = (
     differenceInCalendarDays(parsedTo, parsedFrom) <=
       BRAND_DASHBOARD_MAX_DATE_RANGE_DAYS;
   const page = Number.parseInt(firstValue(params.feedbackPage) ?? '1', 10);
+  const requestedInsightTab = firstValue(params.insightTab);
+  const insightTab =
+    requestedInsightTab === 'loyalty' || requestedInsightTab === 'operations'
+      ? requestedInsightTab
+      : 'customers';
 
   return {
     fromDate: hasValidRange
@@ -72,6 +77,7 @@ export const normalizeBrandDashboardFilters = (
       : fallback.toDate,
     sampleId: firstValue(params.sampleId)?.trim() ?? '',
     feedbackPage: Number.isFinite(page) && page > 0 ? page : 1,
+    insightTab,
   };
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Search, Tag, Trash2, UploadCloud, Library } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -42,14 +42,17 @@ import {
 import {
   useMyWardrobe,
   useBulkDeleteWardrobeItems,
+  useWardrobeCategoryDistribution,
   useCategories,
 } from "@/features/wardrobe/queries/wardrobe.queries";
 import {
+  WardrobeCategoryDistribution,
   WardrobeItemRes as WardrobeItem,
   WardrobeItemStatus,
 } from "@/features/wardrobe/types";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { WardrobeCard } from "./WardrobeCard";
+import { WardrobeCategoryDistributionPanel } from "./WardrobeCategoryDistributionPanel";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { toast } from "sonner";
 import { useGSAP } from "@gsap/react";
@@ -76,8 +79,10 @@ const getCategoryName = (item: WardrobeItem) =>
 
 export default function WardrobeClient({
   initialData,
+  initialDistribution,
 }: {
   initialData?: PaginationResult<WardrobeItem> | null;
+  initialDistribution?: WardrobeCategoryDistribution | null;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -119,10 +124,27 @@ export default function WardrobeClient({
     refetch,
   } = useMyWardrobe(categoryParam || undefined, pageParam);
 
+  const distributionQuery = useWardrobeCategoryDistribution(
+    initialDistribution,
+  );
   const currentData = data || initialData;
   const items = currentData?.items || [];
   const metadata = currentData?.metadata;
 
+  const updateParams = (newParams: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value === null || value === "") {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+  const updateSearchParams = useEffectEvent((value: string) => {
+    updateParams({ q: value, categorySlug: null, page: "1" });
+  });
   // Sync Search state with query params
   useEffect(() => {
     if (searchParam !== lastPushedQ.current) {
@@ -136,7 +158,7 @@ export default function WardrobeClient({
     const handler = setTimeout(() => {
       if (searchInput !== searchParam && searchInput !== lastPushedQ.current) {
         lastPushedQ.current = searchInput;
-        updateParams({ q: searchInput, categorySlug: null, page: "1" });
+        updateSearchParams(searchInput);
       }
     }, 500);
     return () => clearTimeout(handler);
@@ -151,17 +173,6 @@ export default function WardrobeClient({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const updateParams = (newParams: Record<string, string | null>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value === null || value === "") {
-        params.delete(key);
-      } else {
-        params.set(key, value);
-      }
-    });
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
 
   const handleCategoryChange = (slug: string) => {
     updateParams({ categorySlug: slug === "" ? null : slug, page: "1" });
@@ -331,6 +342,13 @@ export default function WardrobeClient({
             {renderActions()}
           </div>
 
+          <WardrobeCategoryDistributionPanel
+            data={distributionQuery.data}
+            isLoading={distributionQuery.isLoading}
+            isFetching={distributionQuery.isFetching}
+            error={distributionQuery.error}
+            onRetry={() => void distributionQuery.refetch()}
+          />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
             <div className="flex flex-wrap gap-x-8 gap-y-4">
               <button

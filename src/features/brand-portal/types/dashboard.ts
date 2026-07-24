@@ -51,10 +51,105 @@ export const BRAND_METRIC_KEYS = [
   'points_issued',
   'points_redeemed',
   'active_vouchers',
+  'new_customers',
+  'customer_claim_rate',
+  'benefit_redemption_count',
+  'brand_item_count',
+  'brand_item_count_by_type',
 ] as const;
 
 export type BrandMetricKey = (typeof BRAND_METRIC_KEYS)[number];
 
+export type BrandMetricResponseKey =
+  | Exclude<BrandMetricKey, 'brand_item_count_by_type'>
+  | `brand_item_count_${string}`;
+
+export type BrandInsightTab = 'customers' | 'loyalty' | 'operations';
+
+export interface CustomerAcquisitionSource {
+  source: string;
+  customerCount: number;
+  percentage: number;
+}
+
+export interface CustomerAcquisition {
+  brandId: string;
+  totalCustomers: number;
+  sources: CustomerAcquisitionSource[];
+}
+
+export interface TierDistributionItem {
+  tierId: string;
+  tierName: string;
+  tierRank: number;
+  memberCount: number;
+  percentage: number;
+}
+
+export interface TierDistribution {
+  brandId: string;
+  totalMembers: number;
+  tiers: TierDistributionItem[];
+}
+
+export interface PointExpiryForecastItem {
+  month: string;
+  pointsExpiring: number;
+}
+
+export interface PointExpiryForecast {
+  brandId: string;
+  forecast: PointExpiryForecastItem[];
+}
+
+export interface RedemptionTrendItem {
+  month: string;
+  redemptionCount: number;
+}
+
+export interface BenefitRedemptionItem {
+  benefitId: string;
+  benefitName: string;
+  benefitType: string;
+  redemptionCount: number;
+  percentage: number;
+}
+
+export interface BenefitRedemptionAnalytics {
+  brandId: string;
+  totalRedemptions: number;
+  trend: RedemptionTrendItem[];
+  topBenefits: BenefitRedemptionItem[];
+}
+
+export interface CatalogStatGroup {
+  label: string;
+  count: number;
+  percentage: number;
+}
+
+export interface CatalogStats {
+  brandId: string;
+  totalItems: number;
+  byStatus: CatalogStatGroup[];
+  byType: CatalogStatGroup[];
+}
+
+export type SpendSegmentName = 'low' | 'medium' | 'high' | 'premium';
+
+export interface SpendSegment {
+  segment: SpendSegmentName | string;
+  minVnd: number;
+  maxVnd?: number;
+  customerCount: number;
+  percentage: number;
+}
+
+export interface SpendSegmentation {
+  brandId: string;
+  totalCustomers: number;
+  segments: SpendSegment[];
+}
 export interface BrandDynamicQueryRequest {
   targetDashboard: 'brand';
   brandId: string;
@@ -69,7 +164,7 @@ export interface BrandDynamicQueryRequest {
 
 export interface TimeSeriesPoint {
   timestamp: string;
-  metrics: Partial<Record<BrandMetricKey, number>>;
+  metrics: Partial<Record<BrandMetricResponseKey, number>>;
 }
 
 export interface DynamicQueryResponse {
@@ -79,7 +174,7 @@ export interface DynamicQueryResponse {
   comparison?: {
     previousPeriodFrom: string;
     previousPeriodTo: string;
-    metricDeltaPercentages: Partial<Record<BrandMetricKey, number>>;
+    metricDeltaPercentages: Partial<Record<BrandMetricResponseKey, number>>;
   };
 }
 
@@ -88,6 +183,7 @@ export interface BrandDashboardFilters {
   toDate: string;
   sampleId: string;
   feedbackPage: number;
+  insightTab: BrandInsightTab;
 }
 
 export interface BrandDashboardSearchParams {
@@ -95,6 +191,7 @@ export interface BrandDashboardSearchParams {
   toDate?: string | string[];
   sampleId?: string | string[];
   feedbackPage?: string | string[];
+  insightTab?: string | string[];
 }
 
 export interface BrandSampleOption {
@@ -111,4 +208,10 @@ export interface BrandDashboardInitialData {
   samples: BrandSampleOption[] | null;
   sampleAnalytics: DigitalSampleLabAnalytics | null;
   sampleFeedbacks: SampleFeedbackList | null;
+  customerAcquisition?: CustomerAcquisition | null;
+  spendSegmentation?: SpendSegmentation | null;
+  tierDistribution?: TierDistribution | null;
+  pointExpiryForecast?: PointExpiryForecast | null;
+  benefitRedemptionAnalytics?: BenefitRedemptionAnalytics | null;
+  catalogStats?: CatalogStats | null;
 }

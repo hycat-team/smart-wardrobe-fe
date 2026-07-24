@@ -54,10 +54,7 @@ export function DashboardToolbar({
   return (
     <div className="flex flex-col gap-6 border-b border-border pb-6 pt-6 lg:flex-row lg:items-end lg:justify-between">
       <div className="space-y-3">
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-          <span className="size-2 rounded-full bg-primary" />
-          Brand intelligence
-        </div>
+        
         <h1 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
           Tổng quan thương hiệu
         </h1>

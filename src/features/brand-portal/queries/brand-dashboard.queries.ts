@@ -2,13 +2,19 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { brandPortalApi } from '../api/brand-portal.api';
 import { brandDashboardApi } from '../api/brand-dashboard.api';
 import type {
+  BenefitRedemptionAnalytics,
   BrandDashboardFilters,
   BrandKPICards,
   BrandPointsLiability,
   BrandSampleOption,
+  CatalogStats,
+  CustomerAcquisition,
   DigitalSampleLabAnalytics,
   DynamicQueryResponse,
+  PointExpiryForecast,
   SampleFeedbackList,
+  SpendSegmentation,
+  TierDistribution,
 } from '../types';
 import {
   BRAND_DASHBOARD_FEEDBACK_LIMIT,
@@ -20,6 +26,10 @@ const BRAND_DASHBOARD_QUERY_OPTIONS = {
   refetchOnWindowFocus: 'always' as const,
 };
 
+type BrandInsightQueryOptions<T> = {
+  enabled?: boolean;
+  initialData?: T | null;
+};
 export const brandDashboardQueryKeys = {
   all: ['brand-dashboard'] as const,
   brand: (brandId: string) =>
@@ -38,7 +48,18 @@ export const brandDashboardQueryKeys = {
       filters.fromDate,
       filters.toDate,
     ] as const,
-  samples: (brandId: string) =>
+  customerAcquisition: (brandId: string) =>
+    [...brandDashboardQueryKeys.brand(brandId), 'customer-acquisition'] as const,
+  spendSegmentation: (brandId: string) =>
+    [...brandDashboardQueryKeys.brand(brandId), 'spend-segmentation'] as const,
+  tierDistribution: (brandId: string) =>
+    [...brandDashboardQueryKeys.brand(brandId), 'tier-distribution'] as const,
+  pointExpiryForecast: (brandId: string) =>
+    [...brandDashboardQueryKeys.brand(brandId), 'point-expiry-forecast'] as const,
+  benefitRedemptionAnalytics: (brandId: string) =>
+    [...brandDashboardQueryKeys.brand(brandId), 'benefit-redemption-analytics'] as const,
+  catalogStats: (brandId: string) =>
+    [...brandDashboardQueryKeys.brand(brandId), 'catalog-stats'] as const,  samples: (brandId: string) =>
     [...brandDashboardQueryKeys.brand(brandId), 'samples'] as const,
   sampleAnalytics: (brandId: string, sampleId: string) =>
     [
@@ -112,6 +133,77 @@ export const useBrandDashboardAnalytics = (
     ...BRAND_DASHBOARD_QUERY_OPTIONS,
   });
 
+export const useBrandDashboardCustomerAcquisition = (
+  brandId: string,
+  options?: BrandInsightQueryOptions<CustomerAcquisition>,
+) =>
+  useQuery({
+    queryKey: brandDashboardQueryKeys.customerAcquisition(brandId),
+    queryFn: () => brandDashboardApi.getCustomerAcquisition(brandId),
+    enabled: Boolean(brandId) && (options?.enabled ?? true),
+    initialData: options?.initialData ?? undefined,
+    ...BRAND_DASHBOARD_QUERY_OPTIONS,
+  });
+
+export const useBrandDashboardSpendSegmentation = (
+  brandId: string,
+  options?: BrandInsightQueryOptions<SpendSegmentation>,
+) =>
+  useQuery({
+    queryKey: brandDashboardQueryKeys.spendSegmentation(brandId),
+    queryFn: () => brandDashboardApi.getSpendSegmentation(brandId),
+    enabled: Boolean(brandId) && (options?.enabled ?? true),
+    initialData: options?.initialData ?? undefined,
+    ...BRAND_DASHBOARD_QUERY_OPTIONS,
+  });
+
+export const useBrandDashboardTierDistribution = (
+  brandId: string,
+  options?: BrandInsightQueryOptions<TierDistribution>,
+) =>
+  useQuery({
+    queryKey: brandDashboardQueryKeys.tierDistribution(brandId),
+    queryFn: () => brandDashboardApi.getTierDistribution(brandId),
+    enabled: Boolean(brandId) && (options?.enabled ?? true),
+    initialData: options?.initialData ?? undefined,
+    ...BRAND_DASHBOARD_QUERY_OPTIONS,
+  });
+
+export const useBrandDashboardPointExpiryForecast = (
+  brandId: string,
+  options?: BrandInsightQueryOptions<PointExpiryForecast>,
+) =>
+  useQuery({
+    queryKey: brandDashboardQueryKeys.pointExpiryForecast(brandId),
+    queryFn: () => brandDashboardApi.getPointExpiryForecast(brandId),
+    enabled: Boolean(brandId) && (options?.enabled ?? true),
+    initialData: options?.initialData ?? undefined,
+    ...BRAND_DASHBOARD_QUERY_OPTIONS,
+  });
+
+export const useBrandDashboardBenefitRedemptionAnalytics = (
+  brandId: string,
+  options?: BrandInsightQueryOptions<BenefitRedemptionAnalytics>,
+) =>
+  useQuery({
+    queryKey: brandDashboardQueryKeys.benefitRedemptionAnalytics(brandId),
+    queryFn: () => brandDashboardApi.getBenefitRedemptionAnalytics(brandId),
+    enabled: Boolean(brandId) && (options?.enabled ?? true),
+    initialData: options?.initialData ?? undefined,
+    ...BRAND_DASHBOARD_QUERY_OPTIONS,
+  });
+
+export const useBrandDashboardCatalogStats = (
+  brandId: string,
+  options?: BrandInsightQueryOptions<CatalogStats>,
+) =>
+  useQuery({
+    queryKey: brandDashboardQueryKeys.catalogStats(brandId),
+    queryFn: () => brandDashboardApi.getCatalogStats(brandId),
+    enabled: Boolean(brandId) && (options?.enabled ?? true),
+    initialData: options?.initialData ?? undefined,
+    ...BRAND_DASHBOARD_QUERY_OPTIONS,
+  });
 export const useBrandDashboardSamples = (
   brandId: string,
   initialData?: BrandSampleOption[],

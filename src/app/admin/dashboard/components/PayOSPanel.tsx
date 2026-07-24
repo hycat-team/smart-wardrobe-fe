@@ -59,7 +59,7 @@ export function PayOSPanel({
     >
       <div className="border-b border-border pb-5">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
-          Payments
+          Thanh toán
         </p>
         <h2 id="payos-heading" className="mt-2 text-2xl font-semibold">
           Đối soát PayOS

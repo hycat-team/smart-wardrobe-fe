@@ -58,12 +58,16 @@ export const normalizeDashboardFilters = (
     differenceInCalendarDays(parsedTo, parsedFrom) <= DASHBOARD_MAX_DATE_RANGE_DAYS;
 
   const page = Number.parseInt(firstValue(params.aiPage) ?? '1', 10);
+  const insightTab = firstValue(params.insightTab) === 'ai'
+    ? 'ai'
+    : 'subscriptions';
 
   return {
     fromDate: hasValidRange ? format(parsedFrom, DASHBOARD_DATE_FORMAT) : fallback.fromDate,
     toDate: hasValidRange ? format(parsedTo, DASHBOARD_DATE_FORMAT) : fallback.toDate,
     aiStatus: firstValue(params.aiStatus)?.trim() ?? '',
     aiPage: Number.isFinite(page) && page > 0 ? page : 1,
+    insightTab,
   };
 };
 

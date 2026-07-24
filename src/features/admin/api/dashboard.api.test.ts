@@ -76,4 +76,23 @@ describe('dashboardApi', () => {
       limit: 20,
     });
   });
+  it.each([
+    ['distribution', '/admin/dashboard/subscriptions/distribution', () => dashboardApi.getSubscriptionDistribution()],
+    ['AI errors', '/admin/dashboard/ai/error-breakdown', () => dashboardApi.getAIErrorBreakdown()],
+    ['renewal', '/admin/dashboard/subscriptions/renewal-stats', () => dashboardApi.getRenewalStats()],
+  ])('gọi đúng endpoint %s', async (_label, endpoint, request) => {
+    mock.onGet(endpoint).reply(200, { data: { ok: true } });
+    await expect(request()).resolves.toEqual({ ok: true });
+  });
+
+  it.each([
+    ['revenue', '/admin/dashboard/subscriptions/revenue-breakdown', (filters: { fromDate: string; toDate: string }) => dashboardApi.getRevenueBreakdown(filters)],
+    ['AI usage', '/admin/dashboard/ai/usage-by-operation', (filters: { fromDate: string; toDate: string }) => dashboardApi.getAIUsageByOperation(filters)],
+  ])('gửi khoảng ngày toolbar cho %s', async (_label, endpoint, request) => {
+    mock.onGet(endpoint).reply((config) => {
+      expect(config.params).toEqual({ fromDate: '2026-07-01', toDate: '2026-07-23' });
+      return [200, { data: null }];
+    });
+    await request({ fromDate: '2026-07-01', toDate: '2026-07-23' });
+  });
 });

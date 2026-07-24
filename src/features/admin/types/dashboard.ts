@@ -2,8 +2,11 @@ import type { PaginationResult } from '@/types/api';
 
 export const ADMIN_METRIC_KEYS = [
   'total_users',
+  'new_users',
   'active_users_dau',
   'ai_requests_count',
+  'ai_error_count',
+  'ai_error_rate',
   'subscription_revenue_vnd',
   'net_ai_margin_vnd',
 ] as const;
@@ -46,6 +49,69 @@ export interface AdminOverview {
   payosReconcile: PayOSReconciliation | null;
 }
 
+export type AdminInsightTab = 'subscriptions' | 'ai';
+
+export interface SubscriptionDistributionItem {
+  planCode: string;
+  userCount: number;
+  percentage: number;
+}
+
+export interface SubscriptionDistribution {
+  distribution: SubscriptionDistributionItem[];
+  totalUsers: number;
+}
+
+export interface RevenueBreakdownItem {
+  planCode: string;
+  month: string;
+  transactionCount: number;
+  revenueVnd: number;
+}
+
+export interface RevenueBreakdown {
+  fromDate: string;
+  toDate: string;
+  breakdown: RevenueBreakdownItem[];
+  totalRevenueVnd: number;
+}
+
+export interface AIUsageByOperationItem {
+  operation: string;
+  logicalRoute: string;
+  requestCount: number;
+  totalCostVnd: number;
+  totalPromptTokens: number;
+  totalOutputTokens: number;
+}
+
+export interface AIUsageByOperation {
+  fromDate: string;
+  toDate: string;
+  operations: AIUsageByOperationItem[];
+}
+
+export interface AIErrorBreakdownItem {
+  errorCode: string;
+  provider: string;
+  model: string;
+  errorCount: number;
+}
+
+export interface AIErrorBreakdown {
+  totalErrors: number;
+  totalRequests: number;
+  errorRate: number;
+  breakdown: AIErrorBreakdownItem[];
+}
+
+export interface RenewalStats {
+  totalAttempts: number;
+  successCount: number;
+  failedCount: number;
+  successRate: number;
+  avgRetryCount: number;
+}
 export interface DynamicQueryTimeframe {
   fromDate: string;
   toDate: string;
@@ -92,6 +158,7 @@ export interface DashboardFilters {
   toDate: string;
   aiStatus: string;
   aiPage: number;
+  insightTab: AdminInsightTab;
 }
 
 export type DashboardSearchParams = Record<
@@ -104,4 +171,9 @@ export interface DashboardInitialData {
   aiMargin: AIMarginAnalytics | null;
   analytics: DynamicQueryResponse | null;
   aiEvents: AIEventList | null;
+  subscriptionDistribution?: SubscriptionDistribution | null;
+  revenueBreakdown?: RevenueBreakdown | null;
+  renewalStats?: RenewalStats | null;
+  aiUsageByOperation?: AIUsageByOperation | null;
+  aiErrorBreakdown?: AIErrorBreakdown | null;
 }

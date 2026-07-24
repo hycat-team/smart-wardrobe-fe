@@ -59,9 +59,9 @@ export function PointsLiabilityPanel({
       <div className="flex items-start justify-between gap-4 border-b border-border pb-5">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
-            Financial exposure
+            Tài chính
           </p>
-          <h2 className="mt-2 text-2xl font-semibold">Nghĩa vụ điểm 30 ngày</h2>
+          <h2 className="mt-2 text-2xl font-semibold">Điểm trong 30 ngày</h2>
         </div>
         <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
           <WalletCards className="size-5" />

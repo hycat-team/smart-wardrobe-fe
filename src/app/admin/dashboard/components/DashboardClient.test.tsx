@@ -11,6 +11,11 @@ const mockOverviewRefetch = jest.fn().mockResolvedValue({});
 const mockMarginRefetch = jest.fn().mockResolvedValue({});
 const mockAnalyticsRefetch = jest.fn().mockResolvedValue({});
 const mockEventsRefetch = jest.fn().mockResolvedValue({});
+const mockDistributionRefetch = jest.fn().mockResolvedValue({});
+const mockRevenueRefetch = jest.fn().mockResolvedValue({});
+const mockRenewalRefetch = jest.fn().mockResolvedValue({});
+const mockAIUsageRefetch = jest.fn().mockResolvedValue({});
+const mockAIErrorRefetch = jest.fn().mockResolvedValue({});
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
@@ -47,6 +52,11 @@ jest.mock('./PayOSPanel', () => ({
 jest.mock('./DashboardTrendChart', () => ({
   DashboardTrendChart: () => <div>Trend chart</div>,
 }));
+jest.mock('./DashboardInsights', () => ({
+  DashboardInsights: ({ onTabChange }: { onTabChange: (tab: 'ai') => void }) => (
+    <button onClick={() => onTabChange('ai')}>Tab AI test</button>
+  ),
+}));
 jest.mock('./AIEventsTable', () => ({
   AIEventsTable: (props: {
     onStatusChange: (status: string) => void;
@@ -66,6 +76,7 @@ const filters: DashboardFilters = {
   toDate: '2026-07-23',
   aiStatus: '',
   aiPage: 1,
+  insightTab: 'subscriptions',
 };
 
 const initialData: DashboardInitialData = {
@@ -114,6 +125,21 @@ describe('DashboardClient', () => {
     (queries.useDashboardAIEvents as jest.Mock).mockReturnValue(
       queryResult(null, mockEventsRefetch),
     );
+    (queries.useDashboardSubscriptionDistribution as jest.Mock).mockReturnValue(
+      queryResult(null, mockDistributionRefetch),
+    );
+    (queries.useDashboardRevenueBreakdown as jest.Mock).mockReturnValue(
+      queryResult(null, mockRevenueRefetch),
+    );
+    (queries.useDashboardRenewalStats as jest.Mock).mockReturnValue(
+      queryResult(null, mockRenewalRefetch),
+    );
+    (queries.useDashboardAIUsageByOperation as jest.Mock).mockReturnValue(
+      queryResult(null, mockAIUsageRefetch),
+    );
+    (queries.useDashboardAIErrorBreakdown as jest.Mock).mockReturnValue(
+      queryResult(null, mockAIErrorRefetch),
+    );
   });
 
   it('hiển thị dữ liệu thật và refresh các query đang hoạt động', async () => {
@@ -132,6 +158,9 @@ describe('DashboardClient', () => {
       expect(mockOverviewRefetch).toHaveBeenCalled();
       expect(mockAnalyticsRefetch).toHaveBeenCalled();
       expect(mockEventsRefetch).toHaveBeenCalled();
+      expect(mockDistributionRefetch).toHaveBeenCalled();
+      expect(mockRevenueRefetch).toHaveBeenCalled();
+      expect(mockRenewalRefetch).toHaveBeenCalled();
     });
     expect(mockMarginRefetch).not.toHaveBeenCalled();
   });

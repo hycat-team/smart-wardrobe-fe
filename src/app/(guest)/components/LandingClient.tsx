@@ -376,8 +376,8 @@ export function LandingClient() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="font-heading text-5xl md:text-6xl font-bold text-[#1A1A1A]">CLOSY</div>
           <div className="flex gap-6 md:gap-8 text-sm">
-            <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Instagram">Instagram</a>
-            <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="TikTok">TikTok</a>
+            {/* <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Instagram">Instagram</a>
+            <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="TikTok">TikTok</a> */}
             <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Chính sách bảo mật">Chính sách</a>
             <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Liên hệ">Liên hệ</a>
           </div>
