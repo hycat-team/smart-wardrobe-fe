@@ -135,8 +135,11 @@ export const userBrandsApi = {
         status: "ACTIVE",
         fashionItem: {
           id: `fashion_${idx}`,
-          categoryId: "cat_mock",
-          categoryName: "Thời trang",
+          category: {
+            id: "cat_mock",
+            name: "Thời trang",
+            slug: "thoi-trang",
+          },
           imageUrl,
           color: "Đen",
           colorHex: "#000000",
@@ -144,7 +147,7 @@ export const userBrandsApi = {
           colorSaturation: 0,
           colorLightness: 0
         }
-      } as BrandItemRes;
+      } satisfies BrandItemRes;
     }
     const res = await api.get<{data: BrandItemRes}>(`/brand-items/${itemId}`);
     return res.data.data;

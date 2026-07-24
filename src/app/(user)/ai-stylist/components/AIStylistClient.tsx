@@ -133,9 +133,13 @@ function AIStylistContent() {
           category: primary.category || primary.fashionItem?.category,
           _role: item.role,
           isGhost: ghostData?.isGhost,
-          brandName: ghostData?.brandName || primary.brandItem?.brandName || primary.brandName,
+          brandName:
+            ghostData?.brandName ||
+            brandItemMetadata.brandItemSnapshot?.brandName ||
+            primary.brandName,
           wardrobeImpact: ghostData?.wardrobeImpact,
-          price: primary.brandItem?.price ?? primary.price,
+          price:
+            brandItemMetadata.brandItemSnapshot?.price ?? primary.price,
           ...brandItemMetadata,
           x,
           y,
@@ -187,9 +191,13 @@ function AIStylistContent() {
         imageUrl: nextItem.fashionItem?.imageUrl || "",
         category: nextItem.category || nextItem.fashionItem?.category,
         isGhost: nextGhostData?.isGhost,
-        brandName: nextGhostData?.brandName || nextItem.brandItem?.brandName || nextItem.brandName,
+        brandName:
+          nextGhostData?.brandName ||
+          brandItemMetadata.brandItemSnapshot?.brandName ||
+          nextItem.brandName,
         wardrobeImpact: nextGhostData?.wardrobeImpact,
-        price: nextItem.brandItem?.price ?? nextItem.price,
+        price:
+          brandItemMetadata.brandItemSnapshot?.price ?? nextItem.price,
         ...brandItemMetadata,
       };
 

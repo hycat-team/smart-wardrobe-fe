@@ -10,7 +10,7 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
   const { data: feedbacks, isLoading: isLoadingFeedbacks } = useGetBrandItemFeedbacks(brandId, sampleId);
   const { data: product, isLoading: isLoadingProduct } = useGetBrandItemDetail(brandId, sampleId);
 
-  const displayProductName = product?.name || product?.fashionItem?.name || "Chi tiết sản phẩm";
+  const displayProductName = product?.name || product?.fashionItem?.style || "Chi tiết sản phẩm";
   const displayImage = product?.fashionItem?.imageUrl || null;
   const displayDesc = product?.description || product?.fashionItem?.description || "Chưa có mô tả chi tiết cho sản phẩm này.";
   const displayPrice = product?.price != null ? `${product.price.toLocaleString('vi-VN')} ₫` : "Liên hệ để biết giá";
