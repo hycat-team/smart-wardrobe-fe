@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useProfile, useUpdateProfile, useChangePassword } from "@/features/profile/queries/profile.queries";
+import { useProfile, useUpdateProfile, useChangePassword, useUpdateAvatar } from "@/features/profile/queries/profile.queries";
 import { Gender } from "@/common/enum";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,6 +12,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { UserRes } from "@/features/profile/types";
 import { getUserAvatar } from "@/lib/utils";
 import Image from "next/image";
+import { useRef } from "react";
+import { profileApi } from "@/features/profile/api/profile.api";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRes }) {
   const { data: profile } = useProfile(initialProfile);
@@ -31,6 +34,47 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
     confirmPassword: "",
     logoutAllDevices: true,
   });
+
+  const [showPassword, setShowPassword] = useState({
+    old: false,
+    new: false,
+    confirm: false,
+  });
+
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const { mutate: updateAvatar } = useUpdateAvatar();
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Vui lòng chọn file hình ảnh');
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+      const signatureData = await profileApi.getAvatarSignature();
+      
+      const uploadRes = await uploadToCloudinary({
+        file,
+        signatureParams: signatureData,
+      });
+
+      updateAvatar({
+        avatarPublicId: uploadRes.public_id,
+        avatarUrl: uploadRes.secure_url,
+      });
+      
+    } catch (error: any) {
+      console.error('Upload avatar error:', error);
+      toast.error(error.message || 'Có lỗi xảy ra khi tải ảnh lên');
+    } finally {
+      setIsUploadingAvatar(false);
+      e.target.value = ''; // Reset input
+    }
+  };
 
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -108,15 +152,26 @@ export function ProfileUpdateClient({ initialProfile }: { initialProfile: UserRe
 
       {/* Avatar Section */}
       <div className="flex justify-center mb-12 relative">
-        <div className="size-24 rounded-full overflow-hidden border border-border bg-muted/50 relative group cursor-not-allowed">
+        <label className="size-24 rounded-full overflow-hidden border border-border bg-muted/50 relative group cursor-pointer block">
           <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={getUserAvatar(profile)}
             alt="Avatar"
             className="w-full h-full object-cover opacity-90 transition-opacity group-hover:opacity-75"
           />
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 backdrop-blur-[2px]">
-            <span className="text-[10px] font-label-caps uppercase tracking-wider text-primary-foreground bg-primary/80 px-2 py-1 rounded-full">Sửa</span>
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px] z-20">
+            {isUploadingAvatar ? (
+              <Loader2 className="size-6 text-white animate-spin" />
+            ) : (
+              <Camera className="size-6 text-white" />
+            )}
           </div>
-        </div>
+          <input 
+            type="file" 
+            onChange={handleAvatarChange} 
+            accept="image/*" 
+            className="hidden" 
+            disabled={isUploadingAvatar}
+          />
+        </label>
       </div>
 
       {/* Profile Form */}

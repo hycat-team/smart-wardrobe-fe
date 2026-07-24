@@ -88,12 +88,12 @@ function ProfileMenu({ brandId, brandName, onNavigate }: { brandId: string, bran
             </Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted focus:bg-muted">
+        {/* <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted focus:bg-muted">
           <Link href={`/brand/brands`} className="flex items-center gap-3 w-full text-foreground" onClick={onNavigate}>
             <LayoutDashboard className="size-4 text-muted-foreground" />
             <span className="font-semibold text-[11px] uppercase tracking-widest">Đổi thương hiệu</span>
           </Link>
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
         <DropdownMenuSeparator className="my-1 bg-border" />
         <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 transition-colors">
           <Link href="/auth/login" className="flex items-center gap-3 w-full" onClick={onNavigate}>

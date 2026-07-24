@@ -36,8 +36,10 @@ export interface CustomerDetail extends BrandCustomer {
 
 export interface LoyaltyTransaction {
   id: string;
-  transactionType: 'earn' | 'redeem' | 'expire' | 'refund' | 'adjust';
+  transactionType: 'earn' | 'redeem' | 'expire' | 'refund' | 'adjust' | 'EARN' | 'REDEEM' | 'EXPIRE' | 'REFUND' | 'ADJUST';
   points: number;
+  pointsDelta?: number;
+  balanceAfter?: number;
   reason: string;
   createdAt: string;
 }

@@ -10,6 +10,7 @@ export const WARDROBE_QUERY_KEYS = {
   detail: (id: string) => [...WARDROBE_QUERY_KEYS.all, 'detail', id] as const,
   search: (query: string) => [...WARDROBE_QUERY_KEYS.all, 'search', query] as const,
   categories: () => [...WARDROBE_QUERY_KEYS.all, 'categories'] as const,
+  stats: () => [...WARDROBE_QUERY_KEYS.all, 'stats'] as const,
   categoryDistribution: () =>
     [...WARDROBE_QUERY_KEYS.all, 'category-distribution'] as const,
 };
@@ -19,6 +20,13 @@ export const useMyWardrobe = (categorySlug?: string, page: number = 1) => {
     queryKey: [...WARDROBE_QUERY_KEYS.lists(), categorySlug, page],
     queryFn: () => wardrobeApi.getMyWardrobeItems({ page, limit: 20, categorySlug: categorySlug }),
     placeholderData: keepPreviousData,
+  });
+};
+
+export const useWardrobeStats = () => {
+  return useQuery({
+    queryKey: WARDROBE_QUERY_KEYS.stats(),
+    queryFn: () => wardrobeApi.getWardrobeStats(),
   });
 };
 

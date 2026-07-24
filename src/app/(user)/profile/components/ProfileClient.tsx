@@ -1,19 +1,22 @@
 "use client";
 import { useAuthStore } from "@/store/useAuthStore";
 import Link from "next/link";
-import { Settings, Crown, TrendingUp, Leaf, Award, Sparkles, Wallet, LayoutDashboard } from "lucide-react";
+import { Settings, Crown, TrendingUp, Leaf, Award, Sparkles, Wallet, LayoutDashboard, Camera, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WalletPageContent } from "@/features/wallet/components/WalletPageContent";
 import { UserRes } from "@/features/profile/types";
-import { useProfile } from "@/features/profile/queries/profile.queries";
+import { useProfile, useUpdateAvatar } from "@/features/profile/queries/profile.queries";
 import { getUserAvatar } from "@/lib/utils";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { subscriptionApi } from "@/features/subscription/api/subscription.api";
 import { CurrentPlanCard } from "@/features/subscription/components/CurrentPlanCard";
 import { ClaimAccountTab } from "./ClaimAccountTab";
+import { profileApi } from "@/features/profile/api/profile.api";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { toast } from "sonner";
 
 
 export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
@@ -39,6 +42,44 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
     retry: 0,
   });
 
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { mutate: updateAvatar } = useUpdateAvatar();
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Vui lòng chọn file hình ảnh');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const signatureData = await profileApi.getAvatarSignature();
+      
+      const uploadRes = await uploadToCloudinary({
+        file,
+        signatureParams: signatureData,
+      });
+
+      updateAvatar({
+        avatarPublicId: uploadRes.public_id,
+        avatarUrl: uploadRes.secure_url,
+      });
+      
+    } catch (error: any) {
+      console.error('Upload avatar error:', error);
+      toast.error(error.message || 'Có lỗi xảy ra khi tải ảnh lên');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-8 animate-in fade-in duration-500 pb-16 pt-10 font-sans px-4">
 
@@ -51,14 +92,31 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
           <div className="absolute inset-0 bg-[radial-gradient(#B8975A_0.5px,transparent_0.5px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
         )}
 
-        <div className="relative z-10 size-32 rounded-full border-4 border-background overflow-hidden shrink-0 shadow-lg">
-          <Image src={avatar} alt={name || "User Avatar"} width={128} height={128} className="w-full h-full object-cover" />
+        <label className="relative z-10 size-32 rounded-full border-4 border-background overflow-hidden shrink-0 shadow-lg group cursor-pointer block">
+          <Image src={avatar} alt={name || "User Avatar"} width={128} height={128} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+          
+          {/* Avatar Upload Overlay */}
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
+            {isUploading ? (
+              <Loader2 className="size-6 text-white animate-spin" />
+            ) : (
+              <Camera className="size-6 text-white" />
+            )}
+          </div>
+          <input 
+            type="file" 
+            onChange={handleAvatarChange} 
+            accept="image/*" 
+            className="hidden" 
+            disabled={isUploading}
+          />
+
           {isPremium && (
-            <div className="absolute bottom-0 inset-x-0 bg-primary/90 text-primary-foreground text-[10px] font-bold text-center py-0.5 uppercase tracking-widest backdrop-blur-sm">
+            <div className="absolute bottom-0 inset-x-0 bg-primary/90 text-primary-foreground text-[10px] font-bold text-center py-0.5 uppercase tracking-widest backdrop-blur-sm z-30">
               Atelier
             </div>
           )}
-        </div>
+        </label>
 
         <div className="relative z-10 flex-1 text-center md:text-left space-y-3">
           <div>

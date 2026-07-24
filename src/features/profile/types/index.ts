@@ -68,3 +68,8 @@ export interface ChangePasswordReq {
   confirmPassword: string;
   logoutAllDevices: boolean;
 }
+
+export interface UpdateAvatarReq {
+  avatarPublicId: string;
+  avatarUrl: string;
+}

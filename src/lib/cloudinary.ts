@@ -6,6 +6,7 @@ export interface CloudinaryUploadParams {
     signature: string;
     folder: string;
     publicId?: string;
+    public_id?: string;
   };
 }
 
@@ -33,8 +34,15 @@ export async function uploadToCloudinary({
   formData.append("timestamp", signatureParams.timestamp.toString());
   formData.append("signature", signatureParams.signature);
   formData.append("folder", signatureParams.folder);
-  if (signatureParams.publicId) {
-    formData.append("public_id", signatureParams.publicId);
+  const pid = signatureParams.publicId || signatureParams.public_id;
+  if (pid) {
+    formData.append("public_id", pid);
+    formData.append("publicId", pid); // In case backend incorrectly signed publicId
+  }
+
+  const preset = signatureParams.uploadPreset || signatureParams.upload_preset;
+  if (preset) {
+    formData.append("upload_preset", preset);
   }
 
   const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {

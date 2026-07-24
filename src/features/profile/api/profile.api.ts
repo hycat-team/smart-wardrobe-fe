@@ -1,6 +1,6 @@
 import api from '@/lib/axios';
 import { APIResponse } from '@/types/api';
-import { UserRes, UpdateProfileReq, ChangePasswordReq } from '../types';
+import { UserRes, UpdateProfileReq, ChangePasswordReq, UpdateAvatarReq } from '../types';
 
 export const profileApi = {
   getProfile: async (): Promise<UserRes> => {
@@ -23,4 +23,14 @@ export const profileApi = {
     const res = await api.put<APIResponse>('/me/change-password', data);
     return { message: res.data.message };
   },
+
+  getAvatarSignature: async (): Promise<{ signature: string; timestamp: number; folder: string; apiKey: string }> => {
+    const res = await api.get<{ data: { signature: string; timestamp: number; folder: string; apiKey: string } }>('/me/avatar-signature');
+    return res.data.data;
+  },
+
+  updateAvatar: async (data: UpdateAvatarReq): Promise<UserRes> => {
+    const res = await api.put<APIResponse<UserRes>>('/me/avatar', data);
+    return res.data.data!;
+  }
 };

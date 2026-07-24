@@ -216,7 +216,7 @@ export default function CustomerDetailClient() {
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Trạng thái</TableHead>
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Ngày tạo</TableHead>
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Ngày hết hạn</TableHead>
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Thao tác</TableHead>
+                    {/* <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Thao tác</TableHead> */}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -234,20 +234,31 @@ export default function CustomerDetailClient() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    claimTokens.map((token: any) => (
-                      <TableRow key={token.id}>
-                        <TableCell className="font-mono text-sm font-bold text-foreground">{token.token}</TableCell>
-                        <TableCell>
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${
-                            token.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-600' :
-                            token.status === 'USED' ? 'bg-blue-500/10 text-blue-600' :
-                            'bg-red-500/10 text-red-600'
-                          }`}>
-                            {token.status}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground text-sm">{formatDate(token.createdAt)}</TableCell>
-                        <TableCell className="text-muted-foreground text-sm">{token.expiresAt ? formatDate(token.expiresAt) : 'Vĩnh viễn'}</TableCell>
+                    claimTokens.map((token: any) => {
+                      const displayToken = token.token || token.id || '';
+                      const truncatedToken = displayToken.length > 12
+                        ? `${displayToken.substring(0, 6)}...${displayToken.slice(-6)}`
+                        : displayToken;
+                        
+                      const status = token.status?.toUpperCase();
+
+                      return (
+                        <TableRow key={token.id}>
+                          <TableCell className="font-mono text-sm font-bold text-foreground">
+                            {truncatedToken}
+                          </TableCell>
+                          <TableCell>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${
+                              status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-600' :
+                              status === 'REVOKED' ? 'bg-red-500/10 text-red-600' :
+                              status === 'USED' ? 'bg-blue-500/10 text-blue-600' : 
+                              'bg-muted text-muted-foreground'
+                            }`}>
+                              {token.status}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{formatDate(token.createdAt)}</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{token.expiresAt ? formatDate(token.expiresAt) : 'Vĩnh viễn'}</TableCell>
                         <TableCell className="text-right">
                           {token.status === 'ACTIVE' && (
                             <Button 
@@ -262,7 +273,8 @@ export default function CustomerDetailClient() {
                           )}
                         </TableCell>
                       </TableRow>
-                    ))
+                    );
+                  })
                   )}
                 </TableBody>
               </Table>

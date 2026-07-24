@@ -91,15 +91,19 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
 
 function ProgressRows({
   rows,
+  disableHumanize = false,
 }: {
   rows: Array<{ label: string; count: number; percentage: number }>;
+  disableHumanize?: boolean;
 }) {
   return (
     <div className="space-y-4">
       {rows.map((row, index) => (
         <div key={`${row.label}-${index}`}>
           <div className="mb-1.5 flex items-center justify-between gap-3 text-xs">
-            <span className="font-medium">{humanize(row.label || 'unknown')}</span>
+            <span className="font-medium">
+              {disableHumanize ? row.label || 'unknown' : humanize(row.label || 'unknown')}
+            </span>
             <span className="font-mono">
               {formatBrandNumber(row.count)} · {formatBrandNumber(row.percentage)}%
             </span>
@@ -201,6 +205,7 @@ function TierPanel({ query }: { query: QueryState<TierDistribution> }) {
         <Empty label="Chưa có dữ liệu hạng loyalty." />
       ) : (
         <ProgressRows
+          disableHumanize
           rows={tiers.map((item) => ({
             label: `${item.tierRank}. ${item.tierName}`,
             count: item.memberCount,

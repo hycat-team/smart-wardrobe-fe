@@ -216,12 +216,12 @@ export function BrandProfileSettingsClient() {
             </div>
 
             {/* Cột Phải (Links & Meta) */}
-            <div className="lg:col-span-1 space-y-6">
+            {/* <div className="lg:col-span-1 space-y-6">
               <div className="bg-muted/30 border border-border p-5 rounded-3xl space-y-5">
                 <h3 className="text-sm font-bold text-foreground mb-4">Thông tin liên hệ</h3>
                 
                 <div className="space-y-4">
-                  {/* Location */}
+                 
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       <MapPin className="size-4" />
@@ -234,7 +234,7 @@ export function BrandProfileSettingsClient() {
                     />
                   </div>
                   
-                  {/* Website */}
+                
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       <Globe className="size-4" />
@@ -247,7 +247,7 @@ export function BrandProfileSettingsClient() {
                     />
                   </div>
                   
-                  {/* Instagram */}
+                 
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       <LinkIcon className="size-4" />
@@ -262,7 +262,7 @@ export function BrandProfileSettingsClient() {
                 </div>
               </div>
             </div>
-            
+             */}
           </div>
         </div>
       </div>

@@ -44,6 +44,7 @@ import {
   useBulkDeleteWardrobeItems,
   useWardrobeCategoryDistribution,
   useCategories,
+  useWardrobeStats,
 } from "@/features/wardrobe/queries/wardrobe.queries";
 import {
   WardrobeCategoryDistribution,
@@ -109,8 +110,11 @@ export default function WardrobeClient({
 
   const { mutate: bulkDelete, isPending: isDeleting } = useBulkDeleteWardrobeItems();
   const { data: subscription } = useMySubscription();
+  const maxWardrobeItems = subscription?.maxWardrobeItems || 0;
   const maxOutfits = subscription?.maxOutfits || 0;
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
+  
+  const { data: stats } = useWardrobeStats();
 
   // Anti-spam refs
   const spamClickCount = useRef(0);
@@ -336,7 +340,7 @@ export default function WardrobeClient({
             <div className="space-y-4 max-w-2xl">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase whitespace-nowrap">Tủ đồ</h1>
               <p className="text-sm text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-border pl-4">
-                {items.length > 0 ? ` Bạn đang lưu trữ ${metadata?.totalItems || items.length} / ${maxOutfits || '-'} món đồ.` : "Hãy bắt đầu thêm đồ."}
+                {items.length > 0 ? ` Bạn đang lưu trữ ${stats?.activeItemsCount ?? metadata?.totalItems ?? items.length} / ${maxWardrobeItems || '-'} món đồ` : "Hãy bắt đầu thêm đồ."}
               </p>
             </div>
             {renderActions()}

@@ -105,18 +105,18 @@ export default function GenerateClaimDialog({ brandId, customerId, open, onOpenC
                   {isCopied ? <Check className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5" />}
                 </Button>
               </div>
-              <div className="flex items-center gap-2 mt-2">
+              {/* <div className="flex items-center gap-2 mt-2">
                 <Clock className="w-4 h-4 text-muted-foreground" />
                 <p className="text-sm font-medium text-muted-foreground">
                   Hết hạn trong: <span className={`font-bold font-mono ${timeLeft < 15 ? 'text-destructive' : 'text-primary'}`}>{timeLeft}s</span>
                 </p>
-              </div>
+              </div> */}
               
-              {timeLeft <= 0 && (
+              {/* {timeLeft <= 0 && (
                 <div className="mt-2 p-3 bg-destructive/10 text-destructive rounded-xl text-sm w-full text-center">
                   Mã này đã hết hạn và tự động bị thu hồi.
                 </div>
-              )}
+              )} */}
             </div>
           ) : (
             <Button 

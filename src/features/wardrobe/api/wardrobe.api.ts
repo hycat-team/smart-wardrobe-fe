@@ -11,11 +11,17 @@ import {
   SearchWardrobeItemRes,
   UpdateWardrobeItemReq,
   CategoryRes,
+  WardrobeStatsRes,
 } from '../types';
 
 export const wardrobeApi = {
   getMyWardrobeItems: async (params?: { page?: number; limit?: number; categorySlug?: string }, axiosInstance: AxiosInstance = api): Promise<PaginationResult<WardrobeItemRes>> => {
     const res = await axiosInstance.get<APIResponse<PaginationResult<WardrobeItemRes>>>('/me/wardrobe-items', { params });
+    return res.data.data!;
+  },
+
+  getWardrobeStats: async (axiosInstance: AxiosInstance = api): Promise<WardrobeStatsRes> => {
+    const res = await axiosInstance.get<APIResponse<WardrobeStatsRes>>('/me/wardrobe-items/stats');
     return res.data.data!;
   },
 

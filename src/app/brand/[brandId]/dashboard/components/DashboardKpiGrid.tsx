@@ -95,7 +95,7 @@ export function DashboardKpiGrid({
     {
       label: 'Chăm sóc khách hàng',
       primary: `${formatBrandNumber(data.openCsTickets)} ticket mở`,
-      secondary: `Phản hồi ${formatResponseDuration(data.csFirstResponseAvgSeconds)}`,
+      // secondary: `Phản hồi ${formatResponseDuration(data.csFirstResponseAvgSeconds)}`,
       icon: Headphones,
     },
   ];

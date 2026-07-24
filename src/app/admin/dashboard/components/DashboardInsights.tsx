@@ -119,7 +119,7 @@ function DistributionPanel({ query }: { query: QueryState<SubscriptionDistributi
           </p>
           <p className="mt-1 text-xs text-muted-foreground">Tổng người dùng có subscription</p>
           <div className="mt-6 space-y-4">
-            {rows.map((item, index) => (
+            {rows.map((item: any, index: number) => (
               <div key={item.planCode}>
                 <div className="mb-1.5 flex items-center justify-between gap-3 text-xs">
                   <span className="font-medium">{humanize(item.planCode)}</span>
@@ -166,11 +166,11 @@ function RevenuePanel({ query }: { query: QueryState<RevenueBreakdown> }) {
   const plans = Array.from(new Set(breakdown.map((item: any) => item.planCode)));
   const rows = Array.from(new Set(breakdown.map((item: any) => item.month)))
     .sort()
-    .map((month) => {
+    .map((month: any) => {
       const row: Record<string, string | number> = { month };
       breakdown
-        .filter((item) => item.month === month)
-        .forEach((item) => {
+        .filter((item: any) => item.month === month)
+        .forEach((item: any) => {
           row[item.planCode] = item.revenueVnd;
         });
       return row;
@@ -200,7 +200,7 @@ function RevenuePanel({ query }: { query: QueryState<RevenueBreakdown> }) {
                 />
                 <Tooltip formatter={(value) => formatVND(Number(value))} />
                 <Legend formatter={(value) => humanize(String(value))} />
-                {plans.map((plan, index) => (
+                {plans.map((plan: any, index: number) => (
                   <Bar
                     key={plan}
                     dataKey={plan}

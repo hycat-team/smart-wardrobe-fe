@@ -23,6 +23,12 @@ export interface WardrobeCategoryDistribution {
   totalItems: number;
   categories: WardrobeCategoryDistributionItem[];
 }
+
+export interface WardrobeStatsRes {
+  activeItemsCount: number;
+  outfitsCount: number;
+}
+
 export interface FashionItemRes {
   id: string;
   category: CategoryRes;

@@ -45,3 +45,18 @@ export const useChangePassword = () => {
     }
   });
 };
+
+export const useUpdateAvatar = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: profileApi.updateAvatar,
+    onSuccess: (res) => {
+      queryClient.setQueryData(PROFILE_QUERY_KEY, res);
+      toast.success('Cập nhật ảnh đại diện thành công');
+    },
+    onError: (error) => {
+      handleApiError(error, 'Cập nhật ảnh đại diện thất bại.');
+    }
+  });
+};
+
