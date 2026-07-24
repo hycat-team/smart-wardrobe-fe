@@ -112,7 +112,7 @@ describe('Brand Dashboard query hooks', () => {
     expect(options.refetchOnWindowFocus).toBe('always');
   });
 
-  it('cấu hình keepPreviousData cho analytics và pagination', () => {
+  it('chỉ giữ dữ liệu trước đó cho biểu đồ theo thời gian', () => {
     const { queryClient, wrapper } = createHarness();
 
     renderHook(() => useBrandDashboardAnalytics('brand-a', filters), {
@@ -149,8 +149,56 @@ describe('Brand Dashboard query hooks', () => {
         }
       ).placeholderData;
     expect(typeof getPlaceholderData(analytics)).toBe('function');
-    expect(typeof getPlaceholderData(sample)).toBe('function');
-    expect(typeof getPlaceholderData(feedback)).toBe('function');
+    expect(getPlaceholderData(sample)).toBeUndefined();
+    expect(getPlaceholderData(feedback)).toBeUndefined();
+  });
+
+  it('không dùng initialData của sample cũ cho sample đang chọn', () => {
+    jest
+      .mocked(brandDashboardApi.getSampleAnalytics)
+      .mockReturnValue(new Promise(() => {}));
+    const { wrapper } = createHarness();
+    const { result } = renderHook(
+      () =>
+        useBrandDashboardSampleAnalytics('brand-a', 'sample-new', {
+          itemId: 'sample-old',
+          votesCount: 10,
+          avgRating: 3.4,
+          feedbackSentiment: '',
+          topPairedCategories: [],
+        }),
+      { wrapper },
+    );
+
+    expect(result.current.data).toBeUndefined();
+  });
+  it('bỏ qua analytics khi response không thuộc sample đang chọn', async () => {
+    jest.mocked(brandDashboardApi.getSampleAnalytics).mockResolvedValue({
+      itemId: 'sample-old',
+      votesCount: 10,
+      avgRating: 3.4,
+      feedbackSentiment: '',
+      topPairedCategories: [],
+    });
+    const { queryClient, wrapper } = createHarness();
+
+    renderHook(
+      () => useBrandDashboardSampleAnalytics('brand-a', 'sample-new'),
+      { wrapper },
+    );
+
+    await queryClient.refetchQueries({
+      queryKey: brandDashboardQueryKeys.sampleAnalytics(
+        'brand-a',
+        'sample-new',
+      ),
+    });
+
+    expect(
+      queryClient.getQueryData(
+        brandDashboardQueryKeys.sampleAnalytics('brand-a', 'sample-new'),
+      ),
+    ).toBeNull();
   });
 
   it('không gọi query item-specific khi chưa có sampleId', () => {

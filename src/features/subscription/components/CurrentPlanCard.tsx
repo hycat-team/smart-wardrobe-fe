@@ -83,6 +83,12 @@ export const CurrentPlanCard = ({ subscription, quota }: CurrentPlanCardProps) =
           </h3>
 
           <div className="space-y-8">
+            {/* Max Items */}
+            <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider">
+              <span className="flex items-center gap-2 text-background/70"><Layers size={14} /> TỐI ĐA MÓN ĐỒ</span>
+              <span className="font-medium text-background">{quota.maxWardrobeItems || quota.maxWardrobeItems || '∞'} MÓN</span>
+            </div>
+
             {/* Max Outfits */}
             <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider">
               <span className="flex items-center gap-2 text-background/70"><Layers size={14} /> TỐI ĐA BỘ PHỐI ĐỒ</span>

@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Share2, Sparkles, ShoppingBag, ChevronLeft, Loader2 } from 'lucide-react';
+import { ShoppingBag, ChevronLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useGetBrandItemDetail, useGetActiveBrandDetail } from '@/features/brands/queries/user-brands.queries';
+import { useBatchUploadWardrobeItems } from '@/features/wardrobe/queries/wardrobe.queries';
 
 interface ProductDetailClientProps {
   productId: string;
@@ -15,15 +15,18 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ productId }: ProductDetailClientProps) {
   const router = useRouter();
-
+  // eslint-disable-next-line react-hooks/purity
+  const imagePublicId = Math.random().toString(36)
   const { data: product, isLoading: isProductLoading } = useGetBrandItemDetail(productId);
   const { data: brand, isLoading: isBrandLoading } = useGetActiveBrandDetail(product?.brandId || "");
 
-  const addToCart = useB2BDemoStore(state => state.addToCart);
+  const { mutate: addToWardrobe, isPending: isAddingToWardrobe } = useBatchUploadWardrobeItems();
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
+
+  
 
   const prod = product as any;
 
@@ -37,30 +40,19 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
 
   if (!product || !brand) return null;
 
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      toast.error('Vui lòng chọn Kích cỡ');
-      return;
+  const handleAddToWardrobe = () => {
+    if (!product.fashionItem?.category.id  ) {
+      toast.error('Sản phẩm thiếu thông tin (Danh mục, Ảnh) để thêm vào tủ đồ');
+      return; 
     }
-    if (!selectedColor) {
-      toast.error('Vui lòng chọn Màu sắc');
-      return;
-    }
-
-    addToCart({
-      productId: product.id,
-      name: product.name || 'Sản phẩm',
-      price: prod.discountPrice || product.price,
-      quantity,
-      size: selectedSize,
-      color: selectedColor,
-      imageUrl: product.fashionItem?.imageUrl || 'https://placehold.co/600x800?text=No+Image',
-      brandId: brand.id,
-      brandName: brand.name,
-      selected: true
+    
+    addToWardrobe({
+      items: [{
+        categoryId: product.fashionItem.category.id,
+        imagePublicId: imagePublicId,
+        imageUrl: product.fashionItem.imageUrl || '',
+      }]
     });
-
-    // toast.success('Đã thêm vào giỏ hàng');
   };
 
   return (
@@ -172,38 +164,15 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
                   <button onClick={() => setQuantity(quantity + 1)} className="px-4 text-muted-foreground hover:text-foreground transition-colors">+</button>
                 </div>
                 <Button
-                  onClick={handleAddToCart}
+                  onClick={handleAddToWardrobe}
+                  disabled={isAddingToWardrobe}
                   className="flex-1 h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-widest flex items-center justify-center gap-2 shadow-sm"
                 >
-                  <ShoppingBag className="w-5 h-5" />
-                  Thêm vào giỏ
-                </Button>
-                {/* <Button variant="outline" className="h-14 w-14 p-0 rounded-full border-border hover:bg-muted flex-shrink-0">
-                  <Heart className="w-5 h-5" />
-                </Button> */}
+                  {isAddingToWardrobe ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShoppingBag className="w-5 h-5" />}
+                  {isAddingToWardrobe ? 'Đang thêm...' : 'Thêm vào tủ đồ'}
+                </Button> 
               </div>
-
-              {/* Style with My Wardrobe CTA */}
-              {/* <Button
-                variant="outline"
-                className="w-full h-14 rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold tracking-wide flex items-center justify-center gap-2 group transition-all"
-                onClick={() => toast('Tính năng AI Styling đang phát triển')}
-              >
-                <Sparkles className="w-5 h-5 text-primary group-hover:text-primary-foreground transition-colors" />
-                Style with My Wardrobe
-              </Button> */}
             </div>
-
-            {/* Accordion Info */}
-            {/* <div className="flex flex-col border-t border-border">
-              {['Chi tiết chất liệu', 'Giao hàng & Đổi trả', 'Hướng dẫn bảo quản'].map((item) => (
-                <div key={item} className="flex items-center justify-between py-4 border-b border-border cursor-pointer group">
-                  <span className="font-bold text-sm tracking-wide group-hover:text-muted-foreground transition-colors">{item}</span>
-                  <span className="text-muted-foreground text-xl font-light">+</span>
-                </div>
-              ))}
-            </div> */}
-
           </div>
         </div>
       </div>

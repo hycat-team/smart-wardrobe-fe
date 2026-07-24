@@ -4,8 +4,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Sparkles, Save, RefreshCw, Layers, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { aiApi } from "@/features/ai-stylist/api/ai.api";
-import { AIOutfitRecommendationRes } from "@/features/ai-stylist/types";
+import type { AIOutfitRecommendationRes } from "@/features/ai-stylist/types";
 import { useOutfitCanvas } from "@/features/outfits/hooks/useOutfitCanvas";
+import type { CanvasItem } from "@/features/outfits/hooks/useOutfitCanvas";
+import { getBrandItemCanvasMetadata } from "@/features/ai-stylist/utils/brand-item-canvas";
 import { OutfitCanvasBoard } from "@/features/outfits/components/OutfitCanvasBoard";
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
 import { useCreateOutfit } from "@/features/outfits/queries/outfits.queries";
@@ -18,6 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { useGhostCloset } from "@/features/ghost-closet/hooks/useGhostCloset";
 import { WardrobeImpactPanel } from "@/features/ghost-closet/components/WardrobeImpactPanel";
 import { GhostItem } from "@/features/ghost-closet/types";
+import { BrandItemFeedbackSheet } from "@/features/brands/components/BrandItemFeedbackSheet";
 
 import { OCCASIONS, STYLES, occasionMap } from "@/features/ai-stylist/components/AIQuickOptions";
 
@@ -41,6 +44,8 @@ function AIStylistContent() {
   const { ghostClosetEnabled, toggleGhostCloset, saveItem, joinWaitlist, hideBrand, logGhostAction } = useGhostCloset();
   const [activeGhostItem, setActiveGhostItem] = useState<GhostItem | null>(null);
   const [isImpactPanelOpen, setIsImpactPanelOpen] = useState(false);
+  const [activeBrandFeedbackItem, setActiveBrandFeedbackItem] = useState<CanvasItem | null>(null);
+  const [isBrandFeedbackOpen, setIsBrandFeedbackOpen] = useState(false);
 
   const [alternativeIndices, setAlternativeIndices] = useState<Record<string, number>>({});
 
@@ -81,7 +86,8 @@ function AIStylistContent() {
 
       const initialItems = res.items.map(item => {
         const primary = item.primary;
-        const isBrand = isGhostItem(primary) || !!(primary as GhostItem).brandName;
+        const brandItemMetadata = getBrandItemCanvasMetadata(item.itemContext, primary);
+        const isBrand = brandItemMetadata.itemContext === "brand_item" || isGhostItem(primary) || !!(primary as GhostItem).brandName;
         let x = 0;
         let y = 0;
         let zIndex = 1;
@@ -124,12 +130,13 @@ function AIStylistContent() {
           id: crypto.randomUUID(),
           clothingItemId: primary.fashionItem?.id || primary.id,
           imageUrl: primary.fashionItem?.imageUrl || "",
-          category: primary.category,
+          category: primary.category || primary.fashionItem?.category,
           _role: item.role,
           isGhost: ghostData?.isGhost,
-          brandName: ghostData?.brandName,
+          brandName: ghostData?.brandName || primary.brandItem?.brandName || primary.brandName,
           wardrobeImpact: ghostData?.wardrobeImpact,
-          price: primary.price,
+          price: primary.brandItem?.price ?? primary.price,
+          ...brandItemMetadata,
           x,
           y,
           scale: isBrand ? 80 : 100,
@@ -166,6 +173,8 @@ function AIStylistContent() {
     }));
 
     const nextItem = allOptions[nextIndex];
+    const nextGhostData = isGhostItem(nextItem) ? nextItem : undefined;
+    const brandItemMetadata = getBrandItemCanvasMetadata(outfitItem.itemContext, nextItem);
 
     setSelectedItems(prev => {
       const existingItemIndex = prev.findIndex(item => item._role === role);
@@ -176,7 +185,12 @@ function AIStylistContent() {
         ...newItems[existingItemIndex],
         clothingItemId: nextItem.fashionItem?.id || nextItem.id,
         imageUrl: nextItem.fashionItem?.imageUrl || "",
-        category: nextItem.category,
+        category: nextItem.category || nextItem.fashionItem?.category,
+        isGhost: nextGhostData?.isGhost,
+        brandName: nextGhostData?.brandName || nextItem.brandItem?.brandName || nextItem.brandName,
+        wardrobeImpact: nextGhostData?.wardrobeImpact,
+        price: nextItem.brandItem?.price ?? nextItem.price,
+        ...brandItemMetadata,
       };
 
       return newItems;
@@ -277,6 +291,10 @@ function AIStylistContent() {
                   hasAlternativesCheck={(role) => {
                     const outfitItem = outfitData.items.find(i => i.role === role);
                     return !!(outfitItem && outfitItem.alternatives && outfitItem.alternatives.length > 0);
+                  }}
+                  onBrandItemFeedbackClick={(item) => {
+                    setActiveBrandFeedbackItem(item);
+                    setIsBrandFeedbackOpen(true);
                   }}
                   onGhostItemClick={(item) => {
                     if (outfitData) {
@@ -437,6 +455,17 @@ function AIStylistContent() {
           </div>
         </div>
       </div>
+
+      <BrandItemFeedbackSheet
+        key={activeBrandFeedbackItem?.brandItemId || "brand-item-feedback"}
+        isOpen={isBrandFeedbackOpen}
+        onClose={() => {
+          setIsBrandFeedbackOpen(false);
+          setActiveBrandFeedbackItem(null);
+        }}
+        brandItemId={activeBrandFeedbackItem?.brandItemId}
+        snapshot={activeBrandFeedbackItem?.brandItemSnapshot}
+      />
 
       <WardrobeImpactPanel
         isOpen={isImpactPanelOpen}

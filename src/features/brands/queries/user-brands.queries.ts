@@ -137,6 +137,14 @@ export const useGetBrandItems = (brandId: string) => {
   });
 };
 
+export const useGetBrandPortalItems = (brandId: string) => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.items(brandId),
+    queryFn: () => userBrandsApi.getBrandPortalItem(brandId),
+    enabled: !!brandId,
+  });
+};
+
 
 export const useClaimOfflineAccount = () => {
   return useMutation({

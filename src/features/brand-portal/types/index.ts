@@ -239,6 +239,12 @@ export interface CreateBrandPayload {
 //   updatedAt?: string;
 // }
 
+export interface Category {
+  id: string,
+  name: string,
+  slug: string
+}
+
 export interface BrandItemRes {
   id: string,
   brandId: string,
@@ -251,8 +257,7 @@ export interface BrandItemRes {
   status: string,
   fashionItem?: {
     id: string,
-    categoryId: string,
-    categoryName?: string,
+    category: Category,
     imageUrl?: string,
     imagePublicId?: string,
     color: string,

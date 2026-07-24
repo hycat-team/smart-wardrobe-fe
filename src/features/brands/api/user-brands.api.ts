@@ -184,6 +184,17 @@ export const userBrandsApi = {
   markConversationRead: async (brandId: string) => {
     const res = await api.post<{data: any}>(`/brands/${brandId}/conversation/read`);
     return res.data.data;
-  }
+  },
+
+  getBrandPortalItem: async (brandId: string) => {
+    const res = await api.get<{data: any}>(`/brand-portal/brands/${brandId}/items`);
+    if (res.data.data && Array.isArray(res.data.data.items)) {
+      return res.data.data.items as BrandItemRes[];
+    }
+    if (Array.isArray(res.data.data)) {
+      return res.data.data as BrandItemRes[];
+    }
+    return [];
+  },
 };
 

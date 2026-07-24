@@ -131,11 +131,16 @@ export const useBrandDashboardSampleAnalytics = (
 ) =>
   useQuery({
     queryKey: brandDashboardQueryKeys.sampleAnalytics(brandId, sampleId),
-    queryFn: () =>
-      brandDashboardApi.getSampleAnalytics({ brandId, itemId: sampleId }),
+    queryFn: async () => {
+      const data = await brandDashboardApi.getSampleAnalytics({
+        brandId,
+        itemId: sampleId,
+      });
+      return data?.itemId === sampleId ? data : null;
+    },
     enabled: Boolean(brandId && sampleId),
-    initialData,
-    placeholderData: keepPreviousData,
+    initialData:
+      initialData?.itemId === sampleId ? initialData : undefined,
     ...BRAND_DASHBOARD_QUERY_OPTIONS,
   });
 
@@ -159,6 +164,5 @@ export const useBrandDashboardSampleFeedbacks = (
       }),
     enabled: Boolean(brandId && filters.sampleId),
     initialData,
-    placeholderData: keepPreviousData,
     ...BRAND_DASHBOARD_QUERY_OPTIONS,
   });

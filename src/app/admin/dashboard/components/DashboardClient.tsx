@@ -135,6 +135,8 @@ export function DashboardClient({
         isLoading={analyticsQuery.isLoading}
         isFetching={analyticsQuery.isFetching}
         error={analyticsQuery.error}
+        fromDate={filters.fromDate}
+        toDate={filters.toDate}
         onRetry={() => void analyticsQuery.refetch()}
       />
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
+import type { BrandItemSnapshot } from "@/features/brands/types";
 
 export interface CanvasItem {
   id: string;
@@ -9,6 +10,9 @@ export interface CanvasItem {
   x: number;
   y: number;
   zIndex: number;
+  itemContext?: string;
+  brandItemId?: string;
+  brandItemSnapshot?: BrandItemSnapshot;
   [key: string]: any;
 }
 

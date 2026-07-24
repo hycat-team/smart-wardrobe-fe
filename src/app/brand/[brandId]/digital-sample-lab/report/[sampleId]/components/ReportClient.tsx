@@ -1,297 +1,167 @@
 "use client";
-import { useState, useEffect } from "react";
-import { MOCK_FIT_REPORT } from "@/features/ghost-closet/mock/ghostClosetMock";
-import { Users, Layers, ArrowRight, ArrowUpRight, TrendingUp, ChevronLeft } from "lucide-react";
+import { Users, Layers, ArrowRight, ArrowUpRight, TrendingUp, ChevronLeft, MessageSquare, Star, Info, Tag } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useGetBrandItemFeedbacks } from "@/features/brand-portal/queries/brand-portal.queries";
+import { useGetBrandItemFeedbacks, useGetBrandItemDetail } from "@/features/brand-portal/queries/brand-portal.queries";
 
 export function ReportClient({ sampleId }: { sampleId: string }) {
   const params = useParams();
   const brandId = params.brandId as string;
   const { data: feedbacks, isLoading: isLoadingFeedbacks } = useGetBrandItemFeedbacks(brandId, sampleId);
-console.log('feedbacks', feedbacks)
-  const [report, setReport] = useState(MOCK_FIT_REPORT);
-  const [productName, setProductName] = useState("Wardrobe Fit Report");
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [actualStats, setActualStats] = useState({ save: 0, waitlist: 0, notMyStyle: 0, swap: 0, keep: 0 });
+  const { data: product, isLoading: isLoadingProduct } = useGetBrandItemDetail(brandId, sampleId);
 
-  useEffect(() => {
-    try {
-      const existingStr = localStorage.getItem("digital_sample_lab_reports");
-      if (existingStr) {
-        const reports = JSON.parse(existingStr);
-        const data = reports.find((r: any) => r.id === sampleId);
-
-        if (data) {
-          if (data.productName) setProductName(data.productName);
-          if (data.imageUrl) setImageUrl(data.imageUrl);
-
-          if (data.variants && data.variants.length > 0) {
-            const newVariants = data.variants.map((v: any, index: number) => {
-              const mockVariant = MOCK_FIT_REPORT.variantComparison[index] || MOCK_FIT_REPORT.variantComparison[0];
-              return {
-                variantName: v.name || `Variant ${index + 1}`,
-                colorHex: v.color,
-                keptRate: mockVariant.keptRate,
-                savedRate: mockVariant.savedRate
-              };
-            });
-
-            setReport(prev => ({ ...prev, variantComparison: newVariants }));
-          }
-        }
-      }
-    } catch (e) {
-      console.error("Error loading sample data", e);
-    }
-
-    const loadStats = () => {
-      try {
-        const analyticsStr = localStorage.getItem("closy_ghost_analytics");
-        if (analyticsStr) {
-          const stats = JSON.parse(analyticsStr);
-          if (stats[sampleId]) {
-            setActualStats(stats[sampleId]);
-          }
-        }
-      } catch (e) { console.error(e); }
-    };
-
-    loadStats();
-
-    // Listen for storage events across tabs to update stats in real-time
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'closy_ghost_analytics') {
-        loadStats();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [sampleId]);
-
-  const toPercent = (num: number) => `${Math.round(num * 100)}%`;
+  const displayProductName = product?.name || product?.fashionItem?.name || "Chi tiết sản phẩm";
+  const displayImage = product?.fashionItem?.imageUrl || null;
+  const displayDesc = product?.description || product?.fashionItem?.description || "Chưa có mô tả chi tiết cho sản phẩm này.";
+  const displayPrice = product?.price != null ? `${product.price.toLocaleString('vi-VN')} ₫` : "Liên hệ để biết giá";
 
   return (
-    <div className="max-w-6xl mx-auto py-12 px-6 space-y-10">
+    <div className="max-w-6xl mx-auto py-12 px-6 space-y-12">
       {/* Header */}
-      <div>
-        <Link href={`/brand/${brandId}/digital-sample-lab/report`} className="text-[10px] font-mono uppercase tracking-widest text-ink-muted hover:text-ink flex items-center gap-1 mb-6 w-fit">
-          <ChevronLeft className="size-3" /> Tất cả Reports
+      <div className="flex flex-col gap-2">
+        <Link href={`/brand/${brandId}/digital-sample-lab/report`} className="text-sm font-medium tracking-wide text-ink-muted hover:text-ink flex items-center gap-2 w-fit transition-colors bg-white/50 px-4 py-2 rounded-full border border-ink/5 backdrop-blur-md">
+          <ChevronLeft className="size-4" /> Quay lại danh sách
         </Link>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-ink/10 pb-6">
-          <div>
-            <h1 className="text-4xl font-semibold uppercase font-medium text-ink mb-2">{productName}</h1>
-            <p className="text-sm font-mono tracking-widest uppercase text-ink-muted border-l-2 border-[#A0522D] pl-3">
-              Sample ID: {sampleId}
-            </p>
-          </div>
-          <div className="flex gap-8 text-right">
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1">Users Exposed</p>
-              <p className="text-2xl font-mono text-ink">{report.usersExposed.toLocaleString()}</p>
-            </div>
-            <div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-1">Qualified Wardrobes</p>
-              <p className="text-2xl font-mono text-[#A0522D]">{report.qualifiedWardrobes.toLocaleString()}</p>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Key Metrics */}
-        <div className="lg:col-span-1 space-y-8">
-          {imageUrl && (
-            <div className="bg-white p-4 border border-ink/10 shadow-sm">
-              <img src={imageUrl} alt={productName} className="w-full h-auto object-contain max-h-80 mx-auto" />
-            </div>
-          )}
-
-          <div className="bg-white p-6 border border-ink/10 shadow-sm space-y-6">
-            <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-2 border-b border-ink/10">Utility Metrics</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-[#F4F1EE]/50 p-4 border border-ink/5">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-2">Outfits Mới</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-3xl font-mono text-ink">+{report.medianNewOutfits}</span>
-                  <TrendingUp className="size-4 text-green-600" />
-                </div>
-                <p className="text-[10px] mt-2 text-ink-muted">Median per user</p>
-              </div>
-              <div className="bg-[#F4F1EE]/50 p-4 border border-ink/5">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-ink-muted mb-2">Đồ Phù Hợp</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-3xl font-mono text-ink">{report.medianCompatibleItems}</span>
-                  <Layers className="size-4 text-ink/40" />
-                </div>
-                <p className="text-[10px] mt-2 text-ink-muted">Món đồ sở hữu</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Detailed Insights */}
-        <div className="lg:col-span-2 space-y-8">
-
-          <div className="bg-white p-6 border border-ink/10 shadow-sm">
-            <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-4 border-b border-ink/10 mb-6">Variant Performance</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-ink/10 text-[10px] font-mono uppercase tracking-widest text-ink-muted">
-                    <th className="pb-3 font-normal">Variant</th>
-                    <th className="pb-3 font-normal text-right">Kept Rate</th>
-                    <th className="pb-3 font-normal text-right">Saved Rate</th>
-                    <th className="pb-3 font-normal text-right">Performance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {report.variantComparison.map((v: any, i: number) => (
-                    <tr key={i} className="border-b border-ink/5 last:border-0">
-                      <td className="py-4 font-medium text-ink flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full border border-ink/10" style={{ backgroundColor: v.colorHex || v.variantName.toLowerCase().replace(' ', '') || '#000' }} />
-                        {v.variantName}
-                        {i === 0 && <span className="ml-2 text-[8px] bg-[#A0522D] text-white px-1.5 py-0.5 uppercase tracking-widest">Top</span>}
-                      </td>
-                      <td className="py-4 text-right font-mono">{toPercent(v.keptRate)}</td>
-                      <td className="py-4 text-right font-mono">{toPercent(v.savedRate)}</td>
-                      <td className="py-4 text-right">
-                        <div className="w-24 h-1.5 bg-ink/10 ml-auto">
-                          <div className="h-full bg-ink" style={{ width: toPercent(v.keptRate) }} />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 border border-ink/10 shadow-sm space-y-6">
-              <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-2 border-b border-ink/10">Engagement Funnel</h3>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-ink">Giữ trong Outfit (Keep)</span>
-                    <span className="font-mono">{toPercent(report.keptRate)}</span>
-                  </div>
-                  <div className="h-2 w-full bg-ink/5">
-                    <div className="h-full bg-green-600/80" style={{ width: toPercent(report.keptRate) }} />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-ink">Lưu / Waitlist</span>
-                    <span className="font-mono">{toPercent(report.savedOrWaitlistRate)}</span>
-                  </div>
-                  <div className="h-2 w-full bg-ink/5">
-                    <div className="h-full bg-[#A0522D]" style={{ width: toPercent(report.savedOrWaitlistRate) }} />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-ink">Đổi món khác (Swap)</span>
-                    <span className="font-mono">{toPercent(report.swappedRate)}</span>
-                  </div>
-                  <div className="h-2 w-full bg-ink/5">
-                    <div className="h-full bg-ink/30" style={{ width: toPercent(report.swappedRate) }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 border border-ink/10 shadow-sm space-y-6">
-              <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-2 border-b border-ink/10">Thực Tế (Từ AI Stylist)</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center text-sm border-b border-ink/5 pb-2">
-                  <span className="text-ink">Lưu vào Tủ đồ (Save)</span>
-                  <span className="font-mono text-lg">{actualStats.save}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm border-b border-ink/5 pb-2">
-                  <span className="text-ink">Đăng ký Waitlist</span>
-                  <span className="font-mono text-lg">{actualStats.waitlist}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm border-b border-ink/5 pb-2">
-                  <span className="text-ink">Giữ lại (Keep)</span>
-                  <span className="font-mono text-lg">{actualStats.keep}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm border-b border-ink/5 pb-2">
-                  <span className="text-ink">Không hợp gu</span>
-                  <span className="font-mono text-lg text-red-500">{actualStats.notMyStyle}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-ink">Đổi món khác (Swap)</span>
-                  <span className="font-mono text-lg text-orange-500">{actualStats.swap}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 border border-ink/10 shadow-sm space-y-4">
-              <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-2 border-b border-ink/10">Top Compatible Items</h3>
-              <ul className="space-y-3">
-                {report.topCompatibleItems.map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-ink">
-                    <ArrowRight className="size-3 text-[#A0522D]" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-white p-6 border border-ink/10 shadow-sm space-y-4">
-              <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-2 border-b border-ink/10">Opportunity Cohorts</h3>
-              <ul className="space-y-4">
-                {report.opportunityCohorts.map((c, i) => (
-                  <li key={i} className="flex justify-between items-center text-sm">
-                    <span className="text-ink">{c.label}</span>
-                    <span className="font-mono text-ink-muted text-xs bg-[#F4F1EE] px-2 py-1">{c.matchCount} users</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 border border-ink/10 shadow-sm space-y-6 mt-8">
-            <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-ink pb-2 border-b border-ink/10">Ý Kiến Khách Hàng (Feedbacks)</h3>
-            {isLoadingFeedbacks ? (
-              <div className="text-sm text-ink-muted py-4">Đang tải...</div>
-            ) : (!feedbacks || feedbacks.length === 0) ? (
-              <div className="text-sm text-ink-muted py-4">Chưa có ý kiến nào.</div>
+      {/* Main Product Hero */}
+      <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-ink/10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#F4F1EE] rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10 items-center">
+          {/* Image */}
+          <div className="bg-[#F4F1EE]/50 rounded-[2rem] p-8 aspect-square flex items-center justify-center border border-ink/5 relative overflow-hidden">
+            {displayImage ? (
+              <img src={displayImage} alt={displayProductName} className="w-full h-full object-contain mix-blend-multiply drop-shadow-xl transition-transform duration-700 group-hover:scale-105" />
             ) : (
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                {feedbacks.map((fb: any, i: number) => (
-                  <div key={fb.id || i} className="p-4 bg-[#F4F1EE]/50 border border-ink/5">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-ink text-sm uppercase tracking-wider text-[11px] px-2 py-1 bg-white border border-ink/10 shadow-sm">{
-                          fb.voteType === 'like' ? '❤️ Thích' :
-                          fb.voteType === 'dislike' ? '👎 Không thích' :
-                          fb.voteType === 'would_buy' ? '🛍️ Sẽ mua' :
-                          fb.voteType === 'not_interested' ? '🤷 Không quan tâm' : fb.voteType
-                        }</span>
-                        {fb.rating && (
-                          <span className="text-[11px] font-mono bg-ink text-white px-2 py-1 uppercase">{fb.rating} / 5 ⭐</span>
-                        )}
-                      </div>
-                      <span className="text-[10px] font-mono uppercase text-ink-muted">{new Date(fb.createdAt).toLocaleDateString('vi-VN')}</span>
-                    </div>
-                    {fb.feedbackText && (
-                      <p className="text-sm text-ink-muted mt-3 border-l-2 border-[#A0522D] pl-3 italic">
-                        "{fb.feedbackText}"
-                      </p>
-                    )}
-                  </div>
-                ))}
+              <div className="flex flex-col items-center justify-center text-ink-muted">
+                <Tag className="size-16 mb-4 opacity-20" />
+                <span className="font-mono text-sm uppercase tracking-widest">Không có ảnh</span>
               </div>
             )}
           </div>
+          
+          {/* Info */}
+          <div className="space-y-8 py-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A0522D]/10 text-[#A0522D] text-xs font-mono uppercase tracking-widest font-semibold">
+              Thông tin mẫu
+            </div>
+            
+            <div className="space-y-4">
+              <h1 className="text-5xl font-medium tracking-tight text-ink leading-[1.1]">{displayProductName}</h1>
+              <p className="text-2xl font-light text-ink/70">{displayPrice}</p>
+            </div>
+
+            <p className="text-lg text-ink-muted leading-relaxed font-light max-w-lg">
+              {displayDesc}
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Feedback Table Section */}
+      <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-ink/10 shadow-sm relative overflow-hidden">
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-2xl font-medium text-ink flex items-center gap-3">
+            <MessageSquare className="size-6 text-ink/50" />
+            Phản Hồi Từ Người Dùng
+          </h3>
+          {feedbacks && feedbacks.length > 0 && (
+            <span className="text-sm font-mono bg-[#F4F1EE] px-4 py-1.5 rounded-full border border-ink/5 text-ink">
+              {feedbacks.length} lượt đánh giá
+            </span>
+          )}
+        </div>
+        
+        {isLoadingFeedbacks ? (
+          <div className="p-16 text-center text-ink-muted flex flex-col items-center gap-4 border border-ink/5 rounded-[2rem] bg-[#F4F1EE]/30">
+             <div className="size-8 border-4 border-ink/20 border-t-ink rounded-full animate-spin" />
+             <p className="text-sm">Đang tải dữ liệu phản hồi...</p>
+          </div>
+        ) : (!feedbacks || feedbacks.length === 0) ? (
+          <div className="p-16 text-center flex flex-col items-center border border-ink/5 rounded-[2rem] bg-[#F4F1EE]/30">
+             <div className="size-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+               <Info className="size-6 text-ink/30" />
+             </div>
+             <p className="text-ink font-medium text-lg">Chưa có phản hồi nào</p>
+             <p className="text-sm text-ink-muted mt-1">Sản phẩm này chưa nhận được ý kiến đánh giá từ người dùng.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto custom-scrollbar border border-ink/5 rounded-[2rem] bg-[#F4F1EE]/10">
+            <table className="w-full text-left text-sm min-w-[800px]">
+              <thead className="bg-[#F4F1EE]/50">
+                <tr className="text-xs uppercase tracking-widest text-ink-muted">
+                  <th className="py-5 px-6 font-medium whitespace-nowrap">Ngày đánh giá</th>
+                  <th className="py-5 px-6 font-medium whitespace-nowrap">Đánh giá chung</th>
+                  <th className="py-5 px-6 font-medium whitespace-nowrap">Mức độ hài lòng</th>
+                  <th className="py-5 px-6 font-medium">Chi tiết phản hồi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-ink/5">
+                {feedbacks.map((fb: any, i: number) => (
+                  <tr key={fb.id || i} className="hover:bg-[#F4F1EE]/30 transition-colors">
+                    <td className="py-5 px-6 font-mono text-[11px] uppercase text-ink/60 whitespace-nowrap">
+                      {new Date(fb.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </td>
+                    <td className="py-5 px-6 whitespace-nowrap">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-[11px] font-bold uppercase tracking-wider ${
+                        fb.voteType === 'like' ? 'bg-pink-50 text-pink-700 border border-pink-100' :
+                        fb.voteType === 'dislike' ? 'bg-gray-100 text-gray-700 border border-gray-200' :
+                        fb.voteType === 'would_buy' ? 'bg-green-50 text-green-700 border border-green-100' :
+                        'bg-blue-50 text-blue-700 border border-blue-100'
+                      }`}>
+                        {
+                          fb.voteType === 'like' ? '❤️ Thích' :
+                          fb.voteType === 'dislike' ? '👎 Không thích' :
+                          fb.voteType === 'would_buy' ? '🛍️ Sẽ mua' :
+                          fb.voteType === 'not_interested' ? '🤷 Bỏ qua' : fb.voteType
+                        }
+                      </span>
+                    </td>
+                    <td className="py-5 px-6 whitespace-nowrap">
+                      {fb.rating ? (
+                        <div className="flex gap-1 items-center">
+                          {Array.from({length: 5}).map((_, idx) => (
+                            <Star key={idx} className={`size-4 ${idx < fb.rating! ? 'fill-[#A0522D] text-[#A0522D]' : 'fill-ink/5 text-ink/10'}`} />
+                          ))}
+                          <span className="ml-2 font-mono text-ink/60 text-xs">{fb.rating}/5</span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-ink/30 italic">Không có</span>
+                      )}
+                    </td>
+                    <td className="py-5 px-6">
+                      {fb.feedbackText ? (
+                        <p className="text-sm text-ink/80 leading-relaxed italic max-w-xl">
+                          "{fb.feedbackText}"
+                        </p>
+                      ) : (
+                        <p className="text-sm text-ink/30 italic">Không để lại bình luận chi tiết.</p>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+      
+      {/* Scrollbar CSS */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: rgba(0,0,0,0.1);
+          border-radius: 20px;
+        }
+      `}} />
     </div>
   );
 }
+

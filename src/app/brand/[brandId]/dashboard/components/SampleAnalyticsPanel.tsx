@@ -107,6 +107,7 @@ export function SampleAnalyticsPanel({
 
   const selectedSample =
     samples.find((sample) => sample.id === selectedSampleId) ?? samples[0];
+  const selectedData = data?.itemId === selectedSampleId ? data : null;
 
   return (
     <section className="rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8">
@@ -118,7 +119,7 @@ export function SampleAnalyticsPanel({
           <h2 className="mt-2 text-2xl font-semibold">Hiệu quả mẫu thử</h2>
         </div>
         <Select
-          value={selectedSampleId}
+          value={selectedSample?.name}
           onValueChange={(value) => {
             if (value) onSampleChange(value);
           }}
@@ -129,7 +130,7 @@ export function SampleAnalyticsPanel({
           >
             <SelectValue placeholder="Chọn mẫu thử" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent alignItemWithTrigger={false}>
             {samples.map((sample) => (
               <SelectItem key={sample.id} value={sample.id}>
                 {sample.name}
@@ -176,10 +177,10 @@ export function SampleAnalyticsPanel({
           </Button>
         </div>
 
-        {isLoadingAnalytics && !data ? (
+        {isLoadingAnalytics && !selectedData ? (
           <Skeleton className="min-h-72 rounded-3xl" />
         ) : analyticsError &&
-          !data &&
+          !selectedData &&
           !isBrandDashboardNotFoundError(analyticsError) ? (
           <div className="rounded-3xl border border-destructive/30 p-8">
             <h3 className="font-semibold">Không thể tải phân tích mẫu thử</h3>
@@ -191,7 +192,7 @@ export function SampleAnalyticsPanel({
               Thử lại
             </Button>
           </div>
-        ) : !data ? (
+        ) : !selectedData ? (
           <div className="rounded-3xl border border-dashed border-border p-10 text-center">
             <h3 className="font-semibold">Mẫu chưa có dữ liệu phân tích</h3>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -204,13 +205,13 @@ export function SampleAnalyticsPanel({
               <div className="rounded-2xl bg-muted/50 p-5">
                 <p className="text-xs text-muted-foreground">Lượt vote</p>
                 <p className="mt-2 text-2xl font-semibold tabular-nums">
-                  {formatBrandNumber(data.votesCount)}
+                  {formatBrandNumber(selectedData.votesCount)}
                 </p>
               </div>
               <div className="rounded-2xl bg-muted/50 p-5">
                 <p className="text-xs text-muted-foreground">Rating</p>
                 <p className="mt-2 flex items-center gap-2 text-2xl font-semibold">
-                  {formatBrandNumber(data.avgRating)}
+                  {formatBrandNumber(selectedData.avgRating)}
                   <Star className="size-4 fill-amber-400 text-amber-400" />
                 </p>
               </div>
@@ -218,9 +219,9 @@ export function SampleAnalyticsPanel({
                 <p className="text-xs text-muted-foreground">Sentiment</p>
                 <Badge
                   variant="ghost"
-                  className={`mt-3 ${sentimentLabels[data.feedbackSentiment]?.className ?? sentimentLabels[''].className}`}
+                  className={`mt-3 ${sentimentLabels[selectedData.feedbackSentiment]?.className ?? sentimentLabels[''].className}`}
                 >
-                  {sentimentLabels[data.feedbackSentiment]?.label ??
+                  {sentimentLabels[selectedData.feedbackSentiment]?.label ??
                     sentimentLabels[''].label}
                 </Badge>
               </div>
@@ -230,11 +231,13 @@ export function SampleAnalyticsPanel({
               <h3 className="text-sm font-semibold">
                 Danh mục thường phối kèm
               </h3>
-              {data.topPairedCategories?.length ? (
+              {selectedData.topPairedCategories?.length ? (
                 <div className="mt-4 space-y-3">
-                  {data.topPairedCategories.map((category) => {
+                  {selectedData.topPairedCategories.map((category) => {
                     const max = Math.max(
-                      ...data.topPairedCategories.map((item) => item.pairCount),
+                      ...selectedData.topPairedCategories.map(
+                        (item) => item.pairCount,
+                      ),
                       1,
                     );
                     return (

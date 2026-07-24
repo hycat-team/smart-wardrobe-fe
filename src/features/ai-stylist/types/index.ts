@@ -12,8 +12,26 @@ export interface AIOutfitRecommendationReq {
 
 export interface AIOutfitItem {
   role: string;
-  primary: WardrobeItemRes;
-  alternatives: WardrobeItemRes[];
+  itemContext?: string;
+  primary: AIOutfitProduct;
+  alternatives: AIOutfitProduct[];
+}
+
+export interface AIOutfitProduct extends WardrobeItemRes {
+  name?: string;
+  description?: string;
+  brandId?: string;
+  brandName?: string;
+  brandItemId?: string;
+  itemContext?: string;
+  brandItem?: {
+    id: string;
+    brandId: string;
+    brandName?: string;
+    itemType?: string;
+    name?: string;
+    price?: number;
+  };
 }
 
 export interface AIOutfitRecommendationRes {

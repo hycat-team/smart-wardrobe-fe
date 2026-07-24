@@ -53,7 +53,7 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
   const hasMedia = post.media && post.media.length > 0;
   const mediaUrl = hasMedia ? post.media[0].mediaUrl : null;
   const isPostOwner = profile?.id === post.userId || profile?.username === post.username;
-  const postDisplayAvatar = isPostOwner && profile ? getUserAvatar(profile) : (post.avatarUrl || '/images-male.png');
+  const postDisplayAvatar = isPostOwner && profile ? getUserAvatar(profile) : (post.avatarUrl || '/avatar-default.jpg');
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

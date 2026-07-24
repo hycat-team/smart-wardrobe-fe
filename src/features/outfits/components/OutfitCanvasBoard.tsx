@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { ZoomIn, ZoomOut, MoveUp, X, RefreshCcw, AlertCircle } from "lucide-react";
+import { ZoomIn, ZoomOut, MoveUp, X, RefreshCcw, AlertCircle, Star } from "lucide-react";
 import { CanvasItem } from "@/features/outfits/hooks/useOutfitCanvas";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
 import { GhostItemBadge } from "@/features/ghost-closet/components/GhostItemBadge";
@@ -16,6 +16,7 @@ export interface OutfitCanvasBoardProps {
   emptyState?: React.ReactNode;
   hasAlternativesCheck?: (role: string) => boolean;
   onGhostItemClick?: (item: CanvasItem) => void;
+  onBrandItemFeedbackClick?: (item: CanvasItem) => void;
 }
 
 export function OutfitCanvasBoard({
@@ -29,6 +30,7 @@ export function OutfitCanvasBoard({
   emptyState,
   hasAlternativesCheck,
   onGhostItemClick,
+  onBrandItemFeedbackClick,
 }: OutfitCanvasBoardProps) {
   return (
     <div className="flex-1 bg-muted/30 border border-border rounded-xl relative overflow-hidden flex items-center justify-center">
@@ -108,6 +110,21 @@ export function OutfitCanvasBoard({
                           title="Xem Wardrobe Impact"
                         >
                           Xem thêm
+                        </button>
+                      </>
+                    )}
+
+                    {item.itemContext === "brand_item" && onBrandItemFeedbackClick && (
+                      <>
+                        <div className="w-px h-4 bg-border" />
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); onBrandItemFeedbackClick(item); }}
+                          className="hover:bg-primary hover:text-primary-foreground text-primary transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold px-3 py-2"
+                          title="Đánh giá sản phẩm"
+                          aria-label="Đánh giá sản phẩm"
+                        >
+                          <Star className="size-3" /> ĐÁNH GIÁ
                         </button>
                       </>
                     )}

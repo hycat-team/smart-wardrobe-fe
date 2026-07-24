@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { brandPortalApi } from '../api/brand-portal.api';
+import { brandDashboardQueryKeys } from './brand-dashboard.queries';
 import { toast } from 'sonner';
 import { BrandStatus, UpsertLoyaltyProgramPayload } from '../types';
 
@@ -20,6 +21,7 @@ const BRAND_PORTAL_KEYS = {
   members: (brandId: string) => [...BRAND_PORTAL_KEYS.all, brandId, 'members'] as const,
   adminBrands: () => [...BRAND_PORTAL_KEYS.all, 'admin-brands'] as const,
   items: (brandId: string) => [...BRAND_PORTAL_KEYS.all, brandId, 'items'] as const,
+  itemDetail: (brandId: string, itemId: string) => [...BRAND_PORTAL_KEYS.items(brandId), itemId, 'detail'] as const,
   itemFeedbacks: (brandId: string, itemId: string) => [...BRAND_PORTAL_KEYS.items(brandId), itemId, 'feedbacks'] as const,
 };
 
@@ -385,11 +387,22 @@ export const useCreateBrandItem = (brandId: string) => {
     mutationFn: (payload: any) => brandPortalApi.createBrandItem(brandId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId) });
+      queryClient.invalidateQueries({
+        queryKey: brandDashboardQueryKeys.samples(brandId),
+      });
       toast.success('Tạo sản phẩm thành công');
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Tạo sản phẩm thất bại');
     }
+  });
+};
+
+export const useGetBrandItemDetail = (brandId: string, itemId: string) => {
+  return useQuery({
+    queryKey: BRAND_PORTAL_KEYS.itemDetail(brandId, itemId),
+    queryFn: () => brandPortalApi.getBrandItemDetail(brandId, itemId),
+    enabled: !!brandId && !!itemId,
   });
 };
 

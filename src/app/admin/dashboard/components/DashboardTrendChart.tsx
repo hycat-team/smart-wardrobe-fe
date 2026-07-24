@@ -72,12 +72,16 @@ export function DashboardTrendChart({
   isLoading,
   isFetching,
   error,
+  fromDate,
+  toDate,
   onRetry,
 }: {
   data?: DynamicQueryResponse | null;
   isLoading: boolean;
   isFetching: boolean;
   error: unknown;
+  fromDate?: string;
+  toDate?: string;
   onRetry: () => void;
 }) {
   const [tab, setTab] = useState<'activity' | 'finance'>('activity');
@@ -144,9 +148,12 @@ export function DashboardTrendChart({
           <h2 id="trend-heading" className="mt-2 text-2xl font-semibold">
             Xu hướng hệ thống
           </h2>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Độ mịn thực tế: {data.granularity}
-          </p>
+          <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
+            {fromDate && toDate && (
+              <p>Thời gian: {fromDate} – {toDate}</p>
+            )}
+            <p>Độ mịn thực tế: {data.granularity}</p>
+          </div>
         </div>
         <Tabs
           value={tab}

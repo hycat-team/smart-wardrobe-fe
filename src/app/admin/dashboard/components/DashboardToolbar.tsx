@@ -71,7 +71,7 @@ export function DashboardToolbar({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      {/* <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <Popover>
           <PopoverTrigger
             className="inline-flex h-11 min-w-64 items-center justify-start gap-2 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground shadow-sm outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/60"
@@ -125,7 +125,7 @@ export function DashboardToolbar({
           />
           {isRefreshing ? 'Đang tải' : 'Làm mới'}
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

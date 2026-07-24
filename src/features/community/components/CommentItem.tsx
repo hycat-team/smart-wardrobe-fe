@@ -35,7 +35,7 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
 
   const isOwner = profile?.id === comment.userId || profile?.username === comment.username;
   const hasReplies = replies && replies.length > 0;
-  const displayAvatar = isOwner && profile ? getUserAvatar(profile) : (comment.avatarUrl || '/images-male.png');
+  const displayAvatar = isOwner && profile ? getUserAvatar(profile) : (comment.avatarUrl || '/avatar-default.jpg');
 
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();

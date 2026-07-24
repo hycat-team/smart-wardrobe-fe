@@ -158,12 +158,12 @@ export function Sidebar() {
               <span className="font-body-sm text-[13px] font-medium">Hồ sơ</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+          {/* <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
             <Link href="/profile/purchases" className="flex items-center gap-3 w-full text-foreground/80">
               <ShoppingBag className="size-4" />
               <span className="font-body-sm text-[13px] font-medium">Đơn hàng</span>
             </Link>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
             <Link href="/profile/update" className="flex items-center gap-3 w-full text-foreground/80">
               <Settings className="size-4" />
