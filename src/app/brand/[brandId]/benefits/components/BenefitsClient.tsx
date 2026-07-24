@@ -142,7 +142,7 @@ export default function BenefitsClient() {
                       ) : null}
                       {benefit.unlockType?.toLowerCase() === 'tier_privilege' && benefit.requiredTierId ? (
                         <Badge variant="outline" className="rounded-md font-medium text-xs border-primary/30 text-primary">
-                          Tier ID: {benefit.requiredTierId}
+                          Hạng: {benefit.requiredTierName}
                         </Badge>
                       ) : null}
                       {benefit.benefitType?.toLowerCase() === 'feature_access' && benefit.featureCode ? (

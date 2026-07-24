@@ -85,8 +85,16 @@ describe('dashboardApi', () => {
     await expect(request()).resolves.toEqual({ ok: true });
   });
 
+  it('does not send date params for revenue breakdown', async () => {
+    mock.onGet('/admin/dashboard/subscriptions/revenue-breakdown').reply((config) => {
+      expect(config.params).toBeUndefined();
+      return [200, { data: null }];
+    });
+
+    await dashboardApi.getRevenueBreakdown();
+  });
+
   it.each([
-    ['revenue', '/admin/dashboard/subscriptions/revenue-breakdown', (filters: { fromDate: string; toDate: string }) => dashboardApi.getRevenueBreakdown(filters)],
     ['AI usage', '/admin/dashboard/ai/usage-by-operation', (filters: { fromDate: string; toDate: string }) => dashboardApi.getAIUsageByOperation(filters)],
   ])('gửi khoảng ngày toolbar cho %s', async (_label, endpoint, request) => {
     mock.onGet(endpoint).reply((config) => {

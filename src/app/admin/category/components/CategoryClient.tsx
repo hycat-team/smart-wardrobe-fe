@@ -121,7 +121,7 @@ export function CategoryClient() {
             <TableRow className="hover:bg-transparent border-b border-border">
               <TableHead className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.15em] py-4 h-auto">Tên danh mục</TableHead>
               <TableHead className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.15em] py-4 h-auto">Đường dẫn (Slug)</TableHead>
-              <TableHead className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.15em] text-right py-4 h-auto">Thao tác</TableHead>
+              {/* <TableHead className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.15em] text-right py-4 h-auto">Thao tác</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -135,7 +135,7 @@ export function CategoryClient() {
               <TableRow key={item.id} className="border-b border-border hover:bg-muted transition-colors">
                 <TableCell className="font-semibold text-lg py-5">{item.name}</TableCell>
                 <TableCell className="font-semibold text-[12px] text-muted-foreground py-5">{item.slug}</TableCell>
-                <TableCell className="text-right py-5">
+                {/* <TableCell className="text-right py-5">
                   <div className="flex justify-end gap-1">
                     <Button variant="ghost" size="icon" onClick={() => openEdit(item)} className="text-muted-foreground hover:text-foreground hover:bg-transparent rounded-full h-8 w-8">
                       <Edit className="size-4" strokeWidth={1.5} />
@@ -144,7 +144,7 @@ export function CategoryClient() {
                       <Trash2 className="size-4" strokeWidth={1.5} />
                     </Button>
                   </div>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>

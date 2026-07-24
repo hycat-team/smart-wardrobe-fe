@@ -7,6 +7,7 @@ import {
   useDashboardAIMargin,
   useDashboardAIUsageByOperation,
   useDashboardAnalytics,
+  useDashboardRevenueBreakdown,
   useDashboardSubscriptionDistribution,
 } from './dashboard.queries';
 import type { DashboardFilters } from '../types';
@@ -86,6 +87,22 @@ describe('dashboard queries', () => {
 
     expect(dashboardApi.getSubscriptionDistribution).not.toHaveBeenCalled();
     expect(dashboardApi.getAIUsageByOperation).not.toHaveBeenCalled();
+  });
+
+  it('calls revenue breakdown without date filters', async () => {
+    (dashboardApi.getRevenueBreakdown as jest.Mock).mockResolvedValue(null);
+
+    const { result } = renderHook(
+      () => useDashboardRevenueBreakdown(),
+      { wrapper: createWrapper() },
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(dashboardApi.getRevenueBreakdown).toHaveBeenCalledWith();
+    expect(dashboardQueryKeys.revenueBreakdown()).toEqual([
+      'admin-dashboard',
+      'revenue-breakdown',
+    ]);
   });
   it('dùng request admin hợp lệ cho analytics', async () => {
     (dashboardApi.queryAnalytics as jest.Mock).mockResolvedValue({

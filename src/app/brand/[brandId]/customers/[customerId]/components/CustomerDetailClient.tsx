@@ -146,8 +146,8 @@ export default function CustomerDetailClient() {
           <Card className="rounded-3xl border-border bg-card shadow-sm">
             <CardContent className="p-6 flex flex-col items-center justify-center text-center h-full gap-2">
               <ShoppingBag className="w-8 h-8 text-primary mb-2" />
-              <span className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Tổng đơn hàng</span>
-              <span className="text-3xl font-bold">{(customer as any)?.totalOrder ?? 0}</span>
+              <span className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Điểm hiện tại</span>
+              <span className="text-3xl font-bold">{(customer as any)?.loyaltyAccount?.currentPoints ?? 0}</span>
             </CardContent>
           </Card>
         </div>
@@ -169,9 +169,9 @@ export default function CustomerDetailClient() {
                 <TableHeader>
                   <TableRow className="bg-muted/50 hover:bg-muted/50">
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Mã GD</TableHead>
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest">Điểm</TableHead>
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest">Lý do</TableHead>
-                    <TableHead className="font-bold text-[10px] uppercase tracking-widest">Thời gian</TableHead>
+                    <TableHead className="font-bold text-[10px] uppercase tracking-widest pl-6">Điểm</TableHead>
+                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Số dư</TableHead>
+                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Thời gian</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -192,11 +192,11 @@ export default function CustomerDetailClient() {
                     transactions.map((tx) => (
                       <TableRow key={tx.id}>
                         <TableCell className="font-medium text-xs text-muted-foreground">{tx.id.slice(0, 8)}...</TableCell>
-                        <TableCell className={`font-bold pl-4 ${tx.transactionType === 'earn' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                          {tx.transactionType === 'earn' ? '+' : '-'}{tx.points}
+                        <TableCell className={`font-bold pl-4 ${tx.transactionType?.toLowerCase() === 'earn' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                          {tx.transactionType?.toLowerCase() === 'earn' ? '+' : '-'}{tx.pointsDelta}
                         </TableCell>
-                        <TableCell>{tx.reason}</TableCell>
-                        <TableCell className="text-muted-foreground text-sm">{formatDate(tx.createdAt)}</TableCell>
+                        <TableCell className="text-right font-bold text-foreground">{tx.balanceAfter}</TableCell>
+                        <TableCell className="text-muted-foreground text-sm text-right">{formatDate(tx.createdAt)}</TableCell>
                       </TableRow>
                     ))
                   )}

@@ -78,7 +78,7 @@ export default async function DashboardData({
           { cache: 'no-store' },
         ),
         serverFetch<RevenueBreakdown>(
-          `/admin/dashboard/subscriptions/revenue-breakdown?${marginParams.toString()}`,
+          '/admin/dashboard/subscriptions/revenue-breakdown',
           { cache: 'no-store' },
         ),
         serverFetch<RenewalStats>(

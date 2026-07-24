@@ -35,8 +35,8 @@ export const dashboardQueryKeys = {
     [...dashboardQueryKeys.all, 'analytics', filters.fromDate, filters.toDate] as const,
   subscriptionDistribution: () =>
     [...dashboardQueryKeys.all, 'subscription-distribution'] as const,
-  revenueBreakdown: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
-    [...dashboardQueryKeys.all, 'revenue-breakdown', filters.fromDate, filters.toDate] as const,
+  revenueBreakdown: () =>
+    [...dashboardQueryKeys.all, 'revenue-breakdown'] as const,
   aiUsageByOperation: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
     [...dashboardQueryKeys.all, 'ai-usage-by-operation', filters.fromDate, filters.toDate] as const,
   aiErrorBreakdown: () =>
@@ -93,12 +93,11 @@ export const useDashboardSubscriptionDistribution = (
   });
 
 export const useDashboardRevenueBreakdown = (
-  filters: DashboardFilters,
   options?: InsightQueryOptions<RevenueBreakdown>,
 ) =>
   useQuery({
-    queryKey: dashboardQueryKeys.revenueBreakdown(filters),
-    queryFn: () => dashboardApi.getRevenueBreakdown(filters),
+    queryKey: dashboardQueryKeys.revenueBreakdown(),
+    queryFn: () => dashboardApi.getRevenueBreakdown(),
     enabled: options?.enabled ?? true,
     initialData: options?.initialData ?? undefined,
     placeholderData: keepPreviousData,

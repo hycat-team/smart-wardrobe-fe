@@ -54,13 +54,9 @@ export const dashboardApi = {
     return unwrap(response);
   },
 
-  getRevenueBreakdown: async ({
-    fromDate,
-    toDate,
-  }: Pick<DashboardFilters, 'fromDate' | 'toDate'>): Promise<RevenueBreakdown | null> => {
+  getRevenueBreakdown: async (): Promise<RevenueBreakdown | null> => {
     const response = await api.get<APIResponse<RevenueBreakdown>>(
       '/admin/dashboard/subscriptions/revenue-breakdown',
-      { params: { fromDate, toDate } },
     );
     return unwrap(response);
   },

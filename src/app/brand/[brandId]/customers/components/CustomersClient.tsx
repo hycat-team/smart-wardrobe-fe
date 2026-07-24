@@ -67,7 +67,6 @@ export default function CustomersClient() {
                 <TableHead className="font-bold text-[10px] uppercase tracking-widest">Khách hàng</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-widest">Liên hệ</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Tổng chi tiêu</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-widest text-center">Đơn hàng</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-widest">Lần cuối mua</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Thao tác</TableHead>
               </TableRow>
@@ -75,13 +74,13 @@ export default function CustomersClient() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-20">
+                  <TableCell colSpan={5} className="text-center py-20">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
                   </TableCell>
                 </TableRow>
               ) : !users || users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-20 text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center py-20 text-muted-foreground">
                     Không tìm thấy khách hàng nào.
                   </TableCell>
                 </TableRow>
@@ -120,10 +119,7 @@ export default function CustomersClient() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-medium text-foreground">
-                      -
-                    </TableCell>
-                    <TableCell className="text-center">
-                      -
+                      {user.loyaltyAccount?.totalSpend != null ? `${user.loyaltyAccount.totalSpend.toLocaleString('vi-VN')}đ` : '-'}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
                       {user.joinedAt ? new Date(user.joinedAt).toLocaleDateString('vi-VN') : '-'}

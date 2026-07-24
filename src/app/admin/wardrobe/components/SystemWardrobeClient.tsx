@@ -147,9 +147,9 @@ export function SystemWardrobeClient() {
                 </div>
 
                 {/* Classification */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 pl-3">
                   <span className="inline-block w-fit px-2 py-1 bg-muted/50 border border-border text-foreground font-semibold text-[10px] uppercase tracking-widest rounded-full">
-                    {item.category ? (typeof item.category === 'string' ? item.category : item.category.name) : (item.type || 'UNKNOWN')}
+                    {item.fashionItem.category.name ? (typeof item.fashionItem.category === 'string' ? item.fashionItem.category : item.fashionItem.category.name) : (item.fashionItem.type || 'UNKNOWN')}
                   </span>
                 </div>
 
@@ -161,13 +161,13 @@ export function SystemWardrobeClient() {
 
                 {/* Actions */}
                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
+                  {/* <button
                     onClick={() => setEditingItem(item)}
                     className="size-8 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-all"
                     title="Edit Record"
                   >
                     <Edit className="size-3.5" />
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => setDeletingId(item.id)}
                     className="size-8 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-all"

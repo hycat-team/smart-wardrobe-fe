@@ -46,23 +46,33 @@ export function GuestHeader() {
         <div className="max-w-[1400px] mx-auto h-full px-6 md:px-10 flex items-center justify-between">
 
           {/* Logo */}
-          <Link href="/" className="relative group flex items-baseline gap-1">
-            <span
+          <Link href="/" className="relative group flex items-center gap-2 md:gap-3">
+            <img 
+              src="/favicon.ico" 
+              alt="Closy Logo" 
               className={`
-                font-semibold font-medium tracking-[-0.03em] transition-all duration-500
-                ${scrolled ? "text-2xl text-white" : "text-4xl md:text-5xl text-[#1A1A1A]"}
+                transition-all duration-500 rounded-full
+                ${scrolled ? "w-7 h-7 md:w-8 md:h-8" : "w-10 h-10 md:w-12 md:h-12"}
               `}
-            >
-              CLOSY
-            </span>
-            <span
-              className={`
-                font-semibold italic transition-all duration-500
-                ${scrolled ? "text-sm text-[#D9C5B2]" : "text-lg md:text-xl text-[#D9C5B2]"}
-              `}
-            >
-              .
-            </span>
+            />
+            <div className="flex items-baseline">
+              <span
+                className={`
+                  font-semibold font-medium tracking-[-0.03em] transition-all duration-500
+                  ${scrolled ? "text-2xl text-white" : "text-4xl md:text-5xl text-[#1A1A1A]"}
+                `}
+              >
+                CLOSY
+              </span>
+              <span
+                className={`
+                  font-semibold italic transition-all duration-500 ml-1
+                  ${scrolled ? "text-sm text-[#D9C5B2]" : "text-lg md:text-xl text-[#D9C5B2]"}
+                `}
+              >
+                .
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Nav */}
@@ -278,9 +288,12 @@ export function GuestHeader() {
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="font-semibold text-5xl text-white font-medium mb-8"
+              className="flex items-center gap-3 mb-8"
             >
-              CLOSY<span className="text-[#D9C5B2] italic">.</span>
+              <img src="/favicon.ico" alt="Closy Logo" className="w-12 h-12 rounded-full" />
+              <div className="flex items-baseline font-semibold text-5xl text-white font-medium">
+                CLOSY<span className="text-[#D9C5B2] italic ml-1">.</span>
+              </div>
             </Link>
 
             <MobileNavLink href="/auth/login" onClick={() => setMobileMenuOpen(false)}>Đăng nhập</MobileNavLink>

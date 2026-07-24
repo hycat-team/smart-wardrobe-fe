@@ -53,7 +53,7 @@ export function DashboardClient({
     enabled: isSubscriptionTab,
     initialData: initialData.subscriptionDistribution,
   });
-  const revenueBreakdownQuery = useDashboardRevenueBreakdown(filters, {
+  const revenueBreakdownQuery = useDashboardRevenueBreakdown({
     enabled: isSubscriptionTab,
     initialData: initialData.revenueBreakdown,
   });
