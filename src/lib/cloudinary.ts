@@ -7,6 +7,8 @@ export interface CloudinaryUploadParams {
     folder: string;
     publicId?: string;
     public_id?: string;
+    uploadPreset?: string;
+    upload_preset?: string;
   };
 }
 
