@@ -309,3 +309,5 @@ export interface DigitalSampleResponseRes {
   feedbackText?: string;
   createdAt: string;
 }
+
+export * from './dashboard';

@@ -1,151 +1,160 @@
-"use client";
+'use client';
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import type {
+  DashboardFilters,
+  DashboardInitialData,
+} from '@/features/admin/types';
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { Users, Sparkles, TrendingUp, ShieldAlert, ArrowUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+  useDashboardAIEvents,
+  useDashboardAIMargin,
+  useDashboardAnalytics,
+  useDashboardOverview,
+} from '@/features/admin/queries/dashboard.queries';
+import { DashboardToolbar } from './DashboardToolbar';
+import { DashboardKpiGrid } from './DashboardKpiGrid';
+import { AIMarginPanel } from './AIMarginPanel';
+import { PayOSPanel } from './PayOSPanel';
+import { DashboardTrendChart } from './DashboardTrendChart';
+import { AIEventsTable } from './AIEventsTable';
 
-import { useAdminUsers, useAdminPosts, useAdminCatalog } from "@/features/admin/queries/admin.queries";
+export function DashboardClient({
+  filters,
+  initialData,
+  hasCustomDateRange,
+}: {
+  filters: DashboardFilters;
+  initialData: DashboardInitialData;
+  hasCustomDateRange: boolean;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-const data = [
-  { name: "Mon", users: 4000, aiCalls: 2400 },
-  { name: "Tue", users: 3000, aiCalls: 1398 },
-  { name: "Wed", users: 2000, aiCalls: 9800 },
-  { name: "Thu", users: 2780, aiCalls: 3908 },
-  { name: "Fri", users: 1890, aiCalls: 4800 },
-  { name: "Sat", users: 2390, aiCalls: 3800 },
-  { name: "Sun", users: 3490, aiCalls: 4300 },
-];
+  const overviewQuery = useDashboardOverview(initialData.overview);
+  const aiMarginQuery = useDashboardAIMargin(filters, {
+    enabled: hasCustomDateRange,
+    initialData: hasCustomDateRange ? initialData.aiMargin : undefined,
+  });
+  const analyticsQuery = useDashboardAnalytics(
+    filters,
+    initialData.analytics,
+  );
+  const aiEventsQuery = useDashboardAIEvents(filters, initialData.aiEvents);
 
-export function DashboardClient() {
-  const { data: usersData, isLoading: usersLoading } = useAdminUsers({ limit: 1 });
-  const { data: postsData, isLoading: postsLoading } = useAdminPosts({ limit: 1 });
-  const { data: catalogData, isLoading: catalogLoading } = useAdminCatalog();
+  const overview = overviewQuery.data;
+  const aiMargin = hasCustomDateRange
+    ? aiMarginQuery.data
+    : overview?.aiMargin ?? initialData.aiMargin;
 
-  const totalUsers = usersData?.metadata?.totalItems || 0;
-  const totalPosts = postsData?.metadata?.totalItems || 0;
-  const totalCatalog = catalogData?.metadata?.totalItems || 0;
+  const updateParams = (updates: Record<string, string | null>) => {
+    const next = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === '') {
+        next.delete(key);
+      } else {
+        next.set(key, value);
+      }
+    });
+    const query = next.toString();
+    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
+
+  const refreshAll = async () => {
+    const requests: Promise<unknown>[] = [
+      overviewQuery.refetch(),
+      analyticsQuery.refetch(),
+      aiEventsQuery.refetch(),
+    ];
+    if (hasCustomDateRange) {
+      requests.push(aiMarginQuery.refetch());
+    }
+    await Promise.allSettled(requests);
+  };
+
+  const isRefreshing =
+    overviewQuery.isFetching ||
+    analyticsQuery.isFetching ||
+    aiEventsQuery.isFetching ||
+    (hasCustomDateRange && aiMarginQuery.isFetching);
+
+  const aiMarginIsLoading = hasCustomDateRange
+    ? aiMarginQuery.isLoading
+    : overviewQuery.isLoading;
+  const aiMarginIsFetching = hasCustomDateRange
+    ? aiMarginQuery.isFetching
+    : overviewQuery.isFetching;
+  const aiMarginError = hasCustomDateRange
+    ? aiMarginQuery.error
+    : overviewQuery.error;
+  const retryAIMargin = hasCustomDateRange
+    ? aiMarginQuery.refetch
+    : overviewQuery.refetch;
 
   return (
-    <div className="flex flex-col gap-10 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full pb-24 text-foreground">
+    <div className="mx-auto flex w-full max-w-[1400px] animate-in flex-col gap-8 fade-in pb-24 text-foreground duration-500">
+      <DashboardToolbar
+        key={`${filters.fromDate}-${filters.toDate}`}
+        filters={filters}
+        updatedAt={overview?.kpiCards?.updatedAt}
+        isRefreshing={isRefreshing}
+        onApply={(fromDate, toDate) =>
+          updateParams({ fromDate, toDate })
+        }
+        onReset={() =>
+          updateParams({ fromDate: null, toDate: null })
+        }
+        onRefresh={() => void refreshAll()}
+      />
 
-      {/* High-end Editorial Header */}
-      <div className="flex flex-col gap-8 pt-6 border-b border-border pb-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-4 max-w-2xl">
-            {/* <h1 className="text-5xl md:text-6xl font-semibold font-medium text-foreground leading-[1.1] uppercase">
-              OVERVIEW
-            </h1> */}
-            <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-border pl-4">
-              Theo dõi sức khỏe và hoạt động của nền tảng. Các thông số vận hành theo thời gian thực.
-            </p>
-          </div>
-        </div>
+      <DashboardKpiGrid
+        data={overview?.kpiCards}
+        isLoading={overviewQuery.isLoading}
+        error={overviewQuery.error}
+        onRetry={() => void overviewQuery.refetch()}
+      />
+
+      <div className="grid gap-6 xl:grid-cols-3">
+        <AIMarginPanel
+          data={aiMargin}
+          isLoading={aiMarginIsLoading}
+          isFetching={aiMarginIsFetching}
+          error={aiMarginError}
+          onRetry={() => void retryAIMargin()}
+        />
+        <PayOSPanel
+          data={overview?.payosReconcile}
+          isLoading={overviewQuery.isLoading}
+          error={overviewQuery.error}
+          onRetry={() => void overviewQuery.refetch()}
+        />
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Người Dùng", value: usersLoading ? "..." : totalUsers.toLocaleString('vi-VN'), change: "Thực tế", icon: Users },
-          { label: "Cộng Đồng", value: postsLoading ? "..." : totalPosts.toLocaleString('vi-VN'), change: "Thực tế", icon: Sparkles },
-          { label: "Catalog", value: catalogLoading ? "..." : totalCatalog.toLocaleString('vi-VN'), change: "Thực tế", icon: TrendingUp },
-          { label: "Cần Duyệt (Mock)", value: "14", change: "Alert", icon: ShieldAlert, alert: true },
-        ].map((stat, i) => (
-          <div key={i} className="bg-card border border-border p-6 rounded-3xl flex flex-col gap-6 shadow-sm relative group hover:border-primary/50 transition-colors">
-            <div className="flex justify-between items-start">
-              <span className="text-[10px] font-semibold font-bold text-muted-foreground uppercase tracking-[0.15em] group-hover:text-foreground transition-colors">{stat.label}</span>
-              <div className="text-muted-foreground group-hover:text-foreground transition-colors">
-                <stat.icon className="size-4" strokeWidth={1.5} />
-              </div>
-            </div>
-            <div className="flex items-end justify-between">
-              <span className="text-4xl font-semibold font-medium text-foreground">{stat.value}</span>
-              <span className={cn(
-                "text-[9px] font-semibold font-bold uppercase tracking-widest mb-1",
-                stat.alert ? "text-foreground border-b border-foreground" : "text-muted-foreground"
-              )}>
-                {stat.change}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
+      <DashboardTrendChart
+        data={analyticsQuery.data}
+        isLoading={analyticsQuery.isLoading}
+        isFetching={analyticsQuery.isFetching}
+        error={analyticsQuery.error}
+        onRetry={() => void analyticsQuery.refetch()}
+      />
 
-      {/* Charts Section */}
-      <div className="grid lg:grid-cols-3 gap-6">
-
-        {/* Main Chart */}
-        <div className="lg:col-span-2 bg-card border border-border p-6 rounded-3xl shadow-sm">
-          <div className="mb-8 border-b border-border pb-4">
-            <h3 className="font-semibold text-2xl text-foreground mb-2">Hoạt Động Tuần</h3>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Lượt dùng AI & Lưu lượng truy cập</p>
-          </div>
-
-          <div className="h-[300px] w-full relative">
-            <ResponsiveContainer width="99%" height={300}>
-              <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis dataKey="name" stroke="#A3A3A3" fontSize={10} fontFamily="IBM Plex Mono" tickLine={false} axisLine={false} />
-                <YAxis stroke="#A3A3A3" fontSize={10} fontFamily="IBM Plex Mono" tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000}k`} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#111', borderColor: '#111', borderRadius: '0', color: '#FFF', fontFamily: 'IBM Plex Mono', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
-                  itemStyle={{ color: '#FFF' }}
-                />
-                <Line type="monotone" dataKey="aiCalls" name="Lượt dùng AI" stroke="#111" strokeWidth={2} dot={{ r: 3, strokeWidth: 1, fill: '#111' }} activeDot={{ r: 5 }} />
-                <Line type="monotone" dataKey="users" name="Truy cập" stroke="#A3A3A3" strokeWidth={1.5} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* System Load */}
-        <div className="bg-card border border-border p-6 rounded-3xl shadow-sm flex flex-col">
-          <div className="mb-8 border-b border-border pb-4">
-            <h3 className="font-semibold text-2xl text-foreground mb-2">Tải Hệ Thống</h3>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Trạng thái xử lý thời gian thực</p>
-          </div>
-
-          <div className="flex-1 flex flex-col justify-center gap-8">
-            <div className="space-y-3">
-              <div className="flex justify-between text-[11px] font-semibold uppercase tracking-widest text-foreground font-bold">
-                <span>LLM Engine</span>
-                <span>45%</span>
-              </div>
-              <div className="h-1 w-full bg-muted overflow-hidden rounded-full">
-                <div className="h-full bg-primary w-[45%] rounded-full" />
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between text-[11px] font-semibold uppercase tracking-widest text-foreground font-bold">
-                <span>Computer Vision</span>
-                <span>78%</span>
-              </div>
-              <div className="h-1 w-full bg-muted overflow-hidden rounded-full">
-                <div className="h-full bg-foreground w-[78%] rounded-full" />
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between text-[11px] font-semibold uppercase tracking-widest text-foreground font-bold">
-                <span>Database Query</span>
-                <span>12%</span>
-              </div>
-              <div className="h-1 w-full bg-muted overflow-hidden rounded-full">
-                <div className="h-full bg-[#A3A3A3] w-[12%]" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
+      <AIEventsTable
+        filters={filters}
+        data={aiEventsQuery.data}
+        isLoading={aiEventsQuery.isLoading}
+        isFetching={aiEventsQuery.isFetching}
+        error={aiEventsQuery.error}
+        onStatusChange={(aiStatus) =>
+          updateParams({
+            aiStatus: aiStatus || null,
+            aiPage: '1',
+          })
+        }
+        onPageChange={(aiPage) =>
+          updateParams({ aiPage: String(aiPage) })
+        }
+        onRetry={() => void aiEventsQuery.refetch()}
+      />
     </div>
   );
 }

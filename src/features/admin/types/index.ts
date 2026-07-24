@@ -167,3 +167,5 @@ export interface CommentRes {
   isDeleted?: boolean;
   status?: string;
 }
+
+export * from './dashboard';

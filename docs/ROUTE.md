@@ -393,6 +393,119 @@ Thông tin cập nhật
 
 ---
 
+## Dashboard Admin
+
+### `GET` `/api/v1/admin/dashboard/ai-margin`
+
+**Summary**: Phân tích biên lợi nhuận AI Token
+
+**Description**: Thống kê doanh thu subscription, chi phí thực tế tiêu thụ AI Token (ai_usage_period_ledgers), lợi nhuận ròng AI (net_ai_margin) và phần trăm biên lợi nhuận.
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `fromDate` | query | string | No | Ngày bắt đầu (định dạng YYYY-MM-DD) |
+| `toDate` | query | string | No | Ngày kết thúc (định dạng YYYY-MM-DD) |
+
+**Responses**:
+
+- **200**: Lấy thông tin biên lợi nhuận AI thành công
+  - Data Schema: [AIMarginAnalyticsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaimarginanalyticsres)
+    **Properties**:
+    - `aiErrorCount` (integer)
+    - `aiRequestsCount` (integer)
+    - `fromDate` (string)
+    - `marginPercentage` (number)
+    - `netAiMarginVnd` (number)
+    - `toDate` (string)
+    - `totalAiActualCostVnd` (number)
+    - `totalAiPaidTokens` (integer)
+    - `totalSubscriptionRevVnd` (number)
+
+---
+
+### `GET` `/api/v1/admin/dashboard/drilldown/ai-events`
+
+**Summary**: Truy vết chi tiết các sự kiện lỗi AI (Drill-down Admin)
+
+**Description**: Lấy danh sách phân trang các sự kiện lỗi AI token với thông tin provider, model, status code.
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `status` | query | string | No | Trạng thái lỗi (ví dụ: FAILED) |
+| `page` | query | integer | No | Số trang |
+| `limit` | query | integer | No | Số lượng phần tử mỗi trang |
+
+**Responses**:
+
+- **200**: Lấy chi tiết sự kiện AI thành công
+  - Data Schema: [DrillDownAIEventListRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownaieventlistres)
+    **Properties**:
+    - `items` (Array<DrillDownAIEventDTO>)
+    - `metadata` (ref: PaginationMetadata)
+
+---
+
+### `GET` `/api/v1/admin/dashboard/kpi-cards`
+
+**Summary**: Lấy các thẻ chỉ số KPI tổng quan Admin
+
+**Description**: Lấy thông tin tổng số lượng người dùng, chỉ số DAU, số nhãn hàng active, số nhãn hàng chờ duyệt, doanh thu subscription và biên lợi nhuận AI net margin.
+
+**Responses**:
+
+- **200**: Lấy danh sách thẻ KPI Admin thành công
+  - Data Schema: [AdminKPICardsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminkpicardsres)
+    **Properties**:
+    - `activeUsersDau` (integer)
+    - `netAiMarginVnd` (number)
+    - `payOSSuccessCount` (integer)
+    - `pendingReviewBrands` (integer)
+    - `subscriptionRevenueVnd` (number)
+    - `totalBrands` (integer)
+    - `totalUsers` (integer)
+    - `updatedAt` (string)
+
+---
+
+### `GET` `/api/v1/admin/dashboard/overview`
+
+**Summary**: Báo cáo tổng quan Admin Dashboard
+
+**Description**: Tổng hợp tất cả dữ liệu từ KPI Cards, AI Margin Analytics và PayOS Reconciliation trong 1 kết quả duy nhất.
+
+**Responses**:
+
+- **200**: Lấy thông tin tổng quan hệ thống thành công
+  - Data Schema: [AdminOverviewRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminoverviewres)
+    **Properties**:
+    - `aiMargin` (ref: AIMarginAnalyticsRes)
+    - `kpiCards` (ref: AdminKPICardsRes)
+    - `payosReconcile` (ref: PayOSReconciliationRes)
+
+---
+
+### `GET` `/api/v1/admin/dashboard/payos-reconciliation`
+
+**Summary**: Thống kê đối soát giao dịch PayOS
+
+**Description**: Báo cáo đối soát số lượng giao dịch thanh toán PayOS, tỷ lệ thành công/thất bại và tổng số tiền thanh toán thực tế.
+
+**Responses**:
+
+- **200**: Lấy thông tin đối soát PayOS thành công
+  - Data Schema: [PayOSReconciliationRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopayosreconciliationres)
+    **Properties**:
+    - `failedCount` (integer)
+    - `successCount` (integer)
+    - `totalSuccessValue` (number)
+    - `totalTransactions` (integer)
+
+---
+
 ## Wardrobe AI
 
 ### `GET` `/api/v1/ai/chat/sessions`
@@ -1039,7 +1152,7 @@ Trạng thái mới
 
 ### `GET` `/api/v1/brands/{brandId}/benefits`
 
-**Summary**: Lấy danh sách quyền lợi đang hoạt động của brand (User)
+**Summary**: Lấy danh sách quyền lợi đang hoạt động của brand (Public)
 
 **Request Parameters**:
 
@@ -2685,6 +2798,112 @@ Danh sách thành viên cần thêm
 
 ---
 
+## Dashboard Brand
+
+### `GET` `/api/v1/brand/dashboard/drilldown/sample-lab-feedbacks`
+
+**Summary**: Truy vết chi tiết đánh giá mẫu thử 3D (Drill-down Brand)
+
+**Description**: Lấy danh sách phân trang chi tiết các nhận xét và lượt bình chọn của mẫu thử sản phẩm.
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `itemId` | query | string | Yes | ID Sản phẩm mẫu thử |
+| `page` | query | integer | No | Số trang |
+| `limit` | query | integer | No | Số lượng phần tử mỗi trang |
+
+**Responses**:
+
+- **200**: Lấy chi tiết đánh giá mẫu thử thành công
+  - Data Schema: [DrillDownSampleFeedbackListRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownsamplefeedbacklistres)
+    **Properties**:
+    - `items` (Array<DrillDownSampleFeedbackDTO>)
+    - `metadata` (ref: PaginationMetadata)
+
+---
+
+### `GET` `/api/v1/brand/dashboard/financials/points-liability`
+
+**Summary**: Phân tích nợ điểm hết hạn trong 30 ngày (Column-Level RBAC)
+
+**Description**: Thống kê số điểm hết hạn trong 30 ngày tới & giá trị quy đổi VND tương ứng. Giá trị VND sẽ bị ẩn (redacted) đối với tài khoản cấp Staff.
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | query | string | Yes | ID Nhãn hàng |
+
+**Responses**:
+
+- **200**: Lấy báo cáo nghĩa vụ điểm quy đổi thành công
+  - Data Schema: [BrandPointsLiabilityRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtobrandpointsliabilityres)
+    **Properties**:
+    - `brandId` (string)
+    - `pointsExpiring30d` (integer)
+    - `pointsLiabilityValueVnd` (number)
+
+---
+
+### `GET` `/api/v1/brand/dashboard/kpi-cards`
+
+**Summary**: Lấy thẻ KPI tổng quan B2B Brand Portal
+
+**Description**: Lấy thống kê số hội viên, điểm phát hành, điểm quy đổi, số voucher active/quy đổi của nhãn hàng.
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | query | string | Yes | ID Nhãn hàng |
+
+**Responses**:
+
+- **200**: Lấy thẻ KPI nhãn hàng thành công
+  - Data Schema: [BrandKPICardsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtobrandkpicardsres)
+    **Properties**:
+    - `activeVouchers` (integer)
+    - `brandId` (string)
+    - `csFirstResponseAvgSeconds` (integer)
+    - `digitalSampleAvgRating` (number)
+    - `digitalSampleVotesCount` (integer)
+    - `openCsTickets` (integer)
+    - `pointsIssued` (integer)
+    - `pointsRedeemed` (integer)
+    - `totalMembers` (integer)
+    - `updatedAt` (string)
+    - `vouchersRedeemed` (integer)
+
+---
+
+### `GET` `/api/v1/brand/dashboard/operations/digital-sample-lab/{itemId}`
+
+**Summary**: Phân tích đánh giá mẫu thử Digital Sample Lab
+
+**Description**: Thống kê số lượt bình chọn, rating trung bình, sentiment phản hồi và danh sách danh mục trang phục thường phối kèm nhiều nhất.
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | query | string | Yes | ID Nhãn hàng |
+| `itemId` | path | string | Yes | ID Sản phẩm mẫu thử |
+
+**Responses**:
+
+- **200**: Lấy phân tích mẫu thử thành công
+  - Data Schema: [DigitalSampleLabAnalyticsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodigitalsamplelabanalyticsres)
+    **Properties**:
+    - `avgRating` (number)
+    - `feedbackSentiment` (ref: FeedbackSentiment)
+    - `itemId` (string)
+    - `topPairedCategories` (Array<PairedCategoryStat>)
+    - `votesCount` (integer)
+
+---
+
 ## Category
 
 ### `GET` `/api/v1/categories`
@@ -2702,6 +2921,41 @@ Danh sách thành viên cần thêm
     - `name` (string)
     - `slug` (string)
     - `sortOrder` (integer)
+
+---
+
+## Dashboard Analytics
+
+### `POST` `/api/v1/dashboard/analytics/query`
+
+**Summary**: Truy vấn tổng hợp linh hoạt đa chiều (Dynamic Query Engine)
+
+**Description**: Gửi các chỉ số (metrics), khoảng thời gian (timeframe), độ mịn (granularity) và bộ lọc để nhận dữ liệu Time-Series linh hoạt. Kiểm tra quyền truy cập theo TargetDashboard.
+
+**Request Body**:
+
+Thông số truy vấn động
+
+- Schema: [DynamicQueryReq](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicqueryreq)
+    **Properties**:
+    - `brandId` (string)
+    - `compareWithPrevious` (boolean)
+    - `filters` (object)
+    - `granularity` (object) - "hour" | "day" | "week" | "month"
+    - `groupBy` (Array<string>)
+    - `metrics` (Array<MetricKey>)
+    - `targetDashboard` (object) - "admin" | "brand" | "user"
+    - `timeframe` (ref: DynamicQueryTimeframeDTO)
+
+**Responses**:
+
+- **200**: Truy vấn dữ liệu tổng hợp thành công
+  - Data Schema: [DynamicQueryRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicqueryres)
+    **Properties**:
+    - `comparison` (ref: ComparisonDTO)
+    - `granularity` (ref: Granularity)
+    - `series` (Array<TimeSeriesPointDTO>)
+    - `targetDashboard` (ref: TargetDashboard)
 
 ---
 
@@ -2896,6 +3150,29 @@ Mật khẩu cũ và mới
     **Properties**:
     - `data` (object)
     - `message` (string)
+
+---
+
+## Dashboard User
+
+### `GET` `/api/v1/me/dashboard/wardrobe-insights`
+
+**Summary**: Thống kê phân tích tủ đồ cá nhân
+
+**Description**: Lấy tổng giá trị tài chính tủ đồ, giá trị trung bình mỗi món đồ (tổng giá trị / số món), tổng số đồ lãng phí chưa mặc > 30 ngày và danh sách đề xuất.
+
+**Responses**:
+
+- **200**: Lấy phân tích tủ đồ cá nhân thành công
+  - Data Schema: [UserWardrobeInsightsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtouserwardrobeinsightsres)
+    **Properties**:
+    - `aiQuotaRemaining` (integer)
+    - `averageItemValueVnd` (number)
+    - `expiringVouchersCount` (integer)
+    - `totalItems` (integer)
+    - `totalWardrobeValueVnd` (number)
+    - `underutilizedItems` (Array<UnderutilizedItemDTO>)
+    - `underutilizedItemsCount` (integer)
 
 ---
 
@@ -4373,6 +4650,238 @@ Dữ liệu Webhook
 - `adjust` (**Adjust**)
 - `expire` (**Expire**)
 - `refund` (**Refund**)
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaimarginanalyticsres"></a>`AIMarginAnalyticsRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `aiErrorCount` | integer | No |  |
+| `aiRequestsCount` | integer | No |  |
+| `fromDate` | string | No |  |
+| `marginPercentage` | number | No |  |
+| `netAiMarginVnd` | number | No |  |
+| `toDate` | string | No |  |
+| `totalAiActualCostVnd` | number | No |  |
+| `totalAiPaidTokens` | integer | No |  |
+| `totalSubscriptionRevVnd` | number | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminkpicardsres"></a>`AdminKPICardsRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `activeUsersDau` | integer | No |  |
+| `netAiMarginVnd` | number | No |  |
+| `payOSSuccessCount` | integer | No |  |
+| `pendingReviewBrands` | integer | No |  |
+| `subscriptionRevenueVnd` | number | No |  |
+| `totalBrands` | integer | No |  |
+| `totalUsers` | integer | No |  |
+| `updatedAt` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminoverviewres"></a>`AdminOverviewRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `aiMargin` | [AIMarginAnalyticsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaimarginanalyticsres) | No |  |
+| `kpiCards` | [AdminKPICardsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminkpicardsres) | No |  |
+| `payosReconcile` | [PayOSReconciliationRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopayosreconciliationres) | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtobrandkpicardsres"></a>`BrandKPICardsRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `activeVouchers` | integer | No |  |
+| `brandId` | string | No |  |
+| `csFirstResponseAvgSeconds` | integer | No |  |
+| `digitalSampleAvgRating` | number | No |  |
+| `digitalSampleVotesCount` | integer | No |  |
+| `openCsTickets` | integer | No |  |
+| `pointsIssued` | integer | No |  |
+| `pointsRedeemed` | integer | No |  |
+| `totalMembers` | integer | No |  |
+| `updatedAt` | string | No |  |
+| `vouchersRedeemed` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtobrandpointsliabilityres"></a>`BrandPointsLiabilityRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `pointsExpiring30d` | integer | No |  |
+| `pointsLiabilityValueVnd` | number | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocomparisondto"></a>`ComparisonDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `metricDeltaPercentages` | object | No |  |
+| `previousPeriodFrom` | string | No |  |
+| `previousPeriodTo` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodigitalsamplelabanalyticsres"></a>`DigitalSampleLabAnalyticsRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `avgRating` | number | No |  |
+| `feedbackSentiment` | [FeedbackSentiment](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsfeedbacksentimentfeedbacksentiment) | No |  |
+| `itemId` | string | No |  |
+| `topPairedCategories` | Array<[PairedCategoryStat](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopairedcategorystat)> | No |  |
+| `votesCount` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownaieventdto"></a>`DrillDownAIEventDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `createdAt` | string | No |  |
+| `errorMessage` | string | No |  |
+| `model` | string | No |  |
+| `provider` | string | No |  |
+| `requestId` | string | No |  |
+| `statusCode` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownaieventlistres"></a>`DrillDownAIEventListRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `items` | Array<[DrillDownAIEventDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownaieventdto)> | No |  |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownsamplefeedbackdto"></a>`DrillDownSampleFeedbackDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `comment` | string | No |  |
+| `createdAt` | string | No |  |
+| `feedbackId` | string | No |  |
+| `itemId` | string | No |  |
+| `rating` | number | No |  |
+| `userId` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownsamplefeedbacklistres"></a>`DrillDownSampleFeedbackListRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `items` | Array<[DrillDownSampleFeedbackDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownsamplefeedbackdto)> | No |  |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicqueryreq"></a>`DynamicQueryReq`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `compareWithPrevious` | boolean | No |  |
+| `filters` | object | No |  |
+| `granularity` | object | No | "hour" | "day" | "week" | "month" |
+| `groupBy` | Array<string> | No |  |
+| `metrics` | Array<[MetricKey](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsmetrickeymetrickey)> | No |  |
+| `targetDashboard` | object | No | "admin" | "brand" | "user" |
+| `timeframe` | [DynamicQueryTimeframeDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicquerytimeframedto) | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicqueryres"></a>`DynamicQueryRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `comparison` | [ComparisonDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocomparisondto) | No |  |
+| `granularity` | [Granularity](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsgranularitygranularity) | No |  |
+| `series` | Array<[TimeSeriesPointDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtotimeseriespointdto)> | No |  |
+| `targetDashboard` | [TargetDashboard](#smart-wardrobe-beinternalmodulesdashboarddomainconstantstargetdashboardtargetdashboard) | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicquerytimeframedto"></a>`DynamicQueryTimeframeDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `fromDate` | string | No |  |
+| `toDate` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtopairedcategorystat"></a>`PairedCategoryStat`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `categoryName` | string | No |  |
+| `pairCount` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtopayosreconciliationres"></a>`PayOSReconciliationRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `failedCount` | integer | No |  |
+| `successCount` | integer | No |  |
+| `totalSuccessValue` | number | No |  |
+| `totalTransactions` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtotimeseriespointdto"></a>`TimeSeriesPointDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `metrics` | object | No |  |
+| `timestamp` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtounderutilizeditemdto"></a>`UnderutilizedItemDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `categoryName` | string | No |  |
+| `imageUrl` | string | No |  |
+| `itemId` | string | No |  |
+| `lastWornDaysAgo` | integer | No |  |
+| `name` | string | No |  |
+| `purchasePriceVnd` | number | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtouserwardrobeinsightsres"></a>`UserWardrobeInsightsRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `aiQuotaRemaining` | integer | No |  |
+| `averageItemValueVnd` | number | No |  |
+| `expiringVouchersCount` | integer | No |  |
+| `totalItems` | integer | No |  |
+| `totalWardrobeValueVnd` | number | No |  |
+| `underutilizedItems` | Array<[UnderutilizedItemDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtounderutilizeditemdto)> | No |  |
+| `underutilizedItemsCount` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantsfeedbacksentimentfeedbacksentiment"></a>`FeedbackSentiment`
+
+*Enum values:*
+
+- `positive` (**Positive**)
+- `neutral` (**Neutral**)
+- `negative` (**Negative**)
+
+### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantsgranularitygranularity"></a>`Granularity`
+
+*Enum values:*
+
+- `hour` (**Hour**)
+- `day` (**Day**)
+- `week` (**Week**)
+- `month` (**Month**)
+
+### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantsmetrickeymetrickey"></a>`MetricKey`
+
+*Enum values:*
+
+- `total_users` (**TotalUsers**)
+- `active_users_dau` (**ActiveUsersDau**)
+- `total_brands` (**TotalBrands**)
+- `pending_review_brands` (**PendingReviewBrands**)
+- `ai_requests_count` (**AIRequestsCount**)
+- `subscription_revenue_vnd` (**SubscriptionRevenueVND**)
+- `net_ai_margin_vnd` (**NetAIMarginVND**)
+- `total_members` (**TotalMembers**)
+- `points_issued` (**PointsIssued**)
+- `points_redeemed` (**PointsRedeemed**)
+- `active_vouchers` (**ActiveVouchers**)
+- `total_wardrobe_items` (**TotalWardrobeItems**)
+- `total_wardrobe_value_vnd` (**TotalWardrobeValueVND**)
+- `average_cost_per_wear_vnd` (**AverageCostPerWearVND**)
+
+### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantstargetdashboardtargetdashboard"></a>`TargetDashboard`
+
+*Enum values:*
+
+- `admin` (**Admin**)
+- `brand` (**Brand**)
+- `user` (**User**)
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtocategorybriefres"></a>`CategoryBriefRes`
 
