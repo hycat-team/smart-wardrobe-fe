@@ -91,7 +91,7 @@ export function DashboardKpiGrid({
       icon: Building2,
     },
     {
-      label: 'Chờ phê duyệt',
+      label: 'Thương hiệu chờ phê duyệt',
       value: formatNumber(data.pendingReviewBrands),
       helper: 'Yêu cầu cần xử lý',
       icon: ShieldAlert,

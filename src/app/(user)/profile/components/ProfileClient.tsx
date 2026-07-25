@@ -127,9 +127,9 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
           </div>
 
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/50 border border-border text-xs font-medium">
+            {/* <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/50 border border-border text-xs font-medium">
               <Award className="size-4 text-terracotta" /> 12 Outfit
-            </div>
+            </div> */}
             {isPremium ? (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-bold uppercase tracking-widest">
                 <Crown className="size-4" /> Premium

@@ -177,7 +177,7 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                     Đặc Quyền
                   </TabsTrigger>
                   <TabsTrigger value="redemptions" className="rounded-xl px-6 py-3 text-sm font-semibold data-[state=active]:bg-zinc-950 data-[state=active]:text-white transition-all">
-                    Voucher Của Tôi
+                    Quyền lợi Của Tôi
                   </TabsTrigger>
                   <TabsTrigger value="history" className="rounded-xl px-6 py-3 text-sm font-semibold data-[state=active]:bg-zinc-950 data-[state=active]:text-white transition-all">
                     Lịch Sử Điểm

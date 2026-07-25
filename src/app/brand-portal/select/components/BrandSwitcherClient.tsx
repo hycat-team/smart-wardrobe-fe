@@ -41,9 +41,9 @@ export default function BrandSwitcherClient() {
           Tài khoản của bạn chưa được liên kết với bất kỳ thương hiệu nào. Bạn có thể đăng ký tạo thương hiệu mới.
         </p>
         <div className="flex justify-center gap-3">
-          <Button variant="outline" className="rounded-full" onClick={() => router.push('/auth/login')}>
+          {/* <Button variant="outline" className="rounded-full" onClick={() => router.push('/auth/login')}>
             <LogOut className="w-4 h-4 mr-2" /> Đăng xuất
-          </Button>
+          </Button> */}
           <Button className="rounded-full" onClick={() => router.push('/brand-portal/register')}>
             Đăng ký thương hiệu
           </Button>
@@ -90,7 +90,7 @@ export default function BrandSwitcherClient() {
                 </div>
               </div>
               <div className="mt-auto pt-4 border-t border-border flex items-center justify-between text-sm text-muted-foreground">
-                <span>{brand.id}</span>
+                {/* <span>{brand.id}</span> */}
                 {isActive ? (
                   <span className="flex items-center gap-1 font-semibold group-hover:text-primary transition-colors">
                     Quản lý <ArrowRight className="w-4 h-4" />

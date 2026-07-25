@@ -88,6 +88,10 @@ export const PricingCard = ({ plan, isPopular, currentPlanSlug }: PricingCardPro
         <ul className="space-y-5 mb-14 flex-1 font-bold text-[11px] uppercase tracking-widest">
           <li className="flex items-center gap-4 group/item">
             <span className="w-[6px] h-[6px] rounded-full bg-primary transition-transform duration-300 group-hover/item:scale-[2]"></span>
+            <span className="opacity-70">TỐI ĐA <strong className="font-bold opacity-100 text-[12px]">{plan.maxWardrobeItems}</strong> ITEMS</span>
+          </li>
+          <li className="flex items-center gap-4 group/item">
+            <span className="w-[6px] h-[6px] rounded-full bg-primary transition-transform duration-300 group-hover/item:scale-[2]"></span>
             <span className="opacity-70">TỐI ĐA <strong className="font-bold opacity-100 text-[12px]">{plan.maxOutfits || plan.MaxOutfits}</strong> BỘ PHỐI ĐỒ</span>
           </li>
           <li className="flex items-center gap-4 group/item">

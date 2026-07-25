@@ -425,6 +425,48 @@ Thông tin cập nhật
 
 ---
 
+### `GET` `/api/v1/admin/dashboard/ai/error-breakdown`
+
+**Summary**: Thống kê lỗi AI theo mã lỗi, nhà cung cấp và mô hình
+
+**Description**: Thống kê số lượng lỗi, tổng số request và tỷ lệ lỗi AI, phân nhóm theo error_code, provider và model
+
+**Responses**:
+
+- **200**: Lấy thống kê lỗi AI thành công
+  - Data Schema: [AIErrorBreakdownRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaierrorbreakdownres)
+    **Properties**:
+    - `breakdown` (Array<AIErrorBreakdownDTO>)
+    - `errorRate` (number)
+    - `totalErrors` (integer)
+    - `totalRequests` (integer)
+
+---
+
+### `GET` `/api/v1/admin/dashboard/ai/usage-by-operation`
+
+**Summary**: Thống kê sử dụng AI theo tác vụ
+
+**Description**: Thống kê số lượng request, chi phí và token AI theo từng loại tác vụ (operation) và tuyến xử lý (logical_route), hỗ trợ lọc khoảng thời gian
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `fromDate` | query | string | No | Ngày bắt đầu (định dạng YYYY-MM-DD) |
+| `toDate` | query | string | No | Ngày kết thúc (định dạng YYYY-MM-DD) |
+
+**Responses**:
+
+- **200**: Lấy thống kê sử dụng AI thành công
+  - Data Schema: [AIUsageByOperationRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaiusagebyoperationres)
+    **Properties**:
+    - `fromDate` (string)
+    - `operations` (Array<AIUsageByOperationDTO>)
+    - `toDate` (string)
+
+---
+
 ### `GET` `/api/v1/admin/dashboard/drilldown/ai-events`
 
 **Summary**: Truy vết chi tiết các sự kiện lỗi AI (Drill-down Admin)
@@ -503,6 +545,66 @@ Thông tin cập nhật
     - `successCount` (integer)
     - `totalSuccessValue` (number)
     - `totalTransactions` (integer)
+
+---
+
+### `GET` `/api/v1/admin/dashboard/subscriptions/distribution`
+
+**Summary**: Phân bổ người dùng theo gói subscription
+
+**Description**: Thống kê số lượng người dùng và tỷ lệ phần trăm theo từng gói subscription (FREE, PREMIUM_MONTHLY, PREMIUM_YEARLY, v.v.)
+
+**Responses**:
+
+- **200**: Lấy phân bổ subscription thành công
+  - Data Schema: [SubscriptionDistributionRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtosubscriptiondistributionres)
+    **Properties**:
+    - `distribution` (Array<SubscriptionDistributionDTO>)
+    - `totalUsers` (integer)
+
+---
+
+### `GET` `/api/v1/admin/dashboard/subscriptions/renewal-stats`
+
+**Summary**: Thống kê gia hạn subscription
+
+**Description**: Thống kê tổng số lần gia hạn, số thành công, số thất bại, tỷ lệ thành công và số lần thử lại trung bình
+
+**Responses**:
+
+- **200**: Lấy thống kê gia hạn subscription thành công
+  - Data Schema: [RenewalStatsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtorenewalstatsres)
+    **Properties**:
+    - `avgRetryCount` (number)
+    - `failedCount` (integer)
+    - `successCount` (integer)
+    - `successRate` (number)
+    - `totalAttempts` (integer)
+
+---
+
+### `GET` `/api/v1/admin/dashboard/subscriptions/revenue-breakdown`
+
+**Summary**: Doanh thu subscription theo gói và thời gian
+
+**Description**: Thống kê doanh thu subscription theo từng plan_code và theo tháng, hỗ trợ lọc khoảng thời gian
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `fromDate` | query | string | No | Ngày bắt đầu (định dạng YYYY-MM-DD) |
+| `toDate` | query | string | No | Ngày kết thúc (định dạng YYYY-MM-DD) |
+
+**Responses**:
+
+- **200**: Lấy doanh thu subscription thành công
+  - Data Schema: [RevenueBreakdownRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtorevenuebreakdownres)
+    **Properties**:
+    - `breakdown` (Array<RevenueBreakdownDTO>)
+    - `fromDate` (string)
+    - `toDate` (string)
+    - `totalRevenueVnd` (number)
 
 ---
 
@@ -711,7 +813,7 @@ Yêu cầu gợi ý phối đồ
     **Properties**:
     - `colorTone` (string) - Tông màu phối đồ (Gợi ý: light, dark, pastel, earthy, neon... hoặc nhập tông màu tùy ý)
     - `details` (string) - Ghi chú thêm bằng tay (free text)
-    - `include_brand_items` (boolean) - Cho phép phối đồ của brand (tỷ lệ tối đa 30%)
+    - `includeBrandItems` (boolean) - Cho phép phối đồ của brand (tỷ lệ tối đa 30%)
     - `occasion` (string) - Dịp phối đồ (Gợi ý: casual, work, date, party, sport, hoặc nhập dịp tùy ý)
     - `season` (string) - Mùa phối đồ @enums spring,summer,autumn,winter,all
     - `styleTarget` (string) - Phong cách hướng tới (Gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant, hoặc nhập phong cách tùy ý)
@@ -2800,6 +2902,76 @@ Danh sách thành viên cần thêm
 
 ## Dashboard Brand
 
+### `GET` `/api/v1/brand/dashboard/benefits/redemption-analytics`
+
+**Summary**: Thống kê đổi benefit
+
+**Description**: Thống kê top benefit được đổi nhiều nhất và xu hướng đổi benefit theo thời gian
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | query | string | Yes | ID Nhãn hàng |
+
+**Responses**:
+
+- **200**: Lấy thống kê đổi benefit thành công
+  - Data Schema: [BenefitRedemptionAnalyticsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtobenefitredemptionanalyticsres)
+    **Properties**:
+    - `brandId` (string)
+    - `topBenefits` (Array<BenefitRedemptionDTO>)
+    - `totalRedemptions` (integer)
+    - `trend` (Array<RedemptionTrendDTO>)
+
+---
+
+### `GET` `/api/v1/brand/dashboard/customers/acquisition`
+
+**Summary**: Thống kê kênh thu hút khách hàng
+
+**Description**: Thống kê số lượng khách hàng và tỷ lệ phần trăm theo từng kênh thu hút (joined_source)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | query | string | Yes | ID Nhãn hàng |
+
+**Responses**:
+
+- **200**: Lấy thống kê kênh thu hút khách hàng thành công
+  - Data Schema: [CustomerAcquisitionRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocustomeracquisitionres)
+    **Properties**:
+    - `brandId` (string)
+    - `sources` (Array<CustomerAcquisitionDTO>)
+    - `totalCustomers` (integer)
+
+---
+
+### `GET` `/api/v1/brand/dashboard/customers/spend-segmentation`
+
+**Summary**: Phân khúc chi tiêu khách hàng
+
+**Description**: Thống kê số lượng khách hàng theo các nhóm chi tiêu (low, medium, high, premium)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | query | string | Yes | ID Nhãn hàng |
+
+**Responses**:
+
+- **200**: Lấy phân khúc chi tiêu thành công
+  - Data Schema: [SpendSegmentationRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtospendsegmentationres)
+    **Properties**:
+    - `brandId` (string)
+    - `segments` (Array<SpendSegmentDTO>)
+    - `totalCustomers` (integer)
+
+---
+
 ### `GET` `/api/v1/brand/dashboard/drilldown/sample-lab-feedbacks`
 
 **Summary**: Truy vết chi tiết đánh giá mẫu thử 3D (Drill-down Brand)
@@ -2878,6 +3050,75 @@ Danh sách thành viên cần thêm
 
 ---
 
+### `GET` `/api/v1/brand/dashboard/loyalty/point-expiry-forecast`
+
+**Summary**: Dự báo điểm loyalty sắp hết hạn
+
+**Description**: Dự báo số điểm sắp hết hạn theo từng tháng dựa trên dữ liệu loyalty_point_lots
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | query | string | Yes | ID Nhãn hàng |
+
+**Responses**:
+
+- **200**: Lấy dự báo điểm hết hạn thành công
+  - Data Schema: [PointExpiryForecastRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopointexpiryforecastres)
+    **Properties**:
+    - `brandId` (string)
+    - `forecast` (Array<PointExpiryForecastDTO>)
+
+---
+
+### `GET` `/api/v1/brand/dashboard/loyalty/tier-distribution`
+
+**Summary**: Phân bổ hạng loyalty thành viên
+
+**Description**: Thống kê số lượng thành viên theo từng hạng loyalty (Bronze, Silver, Gold, v.v.)
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | query | string | Yes | ID Nhãn hàng |
+
+**Responses**:
+
+- **200**: Lấy phân bổ hạng loyalty thành công
+  - Data Schema: [TierDistributionRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtotierdistributionres)
+    **Properties**:
+    - `brandId` (string)
+    - `tiers` (Array<TierDistributionDTO>)
+    - `totalMembers` (integer)
+
+---
+
+### `GET` `/api/v1/brand/dashboard/operations/catalog-stats`
+
+**Summary**: Thống kê catalog sản phẩm
+
+**Description**: Thống kê tổng số sản phẩm trong catalog, phân bổ theo trạng thái và loại sản phẩm
+
+**Request Parameters**:
+
+| Name | In | Type | Required | Description |
+| --- | --- | --- | --- | --- |
+| `brandId` | query | string | Yes | ID Nhãn hàng |
+
+**Responses**:
+
+- **200**: Lấy thống kê catalog thành công
+  - Data Schema: [CatalogStatsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatsres)
+    **Properties**:
+    - `brandId` (string)
+    - `byStatus` (Array<CatalogStatGroupDTO>)
+    - `byType` (Array<CatalogStatGroupDTO>)
+    - `totalItems` (integer)
+
+---
+
 ### `GET` `/api/v1/brand/dashboard/operations/digital-sample-lab/{itemId}`
 
 **Summary**: Phân tích đánh giá mẫu thử Digital Sample Lab
@@ -2940,9 +3181,7 @@ Thông số truy vấn động
     **Properties**:
     - `brandId` (string)
     - `compareWithPrevious` (boolean)
-    - `filters` (object)
-    - `granularity` (object) - "hour" | "day" | "week" | "month"
-    - `groupBy` (Array<string>)
+    - `granularity` (object) - "day" | "week" | "month" | "year"
     - `metrics` (Array<MetricKey>)
     - `targetDashboard` (object) - "admin" | "brand" | "user"
     - `timeframe` (ref: DynamicQueryTimeframeDTO)
@@ -3166,13 +3405,27 @@ Mật khẩu cũ và mới
 - **200**: Lấy phân tích tủ đồ cá nhân thành công
   - Data Schema: [UserWardrobeInsightsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtouserwardrobeinsightsres)
     **Properties**:
-    - `aiQuotaRemaining` (integer)
-    - `averageItemValueVnd` (number)
     - `expiringVouchersCount` (integer)
     - `totalItems` (integer)
     - `totalWardrobeValueVnd` (number)
     - `underutilizedItems` (Array<UnderutilizedItemDTO>)
     - `underutilizedItemsCount` (integer)
+
+---
+
+### `GET` `/api/v1/me/dashboard/wardrobe/category-distribution`
+
+**Summary**: Phân bổ danh mục tủ đồ
+
+**Description**: Thống kê số lượng và tỷ lệ phần trăm item trong tủ đồ theo từng danh mục thời trang
+
+**Responses**:
+
+- **200**: Lấy phân bổ danh mục tủ đồ thành công
+  - Data Schema: [WardrobeCategoryDistributionRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtowardrobecategorydistributionres)
+    **Properties**:
+    - `categories` (Array<CategoryDistributionDTO>)
+    - `totalItems` (integer)
 
 ---
 
@@ -4651,6 +4904,24 @@ Dữ liệu Webhook
 - `expire` (**Expire**)
 - `refund` (**Refund**)
 
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaierrorbreakdowndto"></a>`AIErrorBreakdownDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `errorCode` | string | No |  |
+| `errorCount` | integer | No |  |
+| `model` | string | No |  |
+| `provider` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaierrorbreakdownres"></a>`AIErrorBreakdownRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `breakdown` | Array<[AIErrorBreakdownDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaierrorbreakdowndto)> | No |  |
+| `errorRate` | number | No |  |
+| `totalErrors` | integer | No |  |
+| `totalRequests` | integer | No |  |
+
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaimarginanalyticsres"></a>`AIMarginAnalyticsRes`
 
 | Property | Type | Required | Description |
@@ -4664,6 +4935,25 @@ Dữ liệu Webhook
 | `totalAiActualCostVnd` | number | No |  |
 | `totalAiPaidTokens` | integer | No |  |
 | `totalSubscriptionRevVnd` | number | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaiusagebyoperationdto"></a>`AIUsageByOperationDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `logicalRoute` | string | No |  |
+| `operation` | string | No |  |
+| `requestCount` | integer | No |  |
+| `totalCostVnd` | number | No |  |
+| `totalOutputTokens` | integer | No |  |
+| `totalPromptTokens` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaiusagebyoperationres"></a>`AIUsageByOperationRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `fromDate` | string | No |  |
+| `operations` | Array<[AIUsageByOperationDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaiusagebyoperationdto)> | No |  |
+| `toDate` | string | No |  |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminkpicardsres"></a>`AdminKPICardsRes`
 
@@ -4685,6 +4975,25 @@ Dữ liệu Webhook
 | `aiMargin` | [AIMarginAnalyticsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaimarginanalyticsres) | No |  |
 | `kpiCards` | [AdminKPICardsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminkpicardsres) | No |  |
 | `payosReconcile` | [PayOSReconciliationRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopayosreconciliationres) | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtobenefitredemptionanalyticsres"></a>`BenefitRedemptionAnalyticsRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `topBenefits` | Array<[BenefitRedemptionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtobenefitredemptiondto)> | No |  |
+| `totalRedemptions` | integer | No |  |
+| `trend` | Array<[RedemptionTrendDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoredemptiontrenddto)> | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtobenefitredemptiondto"></a>`BenefitRedemptionDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `benefitId` | string | No |  |
+| `benefitName` | string | No |  |
+| `benefitType` | string | No |  |
+| `percentage` | number | No |  |
+| `redemptionCount` | integer | No |  |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtobrandkpicardsres"></a>`BrandKPICardsRes`
 
@@ -4710,6 +5019,32 @@ Dữ liệu Webhook
 | `pointsExpiring30d` | integer | No |  |
 | `pointsLiabilityValueVnd` | number | No |  |
 
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatgroupdto"></a>`CatalogStatGroupDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `count` | integer | No |  |
+| `label` | string | No |  |
+| `percentage` | number | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatsres"></a>`CatalogStatsRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `byStatus` | Array<[CatalogStatGroupDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatgroupdto)> | No |  |
+| `byType` | Array<[CatalogStatGroupDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatgroupdto)> | No |  |
+| `totalItems` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocategorydistributiondto"></a>`CategoryDistributionDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `categoryId` | string | No |  |
+| `categoryName` | string | No |  |
+| `itemCount` | integer | No |  |
+| `percentage` | number | No |  |
+
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocomparisondto"></a>`ComparisonDTO`
 
 | Property | Type | Required | Description |
@@ -4717,6 +5052,22 @@ Dữ liệu Webhook
 | `metricDeltaPercentages` | object | No |  |
 | `previousPeriodFrom` | string | No |  |
 | `previousPeriodTo` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocustomeracquisitiondto"></a>`CustomerAcquisitionDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customerCount` | integer | No |  |
+| `percentage` | number | No |  |
+| `source` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocustomeracquisitionres"></a>`CustomerAcquisitionRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `sources` | Array<[CustomerAcquisitionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocustomeracquisitiondto)> | No |  |
+| `totalCustomers` | integer | No |  |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodigitalsamplelabanalyticsres"></a>`DigitalSampleLabAnalyticsRes`
 
@@ -4770,9 +5121,7 @@ Dữ liệu Webhook
 | --- | --- | --- | --- |
 | `brandId` | string | No |  |
 | `compareWithPrevious` | boolean | No |  |
-| `filters` | object | No |  |
-| `granularity` | object | No | "hour" | "day" | "week" | "month" |
-| `groupBy` | Array<string> | No |  |
+| `granularity` | object | No | "day" | "week" | "month" | "year" |
 | `metrics` | Array<[MetricKey](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsmetrickeymetrickey)> | No |  |
 | `targetDashboard` | object | No | "admin" | "brand" | "user" |
 | `timeframe` | [DynamicQueryTimeframeDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicquerytimeframedto) | No |  |
@@ -4809,6 +5158,106 @@ Dữ liệu Webhook
 | `totalSuccessValue` | number | No |  |
 | `totalTransactions` | integer | No |  |
 
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtopointexpiryforecastdto"></a>`PointExpiryForecastDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `month` | string | No |  |
+| `pointsExpiring` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtopointexpiryforecastres"></a>`PointExpiryForecastRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `forecast` | Array<[PointExpiryForecastDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopointexpiryforecastdto)> | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoredemptiontrenddto"></a>`RedemptionTrendDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `month` | string | No |  |
+| `redemptionCount` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtorenewalstatsres"></a>`RenewalStatsRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `avgRetryCount` | number | No |  |
+| `failedCount` | integer | No |  |
+| `successCount` | integer | No |  |
+| `successRate` | number | No |  |
+| `totalAttempts` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtorevenuebreakdowndto"></a>`RevenueBreakdownDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `month` | string | No |  |
+| `planCode` | string | No |  |
+| `revenueVnd` | number | No |  |
+| `transactionCount` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtorevenuebreakdownres"></a>`RevenueBreakdownRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `breakdown` | Array<[RevenueBreakdownDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtorevenuebreakdowndto)> | No |  |
+| `fromDate` | string | No |  |
+| `toDate` | string | No |  |
+| `totalRevenueVnd` | number | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtospendsegmentdto"></a>`SpendSegmentDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customerCount` | integer | No |  |
+| `maxVnd` | number | No |  |
+| `minVnd` | number | No |  |
+| `percentage` | number | No |  |
+| `segment` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtospendsegmentationres"></a>`SpendSegmentationRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `segments` | Array<[SpendSegmentDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtospendsegmentdto)> | No |  |
+| `totalCustomers` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtosubscriptiondistributiondto"></a>`SubscriptionDistributionDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `percentage` | number | No |  |
+| `planCode` | string | No |  |
+| `userCount` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtosubscriptiondistributionres"></a>`SubscriptionDistributionRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `distribution` | Array<[SubscriptionDistributionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtosubscriptiondistributiondto)> | No |  |
+| `totalUsers` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtotierdistributiondto"></a>`TierDistributionDTO`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `memberCount` | integer | No |  |
+| `percentage` | number | No |  |
+| `tierId` | string | No |  |
+| `tierName` | string | No |  |
+| `tierRank` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtotierdistributionres"></a>`TierDistributionRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandId` | string | No |  |
+| `tiers` | Array<[TierDistributionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtotierdistributiondto)> | No |  |
+| `totalMembers` | integer | No |  |
+
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtotimeseriespointdto"></a>`TimeSeriesPointDTO`
 
 | Property | Type | Required | Description |
@@ -4831,13 +5280,18 @@ Dữ liệu Webhook
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `aiQuotaRemaining` | integer | No |  |
-| `averageItemValueVnd` | number | No |  |
 | `expiringVouchersCount` | integer | No |  |
 | `totalItems` | integer | No |  |
 | `totalWardrobeValueVnd` | number | No |  |
 | `underutilizedItems` | Array<[UnderutilizedItemDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtounderutilizeditemdto)> | No |  |
 | `underutilizedItemsCount` | integer | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtowardrobecategorydistributionres"></a>`WardrobeCategoryDistributionRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `categories` | Array<[CategoryDistributionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocategorydistributiondto)> | No |  |
+| `totalItems` | integer | No |  |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantsfeedbacksentimentfeedbacksentiment"></a>`FeedbackSentiment`
 
@@ -4851,10 +5305,10 @@ Dữ liệu Webhook
 
 *Enum values:*
 
-- `hour` (**Hour**)
 - `day` (**Day**)
 - `week` (**Week**)
 - `month` (**Month**)
+- `year` (**Year**)
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantsmetrickeymetrickey"></a>`MetricKey`
 
@@ -4873,7 +5327,21 @@ Dữ liệu Webhook
 - `active_vouchers` (**ActiveVouchers**)
 - `total_wardrobe_items` (**TotalWardrobeItems**)
 - `total_wardrobe_value_vnd` (**TotalWardrobeValueVND**)
-- `average_cost_per_wear_vnd` (**AverageCostPerWearVND**)
+- `vouchers_redeemed` (**VouchersRedeemed**)
+- `digital_sample_votes_count` (**DigitalSampleVotesCount**)
+- `digital_sample_avg_rating` (**DigitalSampleAvgRating**)
+- `open_cs_tickets` (**OpenCSTickets**)
+- `cs_first_response_avg_seconds` (**CSFirstResponseAvgSeconds**)
+- `points_expiring_30d` (**PointsExpiring30d**)
+- `points_liability_value_vnd` (**PointsLiabilityValueVND**)
+- `new_users` (**NewUsers**)
+- `ai_error_count` (**AIErrorCount**)
+- `ai_error_rate` (**AIErrorRate**)
+- `new_customers` (**NewCustomers**)
+- `customer_claim_rate` (**CustomerClaimRate**)
+- `benefit_redemption_count` (**BenefitRedemptionCount**)
+- `brand_item_count` (**BrandItemCount**)
+- `brand_item_count_by_type` (**BrandItemCountByType**)
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantstargetdashboardtargetdashboard"></a>`TargetDashboard`
 
@@ -4944,19 +5412,42 @@ Dữ liệu Webhook
 | --- | --- | --- | --- |
 | `colorTone` | string | No | Tông màu phối đồ (Gợi ý: light, dark, pastel, earthy, neon... hoặc nhập tông màu tùy ý) |
 | `details` | string | No | Ghi chú thêm bằng tay (free text) |
-| `include_brand_items` | boolean | No | Cho phép phối đồ của brand (tỷ lệ tối đa 30%) |
+| `includeBrandItems` | boolean | No | Cho phép phối đồ của brand (tỷ lệ tối đa 30%) |
 | `occasion` | string | No | Dịp phối đồ (Gợi ý: casual, work, date, party, sport, hoặc nhập dịp tùy ý) |
 | `season` | string | No | Mùa phối đồ @enums spring,summer,autumn,winter,all |
 | `styleTarget` | string | No | Phong cách hướng tới (Gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant, hoặc nhập phong cách tùy ý) |
 | `weather` | string | No | Thời tiết hiện tại (Gợi ý: hot, cold, warm, cool, rainy, hoặc nhập thời tiết cụ thể) |
 
+### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendedfashionitemres"></a>`RecommendedFashionItemRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `category` | [CategoryBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtocategorybriefres) | No |  |
+| `color` | string | No |  |
+| `colorHex` | string | No |  |
+| `fit` | string | No |  |
+| `id` | string | No |  |
+| `imageUrl` | string | No |  |
+| `material` | string | No |  |
+| `pattern` | string | No |  |
+| `style` | string | No |  |
+
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemgroup"></a>`RecommendedItemGroup`
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
-| `alternatives` | Array<[WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)> | No |  |
-| `primary` | [WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres) | No |  |
+| `alternatives` | Array<[RecommendedItemRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemres)> | No |  |
+| `primary` | [RecommendedItemRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemres) | No |  |
 | `role` | string | No |  |
+
+### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemres"></a>`RecommendedItemRes`
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandItem` | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres) | No |  |
+| `fashionItem` | [RecommendedFashionItemRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendedfashionitemres) | No |  |
+| `id` | string | No |  |
+| `itemContext` | string | No |  |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendedoutfitres"></a>`RecommendedOutfitRes`
 
@@ -5440,6 +5931,7 @@ Dữ liệu Webhook
 | --- | --- | --- | --- |
 | `fashionItem` | [FashionItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitembriefres) | No |  |
 | `id` | string | No |  |
+| `isAvailable` | boolean | No |  |
 | `itemContext` | string | No |  |
 | `layerOrder` | integer | No |  |
 | `positionX` | number | No |  |
