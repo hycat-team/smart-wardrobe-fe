@@ -123,8 +123,9 @@ export function DashboardTrendChart({
           </h2>
           <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
             {fromDate && toDate && (
-              <p>
-                Thời gian: {fromDate} – {toDate}
+              <p className="text-xs text-muted-foreground">
+                {new Date(fromDate).toLocaleDateString('vi-VN')} –{' '}
+                {new Date(toDate).toLocaleDateString('vi-VN')}
               </p>
             )}
             <p>Tính theo : {data.granularity}</p>
