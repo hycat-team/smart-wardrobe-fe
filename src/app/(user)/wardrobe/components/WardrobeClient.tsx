@@ -46,6 +46,7 @@ import {
   useCategories,
   useWardrobeStats,
 } from "@/features/wardrobe/queries/wardrobe.queries";
+import { useWardrobeSSE } from "@/features/wardrobe/hooks/useWardrobeSSE";
 import {
   WardrobeCategoryDistribution,
   WardrobeItemRes as WardrobeItem,
@@ -60,6 +61,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useMySubscription } from "@/features/subscription/queries/subscription.queries";
 import { PaginationResult } from "@/types/api";
+
 
 const getColorValue = (color: string) => {
   const map: Record<string, string> = {
@@ -126,7 +128,7 @@ export default function WardrobeClient({
     isLoading: isLoadingItems,
     isFetching,
     refetch,
-  } = useMyWardrobe(categoryParam || undefined, pageParam);
+  } = useMyWardrobe(categoryParam || undefined, pageParam, initialData);
 
   const distributionQuery = useWardrobeCategoryDistribution(
     initialDistribution,
@@ -134,6 +136,10 @@ export default function WardrobeClient({
   const currentData = data || initialData;
   const items = currentData?.items || [];
   const metadata = currentData?.metadata;
+
+  // Realtime SSE listener for pending AI analysis tasks
+  useWardrobeSSE(items);
+
 
   const updateParams = (newParams: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -405,7 +411,14 @@ export default function WardrobeClient({
         ) : sortedItems.length > 0 ? (
           <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", isFetching && "opacity-60 blur-[1px]")}>
             {sortedItems.map((item, index) => {
-              const isProcessing = item.status === WardrobeItemStatus.Processing;
+
+              const isProcessing =
+                item.status === WardrobeItemStatus.Processing ||
+                (item as any).status === 3 ||
+                (item as any).status === "Processing" ||
+                (item as any).status === "processing";
+
+
 
               const handleCardClick = () => {
                 if (isSelectMode) {

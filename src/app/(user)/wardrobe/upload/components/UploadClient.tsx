@@ -160,7 +160,9 @@ export function UploadClient() {
         total: files.length,
       });
       toast.success("Đã gửi ảnh cho AI phân tích thành công!");
+      router.refresh();
       router.push("/wardrobe");
+
     } catch (err: unknown) {
       console.error(err);
       toast.error(

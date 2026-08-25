@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { wardrobeApi } from '../api/wardrobe.api';
-import { WardrobeCategoryDistribution, WardrobeItemRes } from '../types';
+import { WardrobeCategoryDistribution, WardrobeItemRes, WardrobeItemStatus } from '../types';
+import { PaginationResult } from '@/types/api';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/api-error';
 
@@ -15,13 +16,21 @@ export const WARDROBE_QUERY_KEYS = {
     [...WARDROBE_QUERY_KEYS.all, 'category-distribution'] as const,
 };
 
-export const useMyWardrobe = (categorySlug?: string, page: number = 1) => {
+export const useMyWardrobe = (
+  categorySlug?: string,
+  page: number = 1,
+  initialData?: PaginationResult<WardrobeItemRes> | null,
+) => {
   return useQuery({
     queryKey: [...WARDROBE_QUERY_KEYS.lists(), categorySlug, page],
     queryFn: () => wardrobeApi.getMyWardrobeItems({ page, limit: 20, categorySlug: categorySlug }),
     placeholderData: keepPreviousData,
+    initialData: initialData ?? undefined,
   });
 };
+
+
+
 
 export const useWardrobeStats = () => {
   return useQuery({
@@ -181,3 +190,22 @@ export const useSearchWardrobeItems = (query: string, categorySlug?: string) => 
     enabled: query.trim().length > 0,
   });
 };
+
+export const useRetryWardrobeItemAnalysis = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => wardrobeApi.retryWardrobeItemAnalysis(id),
+    onSuccess: (res, id) => {
+      queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+      queryClient.invalidateQueries({
+        queryKey: WARDROBE_QUERY_KEYS.categoryDistribution(),
+      });
+      queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.detail(id) });
+      toast.success(res?.message || 'Đã gửi lại yêu cầu phân tích trang phục!');
+    },
+    onError: (error) => {
+      handleApiError(error, 'Thử phân tích lại thất bại.');
+    },
+  });
+};
+
