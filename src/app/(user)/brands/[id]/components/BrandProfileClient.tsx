@@ -76,9 +76,9 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
   const activeBenefits = benefits.filter((b: any) => !b.status || b.status === 'active' || b.status === 'ACTIVE');
 
   const brandRedemptions = myRedemptions?.filter((r: any) => 
-    r.benefit?.brandId === brandId || 
-    r.brandBenefit?.brandId === brandId ||
-    r.brandId === brandId ||
+    r.brand?.id === brandId ||
+    r.benefit?.brand?.id === brandId || 
+    r.brandBenefit?.brand?.id === brandId ||
     r.id // If it's returning the brand benefits directly, just show them
   ) || [];
 

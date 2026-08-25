@@ -40,7 +40,7 @@ export default function LoyaltiesClient() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {loyalties.map((loyalty: any, idx: number) => (
-              <Link key={loyalty.id || idx} href={`/brands/${loyalty.brandId}/loyalty`}>
+              <Link key={loyalty.id || idx} href={`/brands/${loyalty.brand?.id}/loyalty`}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
