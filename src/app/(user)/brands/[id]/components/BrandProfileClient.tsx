@@ -262,9 +262,6 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                     <div className="flex flex-col gap-1 px-1">
                       <div className="flex items-center justify-between gap-2">
                         <h4 className="font-medium text-sm text-foreground line-clamp-1">{product.name}</h4>
-                        {product.productCode && (
-                          <span className="text-[10px] text-muted-foreground uppercase tracking-wider shrink-0">{product.productCode}</span>
-                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         {product.discountPrice ? (
