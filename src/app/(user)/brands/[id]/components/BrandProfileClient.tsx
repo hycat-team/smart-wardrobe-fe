@@ -72,7 +72,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
     !p.status || p.status === 'ACTIVE' || p.status === 'active' || p.stockStatus === 'IN_STOCK'
   );
 
-  const benefits = brandBenefits || [];
+  const benefits = brandBenefits?.items || [];
   const activeBenefits = benefits.filter((b: any) => !b.status || b.status === 'active' || b.status === 'ACTIVE');
 
   const brandRedemptions = myRedemptions?.filter((r: any) => 

@@ -58,10 +58,10 @@ export const useJoinLoyalty = () => {
   });
 };
 
-export const useGetBrandBenefits = (brandId: string) => {
+export const useGetBrandBenefits = (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
   return useQuery({
-    queryKey: USER_BRANDS_KEYS.benefits(brandId),
-    queryFn: () => userBrandsApi.getBrandBenefits(brandId),
+    queryKey: ['brand-benefits', brandId, params],
+    queryFn: () => userBrandsApi.getBrandBenefits(brandId, params),
     enabled: !!brandId,
   });
 };
@@ -218,6 +218,15 @@ export const useCreateSampleFeedback = () => {
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Không thể gửi phản hồi. Vui lòng thử lại.');
     }
+  });
+};
+
+
+export const useGetLoyaltyTierDetails = (brandId: string, tierId: string) => {
+  return useQuery({
+    queryKey: ['brand-loyalty-tier', brandId, tierId],
+    queryFn: () => userBrandsApi.getLoyaltyTierDetails(brandId, tierId),
+    enabled: !!brandId && !!tierId,
   });
 };
 

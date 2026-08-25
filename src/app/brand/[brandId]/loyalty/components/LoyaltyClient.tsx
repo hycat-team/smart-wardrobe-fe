@@ -152,14 +152,24 @@ export default function LoyaltyClient() {
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg bg-background/50 border border-border/50`}>
                         {tier.rank}
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 rounded-full bg-background/20 hover:bg-background/40"
-                        onClick={() => handleEditTier(tier)}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 rounded-full bg-background/20 hover:bg-background/40"
+                          onClick={() => handleEditTier(tier)}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 rounded-full bg-background/20 hover:bg-background/40 font-semibold text-xs"
+                          onClick={() => window.location.href = `/brand/${brandId}/loyalty/tiers/${tier.id}`}
+                        >
+                          Chi tiết
+                        </Button>
+                      </div>
                     </div>
                     <CardTitle className="text-2xl font-bold tracking-tight">{tier.name}</CardTitle>
                   </CardHeader>
