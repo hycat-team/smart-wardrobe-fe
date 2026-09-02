@@ -113,6 +113,11 @@ export const brandPortalApi = {
     return res.data.data || [];
   },
 
+  getLoyaltyTierDetails: async (brandId: string, tierId: string) => {
+    const res = await api.get<{data: LoyaltyTierRes}>(`/brand-portal/brands/${brandId}/loyalty/tiers/${tierId}`);
+    return res.data.data;
+  },
+
   createLoyaltyTier: async (brandId: string, payload: CreateLoyaltyTierPayload) => {
     const res = await api.post<{data: LoyaltyTierRes}>(`/brand-portal/brands/${brandId}/loyalty/tiers`, payload);
     return res.data.data;
@@ -129,9 +134,9 @@ export const brandPortalApi = {
   },
 
   // Benefits
-  getBenefits: async (brandId: string) => {
-    const res = await api.get<{data: Benefit[]}>(`/brand-portal/brands/${brandId}/benefits`);
-    return res.data.data || [];
+  getBenefits: async (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
+    const res = await api.get<{data: PaginationResult<Benefit>}>(`/brand-portal/brands/${brandId}/benefits`, { params });
+    return res.data.data;
   },
 
   createBenefit: async (brandId: string, payload: CreateBenefitPayload) => {

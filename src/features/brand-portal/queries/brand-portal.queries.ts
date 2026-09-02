@@ -213,11 +213,19 @@ export const useGetLoyaltyAccountTransactions = (brandId: string, accountId?: st
   });
 };
 
-// Benefits
-export const useGetBenefits = (brandId: string) => {
+export const useGetLoyaltyTierDetails = (brandId: string, tierId: string) => {
   return useQuery({
-    queryKey: BRAND_PORTAL_KEYS.benefits(brandId),
-    queryFn: () => brandPortalApi.getBenefits(brandId),
+    queryKey: ['brand-loyalty-tier', brandId, tierId],
+    queryFn: () => brandPortalApi.getLoyaltyTierDetails(brandId, tierId),
+    enabled: !!brandId && !!tierId,
+  });
+};
+
+// Benefits
+export const useGetBenefits = (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
+  return useQuery({
+    queryKey: ['benefits', brandId, params],
+    queryFn: () => brandPortalApi.getBenefits(brandId, params),
     enabled: !!brandId,
   });
 };

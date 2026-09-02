@@ -72,13 +72,13 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
     !p.status || p.status === 'ACTIVE' || p.status === 'active' || p.stockStatus === 'IN_STOCK'
   );
 
-  const benefits = brandBenefits || [];
+  const benefits = brandBenefits?.items || [];
   const activeBenefits = benefits.filter((b: any) => !b.status || b.status === 'active' || b.status === 'ACTIVE');
 
   const brandRedemptions = myRedemptions?.filter((r: any) => 
-    r.benefit?.brandId === brandId || 
-    r.brandBenefit?.brandId === brandId ||
-    r.brandId === brandId ||
+    r.brand?.id === brandId ||
+    r.benefit?.brand?.id === brandId || 
+    r.brandBenefit?.brand?.id === brandId ||
     r.id // If it's returning the brand benefits directly, just show them
   ) || [];
 
@@ -262,9 +262,6 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                     <div className="flex flex-col gap-1 px-1">
                       <div className="flex items-center justify-between gap-2">
                         <h4 className="font-medium text-sm text-foreground line-clamp-1">{product.name}</h4>
-                        {product.productCode && (
-                          <span className="text-[10px] text-muted-foreground uppercase tracking-wider shrink-0">{product.productCode}</span>
-                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         {product.discountPrice ? (

@@ -15,7 +15,8 @@ export default function BenefitsClient() {
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  const { data: benefits, isLoading } = useGetBenefits(brandId);
+  const { data: benefitsData, isLoading } = useGetBenefits(brandId);
+  const benefits = benefitsData?.items || [];
   const { mutateAsync: updateStatus, isPending: isUpdating } = useUpdateBenefitStatus(brandId);
 
   const handleToggleStatus = async (benefitId: string, currentStatus: string) => {
