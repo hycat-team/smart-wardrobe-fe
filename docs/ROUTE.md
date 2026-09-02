@@ -1544,6 +1544,7 @@ Thông tin cập nhật
     - `brandItem` (ref: BrandItemBriefRes)
     - `createdAt` (string)
     - `fashionItem` (ref: FashionItemRes)
+    - `fashionItemId` (string)
     - `id` (string)
     - `isDeleted` (boolean)
     - `isLocked` (boolean)
@@ -3870,10 +3871,6 @@ Trang thai moi
 
 ### `POST` `/api/v1/brand-portal/brands/{brandId}/members`
 
-**Summary**: Thêm thành viên vào brand
-
-**Description**: Cho phép owner thêm nhiều thành viên với vai trò staff bằng email hoặc tên đăng nhập. API này không tạo owner mới.
-
 **Request Parameters**:
 
 | Name | In | Type | Required | Description |
@@ -4682,6 +4679,7 @@ Danh sách ảnh trang phục
     **Properties**:
     - `brandItem` (ref: BrandItemBriefRes)
     - `fashionItem` (ref: FashionItemBriefRes)
+    - `fashionItemId` (string)
     - `id` (string)
     - `isLocked` (boolean)
     - `lastUsedAt` (string)
@@ -4736,6 +4734,7 @@ Danh sách ID trang phục mẫu
     **Properties**:
     - `brandItem` (ref: BrandItemBriefRes)
     - `fashionItem` (ref: FashionItemBriefRes)
+    - `fashionItemId` (string)
     - `id` (string)
     - `isLocked` (boolean)
     - `lastUsedAt` (string)
@@ -4819,6 +4818,7 @@ Danh sách ID trang phục mẫu
     - `brandItem` (ref: BrandItemBriefRes)
     - `createdAt` (string)
     - `fashionItem` (ref: FashionItemRes)
+    - `fashionItemId` (string)
     - `id` (string)
     - `isDeleted` (boolean)
     - `isLocked` (boolean)
@@ -4860,6 +4860,7 @@ Thông tin cập nhật
     - `brandItem` (ref: BrandItemBriefRes)
     - `createdAt` (string)
     - `fashionItem` (ref: FashionItemRes)
+    - `fashionItemId` (string)
     - `id` (string)
     - `isDeleted` (boolean)
     - `isLocked` (boolean)
@@ -4899,6 +4900,7 @@ Số lượng nhân bản
     **Properties**:
     - `brandItem` (ref: BrandItemBriefRes)
     - `fashionItem` (ref: FashionItemBriefRes)
+    - `fashionItemId` (string)
     - `id` (string)
     - `isLocked` (boolean)
     - `lastUsedAt` (string)
@@ -4928,6 +4930,7 @@ Số lượng nhân bản
     - `brandItem` (ref: BrandItemBriefRes)
     - `createdAt` (string)
     - `fashionItem` (ref: FashionItemRes)
+    - `fashionItemId` (string)
     - `id` (string)
     - `isDeleted` (boolean)
     - `isLocked` (boolean)
@@ -5568,6 +5571,7 @@ Dữ liệu Webhook
 | `itemType` | [BrandItemType](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemtypebranditemtype) | No |  |
 | `name` | string | No |  |
 | `price` | number | No |  |
+| `productCode` | string | No |  |
 | `status` | [BrandItemStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemstatusbranditemstatus) | No |  |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemlistbriefres"></a>`BrandItemListBriefRes`
@@ -7202,6 +7206,7 @@ Dữ liệu Webhook
 | `itemType` | string | No |  |
 | `name` | string | No |  |
 | `price` | number | No |  |
+| `productCode` | string | No |  |
 | `status` | string | No |  |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtobulkdeleteitemsreq"></a>`BulkDeleteItemsReq`
@@ -7363,6 +7368,7 @@ Dữ liệu Webhook
 | --- | --- | --- | --- |
 | `brandItem` | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres) | No |  |
 | `fashionItem` | [FashionItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitembriefres) | No |  |
+| `fashionItemId` | string | No |  |
 | `id` | string | No |  |
 | `isLocked` | boolean | No |  |
 | `lastUsedAt` | string | No |  |
@@ -7377,6 +7383,7 @@ Dữ liệu Webhook
 | `brandItem` | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres) | No |  |
 | `createdAt` | string | No |  |
 | `fashionItem` | [FashionItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitemres) | No |  |
+| `fashionItemId` | string | No |  |
 | `id` | string | No |  |
 | `isDeleted` | boolean | No |  |
 | `isLocked` | boolean | No |  |

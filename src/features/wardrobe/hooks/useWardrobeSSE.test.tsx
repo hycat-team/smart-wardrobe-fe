@@ -144,4 +144,72 @@ describe('useWardrobeSSE hook', () => {
     rerender({ currentItems: [...items] });
     expect(wardrobeApi.subscribeTaskSSE).toHaveBeenCalledTimes(1);
   });
+
+  it('tự động cập nhật cache và refetch queries ngay khi nhận SSE event completed', async () => {
+    let capturedOnMessage: (payload: any) => void = () => {};
+
+    jest.mocked(wardrobeApi.subscribeTaskSSE).mockImplementation(
+      async (taskId, onMessage, onDone, onError, signal) => {
+        capturedOnMessage = onMessage;
+      }
+    );
+
+    const { queryClient, wrapper } = createHarness();
+    queryClient.setQueryData(WARDROBE_QUERY_KEYS.lists(), {
+      items: [
+        {
+          id: 'item-1',
+          status: WardrobeItemStatus.Processing,
+          taskId: 'task-123',
+          createdAt: '2026-08-25T00:00:00Z',
+        },
+      ],
+    });
+
+    const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
+    const refetchSpy = jest.spyOn(queryClient, 'refetchQueries');
+
+    const items: WardrobeItemRes[] = [
+      {
+        id: 'item-1',
+        status: WardrobeItemStatus.Processing,
+        taskId: 'task-123',
+        createdAt: '2026-08-25T00:00:00Z',
+      },
+    ];
+
+    renderHook(() => useWardrobeSSE(items), { wrapper });
+
+    await act(async () => {
+      capturedOnMessage({
+        itemId: 'item-1',
+        status: 'completed',
+        total: 1,
+        index: 0,
+        data: {
+          id: 'item-1',
+          status: 0,
+          fashionItem: {
+            id: 'fi-1',
+            color: 'đen',
+            colorHex: '#000000',
+            style: 'casual',
+            category: { id: 'c-1', name: 'Áo thun', slug: 'ao-thun' },
+          },
+        },
+      });
+    });
+
+    const cachedList: any = queryClient.getQueryData(WARDROBE_QUERY_KEYS.lists());
+    expect(cachedList.items[0].status).toBe(WardrobeItemStatus.InWardrobe);
+    expect(cachedList.items[0].fashionItem.category.name).toBe('Áo thun');
+
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: WARDROBE_QUERY_KEYS.lists(),
+    });
+    expect(refetchSpy).toHaveBeenCalledWith({
+      queryKey: WARDROBE_QUERY_KEYS.lists(),
+      type: 'active',
+    });
+  });
 });

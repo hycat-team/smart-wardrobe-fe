@@ -222,6 +222,111 @@ export const brandPortalApi = {
     return res.data.data || [];
   },
 
+  subscribeBrandItemTaskSSE: async (
+    brandId: string,
+    taskId: string,
+    onMessage: (data: any) => void,
+    onDone: () => void,
+    onError: (error: Error) => void,
+    signal?: AbortSignal
+  ) => {
+    try {
+      const response = await fetch(`/api/v1/brand-portal/brands/${brandId}/items/tasks/${taskId}/sse`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'text/event-stream',
+        },
+        credentials: 'include',
+        signal,
+      });
+
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        const errorMessage = errBody.message || errBody.detail || `HTTP ${response.status} ${response.statusText}`;
+        throw new Error(`[Status: ${response.status}] ${errorMessage}`);
+      }
+
+      let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+
+      try {
+        reader = response.body?.getReader();
+        if (!reader) throw new Error('No readable stream available');
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            onDone();
+            break;
+          }
+
+          buffer += decoder.decode(value, { stream: true });
+
+          // RFC 8895: SSE frames are delimited by double newline (\n\n)
+          const frames = buffer.split('\n\n');
+          buffer = frames.pop() ?? '';
+
+          for (const frame of frames) {
+            if (!frame.trim()) continue;
+
+            let eventType = 'message';
+            const dataLines: string[] = [];
+
+            for (const line of frame.split('\n')) {
+              const trimmedLine = line.trim();
+              if (trimmedLine.startsWith('event:')) {
+                eventType = trimmedLine.slice(6).trim();
+              } else if (trimmedLine.startsWith('data:')) {
+                dataLines.push(trimmedLine.slice(5).trim());
+              }
+            }
+
+            if (dataLines.length === 0) continue;
+
+            const rawData = dataLines.join('\n');
+            let parsedData: any = rawData;
+            try {
+              parsedData = JSON.parse(rawData);
+            } catch {
+              parsedData = rawData;
+            }
+
+            // Ignore heartbeat / ping
+            if (eventType === 'ping') continue;
+
+            onMessage(parsedData);
+
+            const statusLower = String(parsedData?.status || '').toLowerCase();
+            if (
+              eventType === 'done' ||
+              statusLower === 'completed' ||
+              statusLower === 'failed' ||
+              statusLower === 'needs_review'
+            ) {
+              onDone();
+              return;
+            }
+          }
+        }
+      } finally {
+        if (reader) {
+          try {
+            await reader.cancel();
+            reader.releaseLock();
+          } catch {
+            // Stream might already be closed
+          }
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return;
+      onError(error instanceof Error ? error : new Error(String(error)));
+    }
+  },
+
+
 
   // Admin
   getAdminBrands: async (params?: { page?: number; limit?: number; status?: string; q?: string }) => {

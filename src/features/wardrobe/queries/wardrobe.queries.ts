@@ -26,6 +26,7 @@ export const useMyWardrobe = (
     queryFn: () => wardrobeApi.getMyWardrobeItems({ page, limit: 20, categorySlug: categorySlug }),
     placeholderData: keepPreviousData,
     initialData: initialData ?? undefined,
+    initialDataUpdatedAt: 0,
   });
 };
 

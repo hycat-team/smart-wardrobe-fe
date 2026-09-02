@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus, Search, Tag, Trash2, UploadCloud, Library } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -137,8 +137,13 @@ export default function WardrobeClient({
   const items = currentData?.items || [];
   const metadata = currentData?.metadata;
 
+  const handleItemUpdated = useCallback(() => {
+    refetch();
+    distributionQuery.refetch();
+  }, [refetch, distributionQuery]);
+
   // Realtime SSE listener for pending AI analysis tasks
-  useWardrobeSSE(items);
+  useWardrobeSSE(items, handleItemUpdated);
 
 
   const updateParams = (newParams: Record<string, string | null>) => {

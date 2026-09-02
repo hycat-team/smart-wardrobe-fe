@@ -164,13 +164,20 @@ export interface UpdateWardrobeItemReq {
   price?: number;
 }
 
+export type AnalyzeTaskStatusType = "completed" | "failed" | "needs_review" | string;
+
 export interface WardrobeTaskSSEPayload {
+  itemId: string;
+  status: AnalyzeTaskStatusType;
+  total: number;
+  index: number;
+  data?: WardrobeItemBriefRes | WardrobeItemRes | any;
+  error?: string;
+  // Fallbacks for backward compatibility
   taskId?: string;
-  status?: "pending" | "processing" | "completed" | "done" | "failed" | "error" | string;
   progress?: number;
   item?: WardrobeItemBriefRes | WardrobeItemRes;
-  itemId?: string;
   message?: string;
-  error?: string;
 }
+
 

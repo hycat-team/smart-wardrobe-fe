@@ -75,106 +75,49 @@ export const wardrobeApi = {
         throw new Error(`[Status: ${response.status}] ${errorMessage}`);
       }
 
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error('No readable stream available');
+      let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
 
-      const decoder = new TextDecoder();
-      let buffer = '';
-      let currentEvent = 'message';
+      try {
+        reader = response.body?.getReader();
+        if (!reader) throw new Error('No readable stream available');
 
-      const isDoneEvent = (evt: string) => {
-        const e = evt.toLowerCase().trim();
-        return (
-          e === 'done' ||
-          e === 'complete' ||
-          e === 'completed' ||
-          e === 'success' ||
-          e === 'finish' ||
-          e === 'finished' ||
-          e === 'task_completed' ||
-          e === 'task_success'
-        );
-      };
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let processedCount = 0;
+        let totalItems = 0;
 
-      const isErrorEvent = (evt: string) => {
-        const e = evt.toLowerCase().trim();
-        return e === 'error' || e === 'failed' || e === 'fail' || e === 'task_failed';
-      };
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            console.log(`[SSE Task ${taskId}] Stream closed by server -> calling onDone`);
+            onDone();
+            break;
+          }
 
-      const isDoneValue = (val: any): boolean => {
-        if (val === null || val === undefined) return false;
-        if (val === 0 || val === '0') return true;
-        if (typeof val === 'boolean') return val === true;
-        if (typeof val === 'string') {
-          const s = val.toLowerCase().trim();
-          return (
-            s === 'completed' ||
-            s === 'done' ||
-            s === 'success' ||
-            s === 'inwardrobe' ||
-            s === 'in_wardrobe' ||
-            s === 'finished' ||
-            s === 'finish' ||
-            s === 'ok'
-          );
-        }
-        if (typeof val === 'object') {
-          return (
-            isDoneValue(val.status) ||
-            isDoneValue(val.taskStatus) ||
-            isDoneValue(val.task_status) ||
-            isDoneValue(val.state) ||
-            isDoneValue(val.data?.status) ||
-            isDoneValue(val.data?.taskStatus) ||
-            val.isSuccess === true ||
-            val.success === true ||
-            Boolean(val.fashionItem) ||
-            Boolean(val.data?.fashionItem)
-          );
-        }
-        return false;
-      };
+          buffer += decoder.decode(value, { stream: true });
 
-      const isErrorValue = (val: any): boolean => {
-        if (val === null || val === undefined) return false;
-        if (val === 4 || val === '4') return true;
-        if (typeof val === 'string') {
-          const s = val.toLowerCase().trim();
-          return s === 'failed' || s === 'error' || s === 'fail';
-        }
-        if (typeof val === 'object') {
-          return (
-            isErrorValue(val.status) ||
-            isErrorValue(val.taskStatus) ||
-            isErrorValue(val.task_status) ||
-            isErrorValue(val.state) ||
-            isErrorValue(val.data?.status) ||
-            Boolean(val.error)
-          );
-        }
-        return false;
-      };
+          // RFC 8895: SSE frames are delimited by double newline (\n\n)
+          const frames = buffer.split('\n\n');
+          buffer = frames.pop() ?? '';
 
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) {
-          console.log(`[SSE Task ${taskId}] Stream closed by server -> calling onDone`);
-          onDone();
-          break;
-        }
+          for (const frame of frames) {
+            if (!frame.trim()) continue;
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+            let eventType = 'message';
+            const dataLines: string[] = [];
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed === '') continue;
+            for (const line of frame.split('\n')) {
+              const trimmedLine = line.trim();
+              if (trimmedLine.startsWith('event:')) {
+                eventType = trimmedLine.slice(6).trim();
+              } else if (trimmedLine.startsWith('data:')) {
+                dataLines.push(trimmedLine.slice(5).trim());
+              }
+            }
 
-          if (trimmed.startsWith('event:')) {
-            currentEvent = trimmed.replace('event:', '').trim();
-          } else if (trimmed.startsWith('data:')) {
-            const rawData = trimmed.replace('data:', '').trim();
+            if (dataLines.length === 0) continue;
+
+            const rawData = dataLines.join('\n');
             let parsedData: any = rawData;
             try {
               parsedData = JSON.parse(rawData);
@@ -182,18 +125,46 @@ export const wardrobeApi = {
               parsedData = rawData;
             }
 
-            console.log(`[SSE Task ${taskId}] Event:`, currentEvent, 'Data:', parsedData);
+            // Ignore heartbeat / ping
+            if (eventType === 'ping') continue;
 
-            if (isDoneEvent(currentEvent) || isDoneValue(parsedData)) {
-              onMessage(parsedData);
-              onDone();
-              return;
-            } else if (isErrorEvent(currentEvent) || isErrorValue(parsedData)) {
-              onError(new Error(typeof parsedData === 'string' ? parsedData : (parsedData?.message || parsedData?.error || 'Phân tích thất bại')));
-              return;
+            console.log(`[SSE Task ${taskId}] Event:`, eventType, 'Data:', parsedData);
+
+            if (parsedData && typeof parsedData === 'object') {
+              if (typeof parsedData.total === 'number') {
+                totalItems = parsedData.total;
+              }
+              processedCount++;
+
+              onMessage(parsedData as WardrobeTaskSSEPayload);
+
+              const statusLower = String(parsedData.status || '').toLowerCase();
+              const isTerminalStatus =
+                eventType === 'done' ||
+                statusLower === 'completed' ||
+                statusLower === 'failed' ||
+                statusLower === 'needs_review';
+
+              if (
+                (totalItems > 0 && processedCount >= totalItems) ||
+                (isTerminalStatus && (!totalItems || totalItems <= 1))
+              ) {
+                console.log(`[SSE Task ${taskId}] All ${totalItems || processedCount} items processed.`);
+                onDone();
+                return;
+              }
             } else {
               onMessage(parsedData);
             }
+          }
+        }
+      } finally {
+        if (reader) {
+          try {
+            await reader.cancel();
+            reader.releaseLock();
+          } catch {
+            // Stream might already be closed
           }
         }
       }
@@ -204,6 +175,7 @@ export const wardrobeApi = {
       onError(error instanceof Error ? error : new Error(String(error)));
     }
   },
+
 
 
 
