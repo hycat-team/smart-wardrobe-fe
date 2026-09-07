@@ -4,7 +4,7 @@ import { brandDashboardQueryKeys } from './brand-dashboard.queries';
 import { toast } from 'sonner';
 import { BrandStatus, UpsertLoyaltyProgramPayload } from '../types';
 
-const BRAND_PORTAL_KEYS = {
+export const BRAND_PORTAL_KEYS = {
   all: ['brand-portal'] as const,
   myBrands: () => [...BRAND_PORTAL_KEYS.all, 'my-brands'] as const,
   staffs: (brandId: string) => [...BRAND_PORTAL_KEYS.all, 'staffs', brandId] as const,

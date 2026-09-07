@@ -4,14 +4,16 @@ import { APIResponse, PaginationResult } from '@/types/api';
 import {
   WardrobeCategoryDistribution,
   WardrobeItemRes,
+  WardrobeItemBriefRes,
   UploadSignatureResult,
-  BatchCropWardrobeItemsReq,
+  BatchUploadWardrobeItemsReq,
   CloneWardrobeItemReq,
   InitClosetFromCatalogReq,
   SearchWardrobeItemRes,
   UpdateWardrobeItemReq,
   CategoryRes,
   WardrobeStatsRes,
+  WardrobeTaskSSEPayload,
 } from '../types';
 
 export const wardrobeApi = {
@@ -38,15 +40,148 @@ export const wardrobeApi = {
     return res.data.data!;
   },
 
-
   getUploadSignature: async (axiosInstance: AxiosInstance = api): Promise<UploadSignatureResult> => {
     const res = await axiosInstance.get<APIResponse<UploadSignatureResult>>('/wardrobe-items/upload-signature');
     return res.data.data!;
   },
 
-  batchUploadWardrobeItems: async (data: BatchCropWardrobeItemsReq): Promise<WardrobeItemRes[] & { message?: string }> => {
-    const res = await api.post<APIResponse<WardrobeItemRes[]>>('/wardrobe-items/batch-upload', data);
-    const result = res.data.data! as WardrobeItemRes[] & { message?: string };
+  batchUploadWardrobeItems: async (data: BatchUploadWardrobeItemsReq): Promise<WardrobeItemBriefRes[] & { message?: string }> => {
+    const res = await api.post<APIResponse<WardrobeItemBriefRes[]>>('/wardrobe-items/batch-upload', data);
+    const result = res.data.data! as WardrobeItemBriefRes[] & { message?: string };
+    if (result) result.message = res.data.message;
+    return result;
+  },
+
+  subscribeTaskSSE: async (
+    taskId: string,
+    onMessage: (data: WardrobeTaskSSEPayload) => void,
+    onDone: () => void,
+    onError: (error: Error) => void,
+    signal?: AbortSignal
+  ) => {
+    try {
+      const response = await fetch(`/api/v1/wardrobe-items/tasks/${taskId}/sse`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'text/event-stream',
+        },
+        credentials: 'include',
+        signal,
+      });
+
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        const errorMessage = errBody.message || errBody.detail || errBody.title || `HTTP ${response.status} ${response.statusText}`;
+        throw new Error(`[Status: ${response.status}] ${errorMessage}`);
+      }
+
+      let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+
+      try {
+        reader = response.body?.getReader();
+        if (!reader) throw new Error('No readable stream available');
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let processedCount = 0;
+        let totalItems = 0;
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            console.log(`[SSE Task ${taskId}] Stream closed by server -> calling onDone`);
+            onDone();
+            break;
+          }
+
+          buffer += decoder.decode(value, { stream: true });
+
+          // RFC 8895: SSE frames are delimited by double newline (\n\n)
+          const frames = buffer.split('\n\n');
+          buffer = frames.pop() ?? '';
+
+          for (const frame of frames) {
+            if (!frame.trim()) continue;
+
+            let eventType = 'message';
+            const dataLines: string[] = [];
+
+            for (const line of frame.split('\n')) {
+              const trimmedLine = line.trim();
+              if (trimmedLine.startsWith('event:')) {
+                eventType = trimmedLine.slice(6).trim();
+              } else if (trimmedLine.startsWith('data:')) {
+                dataLines.push(trimmedLine.slice(5).trim());
+              }
+            }
+
+            if (dataLines.length === 0) continue;
+
+            const rawData = dataLines.join('\n');
+            let parsedData: any = rawData;
+            try {
+              parsedData = JSON.parse(rawData);
+            } catch {
+              parsedData = rawData;
+            }
+
+            // Ignore heartbeat / ping
+            if (eventType === 'ping') continue;
+
+            console.log(`[SSE Task ${taskId}] Event:`, eventType, 'Data:', parsedData);
+
+            if (parsedData && typeof parsedData === 'object') {
+              if (typeof parsedData.total === 'number') {
+                totalItems = parsedData.total;
+              }
+              processedCount++;
+
+              onMessage(parsedData as WardrobeTaskSSEPayload);
+
+              const statusLower = String(parsedData.status || '').toLowerCase();
+              const isTerminalStatus =
+                eventType === 'done' ||
+                statusLower === 'completed' ||
+                statusLower === 'failed' ||
+                statusLower === 'needs_review';
+
+              if (
+                (totalItems > 0 && processedCount >= totalItems) ||
+                (isTerminalStatus && (!totalItems || totalItems <= 1))
+              ) {
+                console.log(`[SSE Task ${taskId}] All ${totalItems || processedCount} items processed.`);
+                onDone();
+                return;
+              }
+            } else {
+              onMessage(parsedData);
+            }
+          }
+        }
+      } finally {
+        if (reader) {
+          try {
+            await reader.cancel();
+            reader.releaseLock();
+          } catch {
+            // Stream might already be closed
+          }
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
+      onError(error instanceof Error ? error : new Error(String(error)));
+    }
+  },
+
+
+
+
+  retryWardrobeItemAnalysis: async (id: string): Promise<WardrobeItemRes & { message?: string }> => {
+    const res = await api.post<APIResponse<WardrobeItemRes>>(`/wardrobe-items/${id}/retry-analysis`);
+    const result = res.data.data! as WardrobeItemRes & { message?: string };
     if (result) result.message = res.data.message;
     return result;
   },
@@ -99,3 +234,4 @@ export const wardrobeApi = {
     return res.data.data!;
   },
 };
+
