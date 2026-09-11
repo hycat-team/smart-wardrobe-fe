@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import {
+  accessCookieOptions,
+  refreshCookieOptions,
+  stripTokens,
+} from '@/lib/auth-cookies';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -75,30 +80,19 @@ export async function POST(request: NextRequest) {
     }
 
     const responseData = typeof data === 'object' ? { ...data, isAdmin } : { data, isAdmin };
-    if (token && !responseData.accessToken) {
-      responseData.accessToken = token;
-    }
+    // Chuẩn production: KHÔNG trả token về JS — token chỉ đi qua HttpOnly cookie
+    const safeData = stripTokens(responseData);
 
-    const res = NextResponse.json(responseData);
+    const res = NextResponse.json(safeData);
 
     if (token) {
-      res.cookies.set('accessToken', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24, // 1 day
-      });
+      // maxAge tự khớp theo exp của JWT, fallback 15 phút
+      res.cookies.set('accessToken', token, accessCookieOptions(token));
     }
 
     if (refreshToken) {
-      res.cookies.set('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
+      // maxAge tự khớp theo exp của JWT, fallback 7 ngày
+      res.cookies.set('refreshToken', refreshToken, refreshCookieOptions(refreshToken));
     }
 
     return res;

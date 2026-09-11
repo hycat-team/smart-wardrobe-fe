@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import {
+  accessCookieOptions,
+  clearCookieOptions,
+  refreshCookieOptions,
+  stripTokens,
+} from '@/lib/auth-cookies';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -23,10 +29,10 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
 
     if (!response.ok) {
-      const res = NextResponse.json(data, { status: response.status });
-      // If refresh fails, clear cookies
-      res.cookies.delete('accessToken');
-      res.cookies.delete('refreshToken');
+      const res = NextResponse.json(stripTokens(data), { status: response.status });
+      // If refresh fails, clear cookies (path/sameSite phải khớp lúc set)
+      res.cookies.set('accessToken', '', clearCookieOptions());
+      res.cookies.set('refreshToken', '', clearCookieOptions());
       return res;
     }
 
@@ -53,42 +59,24 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const res = NextResponse.json(data);
-
-    // Forward Set-Cookie headers from backend if they exist
-    const setCookies = response.headers.getSetCookie ? response.headers.getSetCookie() : [];
-    if (setCookies && setCookies.length > 0) {
-      setCookies.forEach((cookie) => {
-        res.headers.append('Set-Cookie', cookie);
-      });
-    }
+    // Chuẩn production: KHÔNG forward raw Set-Cookie từ backend (sai Domain),
+    // cũng KHÔNG trả token về JS — tự set lại cookie trên domain của FE.
+    const res = NextResponse.json(stripTokens(data));
 
     if (token) {
-      res.cookies.set('accessToken', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24, // 1 day
-      });
+      res.cookies.set('accessToken', token, accessCookieOptions(token));
     }
 
     if (newRefreshToken) {
-      res.cookies.set('refreshToken', newRefreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      });
+      res.cookies.set('refreshToken', newRefreshToken, refreshCookieOptions(newRefreshToken));
     }
 
     return res;
   } catch (error) {
     console.error('Refresh Token Proxy Error:', error);
     const res = NextResponse.json({ message: 'Lỗi máy chủ nội bộ' }, { status: 500 });
-    res.cookies.delete('accessToken');
-    res.cookies.delete('refreshToken');
+    res.cookies.set('accessToken', '', clearCookieOptions());
+    res.cookies.set('refreshToken', '', clearCookieOptions());
     return res;
   }
 }
