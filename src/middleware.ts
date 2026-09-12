@@ -46,9 +46,12 @@ export async function middleware(request: NextRequest) {
   let newAccessToken = '';
   let newRefreshToken = '';
 
-  // 1. CHẶN VÀ KIỂM TRA HẠN TOKEN
+  // 1. CHẶN VÀ KIỂM TRA HẠN TOKEN (chỉ cho Page request)
+  // Chuẩn production: API /api/v1/* để axios interceptor + /api/auth/refresh-token lo refresh,
+  // middleware không refresh ở đây để tránh double-refresh + race khi rotate refresh token.
   // Bỏ qua route refresh-token để tránh việc middleware và route handler cùng gọi backend 2 lần
-  if ((!accessToken || isTokenExpired(accessToken)) && refreshToken && !pathname.includes('/auth/refresh-token')) {
+  const isApiProxy = pathname.startsWith('/api/v1/');
+  if (!isApiProxy && (!accessToken || isTokenExpired(accessToken)) && refreshToken && !pathname.includes('/auth/refresh-token')) {
     try {
       // Gọi API refresh token tới Backend
       const refreshRes = await fetch(`${BACKEND_URL}/auth/refresh-token`, {
@@ -156,13 +159,22 @@ export async function middleware(request: NextRequest) {
   });
 
   // 4. GẮN COOKIE MỚI VÀO RESPONSE ĐỂ BROWSER LƯU LẠI
+  // maxAge khớp theo exp của JWT thay vì hardcode
+  const maxAgeFor = (token: string, fallback: number) => {
+    const payload = parseJwt(token);
+    if (payload?.exp) {
+      const ttl = payload.exp - Math.floor(Date.now() / 1000) - 30;
+      if (ttl > 30) return ttl;
+    }
+    return fallback;
+  };
   if (newAccessToken) {
     finalResponse.cookies.set('accessToken', newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: maxAgeFor(newAccessToken, 15 * 60),
     });
   }
   
@@ -172,7 +184,7 @@ export async function middleware(request: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: maxAgeFor(newRefreshToken, 7 * 24 * 60 * 60),
     });
   }
 

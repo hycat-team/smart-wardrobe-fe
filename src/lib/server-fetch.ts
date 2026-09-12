@@ -1,53 +1,186 @@
-import { cookies } from 'next/headers';
+// import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
+// const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// /**
+//  * Hàm fetch tùy chỉnh dành riêng cho Server Components.
+//  * Tự động gắn HttpOnly `accessToken` từ cookies vào Header.
+//  */
+// export async function serverFetch<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
+//   const cookieStore = await cookies();
+//   const token = cookieStore.get('accessToken')?.value;
+
+//   const headers = new Headers(options?.headers);
+//   // Cài đặt Content-Type mặc định nếu chưa có
+//   if (!headers.has('Content-Type')) {
+//     headers.set('Content-Type', 'application/json');
+//   }
+
+//   // Tự động gắn Token nếu có
+//   if (token) {
+//     headers.set('Authorization', `Bearer ${token}`);
+//   }
+
+//   console.log(`[serverFetch] BACKEND_URL=${BACKEND_URL}, token=${token ? "exists" : "missing"}, endpoint=${endpoint}`);
+
+//   try {
+//     // Strip quotes from BACKEND_URL if they exist
+//     const cleanBaseUrl = BACKEND_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
+//     const url = `${cleanBaseUrl}${endpoint}`;
+//     console.log(`[serverFetch] Fetching: ${url}`);
+
+//     const res = await fetch(url, {
+//       ...options,
+//       headers,
+//     });
+
+//     if (!res.ok) {
+//       if (res.status === 401 || res.status === 403) {
+//         console.warn(`[ServerFetch Warning] ${endpoint}: ${res.status} ${res.statusText}`);
+//       } else {
+//         console.error(`[ServerFetch Error] ${endpoint}: ${res.status} ${res.statusText}`);
+//       }
+//       return null;
+//     }
+
+//     const data = await res.json();
+//     // API backend của bạn trả về { data: T, message: string }
+//     return data.data as T;
+//   } catch (error) {
+//     console.error(`[ServerFetch Exception] ${endpoint}:`, error);
+//     return null;
+//   }
+// }
+
+// =======================================================
+
+import { cookies, headers } from 'next/headers';
+
+function getBackendUrl(): string {
+  const raw =
+    process.env.BACKEND_API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    'http://127.0.0.1:8080/api/v1';
+  // Bỏ quote thừa + slash cuối để tránh `http://x//products`
+  return raw
+    .replace(/^['"]|['"]$/g, '')
+    .trim()
+    .replace(/\/+$/, '');
+}
+
+export interface ServerFetchOptions extends Omit<RequestInit, 'headers'> {
+  headers?: HeadersInit;
+  /** Mặc định true: gắn Bearer từ HttpOnly cookie */
+  withAuth?: boolean;
+  /** Truyền locale để BE trả message đúng ngôn ngữ (Accept-Language) */
+  locale?: string;
+  /** Next.js cache: 'force-cache' | 'no-store' ... */
+  cache?: RequestCache;
+  /** ISR: số giây revalidate */
+  revalidate?: number;
+  /** Cache tags để revalidateTag() */
+  tags?: string[];
+}
+
+function getCookieToken(cookieStore: Awaited<ReturnType<typeof cookies>>): string | undefined {
+  return cookieStore.get('accessToken')?.value ?? cookieStore.get('access_token')?.value;
+}
+
+async function getLocale(headersList: Awaited<ReturnType<typeof headers>>): Promise<string> {
+  const cookieStore = await cookies();
+  return (
+    cookieStore.get('NEXT_LOCALE')?.value ||
+    headersList.get('accept-language')?.split(',')[0]?.split('-')[0] ||
+    'vi'
+  );
+}
 
 /**
- * Hàm fetch tùy chỉnh dành riêng cho Server Components.
- * Tự động gắn HttpOnly `accessToken` từ cookies vào Header.
+ * Fetch dành cho Server Components / Route Handlers / Server Actions.
+ * - Dùng `BACKEND_API_URL` (server-only), không lộ env public.
+ * - Tự gắn Bearer từ HttpOnly cookie (cả 2 tên accessToken/access_token).
+ * - Hỗ trợ locale, ISR (revalidate/tags), unwrap { data } an toàn.
+ * - Lỗi 4xx/5xx trả null (giữ tương thích cũ). Muốn throw thì dùng `serverFetchOrThrow`.
  */
-export async function serverFetch<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
+export async function serverFetch<T>(
+  endpoint: string,
+  options: ServerFetchOptions = {}
+): Promise<T | null> {
+  const {
+    withAuth = true,
+    locale,
+    cache,
+    revalidate,
+    tags,
+    headers: initHeaders,
+    ...rest
+  } = options;
+
   const cookieStore = await cookies();
-  const token = cookieStore.get('accessToken')?.value;
+  const headersList = await headers();
+  const resolvedLocale = locale ?? (await getLocale(headersList));
 
-  const headers = new Headers(options?.headers);
-  // Cài đặt Content-Type mặc định nếu chưa có
-  if (!headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
+  const reqHeaders = new Headers(initHeaders);
+  if (!reqHeaders.has('Content-Type')) {
+    reqHeaders.set('Content-Type', 'application/json');
+  }
+  reqHeaders.set('Accept-Language', resolvedLocale);
+
+  if (withAuth) {
+    const token = getCookieToken(cookieStore);
+    if (token) reqHeaders.set('Authorization', `Bearer ${token}`);
   }
 
-  // Tự động gắn Token nếu có
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
-
-  console.log(`[serverFetch] BACKEND_URL=${BACKEND_URL}, token=${token ? "exists" : "missing"}, endpoint=${endpoint}`);
+  const url = `${getBackendUrl()}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
   try {
-    // Strip quotes from BACKEND_URL if they exist
-    const cleanBaseUrl = BACKEND_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
-    const url = `${cleanBaseUrl}${endpoint}`;
-    console.log(`[serverFetch] Fetching: ${url}`);
-    
     const res = await fetch(url, {
-      ...options,
-      headers,
+      ...rest,
+      headers: reqHeaders,
+      ...(cache ? { cache } : {}),
+      ...(revalidate !== undefined || tags
+        ? {
+            next: {
+              ...(revalidate !== undefined ? { revalidate } : {}),
+              ...(tags ? { tags } : {}),
+            },
+          }
+        : {}),
     });
 
     if (!res.ok) {
-      if (res.status === 401 || res.status === 403) {
-        console.warn(`[ServerFetch Warning] ${endpoint}: ${res.status} ${res.statusText}`);
-      } else {
-        console.error(`[ServerFetch Error] ${endpoint}: ${res.status} ${res.statusText}`);
+      // Chỉ log ồn khi dev, prod chỉ warn/error nhẹ để khỏi rò rỉ URL/token
+      if (process.env.NODE_ENV === 'development') {
+        if (res.status === 401 || res.status === 403) {
+          console.warn(`[serverFetch] ${endpoint}: ${res.status}`);
+        } else {
+          console.error(`[serverFetch] ${endpoint}: ${res.status} ${res.statusText}`);
+        }
       }
       return null;
     }
 
-    const data = await res.json();
-    // API backend của bạn trả về { data: T, message: string }
-    return data.data as T;
+    if (res.status === 204) return null;
+
+    const json = await res.json().catch(() => null);
+    if (json && typeof json === 'object' && 'data' in json) {
+      return (json as { data: T }).data as T;
+    }
+    return json as T;
   } catch (error) {
-    console.error(`[ServerFetch Exception] ${endpoint}:`, error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`[serverFetch] ${endpoint}:`, error);
+    }
     return null;
   }
+}
+
+/** Biến thể throw lỗi để Server Component dùng `notFound()` / `redirect()` được. */
+export async function serverFetchOrThrow<T>(
+  endpoint: string,
+  options: ServerFetchOptions = {}
+): Promise<T> {
+  const data = await serverFetch<T>(endpoint, options);
+  if (data === null) throw new Error(`serverFetch failed: ${endpoint}`);
+  return data;
 }

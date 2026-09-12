@@ -28,8 +28,8 @@ export const userBrandsApi = {
   },
 
   // Lấy danh sách phúc lợi (active) của brand
-  getBrandBenefits: async (brandId: string) => {
-    const res = await api.get<{data: Benefit[]}>(`/brands/${brandId}/benefits`);
+  getBrandBenefits: async (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
+    const res = await api.get<{data: PaginationResult<Benefit>}>(`/brands/${brandId}/benefits`, { params });
     return res.data.data;
   },
 
@@ -47,12 +47,9 @@ export const userBrandsApi = {
 
   // Lấy danh sách ưu đãi đã đổi của user
   getMyBenefitRedemptions: async (brandId?: string) => {
-    // Tạm thời mock api theo yêu cầu: dùng API lấy benefits của brand
-    if (brandId) {
-      const res = await api.get<{data: any[]}>(`/brands/${brandId}/benefits`);
-      return res.data.data;
-    }
-    return [];
+    const params = brandId ? { brandId } : undefined;
+    const res = await api.get<{data: PaginationResult<any>}>(`/me/benefit-redemptions`, { params });
+    return res.data.data.items || [];
   },
 
   // Xem thẻ thành viên của user
@@ -83,6 +80,12 @@ export const userBrandsApi = {
   // Xem lịch sử tích/tiêu điểm
   getMyLoyaltyTransactions: async (brandId: string) => {
     const res = await api.get<{data: any[]}>(`/me/brand-loyalties/${brandId}/transactions`);
+    return res.data.data;
+  },
+
+  // Xem chi tiết hạng thành viên
+  getLoyaltyTierDetails: async (brandId: string, tierId: string) => {
+    const res = await api.get<{data: any}>(`/brands/${brandId}/loyalty/tiers/${tierId}`);
     return res.data.data;
   },
 

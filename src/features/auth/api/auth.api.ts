@@ -17,7 +17,7 @@ export const authApi = {
     const res = await api.post<APIResponse<AuthTokenRes>>('/api/auth/login', data, {
       baseURL: '', // Bỏ qua /api/v1 baseURL mặc định
     });
-    console.log('Login response:', res.data);
+    // Không log response login — từng chứa token, tránh lộ qua console
     const responseData = res.data as any;
     const resultData = responseData.data || responseData;
     return { ...resultData, message: responseData.message };

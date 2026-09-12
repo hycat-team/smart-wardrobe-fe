@@ -41,7 +41,8 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
   const { data: loyaltyData, isLoading: isLoadingLoyalty } = useGetMyLoyaltyAtBrand(brandId);
   const { data: transactions } = useGetMyLoyaltyTransactions(brandId);
   const { data: lots } = useGetMyLoyaltyLots(brandId);
-  const { data: benefits } = useGetBrandBenefits(brandId);
+  const { data: benefitsData } = useGetBrandBenefits(brandId, { unlockType: 'point_redemption' });
+  const benefits = benefitsData?.items || [];
   const { data: redemptions } = useGetMyBenefitRedemptions(brandId);
   
   const { mutateAsync: joinLoyalty, isPending: isJoining } = useJoinLoyalty();
@@ -214,9 +215,16 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                             </p>
                           </div>
                           <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-xl font-bold font-mono text-zinc-900">{benefit.requiredPoints}</span>
-                              <span className="text-xs font-semibold text-zinc-500 uppercase">pts</span>
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-xl font-bold font-mono text-zinc-900">{benefit.requiredPoints}</span>
+                                <span className="text-xs font-semibold text-zinc-500 uppercase">pts</span>
+                              </div>
+                              {benefit.requiredTierId && benefit.requiredTierName && (
+                                <span className="text-[10px] font-semibold text-primary/80 uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full inline-flex w-fit">
+                                  Yêu cầu hạng: {benefit.requiredTierName}
+                                </span>
+                              )}
                             </div>
                             <Button 
                               variant="ghost"

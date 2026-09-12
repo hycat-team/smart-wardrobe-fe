@@ -51,7 +51,10 @@ export const useUpdateAvatar = () => {
   return useMutation({
     mutationFn: profileApi.updateAvatar,
     onSuccess: (res) => {
-      queryClient.setQueryData(PROFILE_QUERY_KEY, res);
+      queryClient.setQueryData(PROFILE_QUERY_KEY, (oldData: any) => {
+        if (!oldData) return res;
+        return { ...oldData, ...res };
+      });
       toast.success('Cập nhật ảnh đại diện thành công');
     },
     onError: (error) => {
