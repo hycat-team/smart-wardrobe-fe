@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import {
-  accessCookieOptions,
-  refreshCookieOptions,
-  stripTokens,
-} from '@/lib/auth-cookies';
+import { accessCookieOptions, refreshCookieOptions, stripTokens } from '@/lib/auth-cookies';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -42,7 +38,12 @@ export async function POST(request: NextRequest) {
       if (!token) {
         for (const key in data) {
           if (data[key] && typeof data[key] === 'object') {
-            token = data[key].accessToken || data[key].token || data[key].access_token || data[key].jwt || data[key].jwtToken;
+            token =
+              data[key].accessToken ||
+              data[key].token ||
+              data[key].access_token ||
+              data[key].jwt ||
+              data[key].jwtToken;
             refreshToken = data[key].refreshToken || data[key].refresh_token;
             if (token) break;
           }
