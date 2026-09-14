@@ -7,6 +7,7 @@ export interface AIOutfitRecommendationReq {
   weather?: string;
   colorTone?: string;
   details?: string;
+  // Backend dùng camelCase `includeBrandItems` (đã bỏ snake_case `include_brand_items`).
   includeBrandItems?: boolean;
 }
 

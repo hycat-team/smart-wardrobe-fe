@@ -12,9 +12,9 @@ This document is auto-generated from `swagger.json` to provide comprehensive det
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `userId` | query | string | Yes | User ID |
+| Name     | In    | Type   | Required | Description |
+| -------- | ----- | ------ | -------- | ----------- |
+| `userId` | query | string | Yes      | User ID     |
 
 **Responses**:
 
@@ -42,10 +42,10 @@ This document is auto-generated from `swagger.json` to provide comprehensive det
 Thông tin cấp chính sách
 
 - Schema: [CreateAIGrantReq](#smart-wardrobe-beinternalmodulesaiexecutorapplicationdtocreateaigrantreq)
-    **Properties**:
-    - `aiCostPolicyId` (string) **(Required)**
-    - `effectiveTo` (string)
-    - `userId` (string) **(Required)**
+  **Properties**:
+  - `aiCostPolicyId` (string) **(Required)**
+  - `effectiveTo` (string)
+  - `userId` (string) **(Required)**
 
 **Responses**:
 
@@ -94,20 +94,20 @@ Thông tin cấp chính sách
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | Model Config ID |
+| Name | In   | Type   | Required | Description     |
+| ---- | ---- | ------ | -------- | --------------- |
+| `id` | path | string | Yes      | Model Config ID |
 
 **Request Body**:
 
 Thông tin cập nhật giá
 
 - Schema: [UpdatePricingReq](#smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoupdatepricingreq)
-    **Properties**:
-    - `effectiveTo` (string)
-    - `inputUsdPerMillion` (number)
-    - `outputUsdPerMillion` (number)
-    - `usdToVnd` (number)
+  **Properties**:
+  - `effectiveTo` (string)
+  - `inputUsdPerMillion` (number)
+  - `outputUsdPerMillion` (number)
+  - `usdToVnd` (number)
 
 **Responses**:
 
@@ -135,13 +135,13 @@ Thông tin cập nhật giá
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `userId` | query | string | Yes | User ID |
-| `fromDate` | query | string | No | Từ ngày (YYYY-MM-DD) |
-| `toDate` | query | string | No | Đến ngày (YYYY-MM-DD) |
-| `page` | query | integer | No | Trang |
-| `limit` | query | integer | No | Số bản ghi/trang |
+| Name       | In    | Type    | Required | Description           |
+| ---------- | ----- | ------- | -------- | --------------------- |
+| `userId`   | query | string  | Yes      | User ID               |
+| `fromDate` | query | string  | No       | Từ ngày (YYYY-MM-DD)  |
+| `toDate`   | query | string  | No       | Đến ngày (YYYY-MM-DD) |
+| `page`     | query | integer | No       | Trang                 |
+| `limit`    | query | integer | No       | Số bản ghi/trang      |
 
 **Responses**:
 
@@ -163,16 +163,16 @@ Thông tin cập nhật giá
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `actorUserId` | query | string | No | ID admin thực hiện |
-| `action` | query | string | No | Hành động |
-| `targetType` | query | string | No | Loại đối tượng |
-| `targetId` | query | string | No | ID đối tượng |
-| `fromDate` | query | string | No | Từ ngày (YYYY-MM-DD) |
-| `toDate` | query | string | No | Đến ngày (YYYY-MM-DD) |
-| `page` | query | integer | No | Trang |
-| `limit` | query | integer | No | Số bản ghi/trang |
+| Name          | In    | Type    | Required | Description           |
+| ------------- | ----- | ------- | -------- | --------------------- |
+| `actorUserId` | query | string  | No       | ID admin thực hiện    |
+| `action`      | query | string  | No       | Hành động             |
+| `targetType`  | query | string  | No       | Loại đối tượng        |
+| `targetId`    | query | string  | No       | ID đối tượng          |
+| `fromDate`    | query | string  | No       | Từ ngày (YYYY-MM-DD)  |
+| `toDate`      | query | string  | No       | Đến ngày (YYYY-MM-DD) |
+| `page`        | query | integer | No       | Trang                 |
+| `limit`       | query | integer | No       | Số bản ghi/trang      |
 
 **Responses**:
 
@@ -194,12 +194,12 @@ Thông tin cập nhật giá
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
-| `q` | query | string | No |  |
-| `status` | query | string | No |  |
+| Name     | In    | Type    | Required | Description |
+| -------- | ----- | ------- | -------- | ----------- |
+| `limit`  | query | integer | No       |             |
+| `page`   | query | integer | No       |             |
+| `q`      | query | string  | No       |             |
+| `status` | query | string  | No       |             |
 
 **Responses**:
 
@@ -220,12 +220,12 @@ Thông tin cập nhật giá
 Thông tin brand
 
 - Schema: [CreateBrandReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandreq)
-    **Properties**:
-    - `description` (string)
-    - `logoPublicId` (string)
-    - `logoUrl` (string)
-    - `name` (string) **(Required)**
-    - `slug` (string) **(Required)**
+  **Properties**:
+  - `description` (string)
+  - `logoPublicId` (string)
+  - `logoUrl` (string)
+  - `name` (string) **(Required)**
+  - `slug` (string) **(Required)**
 
 **Responses**:
 
@@ -256,9 +256,9 @@ Thông tin brand
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | Brand ID |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | Brand ID    |
 
 **Responses**:
 
@@ -286,17 +286,17 @@ Thông tin brand
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | Brand ID |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | Brand ID    |
 
 **Request Body**:
 
 Thông tin người dùng
 
 - Schema: [AdminAddBrandStaffReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoadminaddbrandstaffreq)
-    **Properties**:
-    - `userId` (string) **(Required)**
+  **Properties**:
+  - `userId` (string) **(Required)**
 
 **Responses**:
 
@@ -324,10 +324,10 @@ Thông tin người dùng
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | Brand ID |
-| `memberId` | path | string | Yes | Member ID |
+| Name       | In   | Type   | Required | Description |
+| ---------- | ---- | ------ | -------- | ----------- |
+| `brandId`  | path | string | Yes      | Brand ID    |
+| `memberId` | path | string | Yes      | Member ID   |
 
 **Responses**:
 
@@ -347,19 +347,19 @@ Thông tin người dùng
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | Brand ID |
-| `memberId` | path | string | Yes | Member ID |
+| Name       | In   | Type   | Required | Description |
+| ---------- | ---- | ------ | -------- | ----------- |
+| `brandId`  | path | string | Yes      | Brand ID    |
+| `memberId` | path | string | Yes      | Member ID   |
 
 **Request Body**:
 
 Thông tin cập nhật
 
 - Schema: [AdminUpdateBrandMemberReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoadminupdatebrandmemberreq)
-    **Properties**:
-    - `role` (ref: BrandMemberRole)
-    - `status` (ref: BrandMemberStatus)
+  **Properties**:
+  - `role` (ref: BrandMemberRole)
+  - `status` (ref: BrandMemberStatus)
 
 **Responses**:
 
@@ -385,17 +385,17 @@ Thông tin cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Trạng thái mới
 
 - Schema: [UpdateBrandStatusReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebrandstatusreq)
-    **Properties**:
-    - `status` (ref: BrandStatus) **(Required)**
+  **Properties**:
+  - `status` (ref: BrandStatus) **(Required)**
 
 **Responses**:
 
@@ -426,18 +426,18 @@ Trạng thái mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | Brand ID |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | Brand ID    |
 
 **Request Body**:
 
 Thông tin chuyển giao
 
 - Schema: [TransferBrandOwnershipReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtotransferbrandownershipreq)
-    **Properties**:
-    - `newOwnerUserId` (string) **(Required)**
-    - `oldOwnerHandling` (string) **(Required)**
+  **Properties**:
+  - `newOwnerUserId` (string) **(Required)**
+  - `oldOwnerHandling` (string) **(Required)**
 
 **Responses**:
 
@@ -480,10 +480,10 @@ Thông tin chuyển giao
 Thông tin danh mục cần tạo
 
 - Schema: [CreateCategoryReq](#smart-wardrobe-beinternalmodulesfashionapplicationdtocreatecategoryreq)
-    **Properties**:
-    - `name` (string) **(Required)**
-    - `slug` (string) **(Required)**
-    - `sortOrder` (integer)
+  **Properties**:
+  - `name` (string) **(Required)**
+  - `slug` (string) **(Required)**
+  - `sortOrder` (integer)
 
 **Responses**:
 
@@ -505,9 +505,9 @@ Thông tin danh mục cần tạo
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID danh mục |
+| Name | In   | Type   | Required | Description |
+| ---- | ---- | ------ | -------- | ----------- |
+| `id` | path | string | Yes      | ID danh mục |
 
 **Responses**:
 
@@ -529,19 +529,19 @@ Thông tin danh mục cần tạo
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID danh mục |
+| Name | In   | Type   | Required | Description |
+| ---- | ---- | ------ | -------- | ----------- |
+| `id` | path | string | Yes      | ID danh mục |
 
 **Request Body**:
 
 Thông tin danh mục cần cập nhật
 
 - Schema: [UpdateCategoryReq](#smart-wardrobe-beinternalmodulesfashionapplicationdtoupdatecategoryreq)
-    **Properties**:
-    - `name` (string) **(Required)**
-    - `slug` (string) **(Required)**
-    - `sortOrder` (integer)
+  **Properties**:
+  - `name` (string) **(Required)**
+  - `slug` (string) **(Required)**
+  - `sortOrder` (integer)
 
 **Responses**:
 
@@ -563,9 +563,9 @@ Thông tin danh mục cần cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID danh mục |
+| Name | In   | Type   | Required | Description |
+| ---- | ---- | ------ | -------- | ----------- |
+| `id` | path | string | Yes      | ID danh mục |
 
 **Responses**:
 
@@ -587,10 +587,10 @@ Thông tin danh mục cần cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `fromDate` | query | string | No | Ngày bắt đầu (định dạng YYYY-MM-DD) |
-| `toDate` | query | string | No | Ngày kết thúc (định dạng YYYY-MM-DD) |
+| Name       | In    | Type   | Required | Description                          |
+| ---------- | ----- | ------ | -------- | ------------------------------------ |
+| `fromDate` | query | string | No       | Ngày bắt đầu (định dạng YYYY-MM-DD)  |
+| `toDate`   | query | string | No       | Ngày kết thúc (định dạng YYYY-MM-DD) |
 
 **Responses**:
 
@@ -635,10 +635,10 @@ Thông tin danh mục cần cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `fromDate` | query | string | No | Ngày bắt đầu (định dạng YYYY-MM-DD) |
-| `toDate` | query | string | No | Ngày kết thúc (định dạng YYYY-MM-DD) |
+| Name       | In    | Type   | Required | Description                          |
+| ---------- | ----- | ------ | -------- | ------------------------------------ |
+| `fromDate` | query | string | No       | Ngày bắt đầu (định dạng YYYY-MM-DD)  |
+| `toDate`   | query | string | No       | Ngày kết thúc (định dạng YYYY-MM-DD) |
 
 **Responses**:
 
@@ -659,11 +659,11 @@ Thông tin danh mục cần cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `status` | query | string | No | Trạng thái lỗi (ví dụ: FAILED) |
-| `page` | query | integer | No | Số trang |
-| `limit` | query | integer | No | Số lượng phần tử mỗi trang |
+| Name     | In    | Type    | Required | Description                    |
+| -------- | ----- | ------- | -------- | ------------------------------ |
+| `status` | query | string  | No       | Trạng thái lỗi (ví dụ: FAILED) |
+| `page`   | query | integer | No       | Số trang                       |
+| `limit`  | query | integer | No       | Số lượng phần tử mỗi trang     |
 
 **Responses**:
 
@@ -775,10 +775,10 @@ Thông tin danh mục cần cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `fromDate` | query | string | No | Ngày bắt đầu (định dạng YYYY-MM-DD) |
-| `toDate` | query | string | No | Ngày kết thúc (định dạng YYYY-MM-DD) |
+| Name       | In    | Type   | Required | Description                          |
+| ---------- | ----- | ------ | -------- | ------------------------------------ |
+| `fromDate` | query | string | No       | Ngày bắt đầu (định dạng YYYY-MM-DD)  |
+| `toDate`   | query | string | No       | Ngày kết thúc (định dạng YYYY-MM-DD) |
 
 **Responses**:
 
@@ -802,12 +802,12 @@ Thông tin danh mục cần cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `planCode` | query | string | No | Mã slug gói |
-| `status` | query | string | No | Trạng thái (active, expired) |
-| `page` | query | integer | No | Trang |
-| `limit` | query | integer | No | Số bản ghi/trang |
+| Name       | In    | Type    | Required | Description                  |
+| ---------- | ----- | ------- | -------- | ---------------------------- |
+| `planCode` | query | string  | No       | Mã slug gói                  |
+| `status`   | query | string  | No       | Trạng thái (active, expired) |
+| `page`     | query | integer | No       | Trang                        |
+| `limit`    | query | integer | No       | Số bản ghi/trang             |
 
 **Responses**:
 
@@ -856,18 +856,18 @@ Thông tin danh mục cần cập nhật
 Thông tin gói cước
 
 - Schema: [CreateSubscriptionPlanReq](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtocreatesubscriptionplanreq)
-    **Properties**:
-    - `aiChatDailyQuota` (integer)
-    - `aiOutfitDailyQuota` (integer)
-    - `durationDays` (integer)
-    - `isActive` (boolean)
-    - `maxOutfits` (integer)
-    - `maxWardrobeItems` (integer)
-    - `name` (string) **(Required)**
-    - `planKind` (ref: PlanKind)
-    - `price` (number)
-    - `slug` (string) **(Required)**
-    - `tierRank` (integer)
+  **Properties**:
+  - `aiChatDailyQuota` (integer)
+  - `aiOutfitDailyQuota` (integer)
+  - `durationDays` (integer)
+  - `isActive` (boolean)
+  - `maxOutfits` (integer)
+  - `maxWardrobeItems` (integer)
+  - `name` (string) **(Required)**
+  - `planKind` (ref: PlanKind)
+  - `price` (number)
+  - `slug` (string) **(Required)**
+  - `tierRank` (integer)
 
 **Responses**:
 
@@ -897,25 +897,25 @@ Thông tin gói cước
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID gói cước |
+| Name | In   | Type   | Required | Description |
+| ---- | ---- | ------ | -------- | ----------- |
+| `id` | path | string | Yes      | ID gói cước |
 
 **Request Body**:
 
 Thông tin cập nhật
 
 - Schema: [UpdateSubscriptionPlanReq](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtoupdatesubscriptionplanreq)
-    **Properties**:
-    - `aiChatDailyQuota` (integer)
-    - `aiOutfitDailyQuota` (integer)
-    - `durationDays` (integer)
-    - `isActive` (boolean)
-    - `maxOutfits` (integer)
-    - `maxWardrobeItems` (integer)
-    - `name` (string)
-    - `price` (number)
-    - `tierRank` (integer)
+  **Properties**:
+  - `aiChatDailyQuota` (integer)
+  - `aiOutfitDailyQuota` (integer)
+  - `durationDays` (integer)
+  - `isActive` (boolean)
+  - `maxOutfits` (integer)
+  - `maxWardrobeItems` (integer)
+  - `name` (string)
+  - `price` (number)
+  - `tierRank` (integer)
 
 **Responses**:
 
@@ -945,17 +945,17 @@ Thông tin cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID gói cước |
+| Name | In   | Type   | Required | Description |
+| ---- | ---- | ------ | -------- | ----------- |
+| `id` | path | string | Yes      | ID gói cước |
 
 **Request Body**:
 
 Trạng thái hoạt động
 
 - Schema: [SetPlanActiveReq](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtosetplanactivereq)
-    **Properties**:
-    - `isActive` (boolean)
+  **Properties**:
+  - `isActive` (boolean)
 
 **Responses**:
 
@@ -985,9 +985,9 @@ Trạng thái hoạt động
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `userId` | path | string | Yes | User ID |
+| Name     | In   | Type   | Required | Description |
+| -------- | ---- | ------ | -------- | ----------- |
+| `userId` | path | string | Yes      | User ID     |
 
 **Responses**:
 
@@ -1007,17 +1007,17 @@ Trạng thái hoạt động
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `userId` | path | string | Yes | User ID |
+| Name     | In   | Type   | Required | Description |
+| -------- | ---- | ------ | -------- | ----------- |
+| `userId` | path | string | Yes      | User ID     |
 
 **Request Body**:
 
 Thông tin gói cấp
 
 - Schema: [adminGrantPlanReq](#internalmodulessubscriptionpresentationhandleradmingrantplanreq)
-    **Properties**:
-    - `planId` (string) **(Required)**
+  **Properties**:
+  - `planId` (string) **(Required)**
 
 **Responses**:
 
@@ -1039,13 +1039,13 @@ Thông tin gói cấp
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `status` | query | string | No | Trạng thái giao dịch |
-| `fromDate` | query | string | No | Ngày bắt đầu (YYYY-MM-DD) |
-| `toDate` | query | string | No | Ngày kết thúc (YYYY-MM-DD) |
-| `page` | query | integer | No | Trang |
-| `limit` | query | integer | No | Số bản ghi/trang |
+| Name       | In    | Type    | Required | Description                |
+| ---------- | ----- | ------- | -------- | -------------------------- |
+| `status`   | query | string  | No       | Trạng thái giao dịch       |
+| `fromDate` | query | string  | No       | Ngày bắt đầu (YYYY-MM-DD)  |
+| `toDate`   | query | string  | No       | Ngày kết thúc (YYYY-MM-DD) |
+| `page`     | query | integer | No       | Trang                      |
+| `limit`    | query | integer | No       | Số bản ghi/trang           |
 
 **Responses**:
 
@@ -1065,9 +1065,9 @@ Thông tin gói cấp
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID giao dịch |
+| Name | In   | Type   | Required | Description  |
+| ---- | ---- | ------ | -------- | ------------ |
+| `id` | path | string | Yes      | ID giao dịch |
 
 **Responses**:
 
@@ -1101,19 +1101,19 @@ Thông tin gói cấp
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `orderCode` | path | integer | Yes | Mã đơn hàng |
+| Name        | In   | Type    | Required | Description |
+| ----------- | ---- | ------- | -------- | ----------- |
+| `orderCode` | path | integer | Yes      | Mã đơn hàng |
 
 **Request Body**:
 
 Lý do
 
 - Schema: [resolveRequest](#internalmodulessubscriptionpresentationhandlerresolverequest)
-    **Properties**:
-    - `paymentLinkId` (string)
-    - `reason` (string)
-    - `reference` (string)
+  **Properties**:
+  - `paymentLinkId` (string)
+  - `reason` (string)
+  - `reference` (string)
 
 **Responses**:
 
@@ -1133,19 +1133,19 @@ Lý do
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `orderCode` | path | integer | Yes | Mã đơn hàng |
+| Name        | In   | Type    | Required | Description |
+| ----------- | ---- | ------- | -------- | ----------- |
+| `orderCode` | path | integer | Yes      | Mã đơn hàng |
 
 **Request Body**:
 
 Lý do
 
 - Schema: [resolveRequest](#internalmodulessubscriptionpresentationhandlerresolverequest)
-    **Properties**:
-    - `paymentLinkId` (string)
-    - `reason` (string)
-    - `reference` (string)
+  **Properties**:
+  - `paymentLinkId` (string)
+  - `reason` (string)
+  - `reference` (string)
 
 **Responses**:
 
@@ -1165,19 +1165,19 @@ Lý do
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `orderCode` | path | integer | Yes | Mã đơn hàng |
+| Name        | In   | Type    | Required | Description |
+| ----------- | ---- | ------- | -------- | ----------- |
+| `orderCode` | path | integer | Yes      | Mã đơn hàng |
 
 **Request Body**:
 
 Bằng chứng + lý do
 
 - Schema: [resolveRequest](#internalmodulessubscriptionpresentationhandlerresolverequest)
-    **Properties**:
-    - `paymentLinkId` (string)
-    - `reason` (string)
-    - `reference` (string)
+  **Properties**:
+  - `paymentLinkId` (string)
+  - `reason` (string)
+  - `reference` (string)
 
 **Responses**:
 
@@ -1197,19 +1197,19 @@ Bằng chứng + lý do
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `orderCode` | path | integer | Yes | Mã đơn hàng |
+| Name        | In   | Type    | Required | Description |
+| ----------- | ---- | ------- | -------- | ----------- |
+| `orderCode` | path | integer | Yes      | Mã đơn hàng |
 
 **Request Body**:
 
 Lý do
 
 - Schema: [resolveRequest](#internalmodulessubscriptionpresentationhandlerresolverequest)
-    **Properties**:
-    - `paymentLinkId` (string)
-    - `reason` (string)
-    - `reference` (string)
+  **Properties**:
+  - `paymentLinkId` (string)
+  - `reason` (string)
+  - `reference` (string)
 
 **Responses**:
 
@@ -1231,13 +1231,13 @@ Lý do
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `isActive` | query | boolean | No |  |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
-| `q` | query | string | No |  |
-| `roleSlug` | query | string | No |  |
+| Name       | In    | Type    | Required | Description |
+| ---------- | ----- | ------- | -------- | ----------- |
+| `isActive` | query | boolean | No       |             |
+| `limit`    | query | integer | No       |             |
+| `page`     | query | integer | No       |             |
+| `q`        | query | string  | No       |             |
+| `roleSlug` | query | string  | No       |             |
 
 **Responses**:
 
@@ -1260,15 +1260,15 @@ Lý do
 Thông tin tài khoản mới
 
 - Schema: [CreateAdminUserReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtocreateadminuserreq)
-    **Properties**:
-    - `dateOfBirth` (string)
-    - `email` (string) **(Required)**
-    - `firstName` (string) **(Required)**
-    - `gender` (object)
-    - `lastName` (string)
-    - `password` (string) **(Required)**
-    - `roleSlug` (ref: RoleSlug)
-    - `username` (string) **(Required)**
+  **Properties**:
+  - `dateOfBirth` (string)
+  - `email` (string) **(Required)**
+  - `firstName` (string) **(Required)**
+  - `gender` (object)
+  - `lastName` (string)
+  - `password` (string) **(Required)**
+  - `roleSlug` (ref: RoleSlug)
+  - `username` (string) **(Required)**
 
 **Responses**:
 
@@ -1300,9 +1300,9 @@ Thông tin tài khoản mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID người dùng |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID người dùng |
 
 **Responses**:
 
@@ -1322,9 +1322,9 @@ Thông tin tài khoản mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID người dùng |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID người dùng |
 
 **Responses**:
 
@@ -1356,17 +1356,17 @@ Thông tin tài khoản mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID người dùng |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID người dùng |
 
 **Request Body**:
 
 Vai trò mới
 
 - Schema: [UpdateUserRoleReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoupdateuserrolereq)
-    **Properties**:
-    - `roleSlug` (ref: RoleSlug) **(Required)**
+  **Properties**:
+  - `roleSlug` (ref: RoleSlug) **(Required)**
 
 **Responses**:
 
@@ -1398,9 +1398,9 @@ Vai trò mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID người dùng |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID người dùng |
 
 **Responses**:
 
@@ -1426,9 +1426,9 @@ Vai trò mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID người dùng |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID người dùng |
 
 **Responses**:
 
@@ -1448,17 +1448,17 @@ Vai trò mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID người dùng |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID người dùng |
 
 **Request Body**:
 
 Trạng thái tài khoản mới
 
 - Schema: [UpdateUserStatusReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoupdateuserstatusreq)
-    **Properties**:
-    - `status` (object)
+  **Properties**:
+  - `status` (object)
 
 **Responses**:
 
@@ -1492,12 +1492,12 @@ Trạng thái tài khoản mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `categorySlug` | query | string | No |  |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
-| `q` | query | string | No |  |
+| Name           | In    | Type    | Required | Description |
+| -------------- | ----- | ------- | -------- | ----------- |
+| `categorySlug` | query | string  | No       |             |
+| `limit`        | query | integer | No       |             |
+| `page`         | query | integer | No       |             |
+| `q`            | query | string  | No       |             |
 
 **Responses**:
 
@@ -1517,24 +1517,24 @@ Trạng thái tài khoản mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID trang phục mẫu |
+| Name | In   | Type   | Required | Description       |
+| ---- | ---- | ------ | -------- | ----------------- |
+| `id` | path | string | Yes      | ID trang phục mẫu |
 
 **Request Body**:
 
 Thông tin cập nhật
 
 - Schema: [UpdateSystemCatalogItemReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtoupdatesystemcatalogitemreq)
-    **Properties**:
-    - `categoryId` (string)
-    - `color` (string)
-    - `fit` (string)
-    - `material` (string)
-    - `pattern` (string)
-    - `price` (number)
-    - `seasonality` (string)
-    - `style` (string)
+  **Properties**:
+  - `categoryId` (string)
+  - `color` (string)
+  - `fit` (string)
+  - `material` (string)
+  - `pattern` (string)
+  - `price` (number)
+  - `seasonality` (string)
+  - `style` (string)
 
 **Responses**:
 
@@ -1565,9 +1565,9 @@ Thông tin cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID trang phục mẫu |
+| Name | In   | Type   | Required | Description       |
+| ---- | ---- | ------ | -------- | ----------------- |
+| `id` | path | string | Yes      | ID trang phục mẫu |
 
 **Responses**:
 
@@ -1612,8 +1612,8 @@ Thông tin cập nhật
 Yêu cầu tạo cuộc trò chuyện
 
 - Schema: [CreateChatSessionReq](#smart-wardrobe-beinternalmodulesfashionapplicationdtocreatechatsessionreq)
-    **Properties**:
-    - `title` (string)
+  **Properties**:
+  - `title` (string)
 
 **Responses**:
 
@@ -1637,9 +1637,9 @@ Yêu cầu tạo cuộc trò chuyện
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `contextID` | path | string | Yes | ID cuộc trò chuyện |
+| Name        | In   | Type   | Required | Description        |
+| ----------- | ---- | ------ | -------- | ------------------ |
+| `contextID` | path | string | Yes      | ID cuộc trò chuyện |
 
 **Responses**:
 
@@ -1659,17 +1659,17 @@ Yêu cầu tạo cuộc trò chuyện
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `contextID` | path | string | Yes | ID cuộc trò chuyện |
+| Name        | In   | Type   | Required | Description        |
+| ----------- | ---- | ------ | -------- | ------------------ |
+| `contextID` | path | string | Yes      | ID cuộc trò chuyện |
 
 **Request Body**:
 
 Thông tin cập nhật cuộc trò chuyện
 
 - Schema: [UpdateChatSessionReq](#smart-wardrobe-beinternalmodulesfashionapplicationdtoupdatechatsessionreq)
-    **Properties**:
-    - `title` (string)
+  **Properties**:
+  - `title` (string)
 
 **Responses**:
 
@@ -1693,9 +1693,9 @@ Thông tin cập nhật cuộc trò chuyện
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `contextID` | path | string | Yes | ID cuộc trò chuyện |
+| Name        | In   | Type   | Required | Description        |
+| ----------- | ---- | ------ | -------- | ------------------ |
+| `contextID` | path | string | Yes      | ID cuộc trò chuyện |
 
 **Responses**:
 
@@ -1715,11 +1715,11 @@ Thông tin cập nhật cuộc trò chuyện
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `contextID` | path | string | Yes | ID cuộc trò chuyện |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
+| Name        | In    | Type    | Required | Description        |
+| ----------- | ----- | ------- | -------- | ------------------ |
+| `contextID` | path  | string  | Yes      | ID cuộc trò chuyện |
+| `limit`     | query | integer | No       |                    |
+| `page`      | query | integer | No       |                    |
 
 **Responses**:
 
@@ -1738,22 +1738,23 @@ Thông tin cập nhật cuộc trò chuyện
 **Description**: Gửi tin nhắn cho stylist AI và nhận phản hồi dạng stream sự kiện (Server-Sent Events).
 Nội dung tin nhắn được giới hạn tối đa 2.000 ký tự Unicode sau khi chuẩn hóa NFC. Frontend nên kiểm tra giới hạn trước khi gửi để đảm bảo trải nghiệm người dùng.
 Nếu mô hình AI phát hiện người dùng yêu cầu phối đồ từ tủ đồ cá nhân, nó sẽ thêm token '[ACTION:REDIRECT_OUTFIT]' vào cuối phản hồi stream.
+
 - CHÚ Ý: Token '[ACTION:REDIRECT_OUTFIT]' có thể bị phân mảnh (split) thành nhiều chunk nhỏ khi truyền tải stream (ví dụ: chunk 1 nhận '[ACTION:RE', chunk 2 nhận 'DIRECT_OUTFIT]').
 - Frontend cần tích luỹ toàn bộ chuỗi (accumulated string) hoặc ghép các chunk lại trước khi kiểm tra sự tồn tại của token này để hiển thị nút/card điều hướng sang tính năng Phối đồ chuyên dụng, thay vì chỉ kiểm tra đơn lẻ trên từng chunk nhận được.
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `contextID` | path | string | Yes | ID cuộc trò chuyện |
+| Name        | In   | Type   | Required | Description        |
+| ----------- | ---- | ------ | -------- | ------------------ |
+| `contextID` | path | string | Yes      | ID cuộc trò chuyện |
 
 **Request Body**:
 
 Nội dung tin nhắn gửi đi
 
 - Schema: [SendChatMessageReq](#smart-wardrobe-beinternalmodulesfashionapplicationdtosendchatmessagereq)
-    **Properties**:
-    - `content` (string) **(Required)**
+  **Properties**:
+  - `content` (string) **(Required)**
 
 **Responses**:
 
@@ -1769,6 +1770,7 @@ Nội dung tin nhắn gửi đi
 **Description**: Nhận gợi ý phối đồ từ các trang phục có sẵn trong tủ đồ của người dùng dựa trên dịp, thời tiết và phong cách.
 
 Các trường trong Request Body:
+
 - occasion (Dịp phối đồ, gợi ý: casual, work, date, party, sport,...)
 - styleTarget (Phong cách hướng tới, gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant,...)
 - season (Mùa phối đồ, enum: spring, summer, autumn, winter, all)
@@ -1781,14 +1783,14 @@ Các trường trong Request Body:
 Yêu cầu gợi ý phối đồ
 
 - Schema: [RecommendOutfitReq](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendoutfitreq)
-    **Properties**:
-    - `colorTone` (string) - Tông màu phối đồ (Gợi ý: light, dark, pastel, earthy, neon... hoặc nhập tông màu tùy ý)
-    - `details` (string) - Ghi chú thêm bằng tay (free text)
-    - `include_brand_items` (boolean) - Cho phép phối đồ của brand (tỷ lệ tối đa 30%)
-    - `occasion` (string) - Dịp phối đồ (Gợi ý: casual, work, date, party, sport, hoặc nhập dịp tùy ý)
-    - `season` (string) - Mùa phối đồ @enums spring,summer,autumn,winter,all
-    - `styleTarget` (string) - Phong cách hướng tới (Gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant, hoặc nhập phong cách tùy ý)
-    - `weather` (string) - Thời tiết hiện tại (Gợi ý: hot, cold, warm, cool, rainy, hoặc nhập thời tiết cụ thể)
+  **Properties**:
+  - `colorTone` (string) - Tông màu phối đồ (Gợi ý: light, dark, pastel, earthy, neon... hoặc nhập tông màu tùy ý)
+  - `details` (string) - Ghi chú thêm bằng tay (free text)
+  - `includeBrandItems` (boolean) - Cho phép phối đồ của brand (tỷ lệ tối đa 30%)
+  - `occasion` (string) - Dịp phối đồ (Gợi ý: casual, work, date, party, sport, hoặc nhập dịp tùy ý)
+  - `season` (string) - Mùa phối đồ @enums spring,summer,autumn,winter,all
+  - `styleTarget` (string) - Phong cách hướng tới (Gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant, hoặc nhập phong cách tùy ý)
+  - `weather` (string) - Thời tiết hiện tại (Gợi ý: hot, cold, warm, cool, rainy, hoặc nhập thời tiết cụ thể)
 
 **Responses**:
 
@@ -1816,8 +1818,8 @@ Yêu cầu gợi ý phối đồ
 Email nhận OTP
 
 - Schema: [SendForgotPasswordOtpReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtosendforgotpasswordotpreq)
-    **Properties**:
-    - `email` (string) **(Required)**
+  **Properties**:
+  - `email` (string) **(Required)**
 
 **Responses**:
 
@@ -1840,9 +1842,9 @@ Email nhận OTP
 Mã OTP và Email
 
 - Schema: [ConfirmForgotPasswordOtpReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoconfirmforgotpasswordotpreq)
-    **Properties**:
-    - `email` (string) **(Required)**
-    - `otpCode` (string) **(Required)**
+  **Properties**:
+  - `email` (string) **(Required)**
+  - `otpCode` (string) **(Required)**
 
 **Responses**:
 
@@ -1865,8 +1867,8 @@ Mã OTP và Email
 Email nhận lại OTP
 
 - Schema: [ResendOtpReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoresendotpreq)
-    **Properties**:
-    - `email` (string) **(Required)**
+  **Properties**:
+  - `email` (string) **(Required)**
 
 **Responses**:
 
@@ -1889,12 +1891,12 @@ Email nhận lại OTP
 Thông tin đăng nhập
 
 - Schema: [LoginReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtologinreq)
-    **Properties**:
-    - `deviceIp` (string)
-    - `deviceName` (string)
-    - `loginName` (string) **(Required)**
-    - `password` (string) **(Required)**
-    - `userAgent` (string)
+  **Properties**:
+  - `deviceIp` (string)
+  - `deviceName` (string)
+  - `loginName` (string) **(Required)**
+  - `password` (string) **(Required)**
+  - `userAgent` (string)
 
 **Responses**:
 
@@ -1949,16 +1951,16 @@ Thông tin đăng nhập
 Thông tin đăng ký
 
 - Schema: [RegisterReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoregisterreq)
-    **Properties**:
-    - `address` (string)
-    - `confirmPassword` (string) **(Required)**
-    - `dateOfBirth` (string) **(Required)**
-    - `email` (string) **(Required)**
-    - `firstName` (string) **(Required)**
-    - `gender` (object)
-    - `lastName` (string)
-    - `password` (string) **(Required)**
-    - `username` (string) **(Required)**
+  **Properties**:
+  - `address` (string)
+  - `confirmPassword` (string) **(Required)**
+  - `dateOfBirth` (string) **(Required)**
+  - `email` (string) **(Required)**
+  - `firstName` (string) **(Required)**
+  - `gender` (object)
+  - `lastName` (string)
+  - `password` (string) **(Required)**
+  - `username` (string) **(Required)**
 
 **Responses**:
 
@@ -1981,9 +1983,9 @@ Thông tin đăng ký
 Mã OTP xác thực
 
 - Schema: [ConfirmRegisterOtpReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoconfirmregisterotpreq)
-    **Properties**:
-    - `email` (string) **(Required)**
-    - `otpCode` (string) **(Required)**
+  **Properties**:
+  - `email` (string) **(Required)**
+  - `otpCode` (string) **(Required)**
 
 **Responses**:
 
@@ -2006,8 +2008,8 @@ Mã OTP xác thực
 Email nhận lại OTP
 
 - Schema: [ResendOtpReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoresendotpreq)
-    **Properties**:
-    - `email` (string) **(Required)**
+  **Properties**:
+  - `email` (string) **(Required)**
 
 **Responses**:
 
@@ -2030,10 +2032,10 @@ Email nhận lại OTP
 Mật khẩu mới và mật khẩu xác nhận
 
 - Schema: [ResetPasswordReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoresetpasswordreq)
-    **Properties**:
-    - `confirmPassword` (string) **(Required)**
-    - `logoutAllDevices` (boolean)
-    - `newPassword` (string) **(Required)**
+  **Properties**:
+  - `confirmPassword` (string) **(Required)**
+  - `logoutAllDevices` (boolean)
+  - `newPassword` (string) **(Required)**
 
 **Responses**:
 
@@ -2053,9 +2055,9 @@ Mật khẩu mới và mật khẩu xác nhận
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `benefitId` | path | string | Yes | ID benefit |
+| Name        | In   | Type   | Required | Description |
+| ----------- | ---- | ------ | -------- | ----------- |
+| `benefitId` | path | string | Yes      | ID benefit  |
 
 **Responses**:
 
@@ -2085,9 +2087,9 @@ Mật khẩu mới và mật khẩu xác nhận
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `benefitId` | path | string | Yes | ID quyền lợi |
+| Name        | In   | Type   | Required | Description  |
+| ----------- | ---- | ------ | -------- | ------------ |
+| `benefitId` | path | string | Yes      | ID quyền lợi |
 
 **Responses**:
 
@@ -2116,13 +2118,13 @@ Mật khẩu mới và mật khẩu xác nhận
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `page` | query | integer | No | Số trang |
-| `limit` | query | integer | No | Số lượng mỗi trang |
-| `unlockType` | query | string | No | Loại mở khóa (tier_privilege, point_redemption, manual_grant) |
-| `benefitType` | query | string | No | Loại quyền lợi (voucher, discount, gift, free_shipping, early_access, feature_access) |
+| Name          | In    | Type    | Required | Description                                                                           |
+| ------------- | ----- | ------- | -------- | ------------------------------------------------------------------------------------- |
+| `brandId`     | path  | string  | Yes      | ID brand                                                                              |
+| `page`        | query | integer | No       | Số trang                                                                              |
+| `limit`       | query | integer | No       | Số lượng mỗi trang                                                                    |
+| `unlockType`  | query | string  | No       | Loại mở khóa (tier_privilege, point_redemption, manual_grant)                         |
+| `benefitType` | query | string  | No       | Loại quyền lợi (voucher, discount, gift, free_shipping, early_access, feature_access) |
 
 **Responses**:
 
@@ -2140,24 +2142,24 @@ Mật khẩu mới và mật khẩu xác nhận
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Thông tin quyền lợi
 
 - Schema: [CreateBrandBenefitReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandbenefitreq)
-    **Properties**:
-    - `benefitType` (string) **(Required)**
-    - `description` (string)
-    - `featureCode` (string)
-    - `featureConfig` (object)
-    - `name` (string) **(Required)**
-    - `requiredPoints` (integer)
-    - `requiredTierId` (string)
-    - `unlockType` (string) **(Required)**
+  **Properties**:
+  - `benefitType` (string) **(Required)**
+  - `description` (string)
+  - `featureCode` (string)
+  - `featureConfig` (object)
+  - `name` (string) **(Required)**
+  - `requiredPoints` (integer)
+  - `requiredTierId` (string)
+  - `unlockType` (string) **(Required)**
 
 **Responses**:
 
@@ -2187,18 +2189,18 @@ Thông tin quyền lợi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `benefitId` | path | string | Yes | ID quyền lợi |
+| Name        | In   | Type   | Required | Description  |
+| ----------- | ---- | ------ | -------- | ------------ |
+| `brandId`   | path | string | Yes      | ID brand     |
+| `benefitId` | path | string | Yes      | ID quyền lợi |
 
 **Request Body**:
 
 Trạng thái mới
 
 - Schema: [UpdateBenefitStatusReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebenefitstatusreq)
-    **Properties**:
-    - `status` (string) **(Required)**
+  **Properties**:
+  - `status` (string) **(Required)**
 
 **Responses**:
 
@@ -2228,13 +2230,13 @@ Trạng thái mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `page` | query | integer | No | Số trang |
-| `limit` | query | integer | No | Số lượng mỗi trang |
-| `unlockType` | query | string | No | Loại mở khóa (tier_privilege, point_redemption, manual_grant) |
-| `benefitType` | query | string | No | Loại quyền lợi (voucher, discount, gift, free_shipping, early_access, feature_access) |
+| Name          | In    | Type    | Required | Description                                                                           |
+| ------------- | ----- | ------- | -------- | ------------------------------------------------------------------------------------- |
+| `brandId`     | path  | string  | Yes      | ID brand                                                                              |
+| `page`        | query | integer | No       | Số trang                                                                              |
+| `limit`       | query | integer | No       | Số lượng mỗi trang                                                                    |
+| `unlockType`  | query | string  | No       | Loại mở khóa (tier_privilege, point_redemption, manual_grant)                         |
+| `benefitType` | query | string  | No       | Loại quyền lợi (voucher, discount, gift, free_shipping, early_access, feature_access) |
 
 **Responses**:
 
@@ -2254,11 +2256,11 @@ Trạng thái mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | No | Lọc theo Brand ID |
-| `page` | query | integer | No | Số trang |
-| `limit` | query | integer | No | Số lượng mỗi trang |
+| Name      | In    | Type    | Required | Description        |
+| --------- | ----- | ------- | -------- | ------------------ |
+| `brandId` | query | string  | No       | Lọc theo Brand ID  |
+| `page`    | query | integer | No       | Số trang           |
+| `limit`   | query | integer | No       | Số lượng mỗi trang |
 
 **Responses**:
 
@@ -2280,9 +2282,9 @@ Trạng thái mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `itemId` | path | string | Yes | ID item |
+| Name     | In   | Type   | Required | Description |
+| -------- | ---- | ------ | -------- | ----------- |
+| `itemId` | path | string | Yes      | ID item     |
 
 **Responses**:
 
@@ -2312,20 +2314,20 @@ Trạng thái mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `itemId` | path | string | Yes | ID sản phẩm mẫu thử |
+| Name     | In   | Type   | Required | Description         |
+| -------- | ---- | ------ | -------- | ------------------- |
+| `itemId` | path | string | Yes      | ID sản phẩm mẫu thử |
 
 **Request Body**:
 
 Nội dung phản hồi
 
 - Schema: [SubmitSampleFeedbackReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtosubmitsamplefeedbackreq)
-    **Properties**:
-    - `feedbackText` (string)
-    - `outfitId` (string)
-    - `rating` (integer)
-    - `voteType` (string)
+  **Properties**:
+  - `feedbackText` (string)
+  - `outfitId` (string)
+  - `rating` (integer)
+  - `voteType` (string)
 
 **Responses**:
 
@@ -2352,11 +2354,11 @@ Nội dung phản hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
-| `q` | query | string | No |  |
+| Name    | In    | Type    | Required | Description |
+| ------- | ----- | ------- | -------- | ----------- |
+| `limit` | query | integer | No       |             |
+| `page`  | query | integer | No       |             |
+| `q`     | query | string  | No       |             |
 
 **Responses**:
 
@@ -2374,9 +2376,9 @@ Nội dung phản hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -2405,11 +2407,11 @@ Nội dung phản hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `page` | query | integer | No | Trang |
-| `limit` | query | integer | No | Số lượng |
+| Name      | In    | Type    | Required | Description |
+| --------- | ----- | ------- | -------- | ----------- |
+| `brandId` | path  | string  | Yes      | ID brand    |
+| `page`    | query | integer | No       | Trang       |
+| `limit`   | query | integer | No       | Số lượng    |
 
 **Responses**:
 
@@ -2427,11 +2429,11 @@ Nội dung phản hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `page` | query | integer | No | Trang |
-| `limit` | query | integer | No | Số lượng |
+| Name      | In    | Type    | Required | Description |
+| --------- | ----- | ------- | -------- | ----------- |
+| `brandId` | path  | string  | Yes      | ID brand    |
+| `page`    | query | integer | No       | Trang       |
+| `limit`   | query | integer | No       | Số lượng    |
 
 **Responses**:
 
@@ -2454,12 +2456,12 @@ Nội dung phản hồi
 Thông tin brand
 
 - Schema: [CreateBrandReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandreq)
-    **Properties**:
-    - `description` (string)
-    - `logoPublicId` (string)
-    - `logoUrl` (string)
-    - `name` (string) **(Required)**
-    - `slug` (string) **(Required)**
+  **Properties**:
+  - `description` (string)
+  - `logoPublicId` (string)
+  - `logoUrl` (string)
+  - `name` (string) **(Required)**
+  - `slug` (string) **(Required)**
 
 **Responses**:
 
@@ -2505,9 +2507,9 @@ Thông tin brand
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -2539,20 +2541,20 @@ Thông tin brand
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Thông tin logo và ảnh nền
 
 - Schema: [UpdateBrandImagesReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebrandimagesreq)
-    **Properties**:
-    - `backgroundPublicId` (string)
-    - `backgroundUrl` (string)
-    - `logoPublicId` (string)
-    - `logoUrl` (string)
+  **Properties**:
+  - `backgroundPublicId` (string)
+  - `backgroundUrl` (string)
+  - `logoPublicId` (string)
+  - `logoUrl` (string)
 
 **Responses**:
 
@@ -2611,9 +2613,9 @@ Thông tin logo và ảnh nền
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -2643,10 +2645,10 @@ Thông tin logo và ảnh nền
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `conversationId` | path | string | Yes | ID hội thoại |
+| Name             | In   | Type   | Required | Description  |
+| ---------------- | ---- | ------ | -------- | ------------ |
+| `brandId`        | path | string | Yes      | ID brand     |
+| `conversationId` | path | string | Yes      | ID hội thoại |
 
 **Responses**:
 
@@ -2676,12 +2678,12 @@ Thông tin logo và ảnh nền
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `conversationId` | path | string | Yes | ID cuộc hội thoại |
-| `page` | query | integer | No | Trang hiện tại (mặc định: 1) |
-| `limit` | query | integer | No | Số lượng tin nhắn mỗi trang (mặc định: 20) |
+| Name             | In    | Type    | Required | Description                                |
+| ---------------- | ----- | ------- | -------- | ------------------------------------------ |
+| `brandId`        | path  | string  | Yes      | ID brand                                   |
+| `conversationId` | path  | string  | Yes      | ID cuộc hội thoại                          |
+| `page`           | query | integer | No       | Trang hiện tại (mặc định: 1)               |
+| `limit`          | query | integer | No       | Số lượng tin nhắn mỗi trang (mặc định: 20) |
 
 **Responses**:
 
@@ -2699,18 +2701,18 @@ Thông tin logo và ảnh nền
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `conversationId` | path | string | Yes | ID cuộc hội thoại |
+| Name             | In   | Type   | Required | Description       |
+| ---------------- | ---- | ------ | -------- | ----------------- |
+| `brandId`        | path | string | Yes      | ID brand          |
+| `conversationId` | path | string | Yes      | ID cuộc hội thoại |
 
 **Request Body**:
 
 Nội dung phản hồi
 
 - Schema: [SendBrandChatMessageReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtosendbrandchatmessagereq)
-    **Properties**:
-    - `message` (string) **(Required)**
+  **Properties**:
+  - `message` (string) **(Required)**
 
 **Responses**:
 
@@ -2733,10 +2735,10 @@ Nội dung phản hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `conversationId` | path | string | Yes | ID hội thoại |
+| Name             | In   | Type   | Required | Description  |
+| ---------------- | ---- | ------ | -------- | ------------ |
+| `brandId`        | path | string | Yes      | ID brand     |
+| `conversationId` | path | string | Yes      | ID hội thoại |
 
 **Responses**:
 
@@ -2766,10 +2768,10 @@ Nội dung phản hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `conversationId` | path | string | Yes | ID hội thoại |
+| Name             | In   | Type   | Required | Description  |
+| ---------------- | ---- | ------ | -------- | ------------ |
+| `brandId`        | path | string | Yes      | ID brand     |
+| `conversationId` | path | string | Yes      | ID hội thoại |
 
 **Responses**:
 
@@ -2799,11 +2801,11 @@ Nội dung phản hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `page` | query | integer | No | Trang hiện tại (mặc định: 1) |
-| `limit` | query | integer | No | Số lượng tin nhắn mỗi trang (mặc định: 20) |
+| Name      | In    | Type    | Required | Description                                |
+| --------- | ----- | ------- | -------- | ------------------------------------------ |
+| `brandId` | path  | string  | Yes      | ID brand                                   |
+| `page`    | query | integer | No       | Trang hiện tại (mặc định: 1)               |
+| `limit`   | query | integer | No       | Số lượng tin nhắn mỗi trang (mặc định: 20) |
 
 **Responses**:
 
@@ -2829,17 +2831,17 @@ Nội dung phản hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Nội dung tin nhắn
 
 - Schema: [SendBrandChatMessageReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtosendbrandchatmessagereq)
-    **Properties**:
-    - `message` (string) **(Required)**
+  **Properties**:
+  - `message` (string) **(Required)**
 
 **Responses**:
 
@@ -2862,9 +2864,9 @@ Nội dung tin nhắn
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -2898,13 +2900,13 @@ Nội dung tin nhắn
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `page` | query | integer | No | Trang hiện tại (mặc định: 1) |
-| `limit` | query | integer | No | Số lượng bản ghi trên mỗi trang (mặc định: 20) |
-| `q` | query | string | No | Từ khóa tìm kiếm (tên, SĐT, mã KH) |
-| `status` | query | string | No | Trạng thái khách hàng (ACTIVE, INACTIVE) |
+| Name      | In    | Type    | Required | Description                                    |
+| --------- | ----- | ------- | -------- | ---------------------------------------------- |
+| `brandId` | path  | string  | Yes      | ID brand                                       |
+| `page`    | query | integer | No       | Trang hiện tại (mặc định: 1)                   |
+| `limit`   | query | integer | No       | Số lượng bản ghi trên mỗi trang (mặc định: 20) |
+| `q`       | query | string  | No       | Từ khóa tìm kiếm (tên, SĐT, mã KH)             |
+| `status`  | query | string  | No       | Trạng thái khách hàng (ACTIVE, INACTIVE)       |
 
 **Responses**:
 
@@ -2924,19 +2926,19 @@ Nội dung tin nhắn
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Thông tin khách hàng mua offline
 
 - Schema: [CreateOfflineBrandCustomerReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreateofflinebrandcustomerreq)
-    **Properties**:
-    - `customerName` (string)
-    - `externalCustomerCode` (string)
-    - `phoneE164` (string) **(Required)**
+  **Properties**:
+  - `customerName` (string)
+  - `externalCustomerCode` (string)
+  - `phoneE164` (string) **(Required)**
 
 **Responses**:
 
@@ -2966,10 +2968,10 @@ Thông tin khách hàng mua offline
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `customerId` | path | string | Yes | ID customer |
+| Name         | In   | Type   | Required | Description |
+| ------------ | ---- | ------ | -------- | ----------- |
+| `brandId`    | path | string | Yes      | ID brand    |
+| `customerId` | path | string | Yes      | ID customer |
 
 **Responses**:
 
@@ -3001,10 +3003,10 @@ Thông tin khách hàng mua offline
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID của Brand |
-| `customerId` | path | string | Yes | ID của khách hàng cần tạo mã claim |
+| Name         | In   | Type   | Required | Description                        |
+| ------------ | ---- | ------ | -------- | ---------------------------------- |
+| `brandId`    | path | string | Yes      | ID của Brand                       |
+| `customerId` | path | string | Yes      | ID của khách hàng cần tạo mã claim |
 
 **Responses**:
 
@@ -3022,10 +3024,10 @@ Thông tin khách hàng mua offline
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID của Brand |
-| `customerId` | path | string | Yes | ID của khách hàng |
+| Name         | In   | Type   | Required | Description       |
+| ------------ | ---- | ------ | -------- | ----------------- |
+| `brandId`    | path | string | Yes      | ID của Brand      |
+| `customerId` | path | string | Yes      | ID của khách hàng |
 
 **Responses**:
 
@@ -3050,19 +3052,19 @@ Thông tin khách hàng mua offline
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID của Brand |
-| `customerId` | path | string | Yes | ID của khách hàng |
-| `claimId` | path | string | Yes | ID của mã claim |
+| Name         | In   | Type   | Required | Description       |
+| ------------ | ---- | ------ | -------- | ----------------- |
+| `brandId`    | path | string | Yes      | ID của Brand      |
+| `customerId` | path | string | Yes      | ID của khách hàng |
+| `claimId`    | path | string | Yes      | ID của mã claim   |
 
 **Request Body**:
 
 Thông tin thu hồi
 
 - Schema: [RevokeClaimTokenReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtorevokeclaimtokenreq)
-    **Properties**:
-    - `reason` (string)
+  **Properties**:
+  - `reason` (string)
 
 **Responses**:
 
@@ -3087,14 +3089,14 @@ Thông tin thu hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `accountId` | path | string | Yes | ID loyalty account |
-| `status` | query | string | No | Trạng thái lô điểm |
-| `expiresAt` | query | string | No | Ngày hết hạn tối đa |
-| `page` | query | integer | No | Trang |
-| `limit` | query | integer | No | Số lượng |
+| Name        | In    | Type    | Required | Description         |
+| ----------- | ----- | ------- | -------- | ------------------- |
+| `brandId`   | path  | string  | Yes      | ID brand            |
+| `accountId` | path  | string  | Yes      | ID loyalty account  |
+| `status`    | query | string  | No       | Trạng thái lô điểm  |
+| `expiresAt` | query | string  | No       | Ngày hết hạn tối đa |
+| `page`      | query | integer | No       | Trang               |
+| `limit`     | query | integer | No       | Số lượng            |
 
 **Responses**:
 
@@ -3117,12 +3119,12 @@ Thông tin thu hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `page` | query | integer | No | Trang hiện tại (mặc định: 1) |
-| `limit` | query | integer | No | Số lượng bản ghi trên mỗi trang (mặc định: 20) |
-| `brandId` | path | string | Yes | ID brand |
-| `accountId` | path | string | Yes | ID loyalty account |
+| Name        | In    | Type    | Required | Description                                    |
+| ----------- | ----- | ------- | -------- | ---------------------------------------------- |
+| `page`      | query | integer | No       | Trang hiện tại (mặc định: 1)                   |
+| `limit`     | query | integer | No       | Số lượng bản ghi trên mỗi trang (mặc định: 20) |
+| `brandId`   | path  | string  | Yes      | ID brand                                       |
+| `accountId` | path  | string  | Yes      | ID loyalty account                             |
 
 **Responses**:
 
@@ -3142,27 +3144,27 @@ Thông tin thu hồi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Thông tin giao dịch điểm
 
 - Schema: [GrantLoyaltyPointsReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtograntloyaltypointsreq)
-    **Properties**:
-    - `customerName` (string)
-    - `externalCustomerCode` (string)
-    - `idempotencyKey` (string)
-    - `phone` (string)
-    - `pointsDelta` (integer)
-    - `purchaseAmount` (number)
-    - `reason` (string)
-    - `referenceId` (string)
-    - `referenceType` (string)
-    - `transactionType` (ref: LoyaltyTransactionType) **(Required)**
-    - `userId` (string)
+  **Properties**:
+  - `customerName` (string)
+  - `externalCustomerCode` (string)
+  - `idempotencyKey` (string)
+  - `phone` (string)
+  - `pointsDelta` (integer)
+  - `purchaseAmount` (number)
+  - `reason` (string)
+  - `referenceId` (string)
+  - `referenceType` (string)
+  - `transactionType` (ref: LoyaltyTransactionType) **(Required)**
+  - `userId` (string)
 
 **Responses**:
 
@@ -3187,9 +3189,9 @@ Thông tin giao dịch điểm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -3214,21 +3216,21 @@ Thông tin giao dịch điểm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Thông tin cấu hình
 
 - Schema: [UpsertLoyaltyProgramReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupsertloyaltyprogramreq)
-    **Properties**:
-    - `amountPerPoint` (number) **(Required)**
-    - `isActive` (boolean)
-    - `name` (string) **(Required)**
-    - `pointExpiryDays` (integer)
-    - `roundingMode` (object) **(Required)**
+  **Properties**:
+  - `amountPerPoint` (number) **(Required)**
+  - `isActive` (boolean)
+  - `name` (string) **(Required)**
+  - `pointExpiryDays` (integer)
+  - `roundingMode` (object) **(Required)**
 
 **Responses**:
 
@@ -3253,9 +3255,9 @@ Thông tin cấu hình
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -3279,20 +3281,20 @@ Thông tin cấu hình
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Thông tin hạng thành viên
 
 - Schema: [CreateLoyaltyTierReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreateloyaltytierreq)
-    **Properties**:
-    - `description` (string)
-    - `minTotalSpend` (number)
-    - `name` (string) **(Required)**
-    - `rank` (integer)
+  **Properties**:
+  - `description` (string)
+  - `minTotalSpend` (number)
+  - `name` (string) **(Required)**
+  - `rank` (integer)
 
 **Responses**:
 
@@ -3316,10 +3318,10 @@ Thông tin hạng thành viên
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `tierId` | path | string | Yes | ID hạng |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
+| `tierId`  | path | string | Yes      | ID hạng     |
 
 **Responses**:
 
@@ -3344,21 +3346,21 @@ Thông tin hạng thành viên
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `tierId` | path | string | Yes | ID hạng thành viên |
+| Name      | In   | Type   | Required | Description        |
+| --------- | ---- | ------ | -------- | ------------------ |
+| `brandId` | path | string | Yes      | ID brand           |
+| `tierId`  | path | string | Yes      | ID hạng thành viên |
 
 **Request Body**:
 
 Thông tin cập nhật hạng thành viên
 
 - Schema: [UpdateLoyaltyTierReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdateloyaltytierreq)
-    **Properties**:
-    - `description` (string)
-    - `minTotalSpend` (number)
-    - `name` (string)
-    - `rank` (integer)
+  **Properties**:
+  - `description` (string)
+  - `minTotalSpend` (number)
+  - `name` (string)
+  - `rank` (integer)
 
 **Responses**:
 
@@ -3387,8 +3389,8 @@ Thông tin cập nhật hạng thành viên
 Mã claim
 
 - Schema: [ClaimOfflineAccountReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoclaimofflineaccountreq)
-    **Properties**:
-    - `claimToken` (string) **(Required)**
+  **Properties**:
+  - `claimToken` (string) **(Required)**
 
 **Responses**:
 
@@ -3413,9 +3415,9 @@ Mã claim
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -3438,10 +3440,10 @@ Mã claim
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `tierId` | path | string | Yes | ID hạng |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
+| `tierId`  | path | string | Yes      | ID hạng     |
 
 **Responses**:
 
@@ -3487,9 +3489,9 @@ Mã claim
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -3514,13 +3516,13 @@ Mã claim
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `status` | query | string | No | Trạng thái lô điểm |
-| `expiresAt` | query | string | No | Ngày hết hạn tối đa |
-| `page` | query | integer | No | Trang |
-| `limit` | query | integer | No | Số lượng |
+| Name        | In    | Type    | Required | Description         |
+| ----------- | ----- | ------- | -------- | ------------------- |
+| `brandId`   | path  | string  | Yes      | ID brand            |
+| `status`    | query | string  | No       | Trạng thái lô điểm  |
+| `expiresAt` | query | string  | No       | Ngày hết hạn tối đa |
+| `page`      | query | integer | No       | Trang               |
+| `limit`     | query | integer | No       | Số lượng            |
 
 **Responses**:
 
@@ -3543,9 +3545,9 @@ Mã claim
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -3573,9 +3575,9 @@ Mã claim
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -3605,25 +3607,25 @@ Mã claim
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Thông tin sản phẩm
 
 - Schema: [CreateBrandItemReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebranditemreq)
-    **Properties**:
-    - `categoryId` (string)
-    - `description` (string)
-    - `imagePublicId` (string) **(Required)**
-    - `imageUrl` (string) **(Required)**
-    - `itemType` (string) **(Required)**
-    - `name` (string) **(Required)**
-    - `price` (number)
-    - `productCode` (string)
-    - `status` (string)
+  **Properties**:
+  - `categoryId` (string)
+  - `description` (string)
+  - `imagePublicId` (string) **(Required)**
+  - `imageUrl` (string) **(Required)**
+  - `itemType` (string) **(Required)**
+  - `name` (string) **(Required)**
+  - `price` (number)
+  - `productCode` (string)
+  - `status` (string)
 
 **Responses**:
 
@@ -3655,10 +3657,10 @@ Thông tin sản phẩm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `taskId` | path | string | Yes | Mã Task ID |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
+| `taskId`  | path | string | Yes      | Mã Task ID  |
 
 **Responses**:
 
@@ -3673,9 +3675,9 @@ Thông tin sản phẩm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -3696,10 +3698,10 @@ Thông tin sản phẩm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `itemId` | path | string | Yes | ID item |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
+| `itemId`  | path | string | Yes      | ID item     |
 
 **Responses**:
 
@@ -3729,22 +3731,22 @@ Thông tin sản phẩm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `itemId` | path | string | Yes | ID sản phẩm |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
+| `itemId`  | path | string | Yes      | ID sản phẩm |
 
 **Request Body**:
 
 Thông tin cập nhật
 
 - Schema: [UpdateBrandItemReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebranditemreq)
-    **Properties**:
-    - `description` (string)
-    - `name` (string) **(Required)**
-    - `price` (number)
-    - `productCode` (string)
-    - `status` (string) **(Required)**
+  **Properties**:
+  - `description` (string)
+  - `name` (string) **(Required)**
+  - `price` (number)
+  - `productCode` (string)
+  - `status` (string) **(Required)**
 
 **Responses**:
 
@@ -3774,10 +3776,10 @@ Thông tin cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `itemId` | path | string | Yes | ID sản phẩm mẫu thử |
+| Name      | In   | Type   | Required | Description         |
+| --------- | ---- | ------ | -------- | ------------------- |
+| `brandId` | path | string | Yes      | ID brand            |
+| `itemId`  | path | string | Yes      | ID sản phẩm mẫu thử |
 
 **Responses**:
 
@@ -3802,18 +3804,18 @@ Thông tin cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
-| `itemId` | path | string | Yes | ID item |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
+| `itemId`  | path | string | Yes      | ID item     |
 
 **Request Body**:
 
 Trang thai moi
 
 - Schema: [UpdateBrandItemStatusReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebranditemstatusreq)
-    **Properties**:
-    - `status` (ref: BrandItemStatus) **(Required)**
+  **Properties**:
+  - `status` (ref: BrandItemStatus) **(Required)**
 
 **Responses**:
 
@@ -3847,9 +3849,9 @@ Trang thai moi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Responses**:
 
@@ -3873,17 +3875,17 @@ Trang thai moi
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | path | string | Yes | ID brand |
+| Name      | In   | Type   | Required | Description |
+| --------- | ---- | ------ | -------- | ----------- |
+| `brandId` | path | string | Yes      | ID brand    |
 
 **Request Body**:
 
 Danh sách thành viên cần thêm
 
 - Schema: [AddBrandMembersReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmembersreq)
-    **Properties**:
-    - `members` (Array<AddBrandMemberItemReq>) **(Required)**
+  **Properties**:
+  - `members` (Array<AddBrandMemberItemReq>) **(Required)**
 
 **Responses**:
 
@@ -3906,9 +3908,9 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | Yes | ID Nhãn hàng |
+| Name      | In    | Type   | Required | Description  |
+| --------- | ----- | ------ | -------- | ------------ |
+| `brandId` | query | string | Yes      | ID Nhãn hàng |
 
 **Responses**:
 
@@ -3930,9 +3932,9 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | Yes | ID Nhãn hàng |
+| Name      | In    | Type   | Required | Description  |
+| --------- | ----- | ------ | -------- | ------------ |
+| `brandId` | query | string | Yes      | ID Nhãn hàng |
 
 **Responses**:
 
@@ -3953,9 +3955,9 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | Yes | ID Nhãn hàng |
+| Name      | In    | Type   | Required | Description  |
+| --------- | ----- | ------ | -------- | ------------ |
+| `brandId` | query | string | Yes      | ID Nhãn hàng |
 
 **Responses**:
 
@@ -3976,11 +3978,11 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `itemId` | query | string | Yes | ID Sản phẩm mẫu thử |
-| `page` | query | integer | No | Số trang |
-| `limit` | query | integer | No | Số lượng phần tử mỗi trang |
+| Name     | In    | Type    | Required | Description                |
+| -------- | ----- | ------- | -------- | -------------------------- |
+| `itemId` | query | string  | Yes      | ID Sản phẩm mẫu thử        |
+| `page`   | query | integer | No       | Số trang                   |
+| `limit`  | query | integer | No       | Số lượng phần tử mỗi trang |
 
 **Responses**:
 
@@ -4000,9 +4002,9 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | Yes | ID Nhãn hàng |
+| Name      | In    | Type   | Required | Description  |
+| --------- | ----- | ------ | -------- | ------------ |
+| `brandId` | query | string | Yes      | ID Nhãn hàng |
 
 **Responses**:
 
@@ -4023,9 +4025,9 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | Yes | ID Nhãn hàng |
+| Name      | In    | Type   | Required | Description  |
+| --------- | ----- | ------ | -------- | ------------ |
+| `brandId` | query | string | Yes      | ID Nhãn hàng |
 
 **Responses**:
 
@@ -4051,9 +4053,9 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | Yes | ID Nhãn hàng |
+| Name      | In    | Type   | Required | Description  |
+| --------- | ----- | ------ | -------- | ------------ |
+| `brandId` | query | string | Yes      | ID Nhãn hàng |
 
 **Responses**:
 
@@ -4073,9 +4075,9 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | Yes | ID Nhãn hàng |
+| Name      | In    | Type   | Required | Description  |
+| --------- | ----- | ------ | -------- | ------------ |
+| `brandId` | query | string | Yes      | ID Nhãn hàng |
 
 **Responses**:
 
@@ -4096,9 +4098,9 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | Yes | ID Nhãn hàng |
+| Name      | In    | Type   | Required | Description  |
+| --------- | ----- | ------ | -------- | ------------ |
+| `brandId` | query | string | Yes      | ID Nhãn hàng |
 
 **Responses**:
 
@@ -4120,10 +4122,10 @@ Danh sách thành viên cần thêm
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `brandId` | query | string | Yes | ID Nhãn hàng |
-| `itemId` | path | string | Yes | ID Sản phẩm mẫu thử |
+| Name      | In    | Type   | Required | Description         |
+| --------- | ----- | ------ | -------- | ------------------- |
+| `brandId` | query | string | Yes      | ID Nhãn hàng        |
+| `itemId`  | path  | string | Yes      | ID Sản phẩm mẫu thử |
 
 **Responses**:
 
@@ -4174,13 +4176,13 @@ Danh sách thành viên cần thêm
 Thông số truy vấn động
 
 - Schema: [DynamicQueryReq](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicqueryreq)
-    **Properties**:
-    - `brandId` (string)
-    - `compareWithPrevious` (boolean)
-    - `granularity` (object) - "day" | "week" | "month" | "year"
-    - `metrics` (Array<MetricKey>)
-    - `targetDashboard` (object) - "admin" | "brand" | "user"
-    - `timeframe` (ref: DynamicQueryTimeframeDTO)
+  **Properties**:
+  - `brandId` (string)
+  - `compareWithPrevious` (boolean)
+  - `granularity` (object) - "day" | "week" | "month" | "year"
+  - `metrics` (Array<MetricKey>)
+  - `targetDashboard` (object) - "admin" | "brand" | "user"
+  - `timeframe` (ref: DynamicQueryTimeframeDTO)
 
 **Responses**:
 
@@ -4235,12 +4237,12 @@ Thông số truy vấn động
 Thông tin cập nhật
 
 - Schema: [UpdateProfileReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoupdateprofilereq)
-    **Properties**:
-    - `address` (string)
-    - `dateOfBirth` (string)
-    - `firstName` (string) **(Required)**
-    - `gender` (object)
-    - `lastName` (string)
+  **Properties**:
+  - `address` (string)
+  - `dateOfBirth` (string)
+  - `firstName` (string) **(Required)**
+  - `gender` (object)
+  - `lastName` (string)
 
 **Responses**:
 
@@ -4275,9 +4277,9 @@ Thông tin cập nhật
 Thông tin ảnh đại diện mới
 
 - Schema: [UpdateAvatarReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoupdateavatarreq)
-    **Properties**:
-    - `avatarPublicId` (string) **(Required)**
-    - `avatarUrl` (string) **(Required)**
+  **Properties**:
+  - `avatarPublicId` (string) **(Required)**
+  - `avatarUrl` (string) **(Required)**
 
 **Responses**:
 
@@ -4325,13 +4327,13 @@ Thông tin ảnh đại diện mới
 Thông tin hồ sơ cơ thể
 
 - Schema: [UpdateBodyProfileReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoupdatebodyprofilereq)
-    **Properties**:
-    - `bodyShape` (string) **(Required)**
-    - `heightCm` (number) **(Required)**
-    - `inferredByAi` (ref: InferredBodyProfileReq)
-    - `measurements` (ref: UpdateBodyMeasurementsReq)
-    - `verifiedByUser` (boolean)
-    - `weightKg` (number) **(Required)**
+  **Properties**:
+  - `bodyShape` (string) **(Required)**
+  - `heightCm` (number) **(Required)**
+  - `inferredByAi` (ref: InferredBodyProfileReq)
+  - `measurements` (ref: UpdateBodyMeasurementsReq)
+  - `verifiedByUser` (boolean)
+  - `weightKg` (number) **(Required)**
 
 **Responses**:
 
@@ -4366,11 +4368,11 @@ Thông tin hồ sơ cơ thể
 Mật khẩu cũ và mới
 
 - Schema: [ChangePasswordReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtochangepasswordreq)
-    **Properties**:
-    - `confirmPassword` (string) **(Required)**
-    - `logoutAllDevices` (boolean)
-    - `newPassword` (string) **(Required)**
-    - `oldPassword` (string) **(Required)**
+  **Properties**:
+  - `confirmPassword` (string) **(Required)**
+  - `logoutAllDevices` (boolean)
+  - `newPassword` (string) **(Required)**
+  - `oldPassword` (string) **(Required)**
 
 **Responses**:
 
@@ -4429,10 +4431,10 @@ Mật khẩu cũ và mới
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
+| Name    | In    | Type    | Required | Description |
+| ------- | ----- | ------- | -------- | ----------- |
+| `limit` | query | integer | No       |             |
+| `page`  | query | integer | No       |             |
 
 **Responses**:
 
@@ -4455,12 +4457,12 @@ Mật khẩu cũ và mới
 Tọa độ 2D và thông tin phối đồ
 
 - Schema: [SaveOutfitReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtosaveoutfitreq)
-    **Properties**:
-    - `coverImageUrl` (string)
-    - `coverPublicId` (string)
-    - `description` (string)
-    - `items` (Array<SaveOutfitItemReq>) **(Required)**
-    - `name` (string) **(Required)**
+  **Properties**:
+  - `coverImageUrl` (string)
+  - `coverPublicId` (string)
+  - `description` (string)
+  - `items` (Array<SaveOutfitItemReq>) **(Required)**
+  - `name` (string) **(Required)**
 
 **Responses**:
 
@@ -4506,9 +4508,9 @@ Tọa độ 2D và thông tin phối đồ
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID bộ phối đồ |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID bộ phối đồ |
 
 **Responses**:
 
@@ -4535,21 +4537,21 @@ Tọa độ 2D và thông tin phối đồ
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID bộ phối đồ |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID bộ phối đồ |
 
 **Request Body**:
 
 Thông tin cập nhật
 
 - Schema: [SaveOutfitReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtosaveoutfitreq)
-    **Properties**:
-    - `coverImageUrl` (string)
-    - `coverPublicId` (string)
-    - `description` (string)
-    - `items` (Array<SaveOutfitItemReq>) **(Required)**
-    - `name` (string) **(Required)**
+  **Properties**:
+  - `coverImageUrl` (string)
+  - `coverPublicId` (string)
+  - `description` (string)
+  - `items` (Array<SaveOutfitItemReq>) **(Required)**
+  - `name` (string) **(Required)**
 
 **Responses**:
 
@@ -4576,9 +4578,9 @@ Thông tin cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID bộ phối đồ |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID bộ phối đồ |
 
 **Responses**:
 
@@ -4600,12 +4602,12 @@ Thông tin cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `categorySlug` | query | string | No |  |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
-| `status` | query | string | No |  |
+| Name           | In    | Type    | Required | Description |
+| -------------- | ----- | ------- | -------- | ----------- |
+| `categorySlug` | query | string  | No       |             |
+| `limit`        | query | integer | No       |             |
+| `page`         | query | integer | No       |             |
+| `status`       | query | string  | No       |             |
 
 **Responses**:
 
@@ -4641,12 +4643,12 @@ Thông tin cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `categorySlug` | query | string | No |  |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
-| `q` | query | string | No |  |
+| Name           | In    | Type    | Required | Description |
+| -------------- | ----- | ------- | -------- | ----------- |
+| `categorySlug` | query | string  | No       |             |
+| `limit`        | query | integer | No       |             |
+| `page`         | query | integer | No       |             |
+| `q`            | query | string  | No       |             |
 
 **Responses**:
 
@@ -4669,8 +4671,8 @@ Thông tin cập nhật
 Danh sách ảnh trang phục
 
 - Schema: [BatchUploadWardrobeItemsReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobatchuploadwardrobeitemsreq)
-    **Properties**:
-    - `items` (Array<WardrobeBatchUploadItemReq>) **(Required)**
+  **Properties**:
+  - `items` (Array<WardrobeBatchUploadItemReq>) **(Required)**
 
 **Responses**:
 
@@ -4700,8 +4702,8 @@ Danh sách ảnh trang phục
 Danh sách ID trang phục cần xóa
 
 - Schema: [BulkDeleteItemsReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobulkdeleteitemsreq)
-    **Properties**:
-    - `ids` (Array<string>) **(Required)**
+  **Properties**:
+  - `ids` (Array<string>) **(Required)**
 
 **Responses**:
 
@@ -4724,8 +4726,8 @@ Danh sách ID trang phục cần xóa
 Danh sách ID trang phục mẫu
 
 - Schema: [InitClosetFromCatalogReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtoinitclosetfromcatalogreq)
-    **Properties**:
-    - `catalogItemIds` (Array<string>) **(Required)**
+  **Properties**:
+  - `catalogItemIds` (Array<string>) **(Required)**
 
 **Responses**:
 
@@ -4768,9 +4770,9 @@ Danh sách ID trang phục mẫu
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `taskId` | path | string | Yes | Mã Task ID |
+| Name     | In   | Type   | Required | Description |
+| -------- | ---- | ------ | -------- | ----------- |
+| `taskId` | path | string | Yes      | Mã Task ID  |
 
 **Responses**:
 
@@ -4806,9 +4808,9 @@ Danh sách ID trang phục mẫu
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID trang phục |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID trang phục |
 
 **Responses**:
 
@@ -4839,18 +4841,18 @@ Danh sách ID trang phục mẫu
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID trang phục |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID trang phục |
 
 **Request Body**:
 
 Thông tin cập nhật
 
 - Schema: [UpdateWardrobeItemReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtoupdatewardrobeitemreq)
-    **Properties**:
-    - `categoryId` (string)
-    - `price` (number)
+  **Properties**:
+  - `categoryId` (string)
+  - `price` (number)
 
 **Responses**:
 
@@ -4881,17 +4883,17 @@ Thông tin cập nhật
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID trang phục gốc |
+| Name | In   | Type   | Required | Description       |
+| ---- | ---- | ------ | -------- | ----------------- |
+| `id` | path | string | Yes      | ID trang phục gốc |
 
 **Request Body**:
 
 Số lượng nhân bản
 
 - Schema: [CloneWardrobeItemReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtoclonewardrobeitemreq)
-    **Properties**:
-    - `quantity` (integer) **(Required)**
+  **Properties**:
+  - `quantity` (integer) **(Required)**
 
 **Responses**:
 
@@ -4918,9 +4920,9 @@ Số lượng nhân bản
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | string | Yes | ID trang phục |
+| Name | In   | Type   | Required | Description   |
+| ---- | ---- | ------ | -------- | ------------- |
+| `id` | path | string | Yes      | ID trang phục |
 
 **Responses**:
 
@@ -4951,10 +4953,11 @@ Số lượng nhân bản
 
 **Description**: Lấy thông tin chi tiết gói hội viên đang kích hoạt của người dùng hiện tại.
 Định nghĩa enum PlanKind:
+
 - 0: DefaultFree (Gói miễn phí mặc định)
 - 1: Finite (Gói giới hạn số ngày sử dụng)
 - 2: Lifetime (Gói trọn đời không giới hạn thời gian)
-Định nghĩa TierRank (Cấp độ gói):
+  Định nghĩa TierRank (Cấp độ gói):
 - 0: Cấp Free
 - 1: Cấp Premium (Gói có cấp Premium lớn hơn sẽ được ưu tiên kích hoạt trước)
 
@@ -4986,8 +4989,8 @@ Số lượng nhân bản
 Trạng thái thiết lập tự động gia hạn
 
 - Schema: [SetAutoRenewReq](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtosetautorenewreq)
-    **Properties**:
-    - `enabled` (boolean) **(Required)**
+  **Properties**:
+  - `enabled` (boolean) **(Required)**
 
 **Responses**:
 
@@ -5005,10 +5008,11 @@ Trạng thái thiết lập tự động gia hạn
 
 **Description**: Lấy hạn ngạch chi tiết và trạng thái sử dụng của người dùng trong ngày.
 Định nghĩa enum PlanKind:
+
 - 0: DefaultFree (Gói miễn phí mặc định)
 - 1: Finite (Gói giới hạn số ngày sử dụng)
 - 2: Lifetime (Gói trọn đời không giới hạn thời gian)
-Định nghĩa TierRank (Cấp độ gói):
+  Định nghĩa TierRank (Cấp độ gói):
 - 0: Cấp Free
 - 1: Cấp Premium (Gói có cấp Premium lớn hơn sẽ được ưu tiên kích hoạt trước)
 
@@ -5036,10 +5040,11 @@ Trạng thái thiết lập tự động gia hạn
 
 **Description**: Lấy danh sách tất cả các gói đăng ký Premium hiện có.
 Định nghĩa enum PlanKind:
+
 - 0: DefaultFree (Gói miễn phí mặc định)
 - 1: Finite (Gói giới hạn số ngày sử dụng)
 - 2: Lifetime (Gói trọn đời không giới hạn thời gian)
-Định nghĩa TierRank (Cấp độ gói):
+  Định nghĩa TierRank (Cấp độ gói):
 - 0: Cấp Free
 - 1: Cấp Premium (Gói có cấp Premium lớn hơn sẽ được ưu tiên kích hoạt trước)
 
@@ -5070,6 +5075,7 @@ Trạng thái thiết lập tự động gia hạn
 
 **Description**: Khởi tạo link thanh toán VietQR qua cổng PayOS để đăng ký gói cước trực tiếp.
 Định nghĩa enum DepositStatus (Trạng thái thanh toán):
+
 - 0: Pending (Chờ thanh toán)
 - 1: Success (Thanh toán thành công)
 - 2: FailedLegacy (Thất bại cũ)
@@ -5086,10 +5092,10 @@ Trạng thái thiết lập tự động gia hạn
 Thông tin gói cước
 
 - Schema: [DirectPurchaseReq](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtodirectpurchasereq)
-    **Properties**:
-    - `cancelUrl` (string)
-    - `planSlug` (string) **(Required)**
-    - `returnUrl` (string)
+  **Properties**:
+  - `cancelUrl` (string)
+  - `planSlug` (string) **(Required)**
+  - `returnUrl` (string)
 
 **Responses**:
 
@@ -5115,8 +5121,8 @@ Thông tin gói cước
 Thông tin gói cước
 
 - Schema: [PurchaseWithWalletReq](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtopurchasewithwalletreq)
-    **Properties**:
-    - `planSlug` (string) **(Required)**
+  **Properties**:
+  - `planSlug` (string) **(Required)**
 
 **Responses**:
 
@@ -5154,10 +5160,10 @@ Thông tin gói cước
 
 **Request Parameters**:
 
-| Name | In | Type | Required | Description |
-| --- | --- | --- | --- | --- |
-| `limit` | query | integer | No |  |
-| `page` | query | integer | No |  |
+| Name    | In    | Type    | Required | Description |
+| ------- | ----- | ------- | -------- | ----------- |
+| `limit` | query | integer | No       |             |
+| `page`  | query | integer | No       |             |
 
 **Responses**:
 
@@ -5175,6 +5181,7 @@ Thông tin gói cước
 
 **Description**: Khởi tạo link thanh toán VietQR qua cổng PayOS để nạp tiền vào ví.
 Định nghĩa enum DepositStatus (Trạng thái thanh toán):
+
 - 0: Pending (Chờ thanh toán)
 - 1: Success (Thanh toán thành công)
 - 2: FailedLegacy (Thất bại cũ)
@@ -5191,10 +5198,10 @@ Thông tin gói cước
 Thông tin nạp tiền
 
 - Schema: [WalletTopUpReq](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtowallettopupreq)
-    **Properties**:
-    - `amount` (number) **(Required)**
-    - `cancelUrl` (string)
-    - `returnUrl` (string)
+  **Properties**:
+  - `amount` (number) **(Required)**
+  - `cancelUrl` (string)
+  - `returnUrl` (string)
 
 **Responses**:
 
@@ -5220,11 +5227,11 @@ Thông tin nạp tiền
 Dữ liệu Webhook
 
 - Schema: [PayOSWebhookReq](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtopayoswebhookreq)
-    **Properties**:
-    - `code` (string)
-    - `data` (ref: PayOSWebhookData)
-    - `desc` (string)
-    - `signature` (string)
+  **Properties**:
+  - `code` (string)
+  - `data` (ref: PayOSWebhookData)
+  - `desc` (string)
+  - `signature` (string)
 
 **Responses**:
 
@@ -5240,776 +5247,776 @@ Dữ liệu Webhook
 
 ### <a id="internalmodulessubscriptionpresentationhandleradmingrantplanreq"></a>`adminGrantPlanReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `planId` | string | Yes |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `planId` | string | Yes      |             |
 
 ### <a id="internalmodulessubscriptionpresentationhandlerresolverequest"></a>`resolveRequest`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `paymentLinkId` | string | No |  |
-| `reason` | string | No |  |
-| `reference` | string | No |  |
+| Property        | Type   | Required | Description |
+| --------------- | ------ | -------- | ----------- |
+| `paymentLinkId` | string | No       |             |
+| `reason`        | string | No       |             |
+| `reference`     | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesadminapplicationdtoadminauditlogdto"></a>`AdminAuditLogDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `action` | string | No |  |
-| `actorUserId` | string | No |  |
-| `createdAt` | string | No |  |
-| `id` | string | No |  |
-| `payload` | object | No |  |
-| `requestIp` | string | No |  |
-| `targetId` | string | No |  |
-| `targetType` | string | No |  |
+| Property      | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `action`      | string | No       |             |
+| `actorUserId` | string | No       |             |
+| `createdAt`   | string | No       |             |
+| `id`          | string | No       |             |
+| `payload`     | object | No       |             |
+| `requestIp`   | string | No       |             |
+| `targetId`    | string | No       |             |
+| `targetType`  | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesadminapplicationdtoadminauditloglistres"></a>`AdminAuditLogListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[AdminAuditLogDTO](#smart-wardrobe-beinternalmodulesadminapplicationdtoadminauditlogdto)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                            | Required | Description |
+| ---------- | ----------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[AdminAuditLogDTO](#smart-wardrobe-beinternalmodulesadminapplicationdtoadminauditlogdto)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)          | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoaicostpolicybriefres"></a>`AICostPolicyBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | string | No |  |
-| `id` | string | No |  |
-| `name` | string | No |  |
-| `version` | integer | No |  |
+| Property  | Type    | Required | Description |
+| --------- | ------- | -------- | ----------- |
+| `code`    | string  | No       |             |
+| `id`      | string  | No       |             |
+| `name`    | string  | No       |             |
+| `version` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoaimodelconfigdto"></a>`AIModelConfigDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `currency` | string | No |  |
-| `effectiveFrom` | string | No |  |
-| `effectiveTo` | string | No |  |
-| `id` | string | No |  |
-| `inputUsdPerMillion` | number | No |  |
-| `model` | string | No |  |
-| `outputUsdPerMillion` | number | No |  |
-| `provider` | string | No |  |
-| `usdToVnd` | number | No |  |
-| `version` | string | No |  |
+| Property              | Type   | Required | Description |
+| --------------------- | ------ | -------- | ----------- |
+| `currency`            | string | No       |             |
+| `effectiveFrom`       | string | No       |             |
+| `effectiveTo`         | string | No       |             |
+| `id`                  | string | No       |             |
+| `inputUsdPerMillion`  | number | No       |             |
+| `model`               | string | No       |             |
+| `outputUsdPerMillion` | number | No       |             |
+| `provider`            | string | No       |             |
+| `usdToVnd`            | number | No       |             |
+| `version`             | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoaipolicygrantdto"></a>`AIPolicyGrantDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiCostPolicy` | [AICostPolicyBriefRes](#smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoaicostpolicybriefres) | No |  |
-| `aiCostPolicyId` | string | No |  |
-| `createdAt` | string | No |  |
-| `effectiveFrom` | string | No |  |
-| `effectiveTo` | string | No |  |
-| `id` | string | No |  |
-| `userId` | string | No |  |
+| Property         | Type                                                                                                  | Required | Description |
+| ---------------- | ----------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `aiCostPolicy`   | [AICostPolicyBriefRes](#smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoaicostpolicybriefres) | No       |             |
+| `aiCostPolicyId` | string                                                                                                | No       |             |
+| `createdAt`      | string                                                                                                | No       |             |
+| `effectiveFrom`  | string                                                                                                | No       |             |
+| `effectiveTo`    | string                                                                                                | No       |             |
+| `id`             | string                                                                                                | No       |             |
+| `userId`         | string                                                                                                | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoaiusageitemdto"></a>`AIUsageItemDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `actualCostMicroVnd` | integer | No |  |
-| `createdAt` | string | No |  |
-| `id` | string | No |  |
-| `model` | string | No |  |
-| `operation` | string | No |  |
-| `outputTokens` | integer | No |  |
-| `promptTokens` | integer | No |  |
-| `provider` | string | No |  |
-| `requestId` | string | No |  |
-| `status` | string | No |  |
-| `thinkingTokens` | integer | No |  |
-| `userId` | string | No |  |
+| Property             | Type    | Required | Description |
+| -------------------- | ------- | -------- | ----------- |
+| `actualCostMicroVnd` | integer | No       |             |
+| `createdAt`          | string  | No       |             |
+| `id`                 | string  | No       |             |
+| `model`              | string  | No       |             |
+| `operation`          | string  | No       |             |
+| `outputTokens`       | integer | No       |             |
+| `promptTokens`       | integer | No       |             |
+| `provider`           | string  | No       |             |
+| `requestId`          | string  | No       |             |
+| `status`             | string  | No       |             |
+| `thinkingTokens`     | integer | No       |             |
+| `userId`             | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesaiexecutorapplicationdtocreateaigrantreq"></a>`CreateAIGrantReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiCostPolicyId` | string | Yes |  |
-| `effectiveTo` | string | No |  |
-| `userId` | string | Yes |  |
+| Property         | Type   | Required | Description |
+| ---------------- | ------ | -------- | ----------- |
+| `aiCostPolicyId` | string | Yes      |             |
+| `effectiveTo`    | string | No       |             |
+| `userId`         | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoupdatepricingreq"></a>`UpdatePricingReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `effectiveTo` | string | No |  |
-| `inputUsdPerMillion` | number | No |  |
-| `outputUsdPerMillion` | number | No |  |
-| `usdToVnd` | number | No |  |
+| Property              | Type   | Required | Description |
+| --------------------- | ------ | -------- | ----------- |
+| `effectiveTo`         | string | No       |             |
+| `inputUsdPerMillion`  | number | No       |             |
+| `outputUsdPerMillion` | number | No       |             |
+| `usdToVnd`            | number | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemreq"></a>`AddBrandMemberItemReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `emailOrUsername` | string | Yes |  |
-| `role` | [BrandMemberRole](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberrolebrandmemberrole) | Yes |  |
+| Property          | Type                                                                                                   | Required | Description |
+| ----------------- | ------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `emailOrUsername` | string                                                                                                 | Yes      |             |
+| `role`            | [BrandMemberRole](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberrolebrandmemberrole) | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult"></a>`AddBrandMemberItemResult`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `emailOrUsername` | string | No |  |
-| `member` | [BrandMemberRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandmemberres) | No |  |
-| `message` | string | No |  |
-| `reasonCode` | string | No |  |
+| Property          | Type                                                                                 | Required | Description |
+| ----------------- | ------------------------------------------------------------------------------------ | -------- | ----------- |
+| `emailOrUsername` | string                                                                               | No       |             |
+| `member`          | [BrandMemberRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandmemberres) | No       |             |
+| `message`         | string                                                                               | No       |             |
+| `reasonCode`      | string                                                                               | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmembersreq"></a>`AddBrandMembersReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `members` | Array<[AddBrandMemberItemReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemreq)> | Yes |  |
+| Property  | Type                                                                                                      | Required | Description |
+| --------- | --------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `members` | Array<[AddBrandMemberItemReq](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemreq)> | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmembersres"></a>`AddBrandMembersRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `created` | Array<[AddBrandMemberItemResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult)> | No |  |
-| `failed` | Array<[AddBrandMemberItemResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult)> | No |  |
-| `updated` | Array<[AddBrandMemberItemResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult)> | No |  |
+| Property  | Type                                                                                                            | Required | Description |
+| --------- | --------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `created` | Array<[AddBrandMemberItemResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult)> | No       |             |
+| `failed`  | Array<[AddBrandMemberItemResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult)> | No       |             |
+| `updated` | Array<[AddBrandMemberItemResult](#smart-wardrobe-beinternalmodulesbrandapplicationdtoaddbrandmemberitemresult)> | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoadminaddbrandstaffreq"></a>`AdminAddBrandStaffReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `userId` | string | Yes |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `userId` | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoadminbrandlistres"></a>`AdminBrandListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                   | Required | Description |
+| ---------- | -------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[BrandRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres)>        | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoadminupdatebrandmemberreq"></a>`AdminUpdateBrandMemberReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `role` | [BrandMemberRole](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberrolebrandmemberrole) | No |  |
-| `status` | [BrandMemberStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberstatusbrandmemberstatus) | No |  |
+| Property | Type                                                                                                         | Required | Description |
+| -------- | ------------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `role`   | [BrandMemberRole](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberrolebrandmemberrole)       | No       |             |
+| `status` | [BrandMemberStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberstatusbrandmemberstatus) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitbriefres"></a>`BenefitBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `benefitType` | string | No |  |
-| `description` | string | No |  |
-| `featureCode` | string | No |  |
-| `featureConfig` | object | No |  |
-| `id` | string | No |  |
-| `name` | string | No |  |
-| `requiredPoints` | integer | No |  |
-| `requiredTierName` | string | No |  |
-| `status` | string | No |  |
-| `unlockType` | string | No |  |
+| Property           | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `benefitType`      | string  | No       |             |
+| `description`      | string  | No       |             |
+| `featureCode`      | string  | No       |             |
+| `featureConfig`    | object  | No       |             |
+| `id`               | string  | No       |             |
+| `name`             | string  | No       |             |
+| `requiredPoints`   | integer | No       |             |
+| `requiredTierName` | string  | No       |             |
+| `status`           | string  | No       |             |
+| `unlockType`       | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitredemptionlistres"></a>`BenefitRedemptionListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[BenefitRedemptionRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitredemptionres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                    | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[BenefitRedemptionRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitredemptionres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitredemptionres"></a>`BenefitRedemptionRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `benefit` | [BenefitBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitbriefres) | No |  |
-| `benefitId` | string | No |  |
-| `brand` | [BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres) | No |  |
-| `brandCustomerId` | string | No |  |
-| `createdAt` | string | No |  |
-| `expiresAt` | string | No |  |
-| `id` | string | No |  |
-| `pointsSpent` | integer | No |  |
-| `redeemedAt` | string | No |  |
-| `status` | string | No |  |
-| `updatedAt` | string | No |  |
-| `usedAt` | string | No |  |
-| `userId` | string | No |  |
+| Property          | Type                                                                                   | Required | Description |
+| ----------------- | -------------------------------------------------------------------------------------- | -------- | ----------- |
+| `benefit`         | [BenefitBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobenefitbriefres) | No       |             |
+| `benefitId`       | string                                                                                 | No       |             |
+| `brand`           | [BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres)     | No       |             |
+| `brandCustomerId` | string                                                                                 | No       |             |
+| `createdAt`       | string                                                                                 | No       |             |
+| `expiresAt`       | string                                                                                 | No       |             |
+| `id`              | string                                                                                 | No       |             |
+| `pointsSpent`     | integer                                                                                | No       |             |
+| `redeemedAt`      | string                                                                                 | No       |             |
+| `status`          | string                                                                                 | No       |             |
+| `updatedAt`       | string                                                                                 | No       |             |
+| `usedAt`          | string                                                                                 | No       |             |
+| `userId`          | string                                                                                 | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitlistres"></a>`BrandBenefitListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[BrandBenefitRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                          | Required | Description |
+| ---------- | --------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[BrandBenefitRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)        | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres"></a>`BrandBenefitRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `benefitType` | string | No |  |
-| `brandId` | string | No |  |
-| `createdAt` | string | No |  |
-| `description` | string | No |  |
-| `featureCode` | string | No |  |
-| `featureConfig` | object | No |  |
-| `id` | string | No |  |
-| `name` | string | No |  |
-| `requiredPoints` | integer | No |  |
-| `requiredTierId` | string | No |  |
-| `requiredTierName` | string | No |  |
-| `status` | string | No |  |
-| `unlockType` | string | No |  |
-| `updatedAt` | string | No |  |
+| Property           | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `benefitType`      | string  | No       |             |
+| `brandId`          | string  | No       |             |
+| `createdAt`        | string  | No       |             |
+| `description`      | string  | No       |             |
+| `featureCode`      | string  | No       |             |
+| `featureConfig`    | object  | No       |             |
+| `id`               | string  | No       |             |
+| `name`             | string  | No       |             |
+| `requiredPoints`   | integer | No       |             |
+| `requiredTierId`   | string  | No       |             |
+| `requiredTierName` | string  | No       |             |
+| `status`           | string  | No       |             |
+| `unlockType`       | string  | No       |             |
+| `updatedAt`        | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres"></a>`BrandBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `backgroundUrl` | string | No |  |
-| `description` | string | No |  |
-| `id` | string | No |  |
-| `logoUrl` | string | No |  |
-| `name` | string | No |  |
-| `slug` | string | No |  |
-| `status` | [BrandStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandstatusbrandstatus) | No |  |
+| Property        | Type                                                                                       | Required | Description |
+| --------------- | ------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `backgroundUrl` | string                                                                                     | No       |             |
+| `description`   | string                                                                                     | No       |             |
+| `id`            | string                                                                                     | No       |             |
+| `logoUrl`       | string                                                                                     | No       |             |
+| `name`          | string                                                                                     | No       |             |
+| `slug`          | string                                                                                     | No       |             |
+| `status`        | [BrandStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandstatusbrandstatus) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessagelistres"></a>`BrandConversationMessageListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[BrandConversationMessageRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessageres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                                  | Required | Description |
+| ---------- | --------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[BrandConversationMessageRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessageres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                                | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessageres"></a>`BrandConversationMessageRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `conversationId` | string | No |  |
-| `createdAt` | string | No |  |
-| `id` | string | No |  |
-| `message` | string | No |  |
-| `sender` | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres) | No |  |
-| `senderRole` | string | No |  |
-| `senderUserId` | string | No |  |
+| Property         | Type                                                                                | Required | Description |
+| ---------------- | ----------------------------------------------------------------------------------- | -------- | ----------- |
+| `conversationId` | string                                                                              | No       |             |
+| `createdAt`      | string                                                                              | No       |             |
+| `id`             | string                                                                              | No       |             |
+| `message`        | string                                                                              | No       |             |
+| `sender`         | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres) | No       |             |
+| `senderRole`     | string                                                                              | No       |             |
+| `senderUserId`   | string                                                                              | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationres"></a>`BrandConversationRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `createdAt` | string | No |  |
-| `customerId` | string | No |  |
-| `customerName` | string | No |  |
-| `id` | string | No |  |
-| `lastMessageAt` | string | No |  |
-| `staffLastReadAt` | string | No |  |
-| `staffUnreadCount` | integer | No |  |
-| `status` | string | No |  |
-| `updatedAt` | string | No |  |
-| `userDisplayName` | string | No |  |
-| `userId` | string | No |  |
-| `userLastReadAt` | string | No |  |
-| `userUnreadCount` | integer | No |  |
+| Property           | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `brandId`          | string  | No       |             |
+| `createdAt`        | string  | No       |             |
+| `customerId`       | string  | No       |             |
+| `customerName`     | string  | No       |             |
+| `id`               | string  | No       |             |
+| `lastMessageAt`    | string  | No       |             |
+| `staffLastReadAt`  | string  | No       |             |
+| `staffUnreadCount` | integer | No       |             |
+| `status`           | string  | No       |             |
+| `updatedAt`        | string  | No       |             |
+| `userDisplayName`  | string  | No       |             |
+| `userId`           | string  | No       |             |
+| `userLastReadAt`   | string  | No       |             |
+| `userUnreadCount`  | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationuserdetailres"></a>`BrandConversationUserDetailRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brand` | [BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres) | No |  |
-| `customerName` | string | No |  |
-| `id` | string | No |  |
-| `lastMessageAt` | string | No |  |
-| `messages` | Array<[BrandConversationMessageRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessageres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
-| `status` | string | No |  |
-| `userDisplayName` | string | No |  |
-| `userLastReadAt` | string | No |  |
-| `userUnreadCount` | integer | No |  |
+| Property          | Type                                                                                                                  | Required | Description |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brand`           | [BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres)                                    | No       |             |
+| `customerName`    | string                                                                                                                | No       |             |
+| `id`              | string                                                                                                                | No       |             |
+| `lastMessageAt`   | string                                                                                                                | No       |             |
+| `messages`        | Array<[BrandConversationMessageRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandconversationmessageres)> | No       |             |
+| `metadata`        | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                                | No       |             |
+| `status`          | string                                                                                                                | No       |             |
+| `userDisplayName` | string                                                                                                                | No       |             |
+| `userLastReadAt`  | string                                                                                                                | No       |             |
+| `userUnreadCount` | integer                                                                                                               | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerbriefres"></a>`BrandCustomerBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `customerName` | string | No |  |
-| `id` | string | No |  |
-| `joinedAt` | string | No |  |
-| `joinedSource` | [BrandCustomerJoinedSource](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerjoinedsourcebrandcustomerjoinedsource) | No |  |
-| `loyaltyAccount` | [CustomerLoyaltyAccountRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtocustomerloyaltyaccountres) | No |  |
-| `status` | [BrandCustomerStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerstatusbrandcustomerstatus) | No |  |
-| `user` | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres) | No |  |
+| Property         | Type                                                                                                                                 | Required | Description |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `customerName`   | string                                                                                                                               | No       |             |
+| `id`             | string                                                                                                                               | No       |             |
+| `joinedAt`       | string                                                                                                                               | No       |             |
+| `joinedSource`   | [BrandCustomerJoinedSource](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerjoinedsourcebrandcustomerjoinedsource) | No       |             |
+| `loyaltyAccount` | [CustomerLoyaltyAccountRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtocustomerloyaltyaccountres)                           | No       |             |
+| `status`         | [BrandCustomerStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerstatusbrandcustomerstatus)                   | No       |             |
+| `user`           | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres)                                                  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerlistres"></a>`BrandCustomerListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[BrandCustomerRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                            | Required | Description |
+| ---------- | ----------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[BrandCustomerRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)          | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandcustomerres"></a>`BrandCustomerRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `claimedAt` | string | No |  |
-| `createdAt` | string | No |  |
-| `createdByMemberId` | string | No |  |
-| `customerName` | string | No |  |
-| `externalCustomerCode` | string | No |  |
-| `id` | string | No |  |
-| `joinedAt` | string | No |  |
-| `joinedSource` | [BrandCustomerJoinedSource](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerjoinedsourcebrandcustomerjoinedsource) | No |  |
-| `loyaltyAccount` | [CustomerLoyaltyAccountRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtocustomerloyaltyaccountres) | No |  |
-| `phoneE164` | string | No |  |
-| `status` | [BrandCustomerStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerstatusbrandcustomerstatus) | No |  |
-| `updatedAt` | string | No |  |
-| `user` | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres) | No |  |
+| Property               | Type                                                                                                                                 | Required | Description |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `brandId`              | string                                                                                                                               | No       |             |
+| `claimedAt`            | string                                                                                                                               | No       |             |
+| `createdAt`            | string                                                                                                                               | No       |             |
+| `createdByMemberId`    | string                                                                                                                               | No       |             |
+| `customerName`         | string                                                                                                                               | No       |             |
+| `externalCustomerCode` | string                                                                                                                               | No       |             |
+| `id`                   | string                                                                                                                               | No       |             |
+| `joinedAt`             | string                                                                                                                               | No       |             |
+| `joinedSource`         | [BrandCustomerJoinedSource](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerjoinedsourcebrandcustomerjoinedsource) | No       |             |
+| `loyaltyAccount`       | [CustomerLoyaltyAccountRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtocustomerloyaltyaccountres)                           | No       |             |
+| `phoneE164`            | string                                                                                                                               | No       |             |
+| `status`               | [BrandCustomerStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerstatusbrandcustomerstatus)                   | No       |             |
+| `updatedAt`            | string                                                                                                                               | No       |             |
+| `user`                 | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres)                                                  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobranditembriefres"></a>`BrandItemBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brand` | [BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres) | No |  |
-| `fashionItem` | [FashionItemBriefRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtofashionitembriefres) | No |  |
-| `id` | string | No |  |
-| `itemType` | [BrandItemType](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemtypebranditemtype) | No |  |
-| `name` | string | No |  |
-| `price` | number | No |  |
-| `productCode` | string | No |  |
-| `status` | [BrandItemStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemstatusbranditemstatus) | No |  |
+| Property      | Type                                                                                                            | Required | Description |
+| ------------- | --------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brand`       | [BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres)                              | No       |             |
+| `fashionItem` | [FashionItemBriefRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtofashionitembriefres)                | No       |             |
+| `id`          | string                                                                                                          | No       |             |
+| `itemType`    | [BrandItemType](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemtypebranditemtype)       | No       |             |
+| `name`        | string                                                                                                          | No       |             |
+| `price`       | number                                                                                                          | No       |             |
+| `productCode` | string                                                                                                          | No       |             |
+| `status`      | [BrandItemStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemstatusbranditemstatus) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemlistbriefres"></a>`BrandItemListBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[BrandItemBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobranditembriefres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                              | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[BrandItemBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobranditembriefres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)            | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobranditemres"></a>`BrandItemRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `brandName` | string | No |  |
-| `createdAt` | string | No |  |
-| `description` | string | No |  |
-| `fashionItem` | [FashionItemRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtofashionitemres) | No |  |
-| `fashionItemId` | string | No |  |
-| `id` | string | No |  |
-| `itemType` | [BrandItemType](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemtypebranditemtype) | No |  |
-| `name` | string | No |  |
-| `price` | number | No |  |
-| `productCode` | string | No |  |
-| `status` | [BrandItemStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemstatusbranditemstatus) | No |  |
-| `taskId` | string | No |  |
-| `updatedAt` | string | No |  |
+| Property        | Type                                                                                                            | Required | Description |
+| --------------- | --------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandId`       | string                                                                                                          | No       |             |
+| `brandName`     | string                                                                                                          | No       |             |
+| `createdAt`     | string                                                                                                          | No       |             |
+| `description`   | string                                                                                                          | No       |             |
+| `fashionItem`   | [FashionItemRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtofashionitemres)                          | No       |             |
+| `fashionItemId` | string                                                                                                          | No       |             |
+| `id`            | string                                                                                                          | No       |             |
+| `itemType`      | [BrandItemType](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemtypebranditemtype)       | No       |             |
+| `name`          | string                                                                                                          | No       |             |
+| `price`         | number                                                                                                          | No       |             |
+| `productCode`   | string                                                                                                          | No       |             |
+| `status`        | [BrandItemStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemstatusbranditemstatus) | No       |             |
+| `taskId`        | string                                                                                                          | No       |             |
+| `updatedAt`     | string                                                                                                          | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandloyaltyres"></a>`BrandLoyaltyRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brand` | [BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres) | No |  |
-| `brandCustomerId` | string | No |  |
-| `brandId` | string | No |  |
-| `currentPoints` | integer | No |  |
-| `currentTier` | [LoyaltyTierBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres) | No |  |
-| `lifetimePoints` | integer | No |  |
-| `loyaltyAccountId` | string | No |  |
-| `nearestExpiringPointLot` | [LoyaltyPointLotRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointlotres) | No |  |
-| `totalSpend` | number | No |  |
+| Property                  | Type                                                                                           | Required | Description |
+| ------------------------- | ---------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brand`                   | [BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres)             | No       |             |
+| `brandCustomerId`         | string                                                                                         | No       |             |
+| `brandId`                 | string                                                                                         | No       |             |
+| `currentPoints`           | integer                                                                                        | No       |             |
+| `currentTier`             | [LoyaltyTierBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres) | No       |             |
+| `lifetimePoints`          | integer                                                                                        | No       |             |
+| `loyaltyAccountId`        | string                                                                                         | No       |             |
+| `nearestExpiringPointLot` | [LoyaltyPointLotRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointlotres)   | No       |             |
+| `totalSpend`              | number                                                                                         | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandmemberres"></a>`BrandMemberRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `createdAt` | string | No |  |
-| `id` | string | No |  |
-| `role` | [BrandMemberRole](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberrolebrandmemberrole) | No |  |
-| `status` | [BrandMemberStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberstatusbrandmemberstatus) | No |  |
-| `updatedAt` | string | No |  |
-| `user` | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres) | No |  |
-| `userEmail` | string | No |  |
-| `userFullName` | string | No |  |
-| `userId` | string | No |  |
+| Property       | Type                                                                                                         | Required | Description |
+| -------------- | ------------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `brandId`      | string                                                                                                       | No       |             |
+| `createdAt`    | string                                                                                                       | No       |             |
+| `id`           | string                                                                                                       | No       |             |
+| `role`         | [BrandMemberRole](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberrolebrandmemberrole)       | No       |             |
+| `status`       | [BrandMemberStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberstatusbrandmemberstatus) | No       |             |
+| `updatedAt`    | string                                                                                                       | No       |             |
+| `user`         | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres)                          | No       |             |
+| `userEmail`    | string                                                                                                       | No       |             |
+| `userFullName` | string                                                                                                       | No       |             |
+| `userId`       | string                                                                                                       | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtobrandres"></a>`BrandRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `approvedAt` | string | No |  |
-| `approvedByUserId` | string | No |  |
-| `backgroundUrl` | string | No |  |
-| `createdAt` | string | No |  |
-| `createdByUserId` | string | No |  |
-| `description` | string | No |  |
-| `id` | string | No |  |
-| `logoUrl` | string | No |  |
-| `name` | string | No |  |
-| `slug` | string | No |  |
-| `status` | [BrandStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandstatusbrandstatus) | No |  |
-| `totalCustomer` | integer | No |  |
-| `updatedAt` | string | No |  |
+| Property           | Type                                                                                       | Required | Description |
+| ------------------ | ------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `approvedAt`       | string                                                                                     | No       |             |
+| `approvedByUserId` | string                                                                                     | No       |             |
+| `backgroundUrl`    | string                                                                                     | No       |             |
+| `createdAt`        | string                                                                                     | No       |             |
+| `createdByUserId`  | string                                                                                     | No       |             |
+| `description`      | string                                                                                     | No       |             |
+| `id`               | string                                                                                     | No       |             |
+| `logoUrl`          | string                                                                                     | No       |             |
+| `name`             | string                                                                                     | No       |             |
+| `slug`             | string                                                                                     | No       |             |
+| `status`           | [BrandStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandstatusbrandstatus) | No       |             |
+| `totalCustomer`    | integer                                                                                    | No       |             |
+| `updatedAt`        | string                                                                                     | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoclaimofflineaccountreq"></a>`ClaimOfflineAccountReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `claimToken` | string | Yes |  |
+| Property     | Type   | Required | Description |
+| ------------ | ------ | -------- | ----------- |
+| `claimToken` | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoclaimtokenres"></a>`ClaimTokenRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandCustomerId` | string | No |  |
-| `consumedAt` | string | No |  |
-| `createdAt` | string | No |  |
-| `expiresAt` | string | No |  |
-| `id` | string | No |  |
-| `revokedAt` | string | No |  |
-| `revokedByUserId` | string | No |  |
-| `revokedReason` | string | No |  |
-| `status` | string | No |  |
+| Property          | Type   | Required | Description |
+| ----------------- | ------ | -------- | ----------- |
+| `brandCustomerId` | string | No       |             |
+| `consumedAt`      | string | No       |             |
+| `createdAt`       | string | No       |             |
+| `expiresAt`       | string | No       |             |
+| `id`              | string | No       |             |
+| `revokedAt`       | string | No       |             |
+| `revokedByUserId` | string | No       |             |
+| `revokedReason`   | string | No       |             |
+| `status`          | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandbenefitreq"></a>`CreateBrandBenefitReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `benefitType` | string | Yes |  |
-| `description` | string | No |  |
-| `featureCode` | string | No |  |
-| `featureConfig` | object | No |  |
-| `name` | string | Yes |  |
-| `requiredPoints` | integer | No |  |
-| `requiredTierId` | string | No |  |
-| `unlockType` | string | Yes |  |
+| Property         | Type    | Required | Description |
+| ---------------- | ------- | -------- | ----------- |
+| `benefitType`    | string  | Yes      |             |
+| `description`    | string  | No       |             |
+| `featureCode`    | string  | No       |             |
+| `featureConfig`  | object  | No       |             |
+| `name`           | string  | Yes      |             |
+| `requiredPoints` | integer | No       |             |
+| `requiredTierId` | string  | No       |             |
+| `unlockType`     | string  | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebranditemreq"></a>`CreateBrandItemReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `categoryId` | string | No |  |
-| `description` | string | No |  |
-| `imagePublicId` | string | Yes |  |
-| `imageUrl` | string | Yes |  |
-| `itemType` | string | Yes |  |
-| `name` | string | Yes |  |
-| `price` | number | No |  |
-| `productCode` | string | No |  |
-| `status` | string | No |  |
+| Property        | Type   | Required | Description |
+| --------------- | ------ | -------- | ----------- |
+| `categoryId`    | string | No       |             |
+| `description`   | string | No       |             |
+| `imagePublicId` | string | Yes      |             |
+| `imageUrl`      | string | Yes      |             |
+| `itemType`      | string | Yes      |             |
+| `name`          | string | Yes      |             |
+| `price`         | number | No       |             |
+| `productCode`   | string | No       |             |
+| `status`        | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreatebrandreq"></a>`CreateBrandReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `description` | string | No |  |
-| `logoPublicId` | string | No |  |
-| `logoUrl` | string | No |  |
-| `name` | string | Yes |  |
-| `slug` | string | Yes |  |
+| Property       | Type   | Required | Description |
+| -------------- | ------ | -------- | ----------- |
+| `description`  | string | No       |             |
+| `logoPublicId` | string | No       |             |
+| `logoUrl`      | string | No       |             |
+| `name`         | string | Yes      |             |
+| `slug`         | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreateclaimtokenres"></a>`CreateClaimTokenRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `claimToken` | string | No |  |
-| `expiresAt` | string | No |  |
+| Property     | Type   | Required | Description |
+| ------------ | ------ | -------- | ----------- |
+| `claimToken` | string | No       |             |
+| `expiresAt`  | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreateloyaltytierreq"></a>`CreateLoyaltyTierReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `description` | string | No |  |
-| `minTotalSpend` | number | No |  |
-| `name` | string | Yes |  |
-| `rank` | integer | No |  |
+| Property        | Type    | Required | Description |
+| --------------- | ------- | -------- | ----------- |
+| `description`   | string  | No       |             |
+| `minTotalSpend` | number  | No       |             |
+| `name`          | string  | Yes      |             |
+| `rank`          | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocreateofflinebrandcustomerreq"></a>`CreateOfflineBrandCustomerReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `customerName` | string | No |  |
-| `externalCustomerCode` | string | No |  |
-| `phoneE164` | string | Yes |  |
+| Property               | Type   | Required | Description |
+| ---------------------- | ------ | -------- | ----------- |
+| `customerName`         | string | No       |             |
+| `externalCustomerCode` | string | No       |             |
+| `phoneE164`            | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtocustomerloyaltyaccountres"></a>`CustomerLoyaltyAccountRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `currentPoints` | integer | No |  |
-| `currentTier` | [LoyaltyTierBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres) | No |  |
-| `id` | string | No |  |
-| `lifetimePoints` | integer | No |  |
-| `totalSpend` | number | No |  |
+| Property         | Type                                                                                           | Required | Description |
+| ---------------- | ---------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `currentPoints`  | integer                                                                                        | No       |             |
+| `currentTier`    | [LoyaltyTierBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres) | No       |             |
+| `id`             | string                                                                                         | No       |             |
+| `lifetimePoints` | integer                                                                                        | No       |             |
+| `totalSpend`     | number                                                                                         | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtodigitalsampleresponseres"></a>`DigitalSampleResponseRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandItemId` | string | No |  |
-| `createdAt` | string | No |  |
-| `feedbackText` | string | No |  |
-| `id` | string | No |  |
-| `outfitId` | string | No |  |
-| `rating` | integer | No |  |
-| `user` | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres) | No |  |
-| `userId` | string | No |  |
-| `voteType` | string | No |  |
+| Property       | Type                                                                                | Required | Description |
+| -------------- | ----------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandItemId`  | string                                                                              | No       |             |
+| `createdAt`    | string                                                                              | No       |             |
+| `feedbackText` | string                                                                              | No       |             |
+| `id`           | string                                                                              | No       |             |
+| `outfitId`     | string                                                                              | No       |             |
+| `rating`       | integer                                                                             | No       |             |
+| `user`         | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres) | No       |             |
+| `userId`       | string                                                                              | No       |             |
+| `voteType`     | string                                                                              | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtograntloyaltypointsreq"></a>`GrantLoyaltyPointsReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `customerName` | string | No |  |
-| `externalCustomerCode` | string | No |  |
-| `idempotencyKey` | string | No |  |
-| `phone` | string | No |  |
-| `pointsDelta` | integer | No |  |
-| `purchaseAmount` | number | No |  |
-| `reason` | string | No |  |
-| `referenceId` | string | No |  |
-| `referenceType` | string | No |  |
-| `transactionType` | [LoyaltyTransactionType](#smart-wardrobe-beinternalmodulesbranddomainconstantsloyaltytransactiontypeloyaltytransactiontype) | Yes |  |
-| `userId` | string | No |  |
+| Property               | Type                                                                                                                        | Required | Description |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `customerName`         | string                                                                                                                      | No       |             |
+| `externalCustomerCode` | string                                                                                                                      | No       |             |
+| `idempotencyKey`       | string                                                                                                                      | No       |             |
+| `phone`                | string                                                                                                                      | No       |             |
+| `pointsDelta`          | integer                                                                                                                     | No       |             |
+| `purchaseAmount`       | number                                                                                                                      | No       |             |
+| `reason`               | string                                                                                                                      | No       |             |
+| `referenceId`          | string                                                                                                                      | No       |             |
+| `referenceType`        | string                                                                                                                      | No       |             |
+| `transactionType`      | [LoyaltyTransactionType](#smart-wardrobe-beinternalmodulesbranddomainconstantsloyaltytransactiontypeloyaltytransactiontype) | Yes      |             |
+| `userId`               | string                                                                                                                      | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointlotres"></a>`LoyaltyPointLotRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `createdAt` | string | No |  |
-| `earnTransactionId` | string | No |  |
-| `earnedPoints` | integer | No |  |
-| `expiresAt` | string | No |  |
-| `id` | string | No |  |
-| `remainingPoints` | integer | No |  |
-| `status` | string | No |  |
+| Property            | Type    | Required | Description |
+| ------------------- | ------- | -------- | ----------- |
+| `createdAt`         | string  | No       |             |
+| `earnTransactionId` | string  | No       |             |
+| `earnedPoints`      | integer | No       |             |
+| `expiresAt`         | string  | No       |             |
+| `id`                | string  | No       |             |
+| `remainingPoints`   | integer | No       |             |
+| `status`            | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointtransactionbriefres"></a>`LoyaltyPointTransactionBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `balanceAfter` | integer | No |  |
-| `createdAt` | string | No |  |
-| `expiresAt` | string | No |  |
-| `id` | string | No |  |
-| `pointsDelta` | integer | No |  |
-| `reason` | string | No |  |
-| `referenceId` | string | No |  |
-| `referenceType` | string | No |  |
-| `spendAmount` | number | No |  |
-| `transactionType` | string | No |  |
+| Property          | Type    | Required | Description |
+| ----------------- | ------- | -------- | ----------- |
+| `balanceAfter`    | integer | No       |             |
+| `createdAt`       | string  | No       |             |
+| `expiresAt`       | string  | No       |             |
+| `id`              | string  | No       |             |
+| `pointsDelta`     | integer | No       |             |
+| `reason`          | string  | No       |             |
+| `referenceId`     | string  | No       |             |
+| `referenceType`   | string  | No       |             |
+| `spendAmount`     | number  | No       |             |
+| `transactionType` | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointtransactiondetailres"></a>`LoyaltyPointTransactionDetailRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `balanceAfter` | integer | No |  |
-| `brandCustomerId` | string | No |  |
-| `brandId` | string | No |  |
-| `createdAt` | string | No |  |
-| `createdByUserId` | string | No |  |
-| `expiresAt` | string | No |  |
-| `id` | string | No |  |
-| `idempotencyKey` | string | No |  |
-| `loyaltyAccountId` | string | No |  |
-| `pointsDelta` | integer | No |  |
-| `reason` | string | No |  |
-| `referenceId` | string | No |  |
-| `referenceType` | string | No |  |
-| `spendAmount` | number | No |  |
-| `transactionType` | string | No |  |
-| `userId` | string | No |  |
+| Property           | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `balanceAfter`     | integer | No       |             |
+| `brandCustomerId`  | string  | No       |             |
+| `brandId`          | string  | No       |             |
+| `createdAt`        | string  | No       |             |
+| `createdByUserId`  | string  | No       |             |
+| `expiresAt`        | string  | No       |             |
+| `id`               | string  | No       |             |
+| `idempotencyKey`   | string  | No       |             |
+| `loyaltyAccountId` | string  | No       |             |
+| `pointsDelta`      | integer | No       |             |
+| `reason`           | string  | No       |             |
+| `referenceId`      | string  | No       |             |
+| `referenceType`    | string  | No       |             |
+| `spendAmount`      | number  | No       |             |
+| `transactionType`  | string  | No       |             |
+| `userId`           | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointstransactionres"></a>`LoyaltyPointsTransactionRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `balanceAfter` | integer | No |  |
-| `brandCustomerId` | string | No |  |
-| `brandId` | string | No |  |
-| `currentTier` | [LoyaltyTierBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres) | No |  |
-| `customerStatus` | [BrandCustomerStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerstatusbrandcustomerstatus) | No |  |
-| `pointsDelta` | integer | No |  |
-| `totalSpend` | number | No |  |
-| `transactionId` | string | No |  |
-| `userId` | string | No |  |
+| Property          | Type                                                                                                               | Required | Description |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `balanceAfter`    | integer                                                                                                            | No       |             |
+| `brandCustomerId` | string                                                                                                             | No       |             |
+| `brandId`         | string                                                                                                             | No       |             |
+| `currentTier`     | [LoyaltyTierBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres)                     | No       |             |
+| `customerStatus`  | [BrandCustomerStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerstatusbrandcustomerstatus) | No       |             |
+| `pointsDelta`     | integer                                                                                                            | No       |             |
+| `totalSpend`      | number                                                                                                             | No       |             |
+| `transactionId`   | string                                                                                                             | No       |             |
+| `userId`          | string                                                                                                             | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltyprogramres"></a>`LoyaltyProgramRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `amountPerPoint` | number | No |  |
-| `brandId` | string | No |  |
-| `createdAt` | string | No |  |
-| `id` | string | No |  |
-| `isActive` | boolean | No |  |
-| `name` | string | No |  |
-| `pointExpiryDays` | integer | No |  |
-| `roundingMode` | string | No |  |
-| `updatedAt` | string | No |  |
+| Property          | Type    | Required | Description |
+| ----------------- | ------- | -------- | ----------- |
+| `amountPerPoint`  | number  | No       |             |
+| `brandId`         | string  | No       |             |
+| `createdAt`       | string  | No       |             |
+| `id`              | string  | No       |             |
+| `isActive`        | boolean | No       |             |
+| `name`            | string  | No       |             |
+| `pointExpiryDays` | integer | No       |             |
+| `roundingMode`    | string  | No       |             |
+| `updatedAt`       | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierbriefres"></a>`LoyaltyTierBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `id` | string | No |  |
-| `name` | string | No |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `id`     | string | No       |             |
+| `name`   | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierdetailres"></a>`LoyaltyTierDetailRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `benefits` | Array<[BrandBenefitRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres)> | No |  |
-| `brandId` | string | No |  |
-| `createdAt` | string | No |  |
-| `description` | string | No |  |
-| `id` | string | No |  |
-| `minTotalSpend` | number | No |  |
-| `name` | string | No |  |
-| `rank` | integer | No |  |
-| `updatedAt` | string | No |  |
+| Property        | Type                                                                                          | Required | Description |
+| --------------- | --------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `benefits`      | Array<[BrandBenefitRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbenefitres)> | No       |             |
+| `brandId`       | string                                                                                        | No       |             |
+| `createdAt`     | string                                                                                        | No       |             |
+| `description`   | string                                                                                        | No       |             |
+| `id`            | string                                                                                        | No       |             |
+| `minTotalSpend` | number                                                                                        | No       |             |
+| `name`          | string                                                                                        | No       |             |
+| `rank`          | integer                                                                                       | No       |             |
+| `updatedAt`     | string                                                                                        | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytierres"></a>`LoyaltyTierRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `createdAt` | string | No |  |
-| `description` | string | No |  |
-| `id` | string | No |  |
-| `minTotalSpend` | number | No |  |
-| `name` | string | No |  |
-| `rank` | integer | No |  |
-| `updatedAt` | string | No |  |
+| Property        | Type    | Required | Description |
+| --------------- | ------- | -------- | ----------- |
+| `brandId`       | string  | No       |             |
+| `createdAt`     | string  | No       |             |
+| `description`   | string  | No       |             |
+| `id`            | string  | No       |             |
+| `minTotalSpend` | number  | No       |             |
+| `name`          | string  | No       |             |
+| `rank`          | integer | No       |             |
+| `updatedAt`     | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltytransactionlistres"></a>`LoyaltyTransactionListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[LoyaltyPointTransactionDetailRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointtransactiondetailres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                                            | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[LoyaltyPointTransactionDetailRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtoloyaltypointtransactiondetailres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                                          | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoportalbrandres"></a>`PortalBrandRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `approvedAt` | string | No |  |
-| `approvedByUserId` | string | No |  |
-| `backgroundUrl` | string | No |  |
-| `createdAt` | string | No |  |
-| `createdByUserId` | string | No |  |
-| `description` | string | No |  |
-| `id` | string | No |  |
-| `logoUrl` | string | No |  |
-| `memberId` | string | No |  |
-| `memberRole` | [BrandMemberRole](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberrolebrandmemberrole) | No |  |
-| `memberStatus` | [BrandMemberStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberstatusbrandmemberstatus) | No |  |
-| `name` | string | No |  |
-| `slug` | string | No |  |
-| `status` | [BrandStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandstatusbrandstatus) | No |  |
-| `totalCustomer` | integer | No |  |
-| `updatedAt` | string | No |  |
+| Property           | Type                                                                                                         | Required | Description |
+| ------------------ | ------------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `approvedAt`       | string                                                                                                       | No       |             |
+| `approvedByUserId` | string                                                                                                       | No       |             |
+| `backgroundUrl`    | string                                                                                                       | No       |             |
+| `createdAt`        | string                                                                                                       | No       |             |
+| `createdByUserId`  | string                                                                                                       | No       |             |
+| `description`      | string                                                                                                       | No       |             |
+| `id`               | string                                                                                                       | No       |             |
+| `logoUrl`          | string                                                                                                       | No       |             |
+| `memberId`         | string                                                                                                       | No       |             |
+| `memberRole`       | [BrandMemberRole](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberrolebrandmemberrole)       | No       |             |
+| `memberStatus`     | [BrandMemberStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberstatusbrandmemberstatus) | No       |             |
+| `name`             | string                                                                                                       | No       |             |
+| `slug`             | string                                                                                                       | No       |             |
+| `status`           | [BrandStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandstatusbrandstatus)                   | No       |             |
+| `totalCustomer`    | integer                                                                                                      | No       |             |
+| `updatedAt`        | string                                                                                                       | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtopublicbrandbrieflistres"></a>`PublicBrandBriefListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                      | Required | Description |
+| ---------- | ----------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[BrandBriefRes](#smart-wardrobe-beinternalmodulesbrandapplicationdtobrandbriefres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)    | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtorevokeclaimtokenreq"></a>`RevokeClaimTokenReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `reason` | string | No |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `reason` | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtosendbrandchatmessagereq"></a>`SendBrandChatMessageReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `message` | string | Yes |  |
+| Property  | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `message` | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtosubmitsamplefeedbackreq"></a>`SubmitSampleFeedbackReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `feedbackText` | string | No |  |
-| `outfitId` | string | No |  |
-| `rating` | integer | No |  |
-| `voteType` | string | No |  |
+| Property       | Type    | Required | Description |
+| -------------- | ------- | -------- | ----------- |
+| `feedbackText` | string  | No       |             |
+| `outfitId`     | string  | No       |             |
+| `rating`       | integer | No       |             |
+| `voteType`     | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtotransferbrandownershipreq"></a>`TransferBrandOwnershipReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `newOwnerUserId` | string | Yes |  |
-| `oldOwnerHandling` | string | Yes |  |
+| Property           | Type   | Required | Description |
+| ------------------ | ------ | -------- | ----------- |
+| `newOwnerUserId`   | string | Yes      |             |
+| `oldOwnerHandling` | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebenefitstatusreq"></a>`UpdateBenefitStatusReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `status` | string | Yes |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `status` | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebrandimagesreq"></a>`UpdateBrandImagesReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `backgroundPublicId` | string | No |  |
-| `backgroundUrl` | string | No |  |
-| `logoPublicId` | string | No |  |
-| `logoUrl` | string | No |  |
+| Property             | Type   | Required | Description |
+| -------------------- | ------ | -------- | ----------- |
+| `backgroundPublicId` | string | No       |             |
+| `backgroundUrl`      | string | No       |             |
+| `logoPublicId`       | string | No       |             |
+| `logoUrl`            | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebranditemreq"></a>`UpdateBrandItemReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `description` | string | No |  |
-| `name` | string | Yes |  |
-| `price` | number | No |  |
-| `productCode` | string | No |  |
-| `status` | string | Yes |  |
+| Property      | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `description` | string | No       |             |
+| `name`        | string | Yes      |             |
+| `price`       | number | No       |             |
+| `productCode` | string | No       |             |
+| `status`      | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebranditemstatusreq"></a>`UpdateBrandItemStatusReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `status` | [BrandItemStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemstatusbranditemstatus) | Yes |  |
+| Property | Type                                                                                                            | Required | Description |
+| -------- | --------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `status` | [BrandItemStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemstatusbranditemstatus) | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdatebrandstatusreq"></a>`UpdateBrandStatusReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `status` | [BrandStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandstatusbrandstatus) | Yes |  |
+| Property | Type                                                                                       | Required | Description |
+| -------- | ------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `status` | [BrandStatus](#smart-wardrobe-beinternalmodulesbranddomainconstantsbrandstatusbrandstatus) | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupdateloyaltytierreq"></a>`UpdateLoyaltyTierReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `description` | string | No |  |
-| `minTotalSpend` | number | No |  |
-| `name` | string | No |  |
-| `rank` | integer | No |  |
+| Property        | Type    | Required | Description |
+| --------------- | ------- | -------- | ----------- |
+| `description`   | string  | No       |             |
+| `minTotalSpend` | number  | No       |             |
+| `name`          | string  | No       |             |
+| `rank`          | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtouploadsignatureresult"></a>`UploadSignatureResult`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `apiKey` | string | No |  |
-| `folder` | string | No |  |
-| `publicId` | string | No |  |
-| `signature` | string | No |  |
-| `timestamp` | integer | No |  |
+| Property    | Type    | Required | Description |
+| ----------- | ------- | -------- | ----------- |
+| `apiKey`    | string  | No       |             |
+| `folder`    | string  | No       |             |
+| `publicId`  | string  | No       |             |
+| `signature` | string  | No       |             |
+| `timestamp` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbrandapplicationdtoupsertloyaltyprogramreq"></a>`UpsertLoyaltyProgramReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `amountPerPoint` | number | Yes |  |
-| `isActive` | boolean | No |  |
-| `name` | string | Yes |  |
-| `pointExpiryDays` | integer | No |  |
-| `roundingMode` | object | Yes |  |
+| Property          | Type    | Required | Description |
+| ----------------- | ------- | -------- | ----------- |
+| `amountPerPoint`  | number  | Yes      |             |
+| `isActive`        | boolean | No       |             |
+| `name`            | string  | Yes      |             |
+| `pointExpiryDays` | integer | No       |             |
+| `roundingMode`    | object  | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerjoinedsourcebrandcustomerjoinedsource"></a>`BrandCustomerJoinedSource`
 
-*Enum values:*
+_Enum values:_
 
 - `self_join` (**SelfJoin**)
 - `offline_purchase` (**OfflinePurchase**)
@@ -6017,7 +6024,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesbranddomainconstantsbrandcustomerstatusbrandcustomerstatus"></a>`BrandCustomerStatus`
 
-*Enum values:*
+_Enum values:_
 
 - `active` (**Active**)
 - `blocked` (**Blocked**)
@@ -6025,7 +6032,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemstatusbranditemstatus"></a>`BrandItemStatus`
 
-*Enum values:*
+_Enum values:_
 
 - `draft` (**Draft**)
 - `active` (**Active**)
@@ -6033,21 +6040,21 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesbranddomainconstantsbranditembranditemtypebranditemtype"></a>`BrandItemType`
 
-*Enum values:*
+_Enum values:_
 
 - `product` (**Product**)
 - `sample` (**Sample**)
 
 ### <a id="smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberrolebrandmemberrole"></a>`BrandMemberRole`
 
-*Enum values:*
+_Enum values:_
 
 - `owner` (**Owner**)
 - `staff` (**Staff**)
 
 ### <a id="smart-wardrobe-beinternalmodulesbranddomainconstantsbrandmemberstatusbrandmemberstatus"></a>`BrandMemberStatus`
 
-*Enum values:*
+_Enum values:_
 
 - `active` (**Active**)
 - `invited` (**Invited**)
@@ -6055,7 +6062,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesbranddomainconstantsbrandstatusbrandstatus"></a>`BrandStatus`
 
-*Enum values:*
+_Enum values:_
 
 - `pending_review` (**PendingReview**)
 - `active` (**Active**)
@@ -6064,7 +6071,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesbranddomainconstantsloyaltyroundingmodeloyaltyroundingmode"></a>`LoyaltyRoundingMode`
 
-*Enum values:*
+_Enum values:_
 
 - `floor` (**Floor**)
 - `round` (**Round**)
@@ -6072,7 +6079,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesbranddomainconstantsloyaltytransactiontypeloyaltytransactiontype"></a>`LoyaltyTransactionType`
 
-*Enum values:*
+_Enum values:_
 
 - `earn` (**Earn**)
 - `redeem` (**Redeem**)
@@ -6082,399 +6089,399 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaierrorbreakdowndto"></a>`AIErrorBreakdownDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `errorCode` | string | No |  |
-| `errorCount` | integer | No |  |
-| `model` | string | No |  |
-| `provider` | string | No |  |
+| Property     | Type    | Required | Description |
+| ------------ | ------- | -------- | ----------- |
+| `errorCode`  | string  | No       |             |
+| `errorCount` | integer | No       |             |
+| `model`      | string  | No       |             |
+| `provider`   | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaierrorbreakdownres"></a>`AIErrorBreakdownRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `breakdown` | Array<[AIErrorBreakdownDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaierrorbreakdowndto)> | No |  |
-| `errorRate` | number | No |  |
-| `totalErrors` | integer | No |  |
-| `totalRequests` | integer | No |  |
+| Property        | Type                                                                                                      | Required | Description |
+| --------------- | --------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `breakdown`     | Array<[AIErrorBreakdownDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaierrorbreakdowndto)> | No       |             |
+| `errorRate`     | number                                                                                                    | No       |             |
+| `totalErrors`   | integer                                                                                                   | No       |             |
+| `totalRequests` | integer                                                                                                   | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaimarginanalyticsres"></a>`AIMarginAnalyticsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiErrorCount` | integer | No |  |
-| `aiRequestsCount` | integer | No |  |
-| `fromDate` | string | No |  |
-| `marginPercentage` | number | No |  |
-| `netAiMarginVnd` | number | No |  |
-| `toDate` | string | No |  |
-| `totalAiActualCostVnd` | number | No |  |
-| `totalAiPaidTokens` | integer | No |  |
-| `totalSubscriptionRevVnd` | number | No |  |
+| Property                  | Type    | Required | Description |
+| ------------------------- | ------- | -------- | ----------- |
+| `aiErrorCount`            | integer | No       |             |
+| `aiRequestsCount`         | integer | No       |             |
+| `fromDate`                | string  | No       |             |
+| `marginPercentage`        | number  | No       |             |
+| `netAiMarginVnd`          | number  | No       |             |
+| `toDate`                  | string  | No       |             |
+| `totalAiActualCostVnd`    | number  | No       |             |
+| `totalAiPaidTokens`       | integer | No       |             |
+| `totalSubscriptionRevVnd` | number  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaiusagebyoperationdto"></a>`AIUsageByOperationDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `logicalRoute` | string | No |  |
-| `operation` | string | No |  |
-| `requestCount` | integer | No |  |
-| `totalCostVnd` | number | No |  |
-| `totalOutputTokens` | integer | No |  |
-| `totalPromptTokens` | integer | No |  |
+| Property            | Type    | Required | Description |
+| ------------------- | ------- | -------- | ----------- |
+| `logicalRoute`      | string  | No       |             |
+| `operation`         | string  | No       |             |
+| `requestCount`      | integer | No       |             |
+| `totalCostVnd`      | number  | No       |             |
+| `totalOutputTokens` | integer | No       |             |
+| `totalPromptTokens` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoaiusagebyoperationres"></a>`AIUsageByOperationRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `fromDate` | string | No |  |
-| `operations` | Array<[AIUsageByOperationDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaiusagebyoperationdto)> | No |  |
-| `toDate` | string | No |  |
+| Property     | Type                                                                                                          | Required | Description |
+| ------------ | ------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `fromDate`   | string                                                                                                        | No       |             |
+| `operations` | Array<[AIUsageByOperationDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaiusagebyoperationdto)> | No       |             |
+| `toDate`     | string                                                                                                        | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminkpicardsres"></a>`AdminKPICardsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `activeUsersDau` | integer | No |  |
-| `netAiMarginVnd` | number | No |  |
-| `payOSSuccessCount` | integer | No |  |
-| `pendingReviewBrands` | integer | No |  |
-| `subscriptionRevenueVnd` | number | No |  |
-| `totalBrands` | integer | No |  |
-| `totalUsers` | integer | No |  |
-| `updatedAt` | string | No |  |
+| Property                 | Type    | Required | Description |
+| ------------------------ | ------- | -------- | ----------- |
+| `activeUsersDau`         | integer | No       |             |
+| `netAiMarginVnd`         | number  | No       |             |
+| `payOSSuccessCount`      | integer | No       |             |
+| `pendingReviewBrands`    | integer | No       |             |
+| `subscriptionRevenueVnd` | number  | No       |             |
+| `totalBrands`            | integer | No       |             |
+| `totalUsers`             | integer | No       |             |
+| `updatedAt`              | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminoverviewres"></a>`AdminOverviewRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiMargin` | [AIMarginAnalyticsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaimarginanalyticsres) | No |  |
-| `kpiCards` | [AdminKPICardsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminkpicardsres) | No |  |
-| `payosReconcile` | [PayOSReconciliationRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopayosreconciliationres) | No |  |
+| Property         | Type                                                                                                     | Required | Description |
+| ---------------- | -------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `aiMargin`       | [AIMarginAnalyticsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoaimarginanalyticsres)     | No       |             |
+| `kpiCards`       | [AdminKPICardsRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoadminkpicardsres)             | No       |             |
+| `payosReconcile` | [PayOSReconciliationRes](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopayosreconciliationres) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtobenefitredemptionanalyticsres"></a>`BenefitRedemptionAnalyticsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `topBenefits` | Array<[BenefitRedemptionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtobenefitredemptiondto)> | No |  |
-| `totalRedemptions` | integer | No |  |
-| `trend` | Array<[RedemptionTrendDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoredemptiontrenddto)> | No |  |
+| Property           | Type                                                                                                        | Required | Description |
+| ------------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandId`          | string                                                                                                      | No       |             |
+| `topBenefits`      | Array<[BenefitRedemptionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtobenefitredemptiondto)> | No       |             |
+| `totalRedemptions` | integer                                                                                                     | No       |             |
+| `trend`            | Array<[RedemptionTrendDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtoredemptiontrenddto)>     | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtobenefitredemptiondto"></a>`BenefitRedemptionDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `benefitId` | string | No |  |
-| `benefitName` | string | No |  |
-| `benefitType` | string | No |  |
-| `percentage` | number | No |  |
-| `redemptionCount` | integer | No |  |
+| Property          | Type    | Required | Description |
+| ----------------- | ------- | -------- | ----------- |
+| `benefitId`       | string  | No       |             |
+| `benefitName`     | string  | No       |             |
+| `benefitType`     | string  | No       |             |
+| `percentage`      | number  | No       |             |
+| `redemptionCount` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtobrandkpicardsres"></a>`BrandKPICardsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `activeVouchers` | integer | No |  |
-| `digitalSampleAvgRating` | number | No |  |
-| `digitalSampleVotesCount` | integer | No |  |
-| `openCsTickets` | integer | No |  |
-| `pointsIssued` | integer | No |  |
-| `pointsRedeemed` | integer | No |  |
-| `totalMembers` | integer | No |  |
-| `vouchersRedeemed` | integer | No |  |
+| Property                  | Type    | Required | Description |
+| ------------------------- | ------- | -------- | ----------- |
+| `activeVouchers`          | integer | No       |             |
+| `digitalSampleAvgRating`  | number  | No       |             |
+| `digitalSampleVotesCount` | integer | No       |             |
+| `openCsTickets`           | integer | No       |             |
+| `pointsIssued`            | integer | No       |             |
+| `pointsRedeemed`          | integer | No       |             |
+| `totalMembers`            | integer | No       |             |
+| `vouchersRedeemed`        | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtobrandpointsliabilityres"></a>`BrandPointsLiabilityRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `pointsExpiring30d` | integer | No |  |
-| `pointsLiabilityValueVnd` | number | No |  |
+| Property                  | Type    | Required | Description |
+| ------------------------- | ------- | -------- | ----------- |
+| `brandId`                 | string  | No       |             |
+| `pointsExpiring30d`       | integer | No       |             |
+| `pointsLiabilityValueVnd` | number  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatgroupdto"></a>`CatalogStatGroupDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `count` | integer | No |  |
-| `label` | string | No |  |
-| `percentage` | number | No |  |
+| Property     | Type    | Required | Description |
+| ------------ | ------- | -------- | ----------- |
+| `count`      | integer | No       |             |
+| `label`      | string  | No       |             |
+| `percentage` | number  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatsres"></a>`CatalogStatsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `byStatus` | Array<[CatalogStatGroupDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatgroupdto)> | No |  |
-| `byType` | Array<[CatalogStatGroupDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatgroupdto)> | No |  |
-| `totalItems` | integer | No |  |
+| Property     | Type                                                                                                      | Required | Description |
+| ------------ | --------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandId`    | string                                                                                                    | No       |             |
+| `byStatus`   | Array<[CatalogStatGroupDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatgroupdto)> | No       |             |
+| `byType`     | Array<[CatalogStatGroupDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocatalogstatgroupdto)> | No       |             |
+| `totalItems` | integer                                                                                                   | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocategorydistributiondto"></a>`CategoryDistributionDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `categoryId` | string | No |  |
-| `categoryName` | string | No |  |
-| `itemCount` | integer | No |  |
-| `percentage` | number | No |  |
+| Property       | Type    | Required | Description |
+| -------------- | ------- | -------- | ----------- |
+| `categoryId`   | string  | No       |             |
+| `categoryName` | string  | No       |             |
+| `itemCount`    | integer | No       |             |
+| `percentage`   | number  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocomparisondto"></a>`ComparisonDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `metricDeltaPercentages` | object | No |  |
-| `previousPeriodFrom` | string | No |  |
-| `previousPeriodTo` | string | No |  |
+| Property                 | Type   | Required | Description |
+| ------------------------ | ------ | -------- | ----------- |
+| `metricDeltaPercentages` | object | No       |             |
+| `previousPeriodFrom`     | string | No       |             |
+| `previousPeriodTo`       | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocustomeracquisitiondto"></a>`CustomerAcquisitionDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `customerCount` | integer | No |  |
-| `percentage` | number | No |  |
-| `source` | string | No |  |
+| Property        | Type    | Required | Description |
+| --------------- | ------- | -------- | ----------- |
+| `customerCount` | integer | No       |             |
+| `percentage`    | number  | No       |             |
+| `source`        | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtocustomeracquisitionres"></a>`CustomerAcquisitionRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `sources` | Array<[CustomerAcquisitionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocustomeracquisitiondto)> | No |  |
-| `totalCustomers` | integer | No |  |
+| Property         | Type                                                                                                            | Required | Description |
+| ---------------- | --------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandId`        | string                                                                                                          | No       |             |
+| `sources`        | Array<[CustomerAcquisitionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocustomeracquisitiondto)> | No       |             |
+| `totalCustomers` | integer                                                                                                         | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodigitalsamplelabanalyticsres"></a>`DigitalSampleLabAnalyticsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `avgRating` | number | No |  |
-| `brandItemId` | string | No |  |
-| `brandItemImageUrl` | string | No |  |
-| `brandItemName` | string | No |  |
-| `feedbackSentiment` | [FeedbackSentiment](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsfeedbacksentimentfeedbacksentiment) | No |  |
-| `itemId` | string | No |  |
-| `topPairedCategories` | Array<[PairedCategoryStat](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopairedcategorystat)> | No |  |
-| `votesCount` | integer | No |  |
+| Property              | Type                                                                                                             | Required | Description |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `avgRating`           | number                                                                                                           | No       |             |
+| `brandItemId`         | string                                                                                                           | No       |             |
+| `brandItemImageUrl`   | string                                                                                                           | No       |             |
+| `brandItemName`       | string                                                                                                           | No       |             |
+| `feedbackSentiment`   | [FeedbackSentiment](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsfeedbacksentimentfeedbacksentiment) | No       |             |
+| `itemId`              | string                                                                                                           | No       |             |
+| `topPairedCategories` | Array<[PairedCategoryStat](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopairedcategorystat)>          | No       |             |
+| `votesCount`          | integer                                                                                                          | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownaieventdto"></a>`DrillDownAIEventDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `createdAt` | string | No |  |
-| `errorMessage` | string | No |  |
-| `model` | string | No |  |
-| `provider` | string | No |  |
-| `requestId` | string | No |  |
-| `statusCode` | integer | No |  |
+| Property       | Type    | Required | Description |
+| -------------- | ------- | -------- | ----------- |
+| `createdAt`    | string  | No       |             |
+| `errorMessage` | string  | No       |             |
+| `model`        | string  | No       |             |
+| `provider`     | string  | No       |             |
+| `requestId`    | string  | No       |             |
+| `statusCode`   | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownaieventlistres"></a>`DrillDownAIEventListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[DrillDownAIEventDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownaieventdto)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                      | Required | Description |
+| ---------- | --------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[DrillDownAIEventDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownaieventdto)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                    | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownsamplefeedbackdto"></a>`DrillDownSampleFeedbackDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandItemImageUrl` | string | No |  |
-| `brandItemName` | string | No |  |
-| `comment` | string | No |  |
-| `createdAt` | string | No |  |
-| `feedbackId` | string | No |  |
-| `itemId` | string | No |  |
-| `rating` | number | No |  |
-| `user` | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres) | No |  |
-| `userId` | string | No |  |
+| Property            | Type                                                                                | Required | Description |
+| ------------------- | ----------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandItemImageUrl` | string                                                                              | No       |             |
+| `brandItemName`     | string                                                                              | No       |             |
+| `comment`           | string                                                                              | No       |             |
+| `createdAt`         | string                                                                              | No       |             |
+| `feedbackId`        | string                                                                              | No       |             |
+| `itemId`            | string                                                                              | No       |             |
+| `rating`            | number                                                                              | No       |             |
+| `user`              | [UserBriefRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres) | No       |             |
+| `userId`            | string                                                                              | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownsamplefeedbacklistres"></a>`DrillDownSampleFeedbackListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[DrillDownSampleFeedbackDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownsamplefeedbackdto)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                                    | Required | Description |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[DrillDownSampleFeedbackDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodrilldownsamplefeedbackdto)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                                  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicqueryreq"></a>`DynamicQueryReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `compareWithPrevious` | boolean | No |  |
-| `granularity` | object | No | "day" | "week" | "month" | "year" |
-| `metrics` | Array<[MetricKey](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsmetrickeymetrickey)> | No |  |
-| `targetDashboard` | object | No | "admin" | "brand" | "user" |
-| `timeframe` | [DynamicQueryTimeframeDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicquerytimeframedto) | No |  |
+| Property              | Type                                                                                                         | Required | Description |
+| --------------------- | ------------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `brandId`             | string                                                                                                       | No       |             |
+| `compareWithPrevious` | boolean                                                                                                      | No       |             |
+| `granularity`         | object                                                                                                       | No       | "day"       | "week"  | "month" | "year" |
+| `metrics`             | Array<[MetricKey](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsmetrickeymetrickey)>              | No       |             |
+| `targetDashboard`     | object                                                                                                       | No       | "admin"     | "brand" | "user"  |
+| `timeframe`           | [DynamicQueryTimeframeDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicquerytimeframedto) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicqueryres"></a>`DynamicQueryRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `comparison` | [ComparisonDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocomparisondto) | No |  |
-| `granularity` | [Granularity](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsgranularitygranularity) | No |  |
-| `series` | Array<[TimeSeriesPointDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtotimeseriespointdto)> | No |  |
-| `targetDashboard` | [TargetDashboard](#smart-wardrobe-beinternalmodulesdashboarddomainconstantstargetdashboardtargetdashboard) | No |  |
+| Property          | Type                                                                                                       | Required | Description |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `comparison`      | [ComparisonDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocomparisondto)                     | No       |             |
+| `granularity`     | [Granularity](#smart-wardrobe-beinternalmodulesdashboarddomainconstantsgranularitygranularity)             | No       |             |
+| `series`          | Array<[TimeSeriesPointDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtotimeseriespointdto)>    | No       |             |
+| `targetDashboard` | [TargetDashboard](#smart-wardrobe-beinternalmodulesdashboarddomainconstantstargetdashboardtargetdashboard) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtodynamicquerytimeframedto"></a>`DynamicQueryTimeframeDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `fromDate` | string | No |  |
-| `toDate` | string | No |  |
+| Property   | Type   | Required | Description |
+| ---------- | ------ | -------- | ----------- |
+| `fromDate` | string | No       |             |
+| `toDate`   | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtopairedcategorystat"></a>`PairedCategoryStat`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `categoryName` | string | No |  |
-| `pairCount` | integer | No |  |
+| Property       | Type    | Required | Description |
+| -------------- | ------- | -------- | ----------- |
+| `categoryName` | string  | No       |             |
+| `pairCount`    | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtopayosreconciliationres"></a>`PayOSReconciliationRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `failedCount` | integer | No |  |
-| `successCount` | integer | No |  |
-| `totalSuccessValue` | number | No |  |
-| `totalTransactions` | integer | No |  |
+| Property            | Type    | Required | Description |
+| ------------------- | ------- | -------- | ----------- |
+| `failedCount`       | integer | No       |             |
+| `successCount`      | integer | No       |             |
+| `totalSuccessValue` | number  | No       |             |
+| `totalTransactions` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtopointexpiryforecastdto"></a>`PointExpiryForecastDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `month` | string | No |  |
-| `pointsExpiring` | integer | No |  |
+| Property         | Type    | Required | Description |
+| ---------------- | ------- | -------- | ----------- |
+| `month`          | string  | No       |             |
+| `pointsExpiring` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtopointexpiryforecastres"></a>`PointExpiryForecastRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `forecast` | Array<[PointExpiryForecastDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopointexpiryforecastdto)> | No |  |
+| Property   | Type                                                                                                            | Required | Description |
+| ---------- | --------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandId`  | string                                                                                                          | No       |             |
+| `forecast` | Array<[PointExpiryForecastDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtopointexpiryforecastdto)> | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtoredemptiontrenddto"></a>`RedemptionTrendDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `month` | string | No |  |
-| `redemptionCount` | integer | No |  |
+| Property          | Type    | Required | Description |
+| ----------------- | ------- | -------- | ----------- |
+| `month`           | string  | No       |             |
+| `redemptionCount` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtorenewalstatsres"></a>`RenewalStatsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `avgRetryCount` | number | No |  |
-| `failedCount` | integer | No |  |
-| `successCount` | integer | No |  |
-| `successRate` | number | No |  |
-| `totalAttempts` | integer | No |  |
+| Property        | Type    | Required | Description |
+| --------------- | ------- | -------- | ----------- |
+| `avgRetryCount` | number  | No       |             |
+| `failedCount`   | integer | No       |             |
+| `successCount`  | integer | No       |             |
+| `successRate`   | number  | No       |             |
+| `totalAttempts` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtorevenuebreakdowndto"></a>`RevenueBreakdownDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `month` | string | No |  |
-| `planCode` | string | No |  |
-| `revenueVnd` | number | No |  |
-| `transactionCount` | integer | No |  |
+| Property           | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `month`            | string  | No       |             |
+| `planCode`         | string  | No       |             |
+| `revenueVnd`       | number  | No       |             |
+| `transactionCount` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtorevenuebreakdownres"></a>`RevenueBreakdownRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `breakdown` | Array<[RevenueBreakdownDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtorevenuebreakdowndto)> | No |  |
-| `fromDate` | string | No |  |
-| `toDate` | string | No |  |
-| `totalRevenueVnd` | number | No |  |
+| Property          | Type                                                                                                      | Required | Description |
+| ----------------- | --------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `breakdown`       | Array<[RevenueBreakdownDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtorevenuebreakdowndto)> | No       |             |
+| `fromDate`        | string                                                                                                    | No       |             |
+| `toDate`          | string                                                                                                    | No       |             |
+| `totalRevenueVnd` | number                                                                                                    | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtospendsegmentdto"></a>`SpendSegmentDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `customerCount` | integer | No |  |
-| `maxVnd` | number | No |  |
-| `minVnd` | number | No |  |
-| `percentage` | number | No |  |
-| `segment` | string | No |  |
+| Property        | Type    | Required | Description |
+| --------------- | ------- | -------- | ----------- |
+| `customerCount` | integer | No       |             |
+| `maxVnd`        | number  | No       |             |
+| `minVnd`        | number  | No       |             |
+| `percentage`    | number  | No       |             |
+| `segment`       | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtospendsegmentationres"></a>`SpendSegmentationRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `segments` | Array<[SpendSegmentDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtospendsegmentdto)> | No |  |
-| `totalCustomers` | integer | No |  |
+| Property         | Type                                                                                              | Required | Description |
+| ---------------- | ------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandId`        | string                                                                                            | No       |             |
+| `segments`       | Array<[SpendSegmentDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtospendsegmentdto)> | No       |             |
+| `totalCustomers` | integer                                                                                           | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtosubscriptiondistributiondto"></a>`SubscriptionDistributionDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `percentage` | number | No |  |
-| `planCode` | string | No |  |
-| `userCount` | integer | No |  |
+| Property     | Type    | Required | Description |
+| ------------ | ------- | -------- | ----------- |
+| `percentage` | number  | No       |             |
+| `planCode`   | string  | No       |             |
+| `userCount`  | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtosubscriptiondistributionres"></a>`SubscriptionDistributionRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `distribution` | Array<[SubscriptionDistributionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtosubscriptiondistributiondto)> | No |  |
-| `totalUsers` | integer | No |  |
+| Property       | Type                                                                                                                      | Required | Description |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `distribution` | Array<[SubscriptionDistributionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtosubscriptiondistributiondto)> | No       |             |
+| `totalUsers`   | integer                                                                                                                   | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtotierdistributiondto"></a>`TierDistributionDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `memberCount` | integer | No |  |
-| `percentage` | number | No |  |
-| `tierId` | string | No |  |
-| `tierName` | string | No |  |
-| `tierRank` | integer | No |  |
+| Property      | Type    | Required | Description |
+| ------------- | ------- | -------- | ----------- |
+| `memberCount` | integer | No       |             |
+| `percentage`  | number  | No       |             |
+| `tierId`      | string  | No       |             |
+| `tierName`    | string  | No       |             |
+| `tierRank`    | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtotierdistributionres"></a>`TierDistributionRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `tiers` | Array<[TierDistributionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtotierdistributiondto)> | No |  |
-| `totalMembers` | integer | No |  |
+| Property       | Type                                                                                                      | Required | Description |
+| -------------- | --------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandId`      | string                                                                                                    | No       |             |
+| `tiers`        | Array<[TierDistributionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtotierdistributiondto)> | No       |             |
+| `totalMembers` | integer                                                                                                   | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtotimeseriespointdto"></a>`TimeSeriesPointDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `metrics` | object | No |  |
-| `timestamp` | string | No |  |
+| Property    | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `metrics`   | object | No       |             |
+| `timestamp` | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtounderutilizeditemdto"></a>`UnderutilizedItemDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `categoryName` | string | No |  |
-| `imageUrl` | string | No |  |
-| `itemId` | string | No |  |
-| `lastWornDaysAgo` | integer | No |  |
-| `name` | string | No |  |
-| `purchasePriceVnd` | number | No |  |
+| Property           | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `categoryName`     | string  | No       |             |
+| `imageUrl`         | string  | No       |             |
+| `itemId`           | string  | No       |             |
+| `lastWornDaysAgo`  | integer | No       |             |
+| `name`             | string  | No       |             |
+| `purchasePriceVnd` | number  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtouserwardrobeinsightsres"></a>`UserWardrobeInsightsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `expiringVouchersCount` | integer | No |  |
-| `totalItems` | integer | No |  |
-| `totalWardrobeValueVnd` | number | No |  |
-| `underutilizedItems` | Array<[UnderutilizedItemDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtounderutilizeditemdto)> | No |  |
-| `underutilizedItemsCount` | integer | No |  |
+| Property                  | Type                                                                                                        | Required | Description |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `expiringVouchersCount`   | integer                                                                                                     | No       |             |
+| `totalItems`              | integer                                                                                                     | No       |             |
+| `totalWardrobeValueVnd`   | number                                                                                                      | No       |             |
+| `underutilizedItems`      | Array<[UnderutilizedItemDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtounderutilizeditemdto)> | No       |             |
+| `underutilizedItemsCount` | integer                                                                                                     | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboardapplicationdtowardrobecategorydistributionres"></a>`WardrobeCategoryDistributionRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `categories` | Array<[CategoryDistributionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocategorydistributiondto)> | No |  |
-| `totalItems` | integer | No |  |
+| Property     | Type                                                                                                              | Required | Description |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `categories` | Array<[CategoryDistributionDTO](#smart-wardrobe-beinternalmodulesdashboardapplicationdtocategorydistributiondto)> | No       |             |
+| `totalItems` | integer                                                                                                           | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantsfeedbacksentimentfeedbacksentiment"></a>`FeedbackSentiment`
 
-*Enum values:*
+_Enum values:_
 
 - `positive` (**Positive**)
 - `neutral` (**Neutral**)
@@ -6482,7 +6489,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantsgranularitygranularity"></a>`Granularity`
 
-*Enum values:*
+_Enum values:_
 
 - `day` (**Day**)
 - `week` (**Week**)
@@ -6491,7 +6498,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantsmetrickeymetrickey"></a>`MetricKey`
 
-*Enum values:*
+_Enum values:_
 
 - `total_users` (**TotalUsers**)
 - `active_users_dau` (**ActiveUsersDau**)
@@ -6523,7 +6530,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesdashboarddomainconstantstargetdashboardtargetdashboard"></a>`TargetDashboard`
 
-*Enum values:*
+_Enum values:_
 
 - `admin` (**Admin**)
 - `brand` (**Brand**)
@@ -6531,633 +6538,633 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtocategoryapires"></a>`CategoryAPIRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `id` | string | No |  |
-| `name` | string | No |  |
-| `slug` | string | No |  |
-| `sortOrder` | integer | No |  |
+| Property    | Type    | Required | Description |
+| ----------- | ------- | -------- | ----------- |
+| `id`        | string  | No       |             |
+| `name`      | string  | No       |             |
+| `slug`      | string  | No       |             |
+| `sortOrder` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtocategorybriefres"></a>`CategoryBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `id` | string | No |  |
-| `name` | string | No |  |
-| `slug` | string | No |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `id`     | string | No       |             |
+| `name`   | string | No       |             |
+| `slug`   | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtochatmessageres"></a>`ChatMessageRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `content` | string | No |  |
-| `createdAt` | string | No |  |
-| `id` | string | No |  |
-| `sender` | [MessageSender](#smart-wardrobe-beinternalmodulesfashiondomainconstantsmessagesendermessagesender) | No |  |
+| Property    | Type                                                                                               | Required | Description |
+| ----------- | -------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `content`   | string                                                                                             | No       |             |
+| `createdAt` | string                                                                                             | No       |             |
+| `id`        | string                                                                                             | No       |             |
+| `sender`    | [MessageSender](#smart-wardrobe-beinternalmodulesfashiondomainconstantsmessagesendermessagesender) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtochatsessionres"></a>`ChatSessionRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `contextSummary` | string | No |  |
-| `createdAt` | string | No |  |
-| `id` | string | No |  |
-| `isArchived` | boolean | No |  |
-| `title` | string | No |  |
-| `updatedAt` | string | No |  |
+| Property         | Type    | Required | Description |
+| ---------------- | ------- | -------- | ----------- |
+| `contextSummary` | string  | No       |             |
+| `createdAt`      | string  | No       |             |
+| `id`             | string  | No       |             |
+| `isArchived`     | boolean | No       |             |
+| `title`          | string  | No       |             |
+| `updatedAt`      | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtocreatecategoryreq"></a>`CreateCategoryReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `name` | string | Yes |  |
-| `slug` | string | Yes |  |
-| `sortOrder` | integer | No |  |
+| Property    | Type    | Required | Description |
+| ----------- | ------- | -------- | ----------- |
+| `name`      | string  | Yes      |             |
+| `slug`      | string  | Yes      |             |
+| `sortOrder` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtocreatechatsessionreq"></a>`CreateChatSessionReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `title` | string | No |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `title`  | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtofashionitembriefres"></a>`FashionItemBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `category` | [CategoryBriefRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtocategorybriefres) | No |  |
-| `color` | string | No |  |
-| `colorHex` | string | No |  |
-| `id` | string | No |  |
-| `imageUrl` | string | No |  |
-| `style` | string | No |  |
+| Property   | Type                                                                                       | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `category` | [CategoryBriefRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtocategorybriefres) | No       |             |
+| `color`    | string                                                                                     | No       |             |
+| `colorHex` | string                                                                                     | No       |             |
+| `id`       | string                                                                                     | No       |             |
+| `imageUrl` | string                                                                                     | No       |             |
+| `style`    | string                                                                                     | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtofashionitemres"></a>`FashionItemRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `category` | [CategoryBriefRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtocategorybriefres) | No |  |
-| `color` | string | No |  |
-| `colorHex` | string | No |  |
-| `colorHue` | number | No |  |
-| `colorLightness` | number | No |  |
-| `colorSaturation` | number | No |  |
-| `createdAt` | string | No |  |
-| `description` | string | No |  |
-| `fit` | string | No |  |
-| `id` | string | No |  |
-| `imageUrl` | string | No |  |
-| `material` | string | No |  |
-| `pattern` | string | No |  |
-| `seasonality` | string | No |  |
-| `style` | string | No |  |
-| `updatedAt` | string | No |  |
+| Property          | Type                                                                                       | Required | Description |
+| ----------------- | ------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `category`        | [CategoryBriefRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtocategorybriefres) | No       |             |
+| `color`           | string                                                                                     | No       |             |
+| `colorHex`        | string                                                                                     | No       |             |
+| `colorHue`        | number                                                                                     | No       |             |
+| `colorLightness`  | number                                                                                     | No       |             |
+| `colorSaturation` | number                                                                                     | No       |             |
+| `createdAt`       | string                                                                                     | No       |             |
+| `description`     | string                                                                                     | No       |             |
+| `fit`             | string                                                                                     | No       |             |
+| `id`              | string                                                                                     | No       |             |
+| `imageUrl`        | string                                                                                     | No       |             |
+| `material`        | string                                                                                     | No       |             |
+| `pattern`         | string                                                                                     | No       |             |
+| `seasonality`     | string                                                                                     | No       |             |
+| `style`           | string                                                                                     | No       |             |
+| `updatedAt`       | string                                                                                     | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendoutfitreq"></a>`RecommendOutfitReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `colorTone` | string | No | Tông màu phối đồ (Gợi ý: light, dark, pastel, earthy, neon... hoặc nhập tông màu tùy ý) |
-| `details` | string | No | Ghi chú thêm bằng tay (free text) |
-| `include_brand_items` | boolean | No | Cho phép phối đồ của brand (tỷ lệ tối đa 30%) |
-| `occasion` | string | No | Dịp phối đồ (Gợi ý: casual, work, date, party, sport, hoặc nhập dịp tùy ý) |
-| `season` | string | No | Mùa phối đồ @enums spring,summer,autumn,winter,all |
-| `styleTarget` | string | No | Phong cách hướng tới (Gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant, hoặc nhập phong cách tùy ý) |
-| `weather` | string | No | Thời tiết hiện tại (Gợi ý: hot, cold, warm, cool, rainy, hoặc nhập thời tiết cụ thể) |
+| Property            | Type    | Required | Description                                                                                                        |
+| ------------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
+| `colorTone`         | string  | No       | Tông màu phối đồ (Gợi ý: light, dark, pastel, earthy, neon... hoặc nhập tông màu tùy ý)                            |
+| `details`           | string  | No       | Ghi chú thêm bằng tay (free text)                                                                                  |
+| `includeBrandItems` | boolean | No       | Cho phép phối đồ của brand (tỷ lệ tối đa 30%)                                                                      |
+| `occasion`          | string  | No       | Dịp phối đồ (Gợi ý: casual, work, date, party, sport, hoặc nhập dịp tùy ý)                                         |
+| `season`            | string  | No       | Mùa phối đồ @enums spring,summer,autumn,winter,all                                                                 |
+| `styleTarget`       | string  | No       | Phong cách hướng tới (Gợi ý: minimalist, vintage, streetwear, preppy, sporty, elegant, hoặc nhập phong cách tùy ý) |
+| `weather`           | string  | No       | Thời tiết hiện tại (Gợi ý: hot, cold, warm, cool, rainy, hoặc nhập thời tiết cụ thể)                               |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendedfashionitembriefres"></a>`RecommendedFashionItemBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `category` | [CategoryBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtocategorybriefres) | No |  |
-| `color` | string | No |  |
-| `colorHex` | string | No |  |
-| `id` | string | No |  |
-| `imageUrl` | string | No |  |
-| `style` | string | No |  |
+| Property   | Type                                                                                        | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `category` | [CategoryBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtocategorybriefres) | No       |             |
+| `color`    | string                                                                                      | No       |             |
+| `colorHex` | string                                                                                      | No       |             |
+| `id`       | string                                                                                      | No       |             |
+| `imageUrl` | string                                                                                      | No       |             |
+| `style`    | string                                                                                      | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemgroup"></a>`RecommendedItemGroup`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `alternatives` | Array<[RecommendedItemRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemres)> | No |  |
-| `primary` | [RecommendedItemRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemres) | No |  |
-| `role` | string | No |  |
+| Property       | Type                                                                                                  | Required | Description |
+| -------------- | ----------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `alternatives` | Array<[RecommendedItemRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemres)> | No       |             |
+| `primary`      | [RecommendedItemRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemres)        | No       |             |
+| `role`         | string                                                                                                | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemres"></a>`RecommendedItemRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandItem` | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres) | No |  |
-| `fashionItem` | [RecommendedFashionItemBriefRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendedfashionitembriefres) | No |  |
-| `id` | string | No |  |
-| `itemContext` | string | No |  |
+| Property      | Type                                                                                                                   | Required | Description |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandItem`   | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres)                          | No       |             |
+| `fashionItem` | [RecommendedFashionItemBriefRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendedfashionitembriefres) | No       |             |
+| `id`          | string                                                                                                                 | No       |             |
+| `itemContext` | string                                                                                                                 | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendedoutfitres"></a>`RecommendedOutfitRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `explanation` | string | No |  |
-| `isFallback` | boolean | No |  |
-| `items` | Array<[RecommendedItemGroup](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemgroup)> | No |  |
-| `remainingQuota` | integer | No |  |
-| `title` | string | No |  |
+| Property         | Type                                                                                                      | Required | Description |
+| ---------------- | --------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `explanation`    | string                                                                                                    | No       |             |
+| `isFallback`     | boolean                                                                                                   | No       |             |
+| `items`          | Array<[RecommendedItemGroup](#smart-wardrobe-beinternalmodulesfashionapplicationdtorecommendeditemgroup)> | No       |             |
+| `remainingQuota` | integer                                                                                                   | No       |             |
+| `title`          | string                                                                                                    | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtosendchatmessagereq"></a>`SendChatMessageReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `content` | string | Yes |  |
+| Property  | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `content` | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtoupdatecategoryreq"></a>`UpdateCategoryReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `name` | string | Yes |  |
-| `slug` | string | Yes |  |
-| `sortOrder` | integer | No |  |
+| Property    | Type    | Required | Description |
+| ----------- | ------- | -------- | ----------- |
+| `name`      | string  | Yes      |             |
+| `slug`      | string  | Yes      |             |
+| `sortOrder` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashionapplicationdtoupdatechatsessionreq"></a>`UpdateChatSessionReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `title` | string | No |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `title`  | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesfashiondomainconstantsmessagesendermessagesender"></a>`MessageSender`
 
-*Enum values:*
+_Enum values:_
 
 - `user` (**User**)
 - `ai` (**AI**)
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoadminuserdetailres"></a>`AdminUserDetailRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `subscription` | object | No |  |
-| `user` | [UserRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserres) | No |  |
+| Property       | Type                                                                      | Required | Description |
+| -------------- | ------------------------------------------------------------------------- | -------- | ----------- |
+| `subscription` | object                                                                    | No       |             |
+| `user`         | [UserRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserres) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoadminuserlistres"></a>`AdminUserListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[UserRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                   | Required | Description |
+| ---------- | -------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[UserRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserres)>       | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtochangepasswordreq"></a>`ChangePasswordReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `confirmPassword` | string | Yes |  |
-| `logoutAllDevices` | boolean | No |  |
-| `newPassword` | string | Yes |  |
-| `oldPassword` | string | Yes |  |
+| Property           | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `confirmPassword`  | string  | Yes      |             |
+| `logoutAllDevices` | boolean | No       |             |
+| `newPassword`      | string  | Yes      |             |
+| `oldPassword`      | string  | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoconfirmforgotpasswordotpreq"></a>`ConfirmForgotPasswordOtpReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `email` | string | Yes |  |
-| `otpCode` | string | Yes |  |
+| Property  | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `email`   | string | Yes      |             |
+| `otpCode` | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoconfirmregisterotpreq"></a>`ConfirmRegisterOtpReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `email` | string | Yes |  |
-| `otpCode` | string | Yes |  |
+| Property  | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `email`   | string | Yes      |             |
+| `otpCode` | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtocreateadminuserreq"></a>`CreateAdminUserReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `dateOfBirth` | string | No |  |
-| `email` | string | Yes |  |
-| `firstName` | string | Yes |  |
-| `gender` | object | No |  |
-| `lastName` | string | No |  |
-| `password` | string | Yes |  |
-| `roleSlug` | [RoleSlug](#smart-wardrobe-beinternalshareddomainconstantsroleslugroleslug) | No |  |
-| `username` | string | Yes |  |
+| Property      | Type                                                                        | Required | Description |
+| ------------- | --------------------------------------------------------------------------- | -------- | ----------- |
+| `dateOfBirth` | string                                                                      | No       |             |
+| `email`       | string                                                                      | Yes      |             |
+| `firstName`   | string                                                                      | Yes      |             |
+| `gender`      | object                                                                      | No       |             |
+| `lastName`    | string                                                                      | No       |             |
+| `password`    | string                                                                      | Yes      |             |
+| `roleSlug`    | [RoleSlug](#smart-wardrobe-beinternalshareddomainconstantsroleslugroleslug) | No       |             |
+| `username`    | string                                                                      | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoinferredbodyprofilereq"></a>`InferredBodyProfileReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `bodyShape` | string | Yes |  |
-| `confidenceScore` | number | No |  |
+| Property          | Type   | Required | Description |
+| ----------------- | ------ | -------- | ----------- |
+| `bodyShape`       | string | Yes      |             |
+| `confidenceScore` | number | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtologinreq"></a>`LoginReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `deviceIp` | string | No |  |
-| `deviceName` | string | No |  |
-| `loginName` | string | Yes |  |
-| `password` | string | Yes |  |
-| `userAgent` | string | No |  |
+| Property     | Type   | Required | Description |
+| ------------ | ------ | -------- | ----------- |
+| `deviceIp`   | string | No       |             |
+| `deviceName` | string | No       |             |
+| `loginName`  | string | Yes      |             |
+| `password`   | string | Yes      |             |
+| `userAgent`  | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoregisterreq"></a>`RegisterReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `address` | string | No |  |
-| `confirmPassword` | string | Yes |  |
-| `dateOfBirth` | string | Yes |  |
-| `email` | string | Yes |  |
-| `firstName` | string | Yes |  |
-| `gender` | object | No |  |
-| `lastName` | string | No |  |
-| `password` | string | Yes |  |
-| `username` | string | Yes |  |
+| Property          | Type   | Required | Description |
+| ----------------- | ------ | -------- | ----------- |
+| `address`         | string | No       |             |
+| `confirmPassword` | string | Yes      |             |
+| `dateOfBirth`     | string | Yes      |             |
+| `email`           | string | Yes      |             |
+| `firstName`       | string | Yes      |             |
+| `gender`          | object | No       |             |
+| `lastName`        | string | No       |             |
+| `password`        | string | Yes      |             |
+| `username`        | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoresendotpreq"></a>`ResendOtpReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `email` | string | Yes |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `email`  | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoresetpasswordreq"></a>`ResetPasswordReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `confirmPassword` | string | Yes |  |
-| `logoutAllDevices` | boolean | No |  |
-| `newPassword` | string | Yes |  |
+| Property           | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `confirmPassword`  | string  | Yes      |             |
+| `logoutAllDevices` | boolean | No       |             |
+| `newPassword`      | string  | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtosendforgotpasswordotpreq"></a>`SendForgotPasswordOtpReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `email` | string | Yes |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `email`  | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoupdateavatarreq"></a>`UpdateAvatarReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `avatarPublicId` | string | Yes |  |
-| `avatarUrl` | string | Yes |  |
+| Property         | Type   | Required | Description |
+| ---------------- | ------ | -------- | ----------- |
+| `avatarPublicId` | string | Yes      |             |
+| `avatarUrl`      | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoupdatebodymeasurementsreq"></a>`UpdateBodyMeasurementsReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `chestCm` | number | No |  |
-| `hipCm` | number | No |  |
-| `waistCm` | number | No |  |
+| Property  | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `chestCm` | number | No       |             |
+| `hipCm`   | number | No       |             |
+| `waistCm` | number | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoupdatebodyprofilereq"></a>`UpdateBodyProfileReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `bodyShape` | string | Yes |  |
-| `heightCm` | number | Yes |  |
-| `inferredByAi` | [InferredBodyProfileReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoinferredbodyprofilereq) | No |  |
-| `measurements` | [UpdateBodyMeasurementsReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoupdatebodymeasurementsreq) | No |  |
-| `verifiedByUser` | boolean | No |  |
-| `weightKg` | number | Yes |  |
+| Property         | Type                                                                                                          | Required | Description |
+| ---------------- | ------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `bodyShape`      | string                                                                                                        | Yes      |             |
+| `heightCm`       | number                                                                                                        | Yes      |             |
+| `inferredByAi`   | [InferredBodyProfileReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoinferredbodyprofilereq)       | No       |             |
+| `measurements`   | [UpdateBodyMeasurementsReq](#smart-wardrobe-beinternalmodulesidentityapplicationdtoupdatebodymeasurementsreq) | No       |             |
+| `verifiedByUser` | boolean                                                                                                       | No       |             |
+| `weightKg`       | number                                                                                                        | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoupdateprofilereq"></a>`UpdateProfileReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `address` | string | No |  |
-| `dateOfBirth` | string | No |  |
-| `firstName` | string | Yes |  |
-| `gender` | object | No |  |
-| `lastName` | string | No |  |
+| Property      | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `address`     | string | No       |             |
+| `dateOfBirth` | string | No       |             |
+| `firstName`   | string | Yes      |             |
+| `gender`      | object | No       |             |
+| `lastName`    | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoupdateuserrolereq"></a>`UpdateUserRoleReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `roleSlug` | [RoleSlug](#smart-wardrobe-beinternalshareddomainconstantsroleslugroleslug) | Yes |  |
+| Property   | Type                                                                        | Required | Description |
+| ---------- | --------------------------------------------------------------------------- | -------- | ----------- |
+| `roleSlug` | [RoleSlug](#smart-wardrobe-beinternalshareddomainconstantsroleslugroleslug) | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtoupdateuserstatusreq"></a>`UpdateUserStatusReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `status` | object | No |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `status` | object | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtouserbodymeasurementsres"></a>`UserBodyMeasurementsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `chestCm` | number | No |  |
-| `hipCm` | number | No |  |
-| `waistCm` | number | No |  |
+| Property  | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `chestCm` | number | No       |             |
+| `hipCm`   | number | No       |             |
+| `waistCm` | number | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtouserbodyprofileres"></a>`UserBodyProfileRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `bodyShape` | string | No |  |
-| `heightCm` | number | No |  |
-| `inferredByAi` | [UserInferredBodyRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserinferredbodyres) | No |  |
-| `lastUpdatedAt` | string | No |  |
-| `measurements` | [UserBodyMeasurementsRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbodymeasurementsres) | No |  |
-| `verifiedByUser` | boolean | No |  |
-| `weightKg` | number | No |  |
+| Property         | Type                                                                                                      | Required | Description |
+| ---------------- | --------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `bodyShape`      | string                                                                                                    | No       |             |
+| `heightCm`       | number                                                                                                    | No       |             |
+| `inferredByAi`   | [UserInferredBodyRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserinferredbodyres)         | No       |             |
+| `lastUpdatedAt`  | string                                                                                                    | No       |             |
+| `measurements`   | [UserBodyMeasurementsRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbodymeasurementsres) | No       |             |
+| `verifiedByUser` | boolean                                                                                                   | No       |             |
+| `weightKg`       | number                                                                                                    | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtouserbriefres"></a>`UserBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `avatarUrl` | string | No |  |
-| `email` | string | No |  |
-| `firstName` | string | No |  |
-| `gender` | [Gender](#smart-wardrobe-beinternalshareddomainconstantssharedgendergender) | No |  |
-| `id` | string | No |  |
-| `lastName` | string | No |  |
-| `status` | [UserStatus](#smart-wardrobe-beinternalmodulesidentitydomainconstantsuserstatususerstatus) | No |  |
-| `username` | string | No |  |
+| Property    | Type                                                                                       | Required | Description |
+| ----------- | ------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `avatarUrl` | string                                                                                     | No       |             |
+| `email`     | string                                                                                     | No       |             |
+| `firstName` | string                                                                                     | No       |             |
+| `gender`    | [Gender](#smart-wardrobe-beinternalshareddomainconstantssharedgendergender)                | No       |             |
+| `id`        | string                                                                                     | No       |             |
+| `lastName`  | string                                                                                     | No       |             |
+| `status`    | [UserStatus](#smart-wardrobe-beinternalmodulesidentitydomainconstantsuserstatususerstatus) | No       |             |
+| `username`  | string                                                                                     | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtouserinferredbodyres"></a>`UserInferredBodyRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `bodyShape` | string | No |  |
-| `confidenceScore` | number | No |  |
+| Property          | Type   | Required | Description |
+| ----------------- | ------ | -------- | ----------- |
+| `bodyShape`       | string | No       |             |
+| `confidenceScore` | number | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtouserres"></a>`UserRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `address` | string | No |  |
-| `avatarUrl` | string | No |  |
-| `bodyProfile` | [UserBodyProfileRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbodyprofileres) | No |  |
-| `createdAt` | string | No |  |
-| `dateOfBirth` | string | No |  |
-| `email` | string | No |  |
-| `firstName` | string | No |  |
-| `gender` | [Gender](#smart-wardrobe-beinternalshareddomainconstantssharedgendergender) | No |  |
-| `id` | string | No |  |
-| `lastName` | string | No |  |
-| `roleSlug` | [RoleSlug](#smart-wardrobe-beinternalshareddomainconstantsroleslugroleslug) | No |  |
-| `status` | [UserStatus](#smart-wardrobe-beinternalmodulesidentitydomainconstantsuserstatususerstatus) | No |  |
-| `subscription` | [UserSubscriptionRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtousersubscriptionres) | No |  |
-| `username` | string | No |  |
+| Property       | Type                                                                                              | Required | Description |
+| -------------- | ------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `address`      | string                                                                                            | No       |             |
+| `avatarUrl`    | string                                                                                            | No       |             |
+| `bodyProfile`  | [UserBodyProfileRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtouserbodyprofileres)   | No       |             |
+| `createdAt`    | string                                                                                            | No       |             |
+| `dateOfBirth`  | string                                                                                            | No       |             |
+| `email`        | string                                                                                            | No       |             |
+| `firstName`    | string                                                                                            | No       |             |
+| `gender`       | [Gender](#smart-wardrobe-beinternalshareddomainconstantssharedgendergender)                       | No       |             |
+| `id`           | string                                                                                            | No       |             |
+| `lastName`     | string                                                                                            | No       |             |
+| `roleSlug`     | [RoleSlug](#smart-wardrobe-beinternalshareddomainconstantsroleslugroleslug)                       | No       |             |
+| `status`       | [UserStatus](#smart-wardrobe-beinternalmodulesidentitydomainconstantsuserstatususerstatus)        | No       |             |
+| `subscription` | [UserSubscriptionRes](#smart-wardrobe-beinternalmodulesidentityapplicationdtousersubscriptionres) | No       |             |
+| `username`     | string                                                                                            | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtousersessionitemdto"></a>`UserSessionItemDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `createdAt` | string | No |  |
-| `deviceIp` | string | No |  |
-| `deviceName` | string | No |  |
-| `expiresAt` | string | No |  |
-| `id` | string | No |  |
-| `isRevoked` | boolean | No |  |
-| `lastActiveAt` | string | No |  |
-| `userAgent` | string | No |  |
+| Property       | Type    | Required | Description |
+| -------------- | ------- | -------- | ----------- |
+| `createdAt`    | string  | No       |             |
+| `deviceIp`     | string  | No       |             |
+| `deviceName`   | string  | No       |             |
+| `expiresAt`    | string  | No       |             |
+| `id`           | string  | No       |             |
+| `isRevoked`    | boolean | No       |             |
+| `lastActiveAt` | string  | No       |             |
+| `userAgent`    | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentityapplicationdtousersubscriptionres"></a>`UserSubscriptionRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiChatDailyQuota` | integer | No |  |
-| `aiOutfitDailyQuota` | integer | No |  |
-| `expiresAt` | string | No |  |
-| `maxOutfits` | integer | No |  |
-| `maxWardrobeItems` | integer | No |  |
-| `planId` | string | No |  |
-| `planName` | string | No |  |
-| `planSlug` | string | No |  |
+| Property             | Type    | Required | Description |
+| -------------------- | ------- | -------- | ----------- |
+| `aiChatDailyQuota`   | integer | No       |             |
+| `aiOutfitDailyQuota` | integer | No       |             |
+| `expiresAt`          | string  | No       |             |
+| `maxOutfits`         | integer | No       |             |
+| `maxWardrobeItems`   | integer | No       |             |
+| `planId`             | string  | No       |             |
+| `planName`           | string  | No       |             |
+| `planSlug`           | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulesidentitydomainconstantsuserstatususerstatus"></a>`UserStatus`
 
-*Enum values:*
+_Enum values:_
 
 - `0` (**Active**)
 - `1` (**Inactive**)
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtoadmindeposittransactionlistres"></a>`AdminDepositTransactionListRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[DepositTransactionRes](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtodeposittransactionres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                             | Required | Description |
+| ---------- | ---------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[DepositTransactionRes](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtodeposittransactionres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                           | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtoadminusersubscriptionitemdto"></a>`AdminUserSubscriptionItemDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `createdAt` | string | No |  |
-| `expiresAt` | string | No |  |
-| `isAutoRenewEnabled` | boolean | No |  |
-| `planId` | string | No |  |
-| `planKind` | [PlanKind](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsplankindplankind) | No |  |
-| `planName` | string | No |  |
-| `planSlug` | string | No |  |
-| `startedAt` | string | No |  |
-| `tierRank` | integer | No |  |
-| `updatedAt` | string | No |  |
-| `userId` | string | No |  |
+| Property             | Type                                                                                     | Required | Description |
+| -------------------- | ---------------------------------------------------------------------------------------- | -------- | ----------- |
+| `createdAt`          | string                                                                                   | No       |             |
+| `expiresAt`          | string                                                                                   | No       |             |
+| `isAutoRenewEnabled` | boolean                                                                                  | No       |             |
+| `planId`             | string                                                                                   | No       |             |
+| `planKind`           | [PlanKind](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsplankindplankind) | No       |             |
+| `planName`           | string                                                                                   | No       |             |
+| `planSlug`           | string                                                                                   | No       |             |
+| `startedAt`          | string                                                                                   | No       |             |
+| `tierRank`           | integer                                                                                  | No       |             |
+| `updatedAt`          | string                                                                                   | No       |             |
+| `userId`             | string                                                                                   | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtocreatesubscriptionplanreq"></a>`CreateSubscriptionPlanReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiChatDailyQuota` | integer | No |  |
-| `aiOutfitDailyQuota` | integer | No |  |
-| `durationDays` | integer | No |  |
-| `isActive` | boolean | No |  |
-| `maxOutfits` | integer | No |  |
-| `maxWardrobeItems` | integer | No |  |
-| `name` | string | Yes |  |
-| `planKind` | [PlanKind](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsplankindplankind) | No |  |
-| `price` | number | No |  |
-| `slug` | string | Yes |  |
-| `tierRank` | integer | No |  |
+| Property             | Type                                                                                     | Required | Description |
+| -------------------- | ---------------------------------------------------------------------------------------- | -------- | ----------- |
+| `aiChatDailyQuota`   | integer                                                                                  | No       |             |
+| `aiOutfitDailyQuota` | integer                                                                                  | No       |             |
+| `durationDays`       | integer                                                                                  | No       |             |
+| `isActive`           | boolean                                                                                  | No       |             |
+| `maxOutfits`         | integer                                                                                  | No       |             |
+| `maxWardrobeItems`   | integer                                                                                  | No       |             |
+| `name`               | string                                                                                   | Yes      |             |
+| `planKind`           | [PlanKind](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsplankindplankind) | No       |             |
+| `price`              | number                                                                                   | No       |             |
+| `slug`               | string                                                                                   | Yes      |             |
+| `tierRank`           | integer                                                                                  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtodeposittransactionres"></a>`DepositTransactionRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `amount` | number | No |  |
-| `cancelledAt` | string | No |  |
-| `createdAt` | string | No |  |
-| `currency` | string | No |  |
-| `failureReason` | string | No |  |
-| `id` | string | No |  |
-| `nextReconciliationAt` | string | No |  |
-| `orderCode` | integer | No |  |
-| `paymentLinkId` | string | No |  |
-| `paymentUrl` | string | No |  |
-| `reference` | string | No |  |
-| `status` | [DepositStatus](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsdepositstatusdepositstatus) | No |  |
-| `targetPlanId` | string | No |  |
-| `transactionType` | string | No |  |
-| `updatedAt` | string | No |  |
-| `userId` | string | No |  |
+| Property               | Type                                                                                                    | Required | Description |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `amount`               | number                                                                                                  | No       |             |
+| `cancelledAt`          | string                                                                                                  | No       |             |
+| `createdAt`            | string                                                                                                  | No       |             |
+| `currency`             | string                                                                                                  | No       |             |
+| `failureReason`        | string                                                                                                  | No       |             |
+| `id`                   | string                                                                                                  | No       |             |
+| `nextReconciliationAt` | string                                                                                                  | No       |             |
+| `orderCode`            | integer                                                                                                 | No       |             |
+| `paymentLinkId`        | string                                                                                                  | No       |             |
+| `paymentUrl`           | string                                                                                                  | No       |             |
+| `reference`            | string                                                                                                  | No       |             |
+| `status`               | [DepositStatus](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsdepositstatusdepositstatus) | No       |             |
+| `targetPlanId`         | string                                                                                                  | No       |             |
+| `transactionType`      | string                                                                                                  | No       |             |
+| `updatedAt`            | string                                                                                                  | No       |             |
+| `userId`               | string                                                                                                  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtodirectpurchasereq"></a>`DirectPurchaseReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `cancelUrl` | string | No |  |
-| `planSlug` | string | Yes |  |
-| `returnUrl` | string | No |  |
+| Property    | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `cancelUrl` | string | No       |             |
+| `planSlug`  | string | Yes      |             |
+| `returnUrl` | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtopayoswebhookdata"></a>`PayOSWebhookData`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `accountNumber` | string | No |  |
-| `amount` | integer | No |  |
-| `code` | string | No |  |
-| `desc` | string | No |  |
-| `description` | string | No |  |
-| `orderCode` | integer | No |  |
-| `paymentLinkId` | string | No |  |
-| `reference` | string | No |  |
-| `transactionDateTime` | string | No |  |
+| Property              | Type    | Required | Description |
+| --------------------- | ------- | -------- | ----------- |
+| `accountNumber`       | string  | No       |             |
+| `amount`              | integer | No       |             |
+| `code`                | string  | No       |             |
+| `desc`                | string  | No       |             |
+| `description`         | string  | No       |             |
+| `orderCode`           | integer | No       |             |
+| `paymentLinkId`       | string  | No       |             |
+| `reference`           | string  | No       |             |
+| `transactionDateTime` | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtopayoswebhookreq"></a>`PayOSWebhookReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | string | No |  |
-| `data` | [PayOSWebhookData](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtopayoswebhookdata) | No |  |
-| `desc` | string | No |  |
-| `signature` | string | No |  |
+| Property    | Type                                                                                            | Required | Description |
+| ----------- | ----------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `code`      | string                                                                                          | No       |             |
+| `data`      | [PayOSWebhookData](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtopayoswebhookdata) | No       |             |
+| `desc`      | string                                                                                          | No       |             |
+| `signature` | string                                                                                          | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtopaymentlinkdto"></a>`PaymentLinkDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `expiresAt` | string | No |  |
-| `nextReconciliationAt` | string | No |  |
-| `orderCode` | integer | No |  |
-| `paymentStatus` | [DepositStatus](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsdepositstatusdepositstatus) | No |  |
-| `paymentUrl` | string | No |  |
+| Property               | Type                                                                                                    | Required | Description |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `expiresAt`            | string                                                                                                  | No       |             |
+| `nextReconciliationAt` | string                                                                                                  | No       |             |
+| `orderCode`            | integer                                                                                                 | No       |             |
+| `paymentStatus`        | [DepositStatus](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsdepositstatusdepositstatus) | No       |             |
+| `paymentUrl`           | string                                                                                                  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtopurchasewithwalletreq"></a>`PurchaseWithWalletReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `planSlug` | string | Yes |  |
+| Property   | Type   | Required | Description |
+| ---------- | ------ | -------- | ----------- |
+| `planSlug` | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtosetautorenewreq"></a>`SetAutoRenewReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `enabled` | boolean | Yes |  |
+| Property  | Type    | Required | Description |
+| --------- | ------- | -------- | ----------- |
+| `enabled` | boolean | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtosetplanactivereq"></a>`SetPlanActiveReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `isActive` | boolean | No |  |
+| Property   | Type    | Required | Description |
+| ---------- | ------- | -------- | ----------- |
+| `isActive` | boolean | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtosubscriptionplanbriefres"></a>`SubscriptionPlanBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiChatDailyQuota` | integer | No |  |
-| `aiOutfitDailyQuota` | integer | No |  |
-| `durationDays` | integer | No |  |
-| `id` | string | No |  |
-| `maxOutfits` | integer | No |  |
-| `maxWardrobeItems` | integer | No |  |
-| `name` | string | No |  |
-| `planKind` | [PlanKind](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsplankindplankind) | No |  |
-| `price` | number | No |  |
-| `slug` | string | No |  |
-| `tierRank` | integer | No |  |
+| Property             | Type                                                                                     | Required | Description |
+| -------------------- | ---------------------------------------------------------------------------------------- | -------- | ----------- |
+| `aiChatDailyQuota`   | integer                                                                                  | No       |             |
+| `aiOutfitDailyQuota` | integer                                                                                  | No       |             |
+| `durationDays`       | integer                                                                                  | No       |             |
+| `id`                 | string                                                                                   | No       |             |
+| `maxOutfits`         | integer                                                                                  | No       |             |
+| `maxWardrobeItems`   | integer                                                                                  | No       |             |
+| `name`               | string                                                                                   | No       |             |
+| `planKind`           | [PlanKind](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsplankindplankind) | No       |             |
+| `price`              | number                                                                                   | No       |             |
+| `slug`               | string                                                                                   | No       |             |
+| `tierRank`           | integer                                                                                  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtosubscriptionplandto"></a>`SubscriptionPlanDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiChatDailyQuota` | integer | No |  |
-| `aiOutfitDailyQuota` | integer | No |  |
-| `durationDays` | integer | No |  |
-| `id` | string | No |  |
-| `isActive` | boolean | No |  |
-| `maxOutfits` | integer | No |  |
-| `maxWardrobeItems` | integer | No |  |
-| `name` | string | No |  |
-| `planKind` | [PlanKind](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsplankindplankind) | No |  |
-| `price` | number | No |  |
-| `slug` | string | No |  |
-| `tierRank` | integer | No |  |
+| Property             | Type                                                                                     | Required | Description |
+| -------------------- | ---------------------------------------------------------------------------------------- | -------- | ----------- |
+| `aiChatDailyQuota`   | integer                                                                                  | No       |             |
+| `aiOutfitDailyQuota` | integer                                                                                  | No       |             |
+| `durationDays`       | integer                                                                                  | No       |             |
+| `id`                 | string                                                                                   | No       |             |
+| `isActive`           | boolean                                                                                  | No       |             |
+| `maxOutfits`         | integer                                                                                  | No       |             |
+| `maxWardrobeItems`   | integer                                                                                  | No       |             |
+| `name`               | string                                                                                   | No       |             |
+| `planKind`           | [PlanKind](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantsplankindplankind) | No       |             |
+| `price`              | number                                                                                   | No       |             |
+| `slug`               | string                                                                                   | No       |             |
+| `tierRank`           | integer                                                                                  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtoupdatesubscriptionplanreq"></a>`UpdateSubscriptionPlanReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiChatDailyQuota` | integer | No |  |
-| `aiOutfitDailyQuota` | integer | No |  |
-| `durationDays` | integer | No |  |
-| `isActive` | boolean | No |  |
-| `maxOutfits` | integer | No |  |
-| `maxWardrobeItems` | integer | No |  |
-| `name` | string | No |  |
-| `price` | number | No |  |
-| `tierRank` | integer | No |  |
+| Property             | Type    | Required | Description |
+| -------------------- | ------- | -------- | ----------- |
+| `aiChatDailyQuota`   | integer | No       |             |
+| `aiOutfitDailyQuota` | integer | No       |             |
+| `durationDays`       | integer | No       |             |
+| `isActive`           | boolean | No       |             |
+| `maxOutfits`         | integer | No       |             |
+| `maxWardrobeItems`   | integer | No       |             |
+| `name`               | string  | No       |             |
+| `price`              | number  | No       |             |
+| `tierRank`           | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtousersubscriptiondto"></a>`UserSubscriptionDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiChatDailyQuota` | integer | No |  |
-| `aiOutfitDailyQuota` | integer | No |  |
-| `aiUsageCount` | integer | No |  |
-| `expiresAt` | string | No |  |
-| `isAutoRenewEnabled` | boolean | No |  |
-| `lastResetDate` | string | No |  |
-| `outfitRecommendCount` | integer | No |  |
-| `planID` | string | No |  |
-| `planName` | string | No |  |
-| `planSlug` | string | No |  |
+| Property               | Type    | Required | Description |
+| ---------------------- | ------- | -------- | ----------- |
+| `aiChatDailyQuota`     | integer | No       |             |
+| `aiOutfitDailyQuota`   | integer | No       |             |
+| `aiUsageCount`         | integer | No       |             |
+| `expiresAt`            | string  | No       |             |
+| `isAutoRenewEnabled`   | boolean | No       |             |
+| `lastResetDate`        | string  | No       |             |
+| `outfitRecommendCount` | integer | No       |             |
+| `planID`               | string  | No       |             |
+| `planName`             | string  | No       |             |
+| `planSlug`             | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtousersubscriptionoverviewdto"></a>`UserSubscriptionOverviewDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `aiChatDailyQuota` | integer | No |  |
-| `aiOutfitDailyQuota` | integer | No |  |
-| `expiresAt` | string | No |  |
-| `isAutoRenewEnabled` | boolean | No |  |
-| `maxOutfits` | integer | No |  |
-| `maxWardrobeItems` | integer | No |  |
-| `planID` | string | No |  |
-| `planName` | string | No |  |
-| `planSlug` | string | No |  |
+| Property             | Type    | Required | Description |
+| -------------------- | ------- | -------- | ----------- |
+| `aiChatDailyQuota`   | integer | No       |             |
+| `aiOutfitDailyQuota` | integer | No       |             |
+| `expiresAt`          | string  | No       |             |
+| `isAutoRenewEnabled` | boolean | No       |             |
+| `maxOutfits`         | integer | No       |             |
+| `maxWardrobeItems`   | integer | No       |             |
+| `planID`             | string  | No       |             |
+| `planName`           | string  | No       |             |
+| `planSlug`           | string  | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtowalletdto"></a>`WalletDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `balance` | number | No |  |
-| `currency` | [Currency](#smart-wardrobe-beinternalshareddomainconstantssharedcurrencycurrency) | No |  |
-| `updatedAt` | string | No |  |
-| `userID` | string | No |  |
+| Property    | Type                                                                              | Required | Description |
+| ----------- | --------------------------------------------------------------------------------- | -------- | ----------- |
+| `balance`   | number                                                                            | No       |             |
+| `currency`  | [Currency](#smart-wardrobe-beinternalshareddomainconstantssharedcurrencycurrency) | No       |             |
+| `updatedAt` | string                                                                            | No       |             |
+| `userID`    | string                                                                            | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtowalletstatementdto"></a>`WalletStatementDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `amount` | number | No |  |
-| `createdAt` | string | No |  |
-| `description` | string | No |  |
-| `id` | string | No |  |
-| `newBalance` | number | No |  |
-| `previousBalance` | number | No |  |
-| `transactionType` | [WalletStatementType](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantswalletstatementtypewalletstatementtype) | No |  |
-| `userID` | string | No |  |
+| Property          | Type                                                                                                                      | Required | Description |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `amount`          | number                                                                                                                    | No       |             |
+| `createdAt`       | string                                                                                                                    | No       |             |
+| `description`     | string                                                                                                                    | No       |             |
+| `id`              | string                                                                                                                    | No       |             |
+| `newBalance`      | number                                                                                                                    | No       |             |
+| `previousBalance` | number                                                                                                                    | No       |             |
+| `transactionType` | [WalletStatementType](#smart-wardrobe-beinternalmodulessubscriptiondomainconstantswalletstatementtypewalletstatementtype) | No       |             |
+| `userID`          | string                                                                                                                    | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptionapplicationdtowallettopupreq"></a>`WalletTopUpReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `amount` | number | Yes |  |
-| `cancelUrl` | string | No |  |
-| `returnUrl` | string | No |  |
+| Property    | Type   | Required | Description |
+| ----------- | ------ | -------- | ----------- |
+| `amount`    | number | Yes      |             |
+| `cancelUrl` | string | No       |             |
+| `returnUrl` | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptiondomainconstantsdepositstatusdepositstatus"></a>`DepositStatus`
 
-*Enum values:*
+_Enum values:_
 
 - `0` (**Pending**)
 - `1` (**Success**)
@@ -7173,7 +7180,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptiondomainconstantsplankindplankind"></a>`PlanKind`
 
-*Enum values:*
+_Enum values:_
 
 - `0` (**DefaultFree**)
 - `1` (**Finite**)
@@ -7181,7 +7188,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmodulessubscriptiondomainconstantswalletstatementtypewalletstatementtype"></a>`WalletStatementType`
 
-*Enum values:*
+_Enum values:_
 
 - `topup` (**Topup**)
 - `subscription_purchase` (**SubscriptionPurchase**)
@@ -7192,225 +7199,225 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtobatchuploadwardrobeitemsreq"></a>`BatchUploadWardrobeItemsReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[WardrobeBatchUploadItemReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobebatchuploaditemreq)> | Yes |  |
+| Property | Type                                                                                                                   | Required | Description |
+| -------- | ---------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`  | Array<[WardrobeBatchUploadItemReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobebatchuploaditemreq)> | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres"></a>`BrandItemBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandId` | string | No |  |
-| `brandName` | string | No |  |
-| `id` | string | No |  |
-| `itemType` | string | No |  |
-| `name` | string | No |  |
-| `price` | number | No |  |
-| `productCode` | string | No |  |
-| `status` | string | No |  |
+| Property      | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `brandId`     | string | No       |             |
+| `brandName`   | string | No       |             |
+| `id`          | string | No       |             |
+| `itemType`    | string | No       |             |
+| `name`        | string | No       |             |
+| `price`       | number | No       |             |
+| `productCode` | string | No       |             |
+| `status`      | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtobulkdeleteitemsreq"></a>`BulkDeleteItemsReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `ids` | Array<string> | Yes |  |
+| Property | Type          | Required | Description |
+| -------- | ------------- | -------- | ----------- |
+| `ids`    | Array<string> | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtocategorybriefres"></a>`CategoryBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `id` | string | No |  |
-| `name` | string | No |  |
-| `slug` | string | No |  |
+| Property | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| `id`     | string | No       |             |
+| `name`   | string | No       |             |
+| `slug`   | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtoclonewardrobeitemreq"></a>`CloneWardrobeItemReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `quantity` | integer | Yes |  |
+| Property   | Type    | Required | Description |
+| ---------- | ------- | -------- | ----------- |
+| `quantity` | integer | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitembriefres"></a>`FashionItemBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `category` | [CategoryBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtocategorybriefres) | No |  |
-| `color` | string | No |  |
-| `colorHex` | string | No |  |
-| `id` | string | No |  |
-| `imageUrl` | string | No |  |
-| `style` | string | No |  |
+| Property   | Type                                                                                        | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `category` | [CategoryBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtocategorybriefres) | No       |             |
+| `color`    | string                                                                                      | No       |             |
+| `colorHex` | string                                                                                      | No       |             |
+| `id`       | string                                                                                      | No       |             |
+| `imageUrl` | string                                                                                      | No       |             |
+| `style`    | string                                                                                      | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitemres"></a>`FashionItemRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `category` | [CategoryBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtocategorybriefres) | No |  |
-| `color` | string | No |  |
-| `colorHex` | string | No |  |
-| `colorHue` | number | No |  |
-| `colorLightness` | number | No |  |
-| `colorSaturation` | number | No |  |
-| `createdAt` | string | No |  |
-| `description` | string | No |  |
-| `fit` | string | No |  |
-| `id` | string | No |  |
-| `imageUrl` | string | No |  |
-| `material` | string | No |  |
-| `pattern` | string | No |  |
-| `seasonality` | string | No |  |
-| `style` | string | No |  |
-| `updatedAt` | string | No |  |
+| Property          | Type                                                                                        | Required | Description |
+| ----------------- | ------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `category`        | [CategoryBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtocategorybriefres) | No       |             |
+| `color`           | string                                                                                      | No       |             |
+| `colorHex`        | string                                                                                      | No       |             |
+| `colorHue`        | number                                                                                      | No       |             |
+| `colorLightness`  | number                                                                                      | No       |             |
+| `colorSaturation` | number                                                                                      | No       |             |
+| `createdAt`       | string                                                                                      | No       |             |
+| `description`     | string                                                                                      | No       |             |
+| `fit`             | string                                                                                      | No       |             |
+| `id`              | string                                                                                      | No       |             |
+| `imageUrl`        | string                                                                                      | No       |             |
+| `material`        | string                                                                                      | No       |             |
+| `pattern`         | string                                                                                      | No       |             |
+| `seasonality`     | string                                                                                      | No       |             |
+| `style`           | string                                                                                      | No       |             |
+| `updatedAt`       | string                                                                                      | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtoinitclosetfromcatalogreq"></a>`InitClosetFromCatalogReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `catalogItemIds` | Array<string> | Yes |  |
+| Property         | Type          | Required | Description |
+| ---------------- | ------------- | -------- | ----------- |
+| `catalogItemIds` | Array<string> | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtooutfitbriefres"></a>`OutfitBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `coverImageUrl` | string | No |  |
-| `createdAt` | string | No |  |
-| `description` | string | No |  |
-| `id` | string | No |  |
-| `name` | string | No |  |
-| `status` | [OutfitStatus](#smart-wardrobe-beinternalmoduleswardrobedomainconstantsoutfitstatusoutfitstatus) | No |  |
+| Property        | Type                                                                                             | Required | Description |
+| --------------- | ------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `coverImageUrl` | string                                                                                           | No       |             |
+| `createdAt`     | string                                                                                           | No       |             |
+| `description`   | string                                                                                           | No       |             |
+| `id`            | string                                                                                           | No       |             |
+| `name`          | string                                                                                           | No       |             |
+| `status`        | [OutfitStatus](#smart-wardrobe-beinternalmoduleswardrobedomainconstantsoutfitstatusoutfitstatus) | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtooutfititemres"></a>`OutfitItemRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `fashionItem` | [FashionItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitembriefres) | No |  |
-| `id` | string | No |  |
-| `isAvailable` | boolean | No |  |
-| `itemContext` | string | No |  |
-| `layerOrder` | integer | No |  |
-| `positionX` | number | No |  |
-| `positionY` | number | No |  |
-| `scale` | number | No |  |
+| Property      | Type                                                                                              | Required | Description |
+| ------------- | ------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `fashionItem` | [FashionItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitembriefres) | No       |             |
+| `id`          | string                                                                                            | No       |             |
+| `isAvailable` | boolean                                                                                           | No       |             |
+| `itemContext` | string                                                                                            | No       |             |
+| `layerOrder`  | integer                                                                                           | No       |             |
+| `positionX`   | number                                                                                            | No       |             |
+| `positionY`   | number                                                                                            | No       |             |
+| `scale`       | number                                                                                            | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtooutfitres"></a>`OutfitRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `coverImageUrl` | string | No |  |
-| `createdAt` | string | No |  |
-| `description` | string | No |  |
-| `id` | string | No |  |
-| `items` | Array<[OutfitItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtooutfititemres)> | No |  |
-| `name` | string | No |  |
-| `status` | [OutfitStatus](#smart-wardrobe-beinternalmoduleswardrobedomainconstantsoutfitstatusoutfitstatus) | No |  |
-| `updatedAt` | string | No |  |
-| `userId` | string | No |  |
+| Property        | Type                                                                                             | Required | Description |
+| --------------- | ------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `coverImageUrl` | string                                                                                           | No       |             |
+| `createdAt`     | string                                                                                           | No       |             |
+| `description`   | string                                                                                           | No       |             |
+| `id`            | string                                                                                           | No       |             |
+| `items`         | Array<[OutfitItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtooutfititemres)>     | No       |             |
+| `name`          | string                                                                                           | No       |             |
+| `status`        | [OutfitStatus](#smart-wardrobe-beinternalmoduleswardrobedomainconstantsoutfitstatusoutfitstatus) | No       |             |
+| `updatedAt`     | string                                                                                           | No       |             |
+| `userId`        | string                                                                                           | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtosaveoutfititemreq"></a>`SaveOutfitItemReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `fashionItemId` | string | Yes |  |
-| `layerOrder` | integer | Yes |  |
-| `positionX` | number | No |  |
-| `positionY` | number | No |  |
-| `scale` | number | Yes |  |
+| Property        | Type    | Required | Description |
+| --------------- | ------- | -------- | ----------- |
+| `fashionItemId` | string  | Yes      |             |
+| `layerOrder`    | integer | Yes      |             |
+| `positionX`     | number  | No       |             |
+| `positionY`     | number  | No       |             |
+| `scale`         | number  | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtosaveoutfitreq"></a>`SaveOutfitReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `coverImageUrl` | string | No |  |
-| `coverPublicId` | string | No |  |
-| `description` | string | No |  |
-| `items` | Array<[SaveOutfitItemReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtosaveoutfititemreq)> | Yes |  |
-| `name` | string | Yes |  |
+| Property        | Type                                                                                                 | Required | Description |
+| --------------- | ---------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `coverImageUrl` | string                                                                                               | No       |             |
+| `coverPublicId` | string                                                                                               | No       |             |
+| `description`   | string                                                                                               | No       |             |
+| `items`         | Array<[SaveOutfitItemReq](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtosaveoutfititemreq)> | Yes      |             |
+| `name`          | string                                                                                               | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtosearchwardrobeitemres"></a>`SearchWardrobeItemRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `fashionItem` | [FashionItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitembriefres) | No |  |
-| `id` | string | No |  |
-| `isSystem` | boolean | No |  |
-| `price` | number | No |  |
+| Property      | Type                                                                                              | Required | Description |
+| ------------- | ------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `fashionItem` | [FashionItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitembriefres) | No       |             |
+| `id`          | string                                                                                            | No       |             |
+| `isSystem`    | boolean                                                                                           | No       |             |
+| `price`       | number                                                                                            | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtoupdatesystemcatalogitemreq"></a>`UpdateSystemCatalogItemReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `categoryId` | string | No |  |
-| `color` | string | No |  |
-| `fit` | string | No |  |
-| `material` | string | No |  |
-| `pattern` | string | No |  |
-| `price` | number | No |  |
-| `seasonality` | string | No |  |
-| `style` | string | No |  |
+| Property      | Type   | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `categoryId`  | string | No       |             |
+| `color`       | string | No       |             |
+| `fit`         | string | No       |             |
+| `material`    | string | No       |             |
+| `pattern`     | string | No       |             |
+| `price`       | number | No       |             |
+| `seasonality` | string | No       |             |
+| `style`       | string | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtoupdatewardrobeitemreq"></a>`UpdateWardrobeItemReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `categoryId` | string | No |  |
-| `price` | number | No |  |
+| Property     | Type   | Required | Description |
+| ------------ | ------ | -------- | ----------- |
+| `categoryId` | string | No       |             |
+| `price`      | number | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobebatchuploaditemreq"></a>`WardrobeBatchUploadItemReq`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `categoryId` | string | No |  |
-| `imagePublicId` | string | Yes |  |
-| `imageUrl` | string | Yes |  |
+| Property        | Type   | Required | Description |
+| --------------- | ------ | -------- | ----------- |
+| `categoryId`    | string | No       |             |
+| `imagePublicId` | string | Yes      |             |
+| `imageUrl`      | string | Yes      |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitembriefres"></a>`WardrobeItemBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandItem` | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres) | No |  |
-| `fashionItem` | [FashionItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitembriefres) | No |  |
-| `fashionItemId` | string | No |  |
-| `id` | string | No |  |
-| `isLocked` | boolean | No |  |
-| `lastUsedAt` | string | No |  |
-| `price` | number | No |  |
-| `status` | [WardrobeItemStatus](#smart-wardrobe-beinternalmoduleswardrobedomainconstantswardrobestatuswardrobeitemstatus) | No |  |
-| `taskId` | string | No |  |
+| Property        | Type                                                                                                           | Required | Description |
+| --------------- | -------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandItem`     | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres)                  | No       |             |
+| `fashionItem`   | [FashionItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitembriefres)              | No       |             |
+| `fashionItemId` | string                                                                                                         | No       |             |
+| `id`            | string                                                                                                         | No       |             |
+| `isLocked`      | boolean                                                                                                        | No       |             |
+| `lastUsedAt`    | string                                                                                                         | No       |             |
+| `price`         | number                                                                                                         | No       |             |
+| `status`        | [WardrobeItemStatus](#smart-wardrobe-beinternalmoduleswardrobedomainconstantswardrobestatuswardrobeitemstatus) | No       |             |
+| `taskId`        | string                                                                                                         | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres"></a>`WardrobeItemRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `brandItem` | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres) | No |  |
-| `createdAt` | string | No |  |
-| `fashionItem` | [FashionItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitemres) | No |  |
-| `fashionItemId` | string | No |  |
-| `id` | string | No |  |
-| `isDeleted` | boolean | No |  |
-| `isLocked` | boolean | No |  |
-| `itemContext` | string | No |  |
-| `lastUsedAt` | string | No |  |
-| `price` | number | No |  |
-| `status` | [WardrobeItemStatus](#smart-wardrobe-beinternalmoduleswardrobedomainconstantswardrobestatuswardrobeitemstatus) | No |  |
-| `taskId` | string | No |  |
-| `userId` | string | No |  |
+| Property        | Type                                                                                                           | Required | Description |
+| --------------- | -------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `brandItem`     | [BrandItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtobranditembriefres)                  | No       |             |
+| `createdAt`     | string                                                                                                         | No       |             |
+| `fashionItem`   | [FashionItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtofashionitemres)                        | No       |             |
+| `fashionItemId` | string                                                                                                         | No       |             |
+| `id`            | string                                                                                                         | No       |             |
+| `isDeleted`     | boolean                                                                                                        | No       |             |
+| `isLocked`      | boolean                                                                                                        | No       |             |
+| `itemContext`   | string                                                                                                         | No       |             |
+| `lastUsedAt`    | string                                                                                                         | No       |             |
+| `price`         | number                                                                                                         | No       |             |
+| `status`        | [WardrobeItemStatus](#smart-wardrobe-beinternalmoduleswardrobedomainconstantswardrobestatuswardrobeitemstatus) | No       |             |
+| `taskId`        | string                                                                                                         | No       |             |
+| `userId`        | string                                                                                                         | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobestatsres"></a>`WardrobeStatsRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `activeItemsCount` | integer | No |  |
-| `outfitsCount` | integer | No |  |
+| Property           | Type    | Required | Description |
+| ------------------ | ------- | -------- | ----------- |
+| `activeItemsCount` | integer | No       |             |
+| `outfitsCount`     | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobedomainconstantsoutfitstatusoutfitstatus"></a>`OutfitStatus`
 
-*Enum values:*
+_Enum values:_
 
 - `0` (**Draft**)
 - `1` (**Active**)
 
 ### <a id="smart-wardrobe-beinternalmoduleswardrobedomainconstantswardrobestatuswardrobeitemstatus"></a>`WardrobeItemStatus`
 
-*Enum values:*
+_Enum values:_
 
 - `0` (**InWardrobe**)
 - `1` (**Selling**)
@@ -7421,96 +7428,96 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata"></a>`PaginationMetadata`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `limit` | integer | No |  |
-| `page` | integer | No |  |
-| `totalItems` | integer | No |  |
-| `totalPages` | integer | No |  |
+| Property     | Type    | Required | Description |
+| ------------ | ------- | -------- | ----------- |
+| `limit`      | integer | No       |             |
+| `page`       | integer | No       |             |
+| `totalItems` | integer | No       |             |
+| `totalPages` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtopaginationresult-smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoaiusageitemdto"></a>`PaginationResult-smart-wardrobe-be_internal_modules_aiexecutor_application_dto_AIUsageItemDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[AIUsageItemDTO](#smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoaiusageitemdto)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                             | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `items`    | Array<[AIUsageItemDTO](#smart-wardrobe-beinternalmodulesaiexecutorapplicationdtoaiusageitemdto)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)           | No       |             |
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtopaginationresult-smart-wardrobe-beinternalmodulesfashionapplicationdtochatmessageres"></a>`PaginationResult-smart-wardrobe-be_internal_modules_fashion_application_dto_ChatMessageRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[ChatMessageRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtochatmessageres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                          | Required | Description |
+| ---------- | --------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[ChatMessageRes](#smart-wardrobe-beinternalmodulesfashionapplicationdtochatmessageres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)        | No       |             |
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtopaginationresult-smart-wardrobe-beinternalmodulessubscriptionapplicationdtoadminusersubscriptionitemdto"></a>`PaginationResult-smart-wardrobe-be_internal_modules_subscription_application_dto_AdminUserSubscriptionItemDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[AdminUserSubscriptionItemDTO](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtoadminusersubscriptionitemdto)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                                           | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `items`    | Array<[AdminUserSubscriptionItemDTO](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtoadminusersubscriptionitemdto)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                                         | No       |             |
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtopaginationresult-smart-wardrobe-beinternalmodulessubscriptionapplicationdtowalletstatementdto"></a>`PaginationResult-smart-wardrobe-be_internal_modules_subscription_application_dto_WalletStatementDTO`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[WalletStatementDTO](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtowalletstatementdto)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                       | Required | Description |
+| ---------- | ---------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[WalletStatementDTO](#smart-wardrobe-beinternalmodulessubscriptionapplicationdtowalletstatementdto)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                     | No       |             |
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtopaginationresult-smart-wardrobe-beinternalmoduleswardrobeapplicationdtooutfitbriefres"></a>`PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_OutfitBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[OutfitBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtooutfitbriefres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                           | Required | Description |
+| ---------- | ---------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[OutfitBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtooutfitbriefres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)         | No       |             |
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtopaginationresult-smart-wardrobe-beinternalmoduleswardrobeapplicationdtosearchwardrobeitemres"></a>`PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_SearchWardrobeItemRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[SearchWardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtosearchwardrobeitemres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                         | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `items`    | Array<[SearchWardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtosearchwardrobeitemres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                       | No       |             |
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtopaginationresult-smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitembriefres"></a>`PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_WardrobeItemBriefRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[WardrobeItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitembriefres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                                       | Required | Description |
+| ---------- | ---------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `items`    | Array<[WardrobeItemBriefRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitembriefres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)                     | No       |             |
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtopaginationresult-smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres"></a>`PaginationResult-smart-wardrobe-be_internal_modules_wardrobe_application_dto_WardrobeItemRes`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | Array<[WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)> | No |  |
-| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata) | No |  |
+| Property   | Type                                                                                             | Required | Description |
+| ---------- | ------------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `items`    | Array<[WardrobeItemRes](#smart-wardrobe-beinternalmoduleswardrobeapplicationdtowardrobeitemres)> | No       |             |
+| `metadata` | [PaginationMetadata](#smart-wardrobe-beinternalsharedapplicationdtopaginationmetadata)           | No       |             |
 
 ### <a id="smart-wardrobe-beinternalsharedapplicationdtouploadsignatureresult"></a>`UploadSignatureResult`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `apiKey` | string | No |  |
-| `folder` | string | No |  |
-| `publicId` | string | No |  |
-| `signature` | string | No |  |
-| `timestamp` | integer | No |  |
+| Property    | Type    | Required | Description |
+| ----------- | ------- | -------- | ----------- |
+| `apiKey`    | string  | No       |             |
+| `folder`    | string  | No       |             |
+| `publicId`  | string  | No       |             |
+| `signature` | string  | No       |             |
+| `timestamp` | integer | No       |             |
 
 ### <a id="smart-wardrobe-beinternalshareddomainconstantsroleslugroleslug"></a>`RoleSlug`
 
-*Enum values:*
+_Enum values:_
 
 - `admin` (**Admin**)
 - `user` (**User**)
 
 ### <a id="smart-wardrobe-beinternalshareddomainconstantssharedcurrencycurrency"></a>`Currency`
 
-*Enum values:*
+_Enum values:_
 
 - `vnd` (**VND**)
 - `usd` (**USD**)
 
 ### <a id="smart-wardrobe-beinternalshareddomainconstantssharedgendergender"></a>`Gender`
 
-*Enum values:*
+_Enum values:_
 
 - `0` (**Unknown**)
 - `1` (**Male**)
@@ -7519,8 +7526,7 @@ Dữ liệu Webhook
 
 ### <a id="smart-wardrobe-beinternalsharedpresentationapiresponse"></a>`APIResponse`
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| `data` | object | No |  |
-| `message` | string | No |  |
-
+| Property  | Type   | Required | Description |
+| --------- | ------ | -------- | ----------- |
+| `data`    | object | No       |             |
+| `message` | string | No       |             |

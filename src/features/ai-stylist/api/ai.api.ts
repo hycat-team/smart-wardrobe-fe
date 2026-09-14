@@ -5,6 +5,7 @@ import { AIOutfitRecommendationReq, AIOutfitRecommendationRes, CreateChatSession
 export const aiApi = {
   getOutfitRecommendation: async (data: AIOutfitRecommendationReq): Promise<AIOutfitRecommendationRes> => {
     // AI processing can take a while, increase timeout to 60 seconds
+    // Backend đã chuyển sang camelCase `includeBrandItems` nên FE gửi thẳng data.
     const res = await api.post<APIResponse<AIOutfitRecommendationRes>>('/ai/outfit-recommendations', data, {
       timeout: 200000,
     });
