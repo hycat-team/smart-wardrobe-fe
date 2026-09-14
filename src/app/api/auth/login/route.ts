@@ -1,19 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import {
-  accessCookieOptions,
-  refreshCookieOptions,
-  stripTokens,
-} from '@/lib/auth-cookies';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { accessCookieOptions, refreshCookieOptions, stripTokens } from '@/lib/auth-cookies';
+import { getBackendBaseUrl } from '@/lib/backend-url';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const cleanBaseUrl = API_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
+    const baseUrl = getBackendBaseUrl();
 
-    const response = await fetch(`${cleanBaseUrl}/auth/login`, {
+    const response = await fetch(`${baseUrl}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +37,12 @@ export async function POST(request: NextRequest) {
       if (!token) {
         for (const key in data) {
           if (data[key] && typeof data[key] === 'object') {
-            token = data[key].accessToken || data[key].token || data[key].access_token || data[key].jwt || data[key].jwtToken;
+            token =
+              data[key].accessToken ||
+              data[key].token ||
+              data[key].access_token ||
+              data[key].jwt ||
+              data[key].jwtToken;
             refreshToken = data[key].refreshToken || data[key].refresh_token;
             if (token) break;
           }

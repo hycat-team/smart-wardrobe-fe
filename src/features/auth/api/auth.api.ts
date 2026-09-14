@@ -13,9 +13,10 @@ import {
 
 export const authApi = {
   login: async (data: LoginReq): Promise<AuthTokenRes & { message?: string }> => {
-    // Gọi thẳng Next.js API route (BFF) để set HttpOnly Cookie
-    const res = await api.post<APIResponse<AuthTokenRes>>('/api/auth/login', data, {
-      baseURL: '', // Bỏ qua /api/v1 baseURL mặc định
+    // Gọi BFF chuẩn /api/v1/auth/login (backend yêu cầu prefix /api/v1).
+    // BFF set HttpOnly Cookie, không lộ token ra JS.
+    const res = await api.post<APIResponse<AuthTokenRes>>('/api/v1/auth/login', data, {
+      baseURL: '', // Bỏ qua /api/v1 baseURL mặc định của axios (đã có sẵn trong path)
     });
     // Không log response login — từng chứa token, tránh lộ qua console
     const responseData = res.data as any;
@@ -39,14 +40,14 @@ export const authApi = {
   },
 
   logout: async (): Promise<{ message?: string }> => {
-    // Next.js API route to clear cookies
-    const res = await api.post<APIResponse>('/api/auth/logout', {}, { baseURL: '' });
+    // Next.js API route to clear cookies (chuẩn /api/v1)
+    const res = await api.post<APIResponse>('/api/v1/auth/logout', {}, { baseURL: '' });
     return { message: res.data.message };
   },
 
   refreshToken: async (): Promise<AuthTokenRes> => {
-    // Next.js API route to refresh and set new HttpOnly cookies
-    const res = await api.post<APIResponse<AuthTokenRes>>('/api/auth/refresh-token', {}, { baseURL: '' });
+    // Next.js API route to refresh and set new HttpOnly cookies (chuẩn /api/v1)
+    const res = await api.post<APIResponse<AuthTokenRes>>('/api/v1/auth/refresh-token', {}, { baseURL: '' });
     return res.data.data || (res.data as any);
   },
 

@@ -6,8 +6,7 @@ import {
   refreshCookieOptions,
   stripTokens,
 } from '@/lib/auth-cookies';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { getBackendBaseUrl } from '@/lib/backend-url';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,8 +16,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Không có refresh token' }, { status: 401 });
     }
 
-    const cleanBaseUrl = API_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
-    const response = await fetch(`${cleanBaseUrl}/auth/refresh-token`, {
+    const baseUrl = getBackendBaseUrl();
+    const response = await fetch(`${baseUrl}/auth/refresh-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

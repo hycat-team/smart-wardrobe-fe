@@ -30,10 +30,24 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    // Chuẩn hóa backend base để luôn là .../api/v1:
+    // - env `.../api` (thiếu v1) -> thêm `/v1`
+    // - env `.../api/v1` -> giữ nguyên (tránh double /api/v1/api/v1)
+    const raw =
+      process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1';
+    const cleaned = raw
+      .replace(/^['"]|['"]$/g, '')
+      .trim()
+      .replace(/\/+$/, '');
+    const backendBase = cleaned.endsWith('/api/v1')
+      ? cleaned
+      : cleaned.endsWith('/api')
+        ? `${cleaned}/v1`
+        : `${cleaned}/api/v1`;
     return [
       {
         source: '/api/v1/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api/v1'}/:path*`,
+        destination: `${backendBase}/:path*`,
       },
     ];
   },

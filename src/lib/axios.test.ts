@@ -33,7 +33,7 @@ describe('Axios Interceptor - Auto Refresh Token Flow', () => {
     // Khởi tạo mock cho instance api
     mock = new MockAdapter(api);
     
-    // Mock trực tiếp axios.post vì interceptor gọi axios.post('/api/auth/refresh-token')
+    // Mock trực tiếp axios.post vì interceptor gọi axios.post('/api/v1/auth/refresh-token')
     jest.spyOn(axios, 'post');
   });
 
@@ -69,7 +69,7 @@ describe('Axios Interceptor - Auto Refresh Token Flow', () => {
     const res = await api.get('/me/wardrobe-items');
 
     // Kiểm tra kết quả
-    expect(axios.post).toHaveBeenCalledWith('/api/auth/refresh-token', {}, { baseURL: '' });
+    expect(axios.post).toHaveBeenCalledWith('/api/v1/auth/refresh-token', {}, { baseURL: '' });
     expect(res.status).toBe(200);
     expect(res.data).toEqual({ data: 'Success after refresh' });
   });
