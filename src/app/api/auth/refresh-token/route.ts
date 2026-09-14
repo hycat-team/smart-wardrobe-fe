@@ -6,7 +6,7 @@ import {
   refreshCookieOptions,
   stripTokens,
 } from '@/lib/auth-cookies';
-import { getBackendBaseUrl } from '@/lib/backend-url';
+import { backendHostForLog, getBackendBaseUrl } from '@/lib/backend-url';
 
 export async function POST(request: NextRequest) {
   try {
@@ -72,8 +72,12 @@ export async function POST(request: NextRequest) {
 
     return res;
   } catch (error) {
-    console.error('Refresh Token Proxy Error:', error);
-    const res = NextResponse.json({ message: 'Lỗi máy chủ nội bộ' }, { status: 500 });
+    const unreachable = error instanceof TypeError;
+    console.error(`Refresh Token Proxy Error (backend=${backendHostForLog()}):`, error);
+    const res = NextResponse.json(
+      { message: unreachable ? 'Không thể kết nối máy chủ. Vui lòng thử lại sau.' : 'Lỗi máy chủ nội bộ' },
+      { status: unreachable ? 503 : 500 }
+    );
     res.cookies.set('accessToken', '', clearCookieOptions());
     res.cookies.set('refreshToken', '', clearCookieOptions());
     return res;
