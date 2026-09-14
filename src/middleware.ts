@@ -5,10 +5,16 @@ import type { NextRequest } from 'next/server';
 // Tránh lỗi production khi env chỉ là `.../api` (thiếu `/v1`)
 // khiến fetch tới `.../api/auth/...` thay vì `.../api/v1/auth/...` gây 500.
 function getBackendBaseUrl(): string {
-  const raw =
-    process.env.BACKEND_API_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    'http://127.0.0.1:8080/api/v1';
+  const raw = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL;
+  if (!raw) {
+    // Production thiếu env -> fetch refresh sẽ ECONNREFUSED về localhost.
+    // Log rõ 1 lần để dễ phát hiện, không throw để tránh sập mọi request.
+    console.error(
+      '[backend-url] Missing BACKEND_API_URL (or NEXT_PUBLIC_API_URL) in production. ' +
+        'Set it to the backend base, e.g. https://<backend-host>/api/v1, and redeploy.'
+    );
+    return 'http://127.0.0.1:8080/api/v1';
+  }
   const cleaned = raw.replace(/^['"]|['"]$/g, '').trim().replace(/\/+$/, '');
   if (cleaned.endsWith('/api/v1')) return cleaned;
   if (cleaned.endsWith('/api')) return `${cleaned}/v1`;
