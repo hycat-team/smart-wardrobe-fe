@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { clearCookieOptions } from '@/lib/auth-cookies';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { getBackendBaseUrl } from '@/lib/backend-url';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,8 +9,8 @@ export async function POST(request: NextRequest) {
 
     // Chuẩn production: revoke refreshToken ở BE (gửi qua Cookie, không phải Bearer access)
     if (refreshToken) {
-      const cleanBaseUrl = API_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
-      await fetch(`${cleanBaseUrl}/auth/logout`, {
+      const baseUrl = getBackendBaseUrl();
+      await fetch(`${baseUrl}/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

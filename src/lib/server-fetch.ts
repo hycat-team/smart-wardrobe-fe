@@ -61,11 +61,15 @@ function getBackendUrl(): string {
     process.env.BACKEND_API_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
     'http://127.0.0.1:8080/api/v1';
-  // Bỏ quote thừa + slash cuối để tránh `http://x//products`
-  return raw
+  // Bỏ quote thừa + slash cuối để tránh `http://x//products`,
+  // đồng thời đảm bảo luôn có hậu tố /api/v1 (fix 500 do thiếu /v1 ở prod).
+  const cleaned = raw
     .replace(/^['"]|['"]$/g, '')
     .trim()
     .replace(/\/+$/, '');
+  if (cleaned.endsWith('/api/v1')) return cleaned;
+  if (cleaned.endsWith('/api')) return `${cleaned}/v1`;
+  return `${cleaned}/api/v1`;
 }
 
 export interface ServerFetchOptions extends Omit<RequestInit, 'headers'> {
