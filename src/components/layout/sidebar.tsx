@@ -53,7 +53,7 @@ export type NavItem = {
 export const NAV_ITEMS: NavItem[] = [
   // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
   // { icon: Globe, label: "Cộng Đồng", path: "/community" },
-  { icon: Compass, label: "Khám Phá", path: "/brands" },
+  // { icon: Compass, label: "Khám Phá", path: "/brands" },
   { icon: Shirt, label: "Tủ Quần Áo", path: "/wardrobe" },
   { icon: Sparkles, label: "AI Phối Đồ", path: "/ai-stylist" },
   { icon: Images, label: "Trang Phục", path: "/outfits" },
