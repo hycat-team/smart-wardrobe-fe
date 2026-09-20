@@ -200,13 +200,13 @@ export function Sidebar() {
             asChild
             className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50"
           >
-            <Link
+            {/* <Link
               href="/brand-portal/select"
               className="flex items-center gap-3 w-full text-foreground/80"
             >
               <Store className="size-4" />
               <span className="font-body-sm text-[13px] font-medium">Kênh Thương Hiệu</span>
-            </Link>
+            </Link> */}
           </DropdownMenuItem>
           {user?.roleSlug === 'admin' && (
             <DropdownMenuItem
