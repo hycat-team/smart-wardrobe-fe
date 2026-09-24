@@ -33,6 +33,18 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="relative z-10 w-full flex min-h-screen">
         {/* Left half - Branding (Hidden on mobile) */}
         <div className="hidden md:flex md:w-1/2 flex-col p-[64px] pointer-events-none gap-4 mt-8">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/brand/logo-only.png"
+              alt="Closy - Smart Wardrobe Logo"
+              width={56}
+              height={56}
+              className="w-14 h-14 object-contain drop-shadow-md"
+            />
+            <span className="font-playfair text-3xl font-semibold text-white drop-shadow-lg tracking-tight">
+              Closy<span className="text-[#D9C5B2]">.</span>
+            </span>
+          </div>
           <h2 className="font-playfair text-white drop-shadow-lg tracking-tight">
             <SplitText
               text="Chào mừng đến với Closy"
@@ -64,8 +76,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         {/* Right half - Card Wrapper */}
         <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-8 relative">
           {/* Mobile Branding */}
-          <div className="absolute top-8 left-0 w-full flex justify-center md:hidden pointer-events-none">
-            <h2 className="font-playfair text-[40px] font-semibold text-white drop-shadow-lg tracking-tight">Closy.</h2>
+          <div className="absolute top-8 left-0 w-full flex items-center justify-center gap-2 md:hidden pointer-events-none">
+            <Image
+              src="/brand/logo-only.png"
+              alt="Closy - Smart Wardrobe Logo"
+              width={36}
+              height={36}
+              className="w-9 h-9 object-contain drop-shadow-md"
+            />
+            <h2 className="font-playfair text-[36px] font-semibold text-white drop-shadow-lg tracking-tight">
+              Closy<span className="text-[#D9C5B2]">.</span>
+            </h2>
           </div>
 
           <AuthCard>

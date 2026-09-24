@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
@@ -16,8 +16,17 @@ const beVietnamPro = Be_Vietnam_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "Smart Wardrobe",
-  description: "Your digital fashion stylist",
+  title: "Closy | AI Fashion Stylist — Tủ Đồ Thông Minh",
+  description: "Closy - Trợ lý thời trang AI và quản lý tủ đồ thông minh của bạn.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/brand/logo-only.png", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({

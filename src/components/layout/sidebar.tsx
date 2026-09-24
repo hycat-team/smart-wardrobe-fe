@@ -109,13 +109,29 @@ export function Sidebar() {
             <span className="text-[9px] font-semibold tracking-[0.2em] uppercase">Tủ đồ thông minh</span>
           </div>
         )}
-        <Link href="/" className="flex items-center group w-fit">
-          <span className={cn(
-            "font-semibold font-light tracking-tighter text-primary transition-all",
-            isCollapsed ? "text-2xl" : "text-4xl"
-          )}>
-            {isCollapsed ? <img src="/favicon.ico" width={50} height={50}></img> : <><span className="font-semibold"> Closy </span><span className="text-[#D9C5B2]">.</span></>}
-          </span>
+        <Link href="/" className="flex items-center gap-2.5 group w-fit">
+          {isCollapsed ? (
+            <img 
+              src="/brand/logo-only.png" 
+              alt="Closy - Smart Wardrobe Logo" 
+              width={36} 
+              height={36} 
+              className="w-9 h-9 object-contain transition-transform group-hover:scale-105" 
+            />
+          ) : (
+            <>
+              <img 
+                src="/brand/logo-only.png" 
+                alt="Closy - Smart Wardrobe Logo" 
+                width={36} 
+                height={36} 
+                className="w-9 h-9 object-contain transition-transform group-hover:scale-105" 
+              />
+              <span className="font-semibold text-3xl font-light tracking-tighter text-primary transition-all">
+                <span className="font-semibold">Closy</span><span className="text-[#D9C5B2]">.</span>
+              </span>
+            </>
+          )}
         </Link>
       </div>
 
