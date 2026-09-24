@@ -1,20 +1,16 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Shirt,
   Sparkles,
@@ -33,15 +29,15 @@ import {
   Globe,
   Compass,
   type LucideIcon,
-  Images
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useB2BDemoStore } from "@/lib/mock-data/b2b/store";
-import { useLogout } from "@/features/auth/queries/auth.queries";
-import { getUserAvatar } from "@/lib/utils";
-import Image from "next/image";
-import { useSidebarStore } from "@/store/useSidebarStore";
+  Images,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
+import { useLogout } from '@/features/auth/queries/auth.queries';
+import { getUserAvatar } from '@/lib/utils';
+import Image from 'next/image';
+import { useSidebarStore } from '@/store/useSidebarStore';
 
 export type NavItem = {
   icon: LucideIcon;
@@ -53,11 +49,11 @@ export type NavItem = {
 export const NAV_ITEMS: NavItem[] = [
   // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
   // { icon: Globe, label: "Cộng Đồng", path: "/community" },
-  { icon: Compass, label: "Khám Phá", path: "/brands" },
-  { icon: Shirt, label: "Tủ Quần Áo", path: "/wardrobe" },
-  { icon: Sparkles, label: "AI Phối Đồ", path: "/ai-stylist" },
-  { icon: Images, label: "Trang Phục", path: "/outfits" },
-  { icon: Store, label: "Kênh Thương Hiệu", path: "/brand-portal/select" },
+  // { icon: Compass, label: "Khám Phá", path: "/brands" },
+  { icon: Shirt, label: 'Tủ Quần Áo', path: '/wardrobe' },
+  { icon: Sparkles, label: 'AI Phối Đồ', path: '/ai-stylist' },
+  { icon: Images, label: 'Trang Phục', path: '/outfits' },
+  // { icon: Store, label: "Kênh Thương Hiệu", path: "/brand-portal/select" },
 ];
 
 export function Sidebar() {
@@ -71,8 +67,8 @@ export function Sidebar() {
 
   // Load from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem("closy_sidebar_collapsed");
-    if (saved === "true") {
+    const saved = localStorage.getItem('closy_sidebar_collapsed');
+    if (saved === 'true') {
       setIsCollapsed(true);
     }
   }, [setIsCollapsed]);
@@ -87,11 +83,12 @@ export function Sidebar() {
   };
 
   return (
-    <aside className={cn(
-      "hidden md:flex flex-col border-r border-border/60 h-dvh sticky top-0 bg-[#FAFAFA] dark:bg-[#111111] z-40 py-6 transition-all duration-300",
-      isCollapsed ? "w-[88px] px-3" : "w-[280px] px-6"
-    )}>
-
+    <aside
+      className={cn(
+        'hidden md:flex flex-col border-r border-border/60 h-dvh sticky top-0 bg-[#FAFAFA] dark:bg-[#111111] z-40 py-6 transition-all duration-300',
+        isCollapsed ? 'w-[88px] px-3' : 'w-[280px] px-6'
+      )}
+    >
       {/* Collapse Toggle Button */}
       <button
         onClick={handleToggleCollapse}
@@ -100,35 +97,39 @@ export function Sidebar() {
         {isCollapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
       </button>
 
-
       {/* Editorial Logo */}
-      <div className={cn("mb-6 flex flex-col transition-all", isCollapsed ? "items-center" : "pl-1")}>
+      <div
+        className={cn('mb-6 flex flex-col transition-all', isCollapsed ? 'items-center' : 'pl-1')}
+      >
         {!isCollapsed && (
           <div className="flex items-center gap-1.5 mb-1.5 opacity-50">
             <Sparkles className="size-3" />
-            <span className="text-[9px] font-semibold tracking-[0.2em] uppercase">Tủ đồ thông minh</span>
+            <span className="text-[9px] font-semibold tracking-[0.2em] uppercase">
+              Tủ đồ thông minh
+            </span>
           </div>
         )}
         <Link href="/" className="flex items-center gap-2.5 group w-fit">
           {isCollapsed ? (
-            <img 
-              src="/brand/logo-only.png" 
-              alt="Closy - Smart Wardrobe Logo" 
-              width={36} 
-              height={36} 
-              className="w-9 h-9 object-contain transition-transform group-hover:scale-105" 
+            <img
+              src="/brand/logo-only.png"
+              alt="Closy - Smart Wardrobe Logo"
+              width={36}
+              height={36}
+              className="w-9 h-9 object-contain transition-transform group-hover:scale-105"
             />
           ) : (
             <>
-              <img 
-                src="/brand/logo-only.png" 
-                alt="Closy - Smart Wardrobe Logo" 
-                width={36} 
-                height={36} 
-                className="w-9 h-9 object-contain transition-transform group-hover:scale-105" 
+              <img
+                src="/brand/logo-only.png"
+                alt="Closy - Smart Wardrobe Logo"
+                width={36}
+                height={36}
+                className="w-9 h-9 object-contain transition-transform group-hover:scale-105"
               />
               <span className="font-semibold text-3xl font-light tracking-tighter text-primary transition-all">
-                <span className="font-semibold">Closy</span><span className="text-[#D9C5B2]">.</span>
+                <span className="font-semibold">Closy</span>
+                <span className="text-[#D9C5B2]">.</span>
               </span>
             </>
           )}
@@ -138,25 +139,27 @@ export function Sidebar() {
       {/* Elegant User Profile with Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className={cn(
-            "flex items-center mb-6 rounded-2xl bg-muted/20 border border-border/30 backdrop-blur-sm transition-all hover:bg-muted/40 cursor-pointer group outline-none",
-            isCollapsed ? "p-2 justify-center" : "p-3 gap-4"
-          )}>
+          <div
+            className={cn(
+              'flex items-center mb-6 rounded-2xl bg-muted/20 border border-border/30 backdrop-blur-sm transition-all hover:bg-muted/40 cursor-pointer group outline-none',
+              isCollapsed ? 'p-2 justify-center' : 'p-3 gap-4'
+            )}
+          >
             <Image
               src={getUserAvatar(user)}
               alt="Avatar"
               width={44}
               height={44}
               className={cn(
-                "rounded-full object-cover ring-2 ring-transparent group-hover:ring-[#D9C5B2]/30 transition-all",
-                isCollapsed ? "size-10" : "size-11"
+                'rounded-full object-cover ring-2 ring-transparent group-hover:ring-[#D9C5B2]/30 transition-all',
+                isCollapsed ? 'size-10' : 'size-11'
               )}
             />
             {!isCollapsed && (
               <>
                 <div className="flex flex-col flex-1 min-w-0">
                   <span className="text-sm font-semibold text-foreground truncate">
-                    {user?.name || "Ethos Atelier"}
+                    {user?.name || 'Ethos Atelier'}
                   </span>
                   <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest mt-0.5">
                     Xem hồ sơ
@@ -167,8 +170,16 @@ export function Sidebar() {
             )}
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align={isCollapsed ? "start" : "end"} side={isCollapsed ? "right" : "bottom"} sideOffset={isCollapsed ? 12 : 4} className="w-[240px] rounded-2xl bg-background/95 backdrop-blur-xl border-border/40 p-2 shadow-xl">
-          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+        <DropdownMenuContent
+          align={isCollapsed ? 'start' : 'end'}
+          side={isCollapsed ? 'right' : 'bottom'}
+          sideOffset={isCollapsed ? 12 : 4}
+          className="w-[240px] rounded-2xl bg-background/95 backdrop-blur-xl border-border/40 p-2 shadow-xl"
+        >
+          <DropdownMenuItem
+            asChild
+            className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50"
+          >
             <Link href="/profile" className="flex items-center gap-3 w-full text-foreground/80">
               <User className="size-4" />
               <span className="font-body-sm text-[13px] font-medium">Hồ sơ</span>
@@ -180,22 +191,40 @@ export function Sidebar() {
               <span className="font-body-sm text-[13px] font-medium">Đơn hàng</span>
             </Link>
           </DropdownMenuItem> */}
-          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
-            <Link href="/profile/update" className="flex items-center gap-3 w-full text-foreground/80">
+          <DropdownMenuItem
+            asChild
+            className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50"
+          >
+            <Link
+              href="/profile/update"
+              className="flex items-center gap-3 w-full text-foreground/80"
+            >
               <Settings className="size-4" />
               <span className="font-body-sm text-[13px] font-medium">Cài đặt</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="my-1 bg-border/40" />
-          <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
-            <Link href="/brand-portal/select" className="flex items-center gap-3 w-full text-foreground/80">
+          <DropdownMenuItem
+            asChild
+            className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50"
+          >
+            {/* <Link
+              href="/brand-portal/select"
+              className="flex items-center gap-3 w-full text-foreground/80"
+            >
               <Store className="size-4" />
               <span className="font-body-sm text-[13px] font-medium">Kênh Thương Hiệu</span>
-            </Link>
+            </Link> */}
           </DropdownMenuItem>
           {user?.roleSlug === 'admin' && (
-            <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
-              <Link href="/admin/brands" className="flex items-center gap-3 w-full text-red-500/80 hover:text-red-500">
+            <DropdownMenuItem
+              asChild
+              className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted/50 focus:bg-muted/50"
+            >
+              <Link
+                href="/admin/brands"
+                className="flex items-center gap-3 w-full text-red-500/80 hover:text-red-500"
+              >
                 <Settings className="size-4" />
                 <span className="font-body-sm text-[13px] font-medium">Quản trị hệ thống</span>
               </Link>
@@ -217,9 +246,11 @@ export function Sidebar() {
       {/* Main Navigation (Minimalist List) */}
       <nav className="flex-1 flex flex-col gap-1">
         {NAV_ITEMS.map((item) => {
-          const isActive = item.path === '/wardrobe'
-            ? pathname === '/wardrobe' || (pathname.startsWith('/wardrobe/') && !pathname.startsWith('/wardrobe/explore'))
-            : pathname.startsWith(item.path);
+          const isActive =
+            item.path === '/wardrobe'
+              ? pathname === '/wardrobe' ||
+                (pathname.startsWith('/wardrobe/') && !pathname.startsWith('/wardrobe/explore'))
+              : pathname.startsWith(item.path);
 
           const Icon = item.icon;
 
@@ -227,32 +258,40 @@ export function Sidebar() {
             <Link
               href={item.path}
               className={cn(
-                "group flex items-center rounded-xl transition-all relative overflow-hidden",
-                isCollapsed ? "justify-center p-3" : "gap-4 px-4 py-3",
-                isActive ? "text-primary bg-primary/5" : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                'group flex items-center rounded-xl transition-all relative overflow-hidden',
+                isCollapsed ? 'justify-center p-3' : 'gap-4 px-4 py-3',
+                isActive
+                  ? 'text-primary bg-primary/5'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
               )}
             >
               {/* Active Indicator Line */}
               {isActive && (
-                <span className={cn(
-                  "absolute bg-[#D9C5B2] rounded-r-full",
-                  isCollapsed ? "left-0 top-1/2 -translate-y-1/2 w-1 h-1/2" : "left-0 top-1/2 -translate-y-1/2 w-1 h-1/2"
-                )} />
+                <span
+                  className={cn(
+                    'absolute bg-[#D9C5B2] rounded-r-full',
+                    isCollapsed
+                      ? 'left-0 top-1/2 -translate-y-1/2 w-1 h-1/2'
+                      : 'left-0 top-1/2 -translate-y-1/2 w-1 h-1/2'
+                  )}
+                />
               )}
 
               <Icon
                 className={cn(
-                  "size-5 transition-transform duration-300 group-hover:scale-110 flex-shrink-0",
-                  isActive ? "text-[#D9C5B2]" : "text-muted-foreground group-hover:text-foreground"
+                  'size-5 transition-transform duration-300 group-hover:scale-110 flex-shrink-0',
+                  isActive ? 'text-[#D9C5B2]' : 'text-muted-foreground group-hover:text-foreground'
                 )}
                 strokeWidth={isActive ? 2.5 : 1.5}
               />
               {!isCollapsed && (
                 <>
-                  <span className={cn(
-                    "font-body-sm text-[14px] tracking-wide truncate",
-                    isActive ? "font-semibold" : "font-medium"
-                  )}>
+                  <span
+                    className={cn(
+                      'font-body-sm text-[14px] tracking-wide truncate',
+                      isActive ? 'font-semibold' : 'font-medium'
+                    )}
+                  >
                     {item.label}
                   </span>
                   {item.comingSoon && (
@@ -268,11 +307,13 @@ export function Sidebar() {
           if (isCollapsed) {
             return (
               <Tooltip key={item.path}>
-                <TooltipTrigger render={<div />}>
-                  {content}
-                </TooltipTrigger>
-                <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest">
-                  {item.label} {item.comingSoon && "(Sắp ra mắt)"}
+                <TooltipTrigger render={<div />}>{content}</TooltipTrigger>
+                <TooltipContent
+                  side="right"
+                  sideOffset={12}
+                  className="font-semibold text-xs font-medium uppercase tracking-widest"
+                >
+                  {item.label} {item.comingSoon && '(Sắp ra mắt)'}
                 </TooltipContent>
               </Tooltip>
             );
@@ -325,11 +366,15 @@ export function Sidebar() {
 
       {/* Premium Upgrade (Minimal Style) */}
       {!user?.isPremium && (
-        <div className={cn(
-          "mt-auto mb-6 relative overflow-hidden rounded-2xl bg-muted/30 border border-border/50 group cursor-pointer transition-colors hover:bg-muted/50",
-          isCollapsed ? "p-3 flex justify-center items-center" : "p-5"
-        )}>
-          {!isCollapsed && <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#D9C5B2]/20 rounded-full blur-2xl transition-colors duration-700 group-hover:bg-[#D9C5B2]/30" />}
+        <div
+          className={cn(
+            'mt-auto mb-6 relative overflow-hidden rounded-2xl bg-muted/30 border border-border/50 group cursor-pointer transition-colors hover:bg-muted/50',
+            isCollapsed ? 'p-3 flex justify-center items-center' : 'p-5'
+          )}
+        >
+          {!isCollapsed && (
+            <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#D9C5B2]/20 rounded-full blur-2xl transition-colors duration-700 group-hover:bg-[#D9C5B2]/30" />
+          )}
 
           {isCollapsed ? (
             <Tooltip>
@@ -338,7 +383,11 @@ export function Sidebar() {
                   <Sparkles className="size-5 text-foreground/80 group-hover:text-[#D9C5B2] transition-colors" />
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest text-[#D9C5B2]">
+              <TooltipContent
+                side="right"
+                sideOffset={12}
+                className="font-semibold text-xs font-medium uppercase tracking-widest text-[#D9C5B2]"
+              >
                 Nâng Cấp Premium
               </TooltipContent>
             </Tooltip>
@@ -359,14 +408,15 @@ export function Sidebar() {
                 href="/pricing"
                 className="mt-3 inline-flex items-center gap-2 text-foreground/90 font-medium text-[13px] group/btn"
               >
-                <span className="border-b border-foreground/30 pb-0.5 group-hover/btn:border-foreground/70 transition-colors">Nâng cấp ngay</span>
+                <span className="border-b border-foreground/30 pb-0.5 group-hover/btn:border-foreground/70 transition-colors">
+                  Nâng cấp ngay
+                </span>
                 <ChevronRight className="size-3 group-hover/btn:translate-x-1 transition-transform" />
               </Link>
             </div>
           )}
         </div>
       )}
-
     </aside>
   );
 }
