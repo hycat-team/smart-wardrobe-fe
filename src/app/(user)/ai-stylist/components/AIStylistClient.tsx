@@ -504,7 +504,7 @@ function AIStylistContent() {
                 />
               </div>
 
-              <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
+              {/* <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-widest text-foreground">
                     Phối đồ với các thương hiệu địa phương
@@ -514,7 +514,7 @@ function AIStylistContent() {
                   </p>
                 </div>
                 <Switch checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} />
-              </div>
+              </div> */}
             </div>
 
             <div className="p-4 border-t border-border bg-card">
