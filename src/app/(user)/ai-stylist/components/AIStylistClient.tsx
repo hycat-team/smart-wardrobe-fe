@@ -78,7 +78,7 @@ function AIStylistContent() {
         details: safeDetails,
         occasion: occasionMap[selectedOccasion] || selectedOccasion.trim(),
         styleTarget: selectedStyle ? selectedStyle.toLowerCase() : '',
-        includeBrandItems: ghostClosetEnabled ? true : undefined,
+        includeBrandItems: ghostClosetEnabled ? false : undefined,
       });
 
       setOutfitData(res);
