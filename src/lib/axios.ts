@@ -81,8 +81,8 @@ api.interceptors.response.use(
         isRefreshing = true;
 
         try {
-          // Gọi API refresh token của BFF
-          await axios.post('/api/auth/refresh-token', {}, { baseURL: '' });
+          // Gọi API refresh token của BFF (chuẩn /api/v1)
+          await axios.post('/api/v1/auth/refresh-token', {}, { baseURL: '' });
           processQueue(null);
           hasShownSessionExpiredToast = false; // Reset if successful
           return api(originalRequest);

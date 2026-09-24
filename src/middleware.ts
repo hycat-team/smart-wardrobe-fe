@@ -1,7 +1,25 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
+// Chuẩn hóa backend base URL để luôn có hậu tố /api/v1.
+// Tránh lỗi production khi env chỉ là `.../api` (thiếu `/v1`)
+// khiến fetch tới `.../api/auth/...` thay vì `.../api/v1/auth/...` gây 500.
+function getBackendBaseUrl(): string {
+  const raw = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL;
+  if (!raw) {
+    // Production thiếu env -> fetch refresh sẽ ECONNREFUSED về localhost.
+    // Log rõ 1 lần để dễ phát hiện, không throw để tránh sập mọi request.
+    console.error(
+      '[backend-url] Missing BACKEND_API_URL (or NEXT_PUBLIC_API_URL) in production. ' +
+        'Set it to the backend base, e.g. https://<backend-host>/api/v1, and redeploy.'
+    );
+    return 'http://127.0.0.1:8080/api/v1';
+  }
+  const cleaned = raw.replace(/^['"]|['"]$/g, '').trim().replace(/\/+$/, '');
+  if (cleaned.endsWith('/api/v1')) return cleaned;
+  if (cleaned.endsWith('/api')) return `${cleaned}/v1`;
+  return `${cleaned}/api/v1`;
+}
 
 // Hàm giải mã JWT Token (Base64) ở môi trường Edge Runtime
 function parseJwt(token: string) {
@@ -53,8 +71,8 @@ export async function middleware(request: NextRequest) {
   const isApiProxy = pathname.startsWith('/api/v1/');
   if (!isApiProxy && (!accessToken || isTokenExpired(accessToken)) && refreshToken && !pathname.includes('/auth/refresh-token')) {
     try {
-      // Gọi API refresh token tới Backend
-      const refreshRes = await fetch(`${BACKEND_URL}/auth/refresh-token`, {
+      // Gọi API refresh token tới Backend (luôn đủ /api/v1)
+      const refreshRes = await fetch(`${getBackendBaseUrl()}/auth/refresh-token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

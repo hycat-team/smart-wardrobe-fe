@@ -6,8 +6,7 @@ import {
   refreshCookieOptions,
   stripTokens,
 } from '@/lib/auth-cookies';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { backendHostForLog, getBackendBaseUrl } from '@/lib/backend-url';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,8 +16,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Không có refresh token' }, { status: 401 });
     }
 
-    const cleanBaseUrl = API_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
-    const response = await fetch(`${cleanBaseUrl}/auth/refresh-token`, {
+    const baseUrl = getBackendBaseUrl();
+    const response = await fetch(`${baseUrl}/auth/refresh-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -73,8 +72,12 @@ export async function POST(request: NextRequest) {
 
     return res;
   } catch (error) {
-    console.error('Refresh Token Proxy Error:', error);
-    const res = NextResponse.json({ message: 'Lỗi máy chủ nội bộ' }, { status: 500 });
+    const unreachable = error instanceof TypeError;
+    console.error(`Refresh Token Proxy Error (backend=${backendHostForLog()}):`, error);
+    const res = NextResponse.json(
+      { message: unreachable ? 'Không thể kết nối máy chủ. Vui lòng thử lại sau.' : 'Lỗi máy chủ nội bộ' },
+      { status: unreachable ? 503 : 500 }
+    );
     res.cookies.set('accessToken', '', clearCookieOptions());
     res.cookies.set('refreshToken', '', clearCookieOptions());
     return res;

@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { accessCookieOptions, refreshCookieOptions, stripTokens } from '@/lib/auth-cookies';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { backendHostForLog, getBackendBaseUrl } from '@/lib/backend-url';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const cleanBaseUrl = API_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
+    const baseUrl = getBackendBaseUrl();
 
-    const response = await fetch(`${cleanBaseUrl}/auth/login`, {
+    const response = await fetch(`${baseUrl}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,7 +97,14 @@ export async function POST(request: NextRequest) {
 
     return res;
   } catch (error) {
-    console.error('Login Proxy Error:', error);
-    return NextResponse.json({ message: 'Lỗi máy chủ nội bộ' }, { status: 500 });
+    // fetch failed (TypeError: DNS/ECONNREFUSED/timeout) nghĩa là BFF không
+    // tới được backend — thường do thiếu/sai BACKEND_API_URL ở production.
+    // Log kèm host để phân biệt "sai URL" vs "backend sập".
+    const unreachable = error instanceof TypeError;
+    console.error(`Login Proxy Error (backend=${backendHostForLog()}):`, error);
+    return NextResponse.json(
+      { message: unreachable ? 'Không thể kết nối máy chủ. Vui lòng thử lại sau.' : 'Lỗi máy chủ nội bộ' },
+      { status: unreachable ? 503 : 500 }
+    );
   }
 }

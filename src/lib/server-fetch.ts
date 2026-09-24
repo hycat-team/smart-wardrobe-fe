@@ -56,16 +56,29 @@
 
 import { cookies, headers } from 'next/headers';
 
+let warnedMissingBackendUrl = false;
+
 function getBackendUrl(): string {
-  const raw =
-    process.env.BACKEND_API_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    'http://127.0.0.1:8080/api/v1';
-  // Bỏ quote thừa + slash cuối để tránh `http://x//products`
-  return raw
+  const raw = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL;
+  if (!raw) {
+    if (process.env.NODE_ENV === 'production' && !warnedMissingBackendUrl) {
+      warnedMissingBackendUrl = true;
+      console.error(
+        '[backend-url] Missing BACKEND_API_URL (or NEXT_PUBLIC_API_URL) in production. ' +
+          'Set it to the backend base, e.g. https://<backend-host>/api/v1, and redeploy.'
+      );
+    }
+    return 'http://127.0.0.1:8080/api/v1';
+  }
+  // Bỏ quote thừa + slash cuối để tránh `http://x//products`,
+  // đồng thời đảm bảo luôn có hậu tố /api/v1 (fix 500 do thiếu /v1 ở prod).
+  const cleaned = raw
     .replace(/^['"]|['"]$/g, '')
     .trim()
     .replace(/\/+$/, '');
+  if (cleaned.endsWith('/api/v1')) return cleaned;
+  if (cleaned.endsWith('/api')) return `${cleaned}/v1`;
+  return `${cleaned}/api/v1`;
 }
 
 export interface ServerFetchOptions extends Omit<RequestInit, 'headers'> {
