@@ -58,8 +58,15 @@ export function AdminSidebar() {
           <ShieldAlert className="size-3 text-primary" />
           <span className="text-[9px] font-semibold tracking-[0.2em] uppercase text-primary">System Admin</span>
         </div>
-        <Link href="/admin/dashboard" className="flex items-center group w-fit">
-          <span className="font-semibold text-4xl text-foreground tracking-tighter">
+        <Link href="/admin/dashboard" className="flex items-center gap-2.5 group w-fit">
+          <img 
+            src="/brand/logo-only.png" 
+            alt="Closy - Smart Wardrobe Logo" 
+            width={32} 
+            height={32} 
+            className="w-8 h-8 object-contain rounded-full transition-transform group-hover:scale-105" 
+          />
+          <span className="font-semibold text-3xl text-foreground tracking-tighter">
             Closy<span className="text-primary">.</span>
           </span>
         </Link>
