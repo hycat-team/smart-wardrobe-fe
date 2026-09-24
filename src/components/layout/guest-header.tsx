@@ -67,7 +67,7 @@ export function GuestHeader() {
               width={48}
               height={48}
               className={`
-                transition-all duration-500 object-contain
+                transition-all duration-500 object-contain rounded-full
                 ${scrolled ? 'w-8 h-8 md:w-9 md:h-9' : 'w-10 h-10 md:w-12 md:h-12'}
               `}
             />
@@ -344,7 +344,7 @@ export function GuestHeader() {
                 alt="Closy - Smart Wardrobe Logo"
                 width={48}
                 height={48}
-                className="w-12 h-12 object-contain"
+                className="w-12 h-12 object-contain rounded-full"
               />
               <div className="flex items-baseline font-semibold text-5xl text-white font-medium">
                 CLOSY<span className="text-[#D9C5B2] italic ml-1">.</span>

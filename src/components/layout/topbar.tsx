@@ -20,7 +20,7 @@ export function Topbar() {
             alt="Closy - Smart Wardrobe Logo" 
             width={32} 
             height={32} 
-            className="w-8 h-8 object-contain" 
+            className="w-8 h-8 object-contain rounded-full" 
           />
           <span className="font-semibold text-xl font-light tracking-tighter text-primary">
             <span className="font-semibold">Closy</span><span className="text-[#D9C5B2]">.</span>

@@ -116,7 +116,7 @@ export function Sidebar() {
               alt="Closy - Smart Wardrobe Logo"
               width={36}
               height={36}
-              className="w-9 h-9 object-contain transition-transform group-hover:scale-105"
+              className="w-9 h-9 object-contain rounded-full transition-transform group-hover:scale-105"
             />
           ) : (
             <>
@@ -125,7 +125,7 @@ export function Sidebar() {
                 alt="Closy - Smart Wardrobe Logo"
                 width={36}
                 height={36}
-                className="w-9 h-9 object-contain transition-transform group-hover:scale-105"
+                className="w-9 h-9 object-contain rounded-full transition-transform group-hover:scale-105"
               />
               <span className="font-semibold text-3xl font-light tracking-tighter text-primary transition-all">
                 <span className="font-semibold">Closy</span>
