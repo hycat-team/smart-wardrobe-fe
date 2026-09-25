@@ -39,7 +39,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               alt="Closy - Smart Wardrobe Logo"
               width={56}
               height={56}
-              className="w-14 h-14 object-contain drop-shadow-md"
+              className="w-14 h-14 object-contain rounded-full drop-shadow-md"
             />
             <span className="font-playfair text-3xl font-semibold text-white drop-shadow-lg tracking-tight">
               Closy<span className="text-[#D9C5B2]">.</span>
@@ -82,7 +82,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               alt="Closy - Smart Wardrobe Logo"
               width={36}
               height={36}
-              className="w-9 h-9 object-contain drop-shadow-md"
+              className="w-9 h-9 object-contain rounded-full drop-shadow-md"
             />
             <h2 className="font-playfair text-[36px] font-semibold text-white drop-shadow-lg tracking-tight">
               Closy<span className="text-[#D9C5B2]">.</span>

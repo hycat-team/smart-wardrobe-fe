@@ -64,7 +64,7 @@ export function AdminSidebar() {
             alt="Closy - Smart Wardrobe Logo" 
             width={32} 
             height={32} 
-            className="w-8 h-8 object-contain transition-transform group-hover:scale-105" 
+            className="w-8 h-8 object-contain rounded-full transition-transform group-hover:scale-105" 
           />
           <span className="font-semibold text-3xl text-foreground tracking-tighter">
             Closy<span className="text-primary">.</span>

@@ -1,34 +1,45 @@
-"use client";
-import { useAuthStore } from "@/store/useAuthStore";
-import Link from "next/link";
-import { Settings, Crown, TrendingUp, Leaf, Award, Sparkles, Wallet, LayoutDashboard, Camera, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WalletPageContent } from "@/features/wallet/components/WalletPageContent";
-import { UserRes } from "@/features/profile/types";
-import { useProfile, useUpdateAvatar } from "@/features/profile/queries/profile.queries";
-import { getUserAvatar } from "@/lib/utils";
-import { useEffect, useState, useRef } from "react";
-import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
-import { subscriptionApi } from "@/features/subscription/api/subscription.api";
-import { CurrentPlanCard } from "@/features/subscription/components/CurrentPlanCard";
-import { ClaimAccountTab } from "./ClaimAccountTab";
-import { profileApi } from "@/features/profile/api/profile.api";
-import { uploadToCloudinary } from "@/lib/cloudinary";
-import { toast } from "sonner";
-
+'use client';
+import { useAuthStore } from '@/store/useAuthStore';
+import Link from 'next/link';
+import {
+  Settings,
+  Crown,
+  TrendingUp,
+  Leaf,
+  Award,
+  Sparkles,
+  Wallet,
+  LayoutDashboard,
+  Camera,
+  Loader2,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { WalletPageContent } from '@/features/wallet/components/WalletPageContent';
+import { UserRes } from '@/features/profile/types';
+import { useProfile, useUpdateAvatar } from '@/features/profile/queries/profile.queries';
+import { getUserAvatar } from '@/lib/utils';
+import { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
+import { useQuery } from '@tanstack/react-query';
+import { subscriptionApi } from '@/features/subscription/api/subscription.api';
+import { CurrentPlanCard } from '@/features/subscription/components/CurrentPlanCard';
+import { ClaimAccountTab } from './ClaimAccountTab';
+import { profileApi } from '@/features/profile/api/profile.api';
+import { uploadToCloudinary } from '@/lib/cloudinary';
+import { toast } from 'sonner';
 
 export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   // Pass initialProfile to useProfile so React Query hydrates it immediately
   const { data: profile } = useProfile(initialProfile);
 
-  const isPremium = (!!profile?.subscription?.planSlug && profile.subscription.planSlug !== "free") ||
-    (!!(profile as any)?.planSlug && (profile as any)?.planSlug !== "free");
+  const isPremium =
+    (!!profile?.subscription?.planSlug && profile.subscription.planSlug !== 'free') ||
+    (!!(profile as any)?.planSlug && (profile as any)?.planSlug !== 'free');
 
   // Format avatar and name to display
   const avatar = getUserAvatar(profile);
-  const name = profile?.firstName + (profile?.lastName ? ` ${profile.lastName}` : "");
+  const name = profile?.firstName + (profile?.lastName ? ` ${profile.lastName}` : '');
 
   const { data: mySubscription } = useQuery({
     queryKey: ['subscription', 'me'],
@@ -58,7 +69,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
     try {
       setIsUploading(true);
       const signatureData = await profileApi.getAvatarSignature();
-      
+
       const uploadRes = await uploadToCloudinary({
         file,
         signatureParams: signatureData,
@@ -68,7 +79,6 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
         avatarPublicId: uploadRes.public_id,
         avatarUrl: uploadRes.secure_url,
       });
-      
     } catch (error: any) {
       console.error('Upload avatar error:', error);
       toast.error(error.message || 'Có lỗi xảy ra khi tải ảnh lên');
@@ -82,19 +92,26 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
 
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-8 animate-in fade-in duration-500 pb-16 pt-10 font-sans px-4">
-
       {/* Profile Header */}
-      <div className={cn(
-        "rounded-3xl p-8 border relative overflow-hidden flex flex-col md:flex-row items-center gap-8",
-        isPremium ? "bg-card border-border shadow-md" : "bg-cream-dark/15 border-cream-dark/60"
-      )}>
+      <div
+        className={cn(
+          'rounded-3xl p-8 border relative overflow-hidden flex flex-col md:flex-row items-center gap-8',
+          isPremium ? 'bg-card border-border shadow-md' : 'bg-cream-dark/15 border-cream-dark/60'
+        )}
+      >
         {isPremium && (
           <div className="absolute inset-0 bg-[radial-gradient(#B8975A_0.5px,transparent_0.5px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
         )}
 
         <label className="relative z-10 size-32 rounded-full border-4 border-background overflow-hidden shrink-0 shadow-lg group cursor-pointer block">
-          <Image src={avatar} alt={name || "User Avatar"} width={128} height={128} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-          
+          <Image
+            src={avatar}
+            alt={name || 'User Avatar'}
+            width={128}
+            height={128}
+            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+          />
+
           {/* Avatar Upload Overlay */}
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
             {isUploading ? (
@@ -103,11 +120,11 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
               <Camera className="size-6 text-white" />
             )}
           </div>
-          <input 
-            type="file" 
-            onChange={handleAvatarChange} 
-            accept="image/*" 
-            className="hidden" 
+          <input
+            type="file"
+            onChange={handleAvatarChange}
+            accept="image/*"
+            className="hidden"
             disabled={isUploading}
           />
 
@@ -120,7 +137,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
 
         <div className="relative z-10 flex-1 text-center md:text-left space-y-3">
           <div>
-            <h1 className={cn("text-3xl font-heading font-medium tracking-wide text-ink")}>
+            <h1 className={cn('text-3xl font-heading font-medium tracking-wide text-ink')}>
               {name}
             </h1>
             <p className="text-sm font-mono text-muted-foreground mt-1">{profile?.email}</p>
@@ -135,7 +152,10 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
                 <Crown className="size-4" /> Premium
               </div>
             ) : (
-              <Link href="/pricing" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream-dark/50 hover:bg-terracotta/10 hover:text-terracotta border border-transparent transition-colors text-xs font-medium text-ink-muted">
+              <Link
+                href="/pricing"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream-dark/50 hover:bg-terracotta/10 hover:text-terracotta border border-transparent transition-colors text-xs font-medium text-ink-muted"
+              >
                 Nâng cấp Premium
               </Link>
             )}
@@ -154,10 +174,16 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-8 bg-cream-dark/15 border border-cream-dark/60 rounded-xl p-1 h-12 mx-auto md:mx-0">
-          <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-ink data-[state=active]:text-cream text-ink-muted">
+          <TabsTrigger
+            value="overview"
+            className="rounded-lg data-[state=active]:bg-ink data-[state=active]:text-cream text-ink-muted"
+          >
             <LayoutDashboard className="size-4 mr-2" /> Tổng quan
           </TabsTrigger>
-          <TabsTrigger value="wallet" className="rounded-lg data-[state=active]:bg-ink data-[state=active]:text-cream text-ink-muted">
+          <TabsTrigger
+            value="wallet"
+            className="rounded-lg data-[state=active]:bg-ink data-[state=active]:text-cream text-ink-muted"
+          >
             <Wallet className="size-4 mr-2" /> Ví thanh toán
           </TabsTrigger>
         </TabsList>
@@ -282,15 +308,13 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
               </div>
             </div>
           )} */}
-          <ClaimAccountTab />
+          {/* <ClaimAccountTab /> */}
         </TabsContent>
-
 
         <TabsContent value="wallet" className="animate-in fade-in duration-500 mt-2">
           <WalletPageContent />
         </TabsContent>
       </Tabs>
-
     </div>
   );
 }

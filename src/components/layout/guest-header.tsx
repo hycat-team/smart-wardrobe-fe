@@ -1,16 +1,30 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { useAuthStore } from "@/store/useAuthStore";
-import { UserCircle, LayoutDashboard, User as UserIcon, Settings, LogOut, Menu, X } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useLogout } from "@/features/auth/queries/auth.queries";
-import { getUserAvatar } from "@/lib/utils";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import { useAuthStore } from '@/store/useAuthStore';
+import {
+  UserCircle,
+  LayoutDashboard,
+  User as UserIcon,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useLogout } from '@/features/auth/queries/auth.queries';
+import { getUserAvatar } from '@/lib/utils';
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from 'react';
 
 export function GuestHeader() {
   const pathname = usePathname();
@@ -23,8 +37,8 @@ export function GuestHeader() {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Chỉ hiển thị ở trang chủ (landing page)
@@ -37,31 +51,31 @@ export function GuestHeader() {
       <header
         className={`
           fixed top-0 w-full z-[100] transition-all duration-500 ease-out
-          ${scrolled
-            ? "h-14 bg-[#1A1A1A]/90 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.06)]"
-            : "h-20 bg-transparent"
+          ${
+            scrolled
+              ? 'h-14 bg-[#1A1A1A]/90 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.06)]'
+              : 'h-20 bg-transparent'
           }
         `}
       >
         <div className="max-w-[1400px] mx-auto h-full px-6 md:px-10 flex items-center justify-between">
-
           {/* Logo */}
           <Link href="/" className="relative group flex items-center gap-2 md:gap-3">
-            <img 
-              src="/brand/logo-only.png" 
-              alt="Closy - Smart Wardrobe Logo" 
+            <img
+              src="/brand/logo-only.png"
+              alt="Closy - Smart Wardrobe Logo"
               width={48}
               height={48}
               className={`
-                transition-all duration-500 object-contain
-                ${scrolled ? "w-8 h-8 md:w-9 md:h-9" : "w-10 h-10 md:w-12 md:h-12"}
+                transition-all duration-500 object-contain rounded-full
+                ${scrolled ? 'w-8 h-8 md:w-9 md:h-9' : 'w-10 h-10 md:w-12 md:h-12'}
               `}
             />
             <div className="flex items-baseline">
               <span
                 className={`
                   font-semibold font-medium tracking-[-0.03em] transition-all duration-500
-                  ${scrolled ? "text-2xl text-white" : "text-4xl md:text-5xl text-[#1A1A1A]"}
+                  ${scrolled ? 'text-2xl text-white' : 'text-4xl md:text-5xl text-[#1A1A1A]'}
                 `}
               >
                 CLOSY
@@ -69,7 +83,7 @@ export function GuestHeader() {
               <span
                 className={`
                   font-semibold italic transition-all duration-500 ml-1
-                  ${scrolled ? "text-sm text-[#D9C5B2]" : "text-lg md:text-xl text-[#D9C5B2]"}
+                  ${scrolled ? 'text-sm text-[#D9C5B2]' : 'text-lg md:text-xl text-[#D9C5B2]'}
                 `}
               >
                 .
@@ -81,7 +95,7 @@ export function GuestHeader() {
           <nav className="hidden md:flex items-center gap-8">
             {isLoggedIn ? (
               <>
-                <Link
+                {/* <Link
                   href="/brand-portal/select"
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
@@ -90,7 +104,7 @@ export function GuestHeader() {
                   `}
                 >
                   Kênh Thương Hiệu
-                </Link>
+                </Link> */}
                 {user?.roleSlug === 'admin' && (
                   <Link
                     href="/admin/brands"
@@ -117,7 +131,7 @@ export function GuestHeader() {
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                     hover:opacity-100
-                    ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
+                    ${scrolled ? 'text-white/60 hover:text-white' : 'text-[#1A1A1A]/50 hover:text-[#1A1A1A]'}
                   `}
                 >
                   AI Stylist
@@ -127,32 +141,35 @@ export function GuestHeader() {
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                     hover:opacity-100
-                    ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
+                    ${scrolled ? 'text-white/60 hover:text-white' : 'text-[#1A1A1A]/50 hover:text-[#1A1A1A]'}
                   `}
                 >
                   Tủ đồ
                 </Link>
 
-
-
                 {/* Divider */}
-                <div className={`w-px h-5 transition-colors duration-500 ${scrolled ? "bg-white/10" : "bg-[#1A1A1A]/10"}`} />
+                <div
+                  className={`w-px h-5 transition-colors duration-500 ${scrolled ? 'bg-white/10' : 'bg-[#1A1A1A]/10'}`}
+                />
 
                 {/* Avatar Dropdown */}
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <button className="relative group/avatar outline-none">
-                      <div className={`
+                      <div
+                        className={`
                         size-9 rounded-full overflow-hidden transition-all duration-300 flex items-center justify-center
                         ring-2 ring-offset-2 group-hover/avatar:ring-[#D9C5B2]
-                        ${scrolled
-                          ? "ring-white/20 ring-offset-[#1A1A1A]"
-                          : "ring-[#1A1A1A]/10 ring-offset-[#F4F1EE]"
+                        ${
+                          scrolled
+                            ? 'ring-white/20 ring-offset-[#1A1A1A]'
+                            : 'ring-[#1A1A1A]/10 ring-offset-[#F4F1EE]'
                         }
-                      `}>
+                      `}
+                      >
                         <Image
                           src={getUserAvatar(user)}
-                          alt={user?.username || "User"}
+                          alt={user?.username || 'User'}
                           width={36}
                           height={36}
                           className="size-full object-cover"
@@ -166,24 +183,36 @@ export function GuestHeader() {
                   >
                     <div className="px-3 py-3 border-b border-[#1A1A1A]/5 mb-2">
                       <p className="font-semibold text-base font-medium text-[#1A1A1A]">
-                        {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.username}
+                        {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() ||
+                          user?.username}
                       </p>
-                      <p className="font-semibold text-[10px] text-[#707070] uppercase tracking-wider mt-1">{user?.email}</p>
+                      <p className="font-semibold text-[10px] text-[#707070] uppercase tracking-wider mt-1">
+                        {user?.email}
+                      </p>
                     </div>
                     <DropdownMenuItem asChild>
-                      <Link href="/profile" className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
+                      <Link
+                        href="/profile"
+                        className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]"
+                      >
                         <UserIcon className="mr-3 h-4 w-4" />
                         Hồ sơ
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/wardrobe" className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
+                      <Link
+                        href="/wardrobe"
+                        className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]"
+                      >
                         <LayoutDashboard className="mr-3 h-4 w-4" />
                         Tủ đồ
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/profile/update" className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]">
+                      <Link
+                        href="/profile/update"
+                        className="cursor-pointer rounded-xl font-semibold text-[11px] uppercase tracking-wider py-2.5 px-3 text-[#1A1A1A]/70 hover:text-[#1A1A1A] focus:bg-[#F4F1EE]"
+                      >
                         <Settings className="mr-3 h-4 w-4" />
                         Cài đặt
                       </Link>
@@ -205,7 +234,7 @@ export function GuestHeader() {
                   href="/auth/login"
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300 px-5 py-2.5 rounded-full
-                    ${scrolled ? "text-white/80 hover:text-white hover:bg-white/10" : "text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-black/5"}
+                    ${scrolled ? 'text-white/80 hover:text-white hover:bg-white/10' : 'text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-black/5'}
                   `}
                 >
                   Đăng nhập
@@ -214,9 +243,10 @@ export function GuestHeader() {
                   <button
                     className={`
                       font-semibold text-[11px] uppercase tracking-[0.15em] px-7 py-2.5 rounded-full transition-all duration-500 border
-                      ${scrolled
-                        ? "bg-white text-[#1A1A1A] border-white hover:bg-[#D9C5B2] hover:border-[#D9C5B2] hover:text-white"
-                        : "bg-[#1A1A1A] text-white border-[#1A1A1A] hover:bg-[#D9C5B2] hover:border-[#D9C5B2]"
+                      ${
+                        scrolled
+                          ? 'bg-white text-[#1A1A1A] border-white hover:bg-[#D9C5B2] hover:border-[#D9C5B2] hover:text-white'
+                          : 'bg-[#1A1A1A] text-white border-[#1A1A1A] hover:bg-[#D9C5B2] hover:border-[#D9C5B2]'
                       }
                     `}
                   >
@@ -230,14 +260,18 @@ export function GuestHeader() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? "Đóng menu" : "Mở menu"}
+            aria-label={mobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
             aria-expanded={mobileMenuOpen}
             className={`
               md:hidden size-10 flex items-center justify-center transition-colors duration-300
-              ${scrolled ? "text-white" : "text-[#1A1A1A]"}
+              ${scrolled ? 'text-white' : 'text-[#1A1A1A]'}
             `}
           >
-            {mobileMenuOpen ? <X className="size-5" strokeWidth={1.5} /> : <Menu className="size-5" strokeWidth={1.5} />}
+            {mobileMenuOpen ? (
+              <X className="size-5" strokeWidth={1.5} />
+            ) : (
+              <Menu className="size-5" strokeWidth={1.5} />
+            )}
           </button>
         </div>
       </header>
@@ -246,7 +280,7 @@ export function GuestHeader() {
       <div
         className={`
           fixed inset-0 z-[99] bg-[#1A1A1A] transition-all duration-500 flex flex-col items-center justify-center gap-8
-          ${mobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
+          ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
         `}
       >
         {isLoggedIn ? (
@@ -256,7 +290,7 @@ export function GuestHeader() {
               <div className="size-16 rounded-full overflow-hidden ring-2 ring-[#D9C5B2] ring-offset-4 ring-offset-[#1A1A1A]">
                 <Image
                   src={getUserAvatar(user)}
-                  alt={user?.username || "User"}
+                  alt={user?.username || 'User'}
                   width={64}
                   height={64}
                   className="size-full object-cover"
@@ -267,19 +301,32 @@ export function GuestHeader() {
               </p>
             </div>
 
-            <MobileNavLink href="/wardrobe" onClick={() => setMobileMenuOpen(false)}>Tủ đồ</MobileNavLink>
-            <MobileNavLink href="/ai-stylist" onClick={() => setMobileMenuOpen(false)}>AI Stylist</MobileNavLink>
-            <MobileNavLink href="/brand-portal/select" onClick={() => setMobileMenuOpen(false)}>Kênh Thương Hiệu</MobileNavLink>
+            <MobileNavLink href="/wardrobe" onClick={() => setMobileMenuOpen(false)}>
+              Tủ đồ
+            </MobileNavLink>
+            <MobileNavLink href="/ai-stylist" onClick={() => setMobileMenuOpen(false)}>
+              AI Stylist
+            </MobileNavLink>
+            <MobileNavLink href="/brand-portal/select" onClick={() => setMobileMenuOpen(false)}>
+              Kênh Thương Hiệu
+            </MobileNavLink>
             {user?.roleSlug === 'admin' && (
-              <MobileNavLink href="/admin/brands" onClick={() => setMobileMenuOpen(false)}>Quản trị hệ thống</MobileNavLink>
+              <MobileNavLink href="/admin/brands" onClick={() => setMobileMenuOpen(false)}>
+                Quản trị hệ thống
+              </MobileNavLink>
             )}
             {/* <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Cộng đồng</MobileNavLink> */}
-            <MobileNavLink href="/profile" onClick={() => setMobileMenuOpen(false)}>Hồ sơ</MobileNavLink>
+            <MobileNavLink href="/profile" onClick={() => setMobileMenuOpen(false)}>
+              Hồ sơ
+            </MobileNavLink>
 
             <div className="w-12 h-px bg-white/10 my-4" />
 
             <button
-              onClick={() => { logout(); setMobileMenuOpen(false); }}
+              onClick={() => {
+                logout();
+                setMobileMenuOpen(false);
+              }}
               className="font-semibold text-[11px] uppercase tracking-[0.3em] text-red-400 hover:text-red-300 transition-colors"
             >
               Đăng xuất
@@ -292,19 +339,21 @@ export function GuestHeader() {
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-3 mb-8"
             >
-              <img 
-                src="/brand/logo-only.png" 
-                alt="Closy - Smart Wardrobe Logo" 
-                width={48} 
-                height={48} 
-                className="w-12 h-12 object-contain" 
+              <img
+                src="/brand/logo-only.png"
+                alt="Closy - Smart Wardrobe Logo"
+                width={48}
+                height={48}
+                className="w-12 h-12 object-contain rounded-full"
               />
               <div className="flex items-baseline font-semibold text-5xl text-white font-medium">
                 CLOSY<span className="text-[#D9C5B2] italic ml-1">.</span>
               </div>
             </Link>
 
-            <MobileNavLink href="/auth/login" onClick={() => setMobileMenuOpen(false)}>Đăng nhập</MobileNavLink>
+            <MobileNavLink href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
+              Đăng nhập
+            </MobileNavLink>
 
             <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)}>
               <button className="font-semibold text-[11px] uppercase tracking-[0.15em] px-10 py-3 rounded-full bg-white text-[#1A1A1A] hover:bg-[#D9C5B2] hover:text-white transition-all duration-300 mt-4">
@@ -318,7 +367,15 @@ export function GuestHeader() {
   );
 }
 
-function MobileNavLink({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: () => void }) {
+function MobileNavLink({
+  href,
+  children,
+  onClick,
+}: {
+  href: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
   return (
     <Link
       href={href}

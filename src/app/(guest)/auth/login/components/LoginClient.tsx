@@ -43,7 +43,7 @@ export function LoginClient() {
           if (res?.isAdmin) {
             router.push("/admin/dashboard");
           } else {
-            router.push("/brands");
+            router.push("/wardrobe");
           }
         },
       }
