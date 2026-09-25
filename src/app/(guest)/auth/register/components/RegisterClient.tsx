@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRegister, useConfirmRegisterOtp, useResendRegisterOtp } from "@/features/auth/queries/auth.queries";
+import { GoogleLoginButton } from "@/features/auth/components/GoogleLoginButton";
 import { toast } from "sonner";
 import { Gender } from "@/common/enum";
 import Image from "next/image";
@@ -435,17 +436,18 @@ export function RegisterClient() {
           </button>
         </form>
 
-        {/* <div className="flex items-center gap-4">
-            <div className="flex-1 h-[1px] bg-background-variant"></div>
-            <span className="font-inter text-[12px] font-bold tracking-[0.1em] text-muted-foreground uppercase">Hoặc đăng ký với</span>
-            <div className="flex-1 h-[1px] bg-background-variant"></div>
+        <div className="relative my-2">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border"></div>
           </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-4 bg-background text-muted-foreground font-inter text-[11px] font-bold tracking-[0.1em] uppercase">
+              Hoặc tiếp tục với
+            </span>
+          </div>
+        </div>
 
-          <div className="flex flex-col gap-4">
-            <button type="button" className="group relative w-full h-12 flex items-center justify-center gap-3 border border-border rounded-full bg-transparent text-foreground font-inter text-[16px] transition-all duration-300 hover:border-primary hover:bg-muted/50 hover:shadow-sm overflow-hidden">
-              <span className="relative z-10 font-medium">Google</span>
-            </button>
-          </div> */}
+        <GoogleLoginButton label="Đăng ký bằng Google" />
 
         <p className="text-center font-inter text-[14px] text-muted-foreground mt-2">
           Đã có tài khoản?{' '}
