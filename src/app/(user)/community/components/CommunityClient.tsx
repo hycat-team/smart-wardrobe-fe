@@ -28,7 +28,15 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
     isLoading,
   } = useInfiniteCommunity();
 
-  const displayData = data || (initialData ? { pages: [initialData], pageParams: [1] } : undefined);
+  /*
+  // ==================== CODE CŨ (DÙNG KHI BE HOÀN THIỆN) ====================
+  // const displayData = data || (initialData ? { pages: [initialData], pageParams: [1] } : undefined);
+  // =========================================================================
+  */
+  const hasRealPosts = Boolean(data && data.pages.some((page) => page.items && page.items.length > 0));
+  const displayData = hasRealPosts
+    ? data
+    : (initialData ? { pages: [initialData], pageParams: [1] } : data);
 
   return (
     <div className="flex-1 bg-background text-foreground pb-20">

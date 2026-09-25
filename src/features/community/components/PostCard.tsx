@@ -220,7 +220,7 @@ export const PostCard = ({ post }: PostCardProps) => {
           shareUrl={
             post.sharePath
               ? `${window.location.origin}${post.sharePath}`
-              : `${window.location.origin}/community/posts/${post.publicId}`
+              : `${window.location.origin}/posts/${post.publicId}`
           }
         />
       )}
