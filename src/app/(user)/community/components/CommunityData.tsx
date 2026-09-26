@@ -2,25 +2,16 @@ import { serverFetch } from '@/lib/server-fetch';
 import { PaginationResult } from '@/types/api';
 import { PostRes } from '@/features/community/types';
 import CommunityClient from './CommunityClient';
-import { mockCommunityPosts } from '@/lib/mock-data/community.mock';
-
-/*
-// ==================== CODE CŨ (DÙNG KHI BE HOÀN THIỆN) ====================
-// export async function CommunityData() {
-//   const initialData = await serverFetch<PaginationResult<PostRes>>('/posts?page=1&limit=10', {
-//     cache: 'no-store'
-//   });
-//
-//   return <CommunityClient initialData={initialData} />;
-// }
-// =========================================================================
-*/
 
 export async function CommunityData() {
-  // Dùng mockData (10 bài viết) cho đến khi BE hoàn thiện
-  const initialData: PaginationResult<PostRes> = mockCommunityPosts;
+  let initialData: PaginationResult<PostRes> | null = null;
+  try {
+    initialData = await serverFetch<PaginationResult<PostRes>>('/posts?page=1&limit=10&type=explore&sort=hot', {
+      cache: 'no-store',
+    });
+  } catch (error) {
+    console.error('Lỗi khi lấy dữ liệu ban đầu cho bảng tin cộng đồng:', error);
+  }
 
   return <CommunityClient initialData={initialData} />;
 }
-
-

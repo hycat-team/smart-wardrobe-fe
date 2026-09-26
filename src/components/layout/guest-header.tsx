@@ -116,7 +116,7 @@ export function GuestHeader() {
                     Quản trị hệ thống
                   </Link>
                 )}
-                {/* <Link
+                <Link
                   href="/community"
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
@@ -125,7 +125,7 @@ export function GuestHeader() {
                   `}
                 >
                   Cộng đồng
-                </Link> */}
+                </Link>
                 <Link
                   href="/ai-stylist"
                   className={`
@@ -315,7 +315,7 @@ export function GuestHeader() {
                 Quản trị hệ thống
               </MobileNavLink>
             )}
-            {/* <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Cộng đồng</MobileNavLink> */}
+            <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Cộng đồng</MobileNavLink>
             <MobileNavLink href="/profile" onClick={() => setMobileMenuOpen(false)}>
               Hồ sơ
             </MobileNavLink>

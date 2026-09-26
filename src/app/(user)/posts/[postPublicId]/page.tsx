@@ -5,13 +5,14 @@ export async function generateMetadata({ params }: { params: Promise<{ postPubli
   try {
     const resolvedParams = await params;
     const post = await serverFetch<PostRes>(`/posts/${resolvedParams.postPublicId}`, { cache: 'no-store' });
+    const authorName = post?.user?.username ? `@${post.user.username}` : 'Cộng đồng';
     return {
-      title: `${post?.title || 'Bài viết'} | Atelier Curators`,
-      description: post?.content || 'Xem bài viết này trên Atelier Curators',
+      title: `${post?.title || 'Bài viết thời trang'} - ${authorName} | Smart Wardrobe`,
+      description: post?.content || 'Xem bài viết thời trang này trên Smart Wardrobe Community',
     };
   } catch (error) {
     return {
-      title: 'Bài viết | Atelier Curators',
+      title: 'Bài viết | Smart Wardrobe Community',
     };
   }
 }

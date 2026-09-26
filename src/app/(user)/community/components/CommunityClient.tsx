@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { CommunityList } from '@/features/community/components/CommunityList';
-import { CreatePostModal } from '@/features/community/components/CreatePostModal';
+import { PostComposerModal } from '@/features/community/components/PostComposerModal';
 import { useInfiniteCommunity } from '@/features/community/queries/community.queries';
 import { PaginationResult } from '@/types/api';
 import { PostRes } from '@/features/community/types';
@@ -20,23 +20,24 @@ interface CommunityClientProps {
 }
 
 export default function CommunityClient({ initialData }: CommunityClientProps) {
+  const [feedType, setFeedType] = React.useState<'explore' | 'following'>('explore');
+  const [feedSort, setFeedSort] = React.useState<'hot' | 'latest'>('hot');
+  const [editingPost, setEditingPost] = React.useState<PostRes | null>(null);
+  const [isComposerOpen, setIsComposerOpen] = React.useState(false);
+
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useInfiniteCommunity();
+  } = useInfiniteCommunity({
+    type: feedType,
+    sort: feedSort,
+  });
 
-  /*
-  // ==================== CODE CŨ (DÙNG KHI BE HOÀN THIỆN) ====================
-  // const displayData = data || (initialData ? { pages: [initialData], pageParams: [1] } : undefined);
-  // =========================================================================
-  */
-  const hasRealPosts = Boolean(data && data.pages.some((page) => page.items && page.items.length > 0));
-  const displayData = hasRealPosts
-    ? data
-    : (initialData ? { pages: [initialData], pageParams: [1] } : data);
+  const displayData = data || (initialData ? { pages: [initialData], pageParams: [1] } : undefined);
+
 
   return (
     <div className="flex-1 bg-background text-foreground pb-20">
@@ -93,6 +94,18 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
               hasNextPage={hasNextPage || false}
               isFetchingNextPage={isFetchingNextPage}
               isLoading={isLoading && !initialData}
+              feedType={feedType}
+              onFeedTypeChange={setFeedType}
+              feedSort={feedSort}
+              onFeedSortChange={setFeedSort}
+              onOpenComposer={() => {
+                setEditingPost(null);
+                setIsComposerOpen(true);
+              }}
+              onEditPost={(post) => {
+                setEditingPost(post);
+                setIsComposerOpen(true);
+              }}
             />
 
             {/* B2B Mock Brand Posts injected after API data */}
@@ -170,9 +183,18 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
               </div>
             </div> */}
 
-          </div>
         </div>
       </div>
+    </div>
+
+      <PostComposerModal
+        isOpen={isComposerOpen}
+        onClose={() => {
+          setIsComposerOpen(false);
+          setEditingPost(null);
+        }}
+        editingPost={editingPost}
+      />
     </div>
   );
 }

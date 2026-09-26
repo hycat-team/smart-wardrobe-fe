@@ -1,22 +1,21 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { PostCard } from './PostCard';
 import { PostRes } from '../types';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { Loader2, Sparkles, Image as ImageIcon, Tag as TagIcon, X } from 'lucide-react';
+import { Loader2, Plus, Flame, Clock, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useCreatePost } from '../queries/community.queries';
-import { communityApi } from '../api/community.api';
-import { toast } from 'sonner';
-import { uploadToCloudinary } from '@/lib/cloudinary';
-import Image from 'next/image';
 import { useAuthStore } from '@/store/useAuthStore';
 import { getUserAvatar } from '@/lib/utils';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
+
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
@@ -27,120 +26,58 @@ interface CommunityListProps {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   isLoading: boolean;
+  feedType?: 'explore' | 'following';
+  onFeedTypeChange?: (type: 'explore' | 'following') => void;
+  feedSort?: 'hot' | 'latest';
+  onFeedSortChange?: (sort: 'hot' | 'latest') => void;
+  onOpenComposer?: () => void;
+  onEditPost?: (post: PostRes) => void;
 }
 
-export const CommunityList = ({
+export const CommunityList: React.FC<CommunityListProps> = ({
   data,
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
   isLoading,
-}: CommunityListProps) => {
+  feedType = 'explore',
+  onFeedTypeChange,
+  feedSort = 'hot',
+  onFeedSortChange,
+  onOpenComposer,
+  onEditPost,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-
-  // --- CREATE POST STATE & LOGIC ---
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [images, setImages] = useState<File[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { mutate: createPost, isPending } = useCreatePost();
   const user = useAuthStore((state) => state.user);
+  const router = useRouter();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files);
-      setImages((prev) => [...prev, ...newFiles]);
-    }
-    // Reset file input so the same file can be selected again if needed
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim() || !content.trim()) {
-      toast.error('Vui lòng nhập cả tiêu đề và nội dung bài viết.');
+  const handleFollowingTabClick = () => {
+    if (!user) {
+      toast.error('Vui lòng đăng nhập để xem bài viết từ những người bạn đang theo dõi.');
+      router.push('/auth/login');
       return;
     }
-
-    try {
-      setIsUploading(true);
-      const mediaList = [];
-      
-      // Upload images
-      for (let i = 0; i < images.length; i++) {
-        const file = images[i];
-        const signatureRes = await communityApi.getPostUploadSignature();
-        
-        const cloudinaryData = await uploadToCloudinary({
-          file,
-          signatureParams: {
-            apiKey: signatureRes.apiKey,
-            timestamp: signatureRes.timestamp,
-            signature: signatureRes.signature,
-            folder: signatureRes.folder,
-            publicId: signatureRes.publicId,
-          },
-        });
-
-        mediaList.push({
-          mediaType: "IMAGE",
-          mediaUrl: cloudinaryData.secure_url,
-          publicId: cloudinaryData.public_id,
-          sortOrder: i,
-        });
-      }
-
-      createPost(
-        {
-          title,
-          content,
-          postType: 'OUTFIT',
-          media: mediaList,
-          items: [],
-        },
-        {
-          onSuccess: () => {
-            setTitle('');
-            setContent('');
-            setImages([]);
-          },
-          onSettled: () => {
-            setIsUploading(false);
-          }
-        }
-      );
-    } catch (error) {
-      toast.error('Failed to upload image.');
-      setIsUploading(false);
-    }
+    onFeedTypeChange?.('following');
   };
-  // ----------------------------------
 
   useGSAP(
     () => {
       const cards = gsap.utils.toArray<HTMLElement>('.community-post-card');
-      
+
       cards.forEach((card) => {
         if (!card.dataset.animated) {
           gsap.fromTo(
             card,
-            { opacity: 0, y: 50 },
+            { opacity: 0, y: 40 },
             {
               opacity: 1,
               y: 0,
-              duration: 0.8,
+              duration: 0.6,
               ease: 'power3.out',
               scrollTrigger: {
                 trigger: card,
-                start: 'top bottom-=100',
+                start: 'top bottom-=80',
                 toggleActions: 'play none none none',
               },
               onComplete: () => {
@@ -179,136 +116,163 @@ export const CommunityList = ({
   const allPosts: PostRes[] = data?.pages.flatMap((page) => page.items) || [];
 
   return (
-    <div className="w-full flex flex-col gap-8" ref={containerRef}>
-      
-      {/* Create Post Box */}
-      <form onSubmit={handleSubmit} className="w-full border border-border rounded-3xl bg-card p-5 flex flex-col gap-4 shadow-sm text-card-foreground">
-        <div className="flex items-start gap-4">
-          <Avatar className="w-10 h-10 ring-1 ring-border shrink-0">
-            <AvatarImage src={getUserAvatar(user)} className="object-cover" />
-            <AvatarFallback className="bg-muted text-foreground font-medium text-sm">{user?.name ? user.name[0].toUpperCase() : 'U'}</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 flex flex-col gap-2">
-            <input 
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Tiêu đề bài viết..." 
-              className="w-full bg-transparent border-none outline-none text-lg font-bold pt-1 text-foreground placeholder:text-muted-foreground"
-            />
-            <textarea 
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Chia sẻ phong cách hoặc nguồn cảm hứng mới nhất của bạn..." 
-              className="w-full bg-transparent border-none outline-none text-[15px] text-foreground placeholder:text-muted-foreground resize-none min-h-[40px]"
-              rows={Math.max(1, content.split('\n').length)}
-            />
-          </div>
-        </div>
-
-        {/* Image Preview Area */}
-        {images.length > 0 && (
-          <div className="flex gap-2 mt-2 overflow-x-auto pb-2">
-            {images.map((file, index) => (
-              <div key={index} className="relative w-24 h-24 shrink-0 rounded-xl bg-muted border border-border overflow-hidden">
-                <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={URL.createObjectURL(file)} 
-                  alt="preview" 
-                  className="w-full h-full object-cover" 
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(index)}
-                  className="absolute top-1 right-1 bg-background/60 hover:bg-background text-foreground rounded-full p-1 transition-colors backdrop-blur-sm"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        <div className="h-[1px] w-full bg-border my-1" />
-        
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              multiple
-              className="hidden"
-            />
-            <button 
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors outline-none"
-            >
-              <ImageIcon className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-widest text-foreground">Tải lên</span>
-            </button>
-            <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors outline-none">
-              <TagIcon className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-widest text-foreground">Gắn thẻ</span>
-            </button>
-          </div>
-          <Button 
-            type="submit" 
-            disabled={!content.trim() || isPending || isUploading}
-            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold uppercase tracking-widest text-xs px-8 h-10 disabled:opacity-50"
+    <div className="w-full flex flex-col gap-6" ref={containerRef}>
+      {/* Feed Controls: Tabs & Sort Filter */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-card border border-border p-3 rounded-2xl shadow-sm">
+        {/* Tabs: Explore vs Following */}
+        <div className="flex items-center gap-1 bg-muted p-1 rounded-xl">
+          <button
+            type="button"
+            onClick={() => onFeedTypeChange?.('explore')}
+            className={cn(
+              'px-4 py-2 rounded-lg text-xs font-bold transition-all uppercase tracking-wider',
+              feedType === 'explore'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
           >
-            {isPending || isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Đăng'}
-          </Button>
+            Khám phá
+          </button>
+          <button
+            type="button"
+            onClick={handleFollowingTabClick}
+            className={cn(
+              'px-4 py-2 rounded-lg text-xs font-bold transition-all uppercase tracking-wider flex items-center gap-1.5',
+              feedType === 'following'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            <span>Đang theo dõi</span>
+            {!user && <span className="text-[10px] text-muted-foreground opacity-60">🔒</span>}
+          </button>
         </div>
-      </form>
 
+        {/* Sort: Hot vs Latest */}
+        <div className="flex items-center gap-1 justify-end">
+          <button
+            type="button"
+            onClick={() => onFeedSortChange?.('hot')}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors',
+              feedSort === 'hot'
+                ? 'bg-primary/10 text-primary border border-primary/20'
+                : 'text-muted-foreground hover:bg-muted'
+            )}
+            title="Sắp xếp theo độ nổi bật"
+          >
+            <Flame className="w-3.5 h-3.5" />
+            <span>Nổi bật</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onFeedSortChange?.('latest')}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors',
+              feedSort === 'latest'
+                ? 'bg-primary/10 text-primary border border-primary/20'
+                : 'text-muted-foreground hover:bg-muted'
+            )}
+            title="Sắp xếp theo thời gian mới nhất"
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span>Mới nhất</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Quick Create Post Bar */}
+      <div
+        onClick={() => {
+          if (!user) {
+            toast.error('Vui lòng đăng nhập để tạo bài viết.');
+            router.push('/auth/login');
+            return;
+          }
+          onOpenComposer?.();
+        }}
+        className="w-full border border-border rounded-2xl bg-card p-4 flex items-center gap-3 shadow-sm text-card-foreground cursor-pointer hover:border-primary/50 hover:bg-card/80 transition-all group"
+      >
+        <Avatar className="w-9 h-9 ring-1 ring-border shrink-0">
+          <AvatarImage src={getUserAvatar(user)} className="object-cover" />
+          <AvatarFallback className="bg-muted text-foreground font-medium text-xs">
+            {user?.name ? user.name[0].toUpperCase() : 'U'}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 bg-muted/60 hover:bg-muted rounded-full px-4 py-2 text-xs sm:text-sm text-muted-foreground transition-colors truncate">
+          Bạn đang nghĩ gì về phong cách hôm nay? Chia sẻ ngay...
+        </div>
+        <Button
+          type="button"
+          size="sm"
+          className="rounded-full gap-1.5 font-bold uppercase tracking-wider text-[11px] h-9 px-4 shrink-0 shadow-sm"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="hidden sm:inline">Tạo bài</span>
+        </Button>
+      </div>
+
+      {/* Posts List & Loading States */}
       {isLoading && !data ? (
-        <div className="w-full flex flex-col gap-12 mt-4">
+        <div className="w-full flex flex-col gap-8 mt-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="w-full bg-card border border-border pb-5 flex flex-col gap-4 shadow-sm rounded-3xl overflow-hidden">
+            <div
+              key={i}
+              className="w-full max-w-[550px] mx-auto bg-card border border-border pb-5 flex flex-col gap-4 shadow-sm rounded-2xl overflow-hidden"
+            >
+              <div className="p-3 flex items-center gap-3">
+                <Skeleton className="w-8 h-8 rounded-full bg-muted" />
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <Skeleton className="h-3.5 w-32 bg-muted" />
+                  <Skeleton className="h-2.5 w-20 bg-muted" />
+                </div>
+              </div>
               <Skeleton className="w-full aspect-[4/5] rounded-none bg-muted" />
-              <div className="px-6 flex flex-col gap-3">
-                <Skeleton className="h-8 w-3/4 bg-muted" />
-                <Skeleton className="h-4 w-full bg-muted" />
-                <Skeleton className="h-4 w-5/6 bg-muted" />
+              <div className="px-4 flex flex-col gap-2">
+                <Skeleton className="h-4 w-3/4 bg-muted" />
+                <Skeleton className="h-3 w-full bg-muted" />
               </div>
             </div>
           ))}
         </div>
+      ) : allPosts.length === 0 ? (
+        <div className="text-center py-16 flex flex-col items-center justify-center space-y-3 bg-card border border-border rounded-2xl max-w-[550px] mx-auto w-full p-8">
+          <Sparkles className="w-10 h-10 text-muted-foreground stroke-1 mb-1" />
+          <h3 className="font-bold text-lg text-foreground tracking-tight">
+            {feedType === 'following' ? 'Chưa có bài viết từ người bạn theo dõi' : 'Chưa có bài viết nào'}
+          </h3>
+          <p className="text-xs text-muted-foreground max-w-sm">
+            {feedType === 'following'
+              ? 'Hãy khám phá cộng đồng và theo dõi thêm các thành viên phong cách để cập nhật trang phục mới.'
+              : 'Hãy trở thành người đầu tiên chia sẻ cảm hứng và phong cách của bạn với cộng đồng.'}
+          </p>
+          <Button
+            type="button"
+            onClick={() => (feedType === 'following' ? onFeedTypeChange?.('explore') : onOpenComposer?.())}
+            variant="outline"
+            className="rounded-full text-xs font-bold uppercase tracking-wider mt-3"
+          >
+            {feedType === 'following' ? 'Khám phá cộng đồng' : 'Tạo bài viết đầu tiên'}
+          </Button>
+        </div>
       ) : (
-        <div className="flex flex-col gap-12 mt-4">
+        <div className="flex flex-col gap-8 mt-1">
           {allPosts.map((post) => (
             <div key={post.id} className="community-post-card">
-              <PostCard post={post} />
+              <PostCard post={post} onEdit={onEditPost} />
             </div>
           ))}
         </div>
       )}
 
       {/* Infinite Scroll Trigger */}
-      <div
-        ref={loadMoreRef}
-        className="w-full h-32 flex items-center justify-center mt-8 border-t border-border"
-      >
+      <div ref={loadMoreRef} className="w-full h-24 flex items-center justify-center mt-4">
         {isFetchingNextPage && (
-          <div className="flex items-center space-x-3 text-muted-foreground font-bold uppercase tracking-widest text-xs">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Đang tải...</span>
+          <div className="flex items-center space-x-2 text-muted-foreground font-bold uppercase tracking-widest text-xs">
+            <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            <span>Đang tải thêm bài viết...</span>
           </div>
         )}
-        {/* {!hasNextPage && allPosts.length > 0 && (
-          <p className="text-xs text-black/40 font-bold uppercase tracking-widest">
-            Bạn đã xem hết bài viết.
-          </p>
-        )}
-        {!hasNextPage && allPosts.length === 0 && !isLoading && (
-          <div className="text-center py-10 flex flex-col items-center justify-center space-y-4">
-            <h3 className="font-bold text-2xl text-black tracking-tight">Chưa có bài viết nào</h3>
-            <p className="text-sm text-black/60">
-              Hãy trở thành người đầu tiên chia sẻ phong cách với cộng đồng.
-            </p>
-          </div>
-        )} */}
       </div>
     </div>
   );

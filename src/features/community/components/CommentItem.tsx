@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Link from 'next/link';
+import Image from 'next/image';
 import { CommentRes } from '../types';
 import { useCommentReplies, useDeleteComment, useUpdateComment } from '../queries/community.queries';
-import { Loader2, Trash2, MoreHorizontal, Pencil, X } from 'lucide-react';
+import { Loader2, Trash2, MoreHorizontal, Pencil } from 'lucide-react';
 import { useProfile } from '@/features/profile/queries/profile.queries';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { getUserAvatar } from '@/lib/utils';
-import Image from 'next/image';
+import { getCommunityUserAvatar, getCommunityUserDisplayName } from '../utils/community.utils';
 
 interface CommentItemProps {
   comment: CommentRes;
@@ -24,18 +24,18 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
   const { mutate: updateComment, isPending: isUpdating } = useUpdateComment();
   
   // Fetch replies only for top-level comments
-  const { data: replies, isLoading: isLoadingReplies } = useCommentReplies(postPublicID, comment.id, !isReply);
+  const { data: replies, isLoading: isLoadingReplies } = useCommentReplies(postPublicID, comment.id, !isReply && showReplies);
 
-  const getInitials = (firstName?: string, lastName?: string, username?: string) => {
-    if (firstName && lastName) return `${firstName[0]}${lastName[0]}`;
-    if (firstName) return firstName[0];
-    if (username) return username[0].toUpperCase();
-    return 'U';
-  };
+  const authorUsername = comment.user?.username || 'user';
+  const authorDisplayName = getCommunityUserDisplayName(comment.user);
+  const authorAvatar = getCommunityUserAvatar(comment.user);
 
-  const isOwner = profile?.id === comment.userId || profile?.username === comment.username;
-  const hasReplies = replies && replies.length > 0;
-  const displayAvatar = isOwner && profile ? getUserAvatar(profile) : (comment.avatarUrl || '/avatar-default.jpg');
+  const isOwner = Boolean(
+    profile && comment.user && (profile.id === comment.user.userId || profile.username === comment.user.username)
+  );
+
+  const replyCount = comment.replyCount ?? (replies ? replies.length : 0);
+  const hasReplies = replyCount > 0;
 
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,23 +56,38 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
   return (
     <div className={`flex flex-col gap-3 ${isReply ? 'mt-4' : ''}`}>
       <div className="flex gap-3 group items-start">
-        <Image
-          src={displayAvatar}
-          alt="Avatar"
-          width={32}
-          height={32}
-          className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} rounded-full object-cover ring-1 ring-border shrink-0 mt-0.5`}
-        />
+        {comment.isDeleted ? (
+          <div className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5 text-xs text-muted-foreground`}>
+            ?
+          </div>
+        ) : (
+          <Link href={`/users/${authorUsername}`} className="shrink-0">
+            <Image
+              src={authorAvatar}
+              alt={authorDisplayName}
+              width={32}
+              height={32}
+              className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} rounded-full object-cover ring-1 ring-border shrink-0 mt-0.5 hover:opacity-90 transition-opacity`}
+            />
+          </Link>
+        )}
         
         <div className="flex-1 flex flex-col gap-1 min-w-0">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-xs text-foreground">@{comment.username}</span>
+              {comment.isDeleted ? (
+                <span className="font-semibold text-xs text-muted-foreground italic">Người dùng</span>
+              ) : (
+                <Link href={`/users/${authorUsername}`} className="hover:underline">
+                  <span className="font-bold text-xs text-foreground">@{authorUsername}</span>
+                </Link>
+              )}
               <span className="text-[10px] text-muted-foreground font-medium">
                 {new Date(comment.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
               </span>
             </div>
-            {isOwner && !isEditing && (
+            
+            {isOwner && !comment.isDeleted && !isEditing && (
               <DropdownMenu>
                 <DropdownMenuTrigger className="opacity-0 group-hover:opacity-100 outline-none text-muted-foreground hover:text-foreground transition-all p-1 -mt-1 -mr-1">
                   {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MoreHorizontal className="w-4 h-4" />}
@@ -95,7 +110,11 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
             )}
           </div>
           
-          {isEditing ? (
+          {comment.isDeleted ? (
+            <p className="text-xs italic text-muted-foreground py-1">
+              Bình luận này đã bị xóa
+            </p>
+          ) : isEditing ? (
             <form onSubmit={handleEditSubmit} className="flex flex-col gap-2 mt-1">
               <input
                 value={editContent}
@@ -130,14 +149,16 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
           )}
           
           {/* Actions */}
-          <div className="flex items-center gap-4 mt-1">
-            <button 
-              onClick={() => onReply(isReply && comment.parentCommentId ? comment.parentCommentId : comment.id, comment.username)}
-              className="text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Reply
-            </button>
-          </div>
+          {!comment.isDeleted && (
+            <div className="flex items-center gap-4 mt-1">
+              <button 
+                onClick={() => onReply(isReply && comment.parentCommentId ? comment.parentCommentId : comment.id, authorUsername)}
+                className="text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Trả lời
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -150,7 +171,7 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
               className="flex items-center gap-2 text-[11px] font-bold text-muted-foreground hover:text-foreground transition-colors self-start py-1"
             >
               <div className="w-6 h-[1px] bg-border" />
-              View {replies.length} replies
+              Xem {replyCount} câu trả lời
             </button>
           )}
 
@@ -159,7 +180,7 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
               {isLoadingReplies ? (
                 <div className="flex items-center gap-2 py-2">
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
-                  <span className="text-[11px] text-muted-foreground">Loading replies...</span>
+                  <span className="text-[11px] text-muted-foreground">Đang tải câu trả lời...</span>
                 </div>
               ) : (
                 replies?.map((reply) => (
@@ -177,7 +198,7 @@ export const CommentItem = ({ comment, postPublicID, onReply, isReply = false }:
                 onClick={() => setShowReplies(false)}
                 className="text-[10px] font-semibold text-muted-foreground hover:text-foreground uppercase tracking-wider transition-colors self-start mt-3 mb-1"
               >
-                Hide replies
+                Ẩn câu trả lời
               </button>
             </div>
           )}

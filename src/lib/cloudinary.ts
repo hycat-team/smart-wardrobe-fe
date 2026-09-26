@@ -9,7 +9,9 @@ export interface CloudinaryUploadParams {
     public_id?: string;
     uploadPreset?: string;
     upload_preset?: string;
+    resourceType?: 'image' | 'video';
   };
+  resourceType?: 'image' | 'video';
 }
 
 export interface CloudinaryUploadResponse {
@@ -21,6 +23,7 @@ export interface CloudinaryUploadResponse {
 export async function uploadToCloudinary({
   file,
   signatureParams,
+  resourceType,
 }: CloudinaryUploadParams): Promise<CloudinaryUploadResponse> {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
   const formData = new FormData();
@@ -47,7 +50,9 @@ export async function uploadToCloudinary({
     formData.append("upload_preset", preset);
   }
 
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+  const finalResourceType = resourceType || signatureParams.resourceType || "image";
+
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${finalResourceType}/upload`, {
     method: "POST",
     body: formData,
   });
@@ -55,7 +60,7 @@ export async function uploadToCloudinary({
   if (!response.ok) {
     const errorText = await response.text();
     console.error("Cloudinary upload error details:", errorText);
-    throw new Error("Không thể upload ảnh lên Cloudinary");
+    throw new Error(`Không thể upload ${finalResourceType === 'video' ? 'video' : 'ảnh'} lên Cloudinary`);
   }
 
   return response.json();

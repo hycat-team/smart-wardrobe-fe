@@ -1,77 +1,81 @@
-export interface PaginationMetadata {
-  limit: number;
-  page: number;
-  totalItems: number;
-  totalPages: number;
+import { PaginationMetadata, PaginationResult } from '@/types/api';
+
+export type { PaginationMetadata, PaginationResult };
+
+export interface CommunityUserRes {
+  userId: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string; // omitempty: có thể vắng khi người dùng chưa đặt avatar
+  gender?: number;    // omitempty: 1 = Nam, 2 = Nữ, 3 = Khác; vắng khi không xác định (0)
+}
+
+export interface OutfitBriefRes {
+  id: string;
+  name: string;
+  coverImageUrl?: string;
 }
 
 export interface PostMediaRes {
   id: string;
-  mediaType: string;
+  mediaType: 'image' | 'video';
   mediaUrl: string;
-  publicId: string;
+  publicId?: string;
   sortOrder: number;
 }
 
-// Temporary inline or imported type to avoid circular/missing dependencies
-export interface WardrobeItemRes {
-  id: string;
-  [key: string]: unknown;
-}
-
-export interface PostItemRes {
-  buyerUserId?: string;
-  declinedAt?: string;
-  id: string;
-  item: WardrobeItemRes;
-  itemCondition?: string;
-  price?: number;
-  soldAt?: string;
-  status?: string;
-  transferState?: string;
-}
-
 export interface PostRes {
-  avatarUrl?: string;
-  commentCount: number;
-  contactInfo?: string;
-  content: string;
-  createdAt: string;
-  finalFeedScore?: number;
-  firstName?: string;
-  globalHotnessScore?: number;
   id: string;
-  isDeleted: boolean;
-  isLiked: boolean;
-  items: PostItemRes[];
-  lastName?: string;
-  likeCount: number;
-  media: PostMediaRes[];
-  postType: 'OUTFIT' | 'SALE';
   publicId: string;
-  sharePath?: string;
-  title: string;
-  totalPrice?: number;
+  user: CommunityUserRes;           // Thông tin tác giả dạng đối tượng lồng (Breaking)
+  postType: 'outfit' | 'media';     // Chuẩn hóa chữ thường
+  status: 'published' | 'hidden' | 'deleted'; // Trạng thái bài đăng
+  title?: string | null;            // Tối đa 150 ký tự
+  content: string;                  // Tối đa 5000 ký tự
+  outfit?: OutfitBriefRes | null;   // Có khi postType = 'outfit'
+  likeCount: number;
+  commentCount: number;
+  isLiked: boolean;
+  isFollowingAuthor: boolean;       // Luôn false nếu viewer là tác giả
+  sharePath: string;                // Ví dụ: "/community/posts/{publicId}"
+  media?: PostMediaRes[];           // Tối đa 10 phần tử
+  createdAt: string;
   updatedAt: string;
-  userId: string;
-  username: string;
-}
-
-export interface GetFeedRes {
-  items: PostRes[];
-  metadata: PaginationMetadata;
 }
 
 export interface CommentRes {
-  avatarUrl?: string;
-  content: string;
+  id: string;                       // UUID nội bộ của bình luận
+  user: CommunityUserRes;           // Thông tin người bình luận dạng đối tượng lồng
+  content: string;                  // Tối đa 1000 ký tự; rỗng khi isDeleted = true mà còn câu trả lời
+  parentCommentId?: string | null;  // Vắng key khi là bình luận gốc
+  replyCount: number;               // Số phản hồi con (chỉ có ở gốc, con = 0)
+  isDeleted: boolean;               // True khi bình luận đã bị xóa
   createdAt: string;
-  firstName?: string;
-  id: string;
-  lastName?: string;
-  parentCommentId?: string;
-  userId: string;
-  username: string;
+}
+
+export interface PublicProfileStats {
+  followerCount: number;
+  followingCount: number;
+  postCount: number;
+}
+
+export interface PublicProfileRes {
+  user: CommunityUserRes;
+  stats: PublicProfileStats;
+  isFollowing: boolean;
+  isMe: boolean;
+}
+
+export interface FollowUserRes {
+  user: CommunityUserRes;
+  relation: 'following' | 'follower';
+  followedAt: string;
+}
+
+export interface SearchRes {
+  users: PaginationResult<CommunityUserRes>;
+  posts: PaginationResult<PostRes>;
 }
 
 export interface AddCommentReq {
@@ -83,32 +87,37 @@ export interface LikePostReq {
   isLiked: boolean;
 }
 
-export interface PostItemInputReq {
-  itemCondition?: string;
-  itemId: string;
-  price?: number;
+export interface FollowReq {
+  isFollowing: boolean;
 }
 
 export interface PostMediaReq {
-  mediaType: string;
+  mediaType: 'image' | 'video';
   mediaUrl: string;
-  publicId: string;
+  publicId?: string;
   sortOrder: number;
 }
 
 export interface CreatePostReq {
-  contactInfo?: string;
+  postType: 'outfit' | 'media';
+  title?: string;
   content: string;
-  items?: PostItemInputReq[];
+  outfitId?: string;
   media?: PostMediaReq[];
-  postType: 'OUTFIT' | 'SALE';
-  title: string;
+}
+
+export interface UpdatePostReq {
+  title?: string;
+  content: string;
+  outfitId?: string;
+  media?: PostMediaReq[];
 }
 
 export interface UploadSignatureResult {
   apiKey: string;
   folder: string;
-  publicId?: string;
+  publicId: string;
   signature: string;
   timestamp: number;
+  resourceType: 'image' | 'video';
 }
