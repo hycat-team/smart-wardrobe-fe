@@ -150,7 +150,8 @@ export function SystemCatalogClient() {
     }
   }, { dependencies: [selectedIds.size] });
 
-  const getWardrobeItemName = (item: WardrobeItemRes) => item.category?.name || "Trang phục";
+  const getWardrobeItemName = (item: WardrobeItemRes) =>
+    item.category?.name || item.fashionItem?.category?.name || "Trang phục";
 
   const renderActions = () => (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">

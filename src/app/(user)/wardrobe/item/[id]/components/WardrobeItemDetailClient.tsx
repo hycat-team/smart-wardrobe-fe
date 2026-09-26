@@ -3,10 +3,12 @@ import { useRouter } from "next/navigation";
 import {
   useWardrobeItemDetail,
   useBulkDeleteWardrobeItems,
+  useRetryWardrobeItemAnalysis,
 } from "@/features/wardrobe/queries/wardrobe.queries";
+import { useWardrobeSSE } from "@/features/wardrobe/hooks/useWardrobeSSE";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, Loader2, AlertCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, AlertCircle, Sparkles, RotateCcw } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +25,7 @@ import {
   WardrobeItemRes as WardrobeItem,
 } from "@/features/wardrobe/types";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
+import { getWardrobeItemTitle } from "@/features/wardrobe/utils";
 import Image from "next/image";
 
 interface WardrobeItemDetailClientProps {
@@ -43,6 +46,11 @@ export function WardrobeItemDetailClient({
   } = useWardrobeItemDetail(itemId, initialItem);
   const { mutate: bulkDelete, isPending: isDeleting } =
     useBulkDeleteWardrobeItems();
+  const { mutate: retryAnalysis, isPending: isRetrying } =
+    useRetryWardrobeItemAnalysis();
+
+  // Listen to realtime task updates if item is being analyzed by AI
+  useWardrobeSSE(item ? [item] : undefined);
 
   const handleDelete = () => {
     bulkDelete(
@@ -92,15 +100,22 @@ export function WardrobeItemDetailClient({
   const isFailed = item.status === WardrobeItemStatus.Failed;
 
   const categoryName =
-    typeof item.category === "object" &&
-    item.category !== null &&
-    "name" in item.category
-      ? String(item.category.name)
-      : item.category;
+    item.category?.name ||
+    item.fashionItem?.category?.name ||
+    (typeof item.category === "string" ? item.category : "") ||
+    (item as any).categoryName ||
+    "";
 
-  const itemName = categoryName
-    ? `${categoryName} ${item.fashionItem?.color || (item as any).color || ""} ${item.fashionItem?.style || (item as any).style || ""}`.trim()
-    : "Trang phục chưa phân loại";
+  const brandName =
+    item.brandItem?.brandName ||
+    (item as any).brand ||
+    "";
+
+  const color = item.fashionItem?.color || (item as any).color || "";
+  const colorHex = item.fashionItem?.colorHex || (item as any).colorHex;
+
+  const itemName = getWardrobeItemTitle(item);
+
 
   return (
     <div className="flex-1 min-h-screen bg-background text-foreground pb-24 md:pb-12">
@@ -160,41 +175,74 @@ export function WardrobeItemDetailClient({
         {/* Main Split Layout: 5/7 */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           {/* Left Column: Minimal Image Area */}
-          <div className="image-frame relative w-full aspect-[3/4] p-8 md:p-12 lg:col-span-5 transition-all duration-200 overflow-hidden rounded-2xl">
-            {isProcessing && (
-              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-4">
-                <div className="size-10 border border-foreground border-t-transparent rounded-full animate-spin" />
-                <div className="text-center font-semibold">
-                  <p className="text-[11px] font-medium text-foreground uppercase tracking-[0.12em] animate-pulse">
-                    AI is analyzing
-                  </p>
-                  <p className="text-[9px] text-muted-foreground uppercase tracking-[0.12em] mt-2">
-                    Please wait...
+          <div className="lg:col-span-5 flex flex-col gap-4">
+            <div className="image-frame relative w-full aspect-[3/4] p-8 md:p-12 transition-all duration-200 overflow-hidden rounded-2xl">
+              {isProcessing && (
+                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-4">
+                  <div className="size-10 border border-foreground border-t-transparent rounded-full animate-spin" />
+                  <div className="text-center font-semibold">
+                    <p className="text-[11px] font-medium text-foreground uppercase tracking-[0.12em] animate-pulse">
+                      AI đang phân tích
+                    </p>
+                    <p className="text-[9px] text-muted-foreground uppercase tracking-[0.12em] mt-2">
+                      Vui lòng đợi trong giây lát...
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <Image
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl)}
+                alt={itemName}
+                className="h-full w-full object-contain drop-shadow-sm"
+              />
+
+              <div className="absolute top-6 left-6 flex flex-col gap-2 z-20">
+                {item.status === WardrobeItemStatus.Selling && (
+                  <span className="rounded-full bg-destructive px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-primary-foreground shadow-sm">
+                    Đang bán
+                  </span>
+                )}
+                {isFailed && (
+                  <span className="rounded-full bg-destructive px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-primary-foreground shadow-sm">
+                    Phân tích thất bại
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* AI Retry banner when failed */}
+            {isFailed && (
+              <div className="p-4 rounded-2xl border border-destructive/20 bg-destructive/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <AlertCircle className="size-4 text-destructive shrink-0" />
+                  <p className="text-[12px] font-medium text-destructive">
+                    AI chưa thể nhận diện trang phục này.
                   </p>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isRetrying}
+                  onClick={() => retryAnalysis(itemId)}
+                  className="rounded-full border-destructive/30 text-destructive hover:bg-destructive/10 text-[10px] font-semibold uppercase tracking-wider shrink-0"
+                >
+                  {isRetrying ? (
+                    <>
+                      <Loader2 className="mr-1.5 size-3 animate-spin" />
+                      Đang thử lại...
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="mr-1.5 size-3" />
+                      Thử phân tích lại
+                    </>
+                  )}
+                </Button>
               </div>
             )}
-
-            <Image
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl)}
-              alt={itemName}
-              className="h-full w-full object-contain drop-shadow-sm"
-            />
-
-            <div className="absolute top-6 left-6 flex flex-col gap-2 z-20">
-              {item.status === WardrobeItemStatus.Selling && (
-                <span className="rounded-full bg-destructive px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-primary-foreground">
-                  For Sale
-                </span>
-              )}
-              {isFailed && (
-                <span className="rounded-full bg-destructive px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-primary-foreground">
-                  AI Failed
-                </span>
-              )}
-            </div>
           </div>
 
           {/* Right Column: Editorial Details Area */}
@@ -206,23 +254,24 @@ export function WardrobeItemDetailClient({
               </h1>
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                <span>{(item as any).brand || categoryName || "ACNE STUDIOS"}</span>
+                <span>{brandName || categoryName || "Tủ đồ cá nhân"}</span>
                 <span className="w-1 h-1 rounded-full bg-border" />
                 <div className="flex items-center gap-2">
-                  <div
-                    className="h-[14px] w-[14px] rounded-full border border-border shadow-sm"
-                    style={{ backgroundColor: item.fashionItem?.colorHex || (item as any).colorHex }}
-                    title={item.fashionItem?.color || (item as any).color || "Màu sắc"}
-                  />
-                  <span>{item.fashionItem?.color || (item as any).color || "No Color"}</span>
+                  {colorHex && (
+                    <div
+                      className="h-[14px] w-[14px] rounded-full border border-border shadow-sm shrink-0"
+                      style={{ backgroundColor: colorHex }}
+                      title={color || "Màu sắc"}
+                    />
+                  )}
+                  <span>{color || "Chưa có màu"}</span>
                 </div>
                 <span className="w-1 h-1 rounded-full bg-border" />
-                {/* <span>Size {item.size || "S"}</span> */}
-                {/* <span className="w-1 h-1 rounded-full bg-border" /> */}
                 <span>
-                  Added{" "}
-                  {new Date(item.createdAt).toLocaleDateString("en-US", {
-                    month: "short",
+                  Đã thêm{" "}
+                  {new Date(item.createdAt).toLocaleDateString("vi-VN", {
+                    day: "2-digit",
+                    month: "2-digit",
                     year: "numeric",
                   })}
                 </span>
@@ -236,6 +285,44 @@ export function WardrobeItemDetailClient({
               </h3>
 
               <div className="flex flex-col gap-4 text-[12px] tracking-[0.05em] text-foreground">
+                {/* Category */}
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                  <span className="text-muted-foreground uppercase">Danh mục</span>
+                  <span className="col-span-2 sm:col-span-3 text-foreground font-medium">
+                    {categoryName || "Chưa phân loại"}
+                  </span>
+                </div>
+                <div className="h-px w-full bg-border" />
+
+                {/* Brand (if exists) */}
+                {brandName && (
+                  <>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                      <span className="text-muted-foreground uppercase">Thương hiệu</span>
+                      <span className="col-span-2 sm:col-span-3 text-foreground font-medium">
+                        {brandName}
+                      </span>
+                    </div>
+                    <div className="h-px w-full bg-border" />
+                  </>
+                )}
+
+                {/* Color */}
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                  <span className="text-muted-foreground uppercase">Màu sắc</span>
+                  <span className="col-span-2 sm:col-span-3 text-foreground flex items-center gap-2">
+                    {colorHex && (
+                      <span
+                        className="inline-block size-3 rounded-full border border-border shrink-0"
+                        style={{ backgroundColor: colorHex }}
+                      />
+                    )}
+                    {color || "—"}
+                  </span>
+                </div>
+                <div className="h-px w-full bg-border" />
+
+                {/* Material */}
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
                   <span className="text-muted-foreground uppercase">Vải</span>
                   <span className="col-span-2 sm:col-span-3 text-foreground">
@@ -244,40 +331,62 @@ export function WardrobeItemDetailClient({
                 </div>
                 <div className="h-px w-full bg-border" />
 
+                {/* Fit */}
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                  <span className="text-muted-foreground uppercase">
-                    Kiểu dáng
-                  </span>
+                  <span className="text-muted-foreground uppercase">Kiểu dáng</span>
                   <span className="col-span-2 sm:col-span-3 text-foreground">
                     {item.fashionItem?.fit || (item as any).fit || "—"}
                   </span>
                 </div>
                 <div className="h-px w-full bg-border" />
 
+                {/* Pattern */}
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                  <span className="text-muted-foreground uppercase">
-                    Họa tiết
-                  </span>
+                  <span className="text-muted-foreground uppercase">Họa tiết</span>
                   <span className="col-span-2 sm:col-span-3 text-foreground">
                     {item.fashionItem?.pattern || (item as any).pattern || "—"}
                   </span>
                 </div>
                 <div className="h-px w-full bg-border" />
 
+                {/* Seasonality */}
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                  <span className="text-muted-foreground uppercase">
-                    Thời tiết
-                  </span>
+                  <span className="text-muted-foreground uppercase">Thời tiết</span>
                   <span className="col-span-2 sm:col-span-3 text-foreground">
                     {item.fashionItem?.seasonality || (item as any).seasonality || "—"}
                   </span>
                 </div>
+
+                {/* Price (if exists) */}
+                {typeof item.price === "number" && item.price > 0 && (
+                  <>
+                    <div className="h-px w-full bg-border" />
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                      <span className="text-muted-foreground uppercase">Giá tham khảo</span>
+                      <span className="col-span-2 sm:col-span-3 text-foreground font-medium">
+                        {item.price.toLocaleString("vi-VN")} đ
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
+            {/* Description */}
+            {(item.fashionItem?.description || (item as any).description) && (
+              <div className="pt-2 flex flex-col gap-2">
+                <p className="font-semibold text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+                  Mô tả chi tiết
+                </p>
+                <p className="text-[12px] leading-relaxed text-muted-foreground">
+                  {item.fashionItem?.description || (item as any).description}
+                </p>
+              </div>
+            )}
+
             {/* Tags / Style */}
             {(item.fashionItem?.style || (item as any).style) && (
-              <div className="pt-4 flex flex-col gap-4">
+              <div className="pt-2 flex flex-col gap-4">
                 <p className="font-semibold text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
                   Phong cách
                 </p>
@@ -294,6 +403,7 @@ export function WardrobeItemDetailClient({
               </div>
             )}
           </div>
+
         </div>
       </div>
     </div>
