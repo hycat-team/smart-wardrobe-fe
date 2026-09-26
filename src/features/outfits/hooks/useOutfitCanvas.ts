@@ -3,6 +3,11 @@ import { toast } from "sonner";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
 import type { BrandItemSnapshot } from "@/features/brands/types";
+import type { FashionRole } from "@/features/ai-stylist/types";
+import {
+  normalizeFashionRole,
+  ROLE_COORDINATES_SEPARATE,
+} from "@/features/ai-stylist/utils/outfit-canvas-layout";
 
 export interface CanvasItem {
   id: string;
@@ -10,6 +15,7 @@ export interface CanvasItem {
   x: number;
   y: number;
   zIndex: number;
+  _role?: FashionRole | string;
   itemContext?: string;
   brandItemId?: string;
   brandItemSnapshot?: BrandItemSnapshot;
@@ -31,43 +37,13 @@ export function useOutfitCanvas() {
       setSelectedItems((prev) => prev.filter((x) => x.id !== item.id));
     } else {
       const maxZ = Math.max(...selectedItems.map((i) => i.zIndex || 0), 0);
-      
-      let x = 0;
-      let y = 0;
-      let scale = 100;
-      let zIndex = maxZ + 1;
-      
-      const isBrand = item.isGhost || item.brandName;
-      
-      if (isBrand) {
-        x = 280 + (Math.random() * 40 - 20); // Right side
-        y = -150 + (Math.random() * 100 - 50);
-        zIndex = maxZ + 10;
-        scale = 80;
-      } else {
-        const slug = (item.category?.slug || '').toLowerCase();
-        
-        if (slug === 'phu-kien' || slug.startsWith('phu-kien-') || slug.includes('accessory')) {
-          x = -280 + (Math.random() * 40 - 20); // Left side
-          y = -150 + (Math.random() * 100 - 50);
-          zIndex = maxZ + 5;
-        } else if (slug === 'mu' || slug === 'non' || slug.includes('hat')) {
-          y = -350 + (Math.random() * 20 - 10);
-          zIndex = maxZ + 4;
-        } else if (slug === 'ao' || slug.startsWith('ao-') || slug.includes('top') || slug.includes('jacket')) {
-          y = -180 + (Math.random() * 20 - 10);
-          zIndex = maxZ + 3;
-        } else if (slug === 'quan' || slug === 'vay' || slug.startsWith('quan-') || slug.startsWith('vay-') || slug.includes('bottom') || slug.includes('skirt')) {
-          y = 120 + (Math.random() * 20 - 10);
-          zIndex = maxZ + 2;
-        } else if (slug === 'giay' || slug.startsWith('giay-') || slug.includes('shoes') || slug.includes('footwear')) {
-          y = 270 + (Math.random() * 20 - 10);
-          zIndex = maxZ + 3;
-        } else {
-          y = (Math.random() * 80 - 40);
-          x = (Math.random() * 80 - 40);
-        }
-      }
+      const role = normalizeFashionRole(item._role, item.category?.slug);
+      const coord = ROLE_COORDINATES_SEPARATE[role] || ROLE_COORDINATES_SEPARATE.other;
+
+      const x = coord.x;
+      const y = coord.y;
+      const scale = coord.scale;
+      const zIndex = maxZ + (coord.zIndex || 1);
 
       setSelectedItems((prev) => [
         ...prev,

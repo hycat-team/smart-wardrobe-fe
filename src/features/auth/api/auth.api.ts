@@ -13,12 +13,9 @@ import {
 
 export const authApi = {
   login: async (data: LoginReq): Promise<AuthTokenRes & { message?: string }> => {
-    // Gọi BFF chuẩn /api/v1/auth/login (backend yêu cầu prefix /api/v1).
-    // BFF set HttpOnly Cookie, không lộ token ra JS.
-    const res = await api.post<APIResponse<AuthTokenRes>>('/api/v1/auth/login', data, {
-      baseURL: '', // Bỏ qua /api/v1 baseURL mặc định của axios (đã có sẵn trong path)
-    });
-    // Không log response login — từng chứa token, tránh lộ qua console
+    // Gọi endpoint qua proxy rewrite (/api/v1/auth/login).
+    // Backend là nguồn duy nhất Set-Cookie HttpOnly (Domain=.closy.hycat.online), không lộ token ra JS.
+    const res = await api.post<APIResponse<AuthTokenRes>>('/auth/login', data);
     const responseData = res.data as any;
     const resultData = responseData.data || responseData;
     return { ...resultData, message: responseData.message };
@@ -40,14 +37,16 @@ export const authApi = {
   },
 
   logout: async (): Promise<{ message?: string }> => {
-    // Next.js API route to clear cookies (chuẩn /api/v1)
-    const res = await api.post<APIResponse>('/api/v1/auth/logout', {}, { baseURL: '' });
+    // Gọi endpoint qua proxy rewrite (/api/v1/auth/logout).
+    // Backend tự phát ra Set-Cookie Max-Age=0 kèm Domain để xóa cookie auth sạch sẽ.
+    const res = await api.post<APIResponse>('/auth/logout');
     return { message: res.data.message };
   },
 
   refreshToken: async (): Promise<AuthTokenRes> => {
-    // Next.js API route to refresh and set new HttpOnly cookies (chuẩn /api/v1)
-    const res = await api.post<APIResponse<AuthTokenRes>>('/api/v1/auth/refresh-token', {}, { baseURL: '' });
+    // Gọi endpoint qua proxy rewrite (/api/v1/auth/refresh-token).
+    // Backend tự động đọc refresh token từ Cookie và trả Set-Cookie xoay vòng token mới.
+    const res = await api.post<APIResponse<AuthTokenRes>>('/auth/refresh-token');
     return res.data.data || (res.data as any);
   },
 

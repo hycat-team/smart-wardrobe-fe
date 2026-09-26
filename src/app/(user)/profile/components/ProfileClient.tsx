@@ -21,8 +21,8 @@ import { useProfile, useUpdateAvatar } from '@/features/profile/queries/profile.
 import { getUserAvatar } from '@/lib/utils';
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { useQuery } from '@tanstack/react-query';
-import { subscriptionApi } from '@/features/subscription/api/subscription.api';
+import { useDailyQuota, useMySubscription } from '@/features/subscription/queries/subscription.queries';
+import { useWardrobeStats } from '@/features/wardrobe/queries/wardrobe.queries';
 import { CurrentPlanCard } from '@/features/subscription/components/CurrentPlanCard';
 import { ClaimAccountTab } from './ClaimAccountTab';
 import { profileApi } from '@/features/profile/api/profile.api';
@@ -41,17 +41,9 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   const avatar = getUserAvatar(profile);
   const name = profile?.firstName + (profile?.lastName ? ` ${profile.lastName}` : '');
 
-  const { data: mySubscription } = useQuery({
-    queryKey: ['subscription', 'me'],
-    queryFn: () => subscriptionApi.getMySubscription(),
-    retry: 0,
-  });
-
-  const { data: dailyQuota } = useQuery({
-    queryKey: ['subscription', 'quota'],
-    queryFn: () => subscriptionApi.getDailyQuota(),
-    retry: 0,
-  });
+  const { data: mySubscription } = useMySubscription();
+  const { data: dailyQuota } = useDailyQuota();
+  const { data: wardrobeStats } = useWardrobeStats();
 
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -194,7 +186,11 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
               <h2 className="font-bold text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-6 md:text-left ml-2">
                 GÓI HIỆN TẠI CỦA BẠN
               </h2>
-              <CurrentPlanCard subscription={mySubscription} quota={dailyQuota} />
+              <CurrentPlanCard
+                subscription={mySubscription}
+                quota={dailyQuota}
+                stats={wardrobeStats}
+              />
             </section>
           )}
 

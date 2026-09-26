@@ -16,7 +16,7 @@
 - Q: Giao diện trang tiếp nhận callback (`/auth/callback`) nên được thiết kế như thế nào trong thời gian chờ xác thực phiên đăng nhập? → A: Hiển thị Auth Card ở giữa màn hình với Logo Closy, animation loading và thông báo "Đang hoàn tất đăng nhập...".
 - Q: Có triển khai thêm Google One Tap (Google Identity Services) không? → A: Chỉ tập trung hoàn thiện luồng Web Redirect (§1) cho giai đoạn này; không nhúng thư viện script ngoài.
 - Q: Khi phát sinh lỗi từ backend hoặc Google, giao diện nên hiển thị thông báo lỗi theo hình thức nào? → A: Điều hướng về `/auth/login` và hiển thị Toast tiếng Việt qua thư viện `sonner` theo bảng ánh xạ mã lỗi chuẩn.
-- Q: Cơ chế bảo toàn và điều hướng về trang đích ban đầu (`returnUrl`)? → A: Lưu `returnUrl` vào `sessionStorage` trước khi redirect sang Google; trang callback đọc ra, điều hướng và xóa khỏi storage (fallback về `/brands` cho User hoặc `/admin/dashboard` cho Admin).
+- Q: Cơ chế bảo toàn và điều hướng về trang đích ban đầu (`returnUrl`)? → A: Lưu `returnUrl` vào `sessionStorage` trước khi redirect sang Google; trang callback đọc ra, điều hướng và xóa khỏi storage (fallback về `/wardrobe` cho User hoặc `/admin/dashboard` cho Admin).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -31,7 +31,7 @@ Người dùng mở trang đăng nhập `/auth/login` (hoặc `/auth/register`),
 **Acceptance Scenarios**:
 
 1. **Given** người dùng chưa đăng nhập ở trang `/auth/login`, **When** người dùng nhấn nút "Đăng nhập bằng Google", **Then** trình duyệt chuyển hướng đến endpoint `{API_BASE}/api/v1/auth/google?redirectUrl={FE_RETURN_URL}`.
-2. **Given** người dùng hoàn tất đăng nhập tại Google và quay lại `/auth/callback`, **When** trang callback không nhận tham số `error`, **Then** hệ thống gọi API xác nhận phiên (`/api/v1/me` hoặc profile query), cập nhật trạng thái người dùng trong store/cache, hiển thị thông báo thành công và chuyển hướng đến trang đích (`/brands` hoặc `/admin/dashboard` tùy theo quyền).
+2. **Given** người dùng hoàn tất đăng nhập tại Google và quay lại `/auth/callback`, **When** trang callback không nhận tham số `error`, **Then** hệ thống gọi API xác nhận phiên (`/api/v1/me` hoặc profile query), cập nhật trạng thái người dùng trong store/cache, hiển thị thông báo thành công và chuyển hướng đến trang đích (`/wardrobe` hoặc `/admin/dashboard` tùy theo quyền).
 
 ---
 
@@ -82,7 +82,7 @@ Người dùng đang xem một trang cần đăng nhập hoặc nhấn đăng nh
 - **FR-004**: Route `/auth/callback` MUST kiểm tra sự tồn tại của query parameter `error`. Nếu có lỗi, MUST ánh xạ mã lỗi sang thông báo tiếng Việt theo bảng mã lỗi chuẩn, điều hướng người dùng về `/auth/login` và kích hoạt Toast (Sonner) thông báo lỗi.
 - **FR-005**: Nếu không có `error`, route `/auth/callback` MUST kích hoạt xác nhận phiên đăng nhập thông qua API hiện hành với chế độ credentials HttpOnly (`fetch(..., { credentials: 'include' })` hoặc `profileApi.getProfile()`).
 - **FR-006**: Sau khi xác nhận phiên thành công, ứng dụng MUST cập nhật TanStack React Query cache (`authStatus`, `profile`), cập nhật Zustand store (nếu có), hiển thị toast thông báo thành công và điều hướng tới trang nội bộ phù hợp.
-- **FR-007**: Hệ thống MUST xử lý điều hướng phân quyền và ngữ cảnh: nếu có lưu `returnUrl` hợp lệ trong `sessionStorage`, ưu tiên điều hướng về trang đó; nếu không, người dùng có vai trò Admin chuyển về `/admin/dashboard`, người dùng thông thường chuyển về trang danh mục/khám phá (`/brands`).
+- **FR-007**: Hệ thống MUST xử lý điều hướng phân quyền và ngữ cảnh: nếu có lưu `returnUrl` hợp lệ trong `sessionStorage`, ưu tiên điều hướng về trang đó; nếu không, người dùng có vai trò Admin chuyển về `/admin/dashboard`, người dùng thông thường chuyển về trang tủ đồ cá nhân (`/wardrobe`).
 - **FR-008**: Nút "Đăng nhập bằng Google" MUST được hiển thị ở cả trang Đăng nhập (`/auth/login`) và trang Đăng ký (`/auth/register`) với cùng luồng khởi tạo OAuth.
 - **FR-009**: Trang `/auth/callback` MUST hiển thị Auth Card ở giữa màn hình với logo Closy, hiệu ứng loading động và thông báo "Đang hoàn tất đăng nhập..." trong khi xử lý xác thực phiên và điều hướng.
 - **FR-010**: Hệ thống MUST tập trung hoàn toàn vào luồng Web Redirect qua backend (`GET /api/v1/auth/google?redirectUrl=...`); không nhúng thư viện JS ngoài (Google Identity Services) trong giai đoạn này.

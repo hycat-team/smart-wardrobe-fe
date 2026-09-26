@@ -4,6 +4,7 @@ import { ZoomIn, ZoomOut, MoveUp, X, RefreshCcw, AlertCircle, Star } from "lucid
 import { CanvasItem } from "@/features/outfits/hooks/useOutfitCanvas";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
 import { GhostItemBadge } from "@/features/ghost-closet/components/GhostItemBadge";
+import { getItemBoundingBox } from "@/features/ai-stylist/utils/outfit-canvas-layout";
 
 export interface OutfitCanvasBoardProps {
   canvasRef: React.RefObject<HTMLDivElement | null>;
@@ -42,6 +43,7 @@ export function OutfitCanvasBoard({
         {selectedItems.length > 0 ? (
           selectedItems.map(item => {
             const hasAlternatives = item._role && hasAlternativesCheck ? hasAlternativesCheck(item._role) : false;
+            const itemBox = getItemBoundingBox(item._role, item.scale || 100, item.category?.slug);
 
             return (
               <motion.div
@@ -142,16 +144,16 @@ export function OutfitCanvasBoard({
 
                   {/* Image */}
                   <div
-                    className="pointer-events-none drop-shadow-xl ring-1 ring-transparent group-hover:ring-black/10 transition-all rounded-sm relative"
+                    className="pointer-events-none drop-shadow-xl ring-1 ring-transparent group-hover:ring-black/10 transition-all rounded-sm relative flex items-center justify-center"
                     style={{
-                      width: `${item.scale * 2.2}px`,
-                      height: "auto",
+                      width: `${itemBox.width}px`,
+                      height: `${itemBox.height}px`,
                     }}
                   >
                     <img
                       src={item.isGhost ? (item.fashionItem?.imageUrl || item.imageUrl) : applyCloudinaryTrim(item.fashionItem?.imageUrl || item.imageUrl)}
                       alt="Outfit Item"
-                      className="w-full h-auto object-contain filter drop-shadow-md"
+                      className="max-w-full max-h-full w-auto h-auto object-contain filter drop-shadow-md select-none"
                       draggable={false}
                     />
                     {item.isGhost && <GhostItemBadge brandName={item.brandName || 'Local Brand'} />}

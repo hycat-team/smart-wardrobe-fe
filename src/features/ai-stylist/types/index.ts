@@ -11,8 +11,20 @@ export interface AIOutfitRecommendationReq {
   includeBrandItems?: boolean;
 }
 
+export type FashionRole =
+  | 'headwear'
+  | 'top'
+  | 'bottom'
+  | 'fullbody'
+  | 'outerwear'
+  | 'footwear'
+  | 'accessory'
+  | 'other';
+
+export type OutfitCompositionType = 'SEPARATE_PIECES' | 'FULLBODY' | 'INCOMPLETE';
+
 export interface AIOutfitItem {
-  role: string;
+  role: FashionRole | string;
   itemContext?: string;
   primary: AIOutfitProduct;
   alternatives: AIOutfitProduct[];
@@ -25,6 +37,8 @@ export interface AIOutfitProduct extends WardrobeItemRes {
   brandName?: string;
   brandItemId?: string;
   itemContext?: string;
+  isGhost?: boolean;
+  wardrobeImpact?: Record<string, unknown>;
   brandItem?: {
     id: string;
     brandId: string;

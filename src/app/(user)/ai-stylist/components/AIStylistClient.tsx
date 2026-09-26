@@ -7,7 +7,14 @@ import { aiApi } from '@/features/ai-stylist/api/ai.api';
 import type { AIOutfitRecommendationRes } from '@/features/ai-stylist/types';
 import { useOutfitCanvas } from '@/features/outfits/hooks/useOutfitCanvas';
 import type { CanvasItem } from '@/features/outfits/hooks/useOutfitCanvas';
-import { getBrandItemCanvasMetadata } from '@/features/ai-stylist/utils/brand-item-canvas';
+import {
+  resolveCanvasOutfitItems,
+  swapCanvasItemByRole,
+  normalizeFashionRole,
+  detectCompositionType,
+  ROLE_COORDINATES_SEPARATE,
+  ROLE_COORDINATES_FULLBODY,
+} from '@/features/ai-stylist/utils/outfit-canvas-layout';
 import { OutfitCanvasBoard } from '@/features/outfits/components/OutfitCanvasBoard';
 import { wardrobeApi } from '@/features/wardrobe/api/wardrobe.api';
 import { useCreateOutfit } from '@/features/outfits/queries/outfits.queries';
@@ -35,7 +42,7 @@ function AIStylistContent() {
 
   const [selectedOccasion, setSelectedOccasion] = useState<string>('');
   const [selectedStyle, setSelectedStyle] = useState<string>('');
-  const [detailsInput, setDetailsInput] = useState('');
+  const [detailsInput, setDetailsInput] = useState(() => searchParams.get('details') || '');
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,9 +62,29 @@ function AIStylistContent() {
   const [isBrandFeedbackOpen, setIsBrandFeedbackOpen] = useState(false);
 
   const [alternativeIndices, setAlternativeIndices] = useState<Record<string, number>>({});
+  const [itemScaleModifier, setItemScaleModifier] = useState<number>(100);
 
   const { selectedItems, setSelectedItems, bringToFront, updateScale, handleDragEnd } =
     useOutfitCanvas();
+
+  const handleScaleModifierChange = (newModifier: number) => {
+    setItemScaleModifier(newModifier);
+    if (selectedItems.length > 0) {
+      const isFullbody = outfitData ? detectCompositionType(outfitData.items) === 'FULLBODY' : false;
+      const coordinateMap = isFullbody ? ROLE_COORDINATES_FULLBODY : ROLE_COORDINATES_SEPARATE;
+
+      setSelectedItems((prev) =>
+        prev.map((item) => {
+          const role = normalizeFashionRole(item._role, item.category?.slug);
+          const basePlacement = coordinateMap[role] || coordinateMap.other;
+          return {
+            ...item,
+            scale: Math.round(basePlacement.scale * (newModifier / 100)),
+          };
+        })
+      );
+    }
+  };
 
   const createOutfitMutation = useCreateOutfit();
   const createSampleFeedback = useCreateSampleFeedback();
@@ -65,6 +92,7 @@ function AIStylistContent() {
   useEffect(() => {
     const detailsParam = searchParams.get('details');
     if (detailsParam) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDetailsInput(detailsParam);
     }
   }, [searchParams]);
@@ -83,104 +111,8 @@ function AIStylistContent() {
 
       setOutfitData(res);
 
-      let brandYOffset = -150;
-      let accessoryYOffset = -150;
-
-      const initialItems = res.items.map((item) => {
-        const primary = item.primary;
-        const brandItemMetadata = getBrandItemCanvasMetadata(item.itemContext, primary);
-        const isBrand =
-          brandItemMetadata.itemContext === 'brand_item' ||
-          isGhostItem(primary) ||
-          !!(primary as GhostItem).brandName;
-        let x = 0;
-        let y = 0;
-        let zIndex = 1;
-
-        if (isBrand) {
-          x = 280;
-          y = brandYOffset;
-          brandYOffset += 240;
-          zIndex = 10;
-        } else {
-          const slug = (primary.category?.slug || '').toLowerCase();
-          const role = (item.role || '').toLowerCase();
-
-          if (
-            slug.includes('phu-kien') ||
-            slug.includes('accessory') ||
-            role.includes('phụ kiện')
-          ) {
-            x = -280;
-            y = accessoryYOffset;
-            accessoryYOffset += 240;
-            zIndex = 5;
-          } else if (
-            slug === 'mu' ||
-            slug === 'non' ||
-            slug.includes('hat') ||
-            role.includes('mũ') ||
-            role.includes('nón')
-          ) {
-            y = -350;
-            zIndex = 4;
-          } else if (
-            slug === 'ao' ||
-            slug.startsWith('ao-') ||
-            slug.includes('top') ||
-            slug.includes('jacket') ||
-            role.includes('áo')
-          ) {
-            y = -180;
-            zIndex = 3;
-          } else if (
-            slug === 'quan' ||
-            slug === 'vay' ||
-            slug.startsWith('quan-') ||
-            slug.startsWith('vay-') ||
-            slug.includes('bottom') ||
-            slug.includes('skirt') ||
-            role.includes('quần') ||
-            role.includes('váy')
-          ) {
-            y = 120;
-            zIndex = 2;
-          } else if (
-            slug === 'giay' ||
-            slug.startsWith('giay-') ||
-            slug.includes('shoes') ||
-            slug.includes('footwear') ||
-            role.includes('giày')
-          ) {
-            y = 270;
-            zIndex = 3;
-          } else {
-            y = Math.random() * 80 - 40;
-            x = Math.random() * 80 - 40;
-          }
-        }
-
-        const ghostData = isGhostItem(primary) ? primary : undefined;
-
-        return {
-          id: crypto.randomUUID(),
-          clothingItemId: primary.fashionItem?.id || primary.id,
-          imageUrl: primary.fashionItem?.imageUrl || '',
-          category: primary.category || primary.fashionItem?.category,
-          _role: item.role,
-          isGhost: ghostData?.isGhost,
-          brandName:
-            ghostData?.brandName ||
-            brandItemMetadata.brandItemSnapshot?.brandName ||
-            primary.brandName,
-          wardrobeImpact: ghostData?.wardrobeImpact,
-          price: brandItemMetadata.brandItemSnapshot?.price ?? primary.price,
-          ...brandItemMetadata,
-          x,
-          y,
-          scale: isBrand ? 80 : 100,
-          zIndex,
-        };
+      const initialItems = resolveCanvasOutfitItems(res.items, {
+        scaleMultiplier: itemScaleModifier / 100,
       });
       setSelectedItems(initialItems);
       setAlternativeIndices({});
@@ -196,47 +128,28 @@ function AIStylistContent() {
   const handleSwap = (role: string) => {
     if (!outfitData) return;
 
-    const outfitItem = outfitData.items.find((i) => i.role === role);
+    const outfitItem = outfitData.items.find(
+      (i) => normalizeFashionRole(i.role) === normalizeFashionRole(role)
+    );
     if (!outfitItem || !outfitItem.alternatives || outfitItem.alternatives.length === 0) {
       toast.error('Không có lựa chọn thay thế cho món đồ này');
       return;
     }
 
-    const currentIndex = alternativeIndices[outfitItem.role] || 0;
+    const itemRoleKey = outfitItem.role || role;
+    const currentIndex = alternativeIndices[itemRoleKey] || 0;
     const allOptions = [outfitItem.primary, ...outfitItem.alternatives];
     const nextIndex = (currentIndex + 1) % allOptions.length;
 
     setAlternativeIndices((prev) => ({
       ...prev,
-      [outfitItem.role]: nextIndex,
+      [itemRoleKey]: nextIndex,
     }));
 
     const nextItem = allOptions[nextIndex];
-    const nextGhostData = isGhostItem(nextItem) ? nextItem : undefined;
-    const brandItemMetadata = getBrandItemCanvasMetadata(outfitItem.itemContext, nextItem);
-
-    setSelectedItems((prev) => {
-      const existingItemIndex = prev.findIndex((item) => item._role === role);
-      if (existingItemIndex === -1) return prev;
-
-      const newItems = [...prev];
-      newItems[existingItemIndex] = {
-        ...newItems[existingItemIndex],
-        clothingItemId: nextItem.fashionItem?.id || nextItem.id,
-        imageUrl: nextItem.fashionItem?.imageUrl || '',
-        category: nextItem.category || nextItem.fashionItem?.category,
-        isGhost: nextGhostData?.isGhost,
-        brandName:
-          nextGhostData?.brandName ||
-          brandItemMetadata.brandItemSnapshot?.brandName ||
-          nextItem.brandName,
-        wardrobeImpact: nextGhostData?.wardrobeImpact,
-        price: brandItemMetadata.brandItemSnapshot?.price ?? nextItem.price,
-        ...brandItemMetadata,
-      };
-
-      return newItems;
-    });
+    setSelectedItems((prev) =>
+      swapCanvasItemByRole(prev, role, nextItem, outfitItem.itemContext)
+    );
   };
 
   const handleSaveOutfit = async () => {
@@ -333,7 +246,9 @@ function AIStylistContent() {
                   handleDragEnd={handleDragEnd}
                   onSwap={handleSwap}
                   hasAlternativesCheck={(role) => {
-                    const outfitItem = outfitData.items.find((i) => i.role === role);
+                    const outfitItem = outfitData.items.find(
+                      (i) => normalizeFashionRole(i.role) === normalizeFashionRole(role)
+                    );
                     return !!(
                       outfitItem &&
                       outfitItem.alternatives &&
@@ -346,7 +261,9 @@ function AIStylistContent() {
                   }}
                   onGhostItemClick={(item) => {
                     if (outfitData) {
-                      const outfitItem = outfitData.items.find((i) => i.role === item._role);
+                      const outfitItem = outfitData.items.find(
+                        (i) => normalizeFashionRole(i.role) === normalizeFashionRole(item._role)
+                      );
                       if (outfitItem) {
                         const allOptions = [outfitItem.primary, ...(outfitItem.alternatives || [])];
                         const realGhostItem = allOptions.find(
@@ -504,6 +421,58 @@ function AIStylistContent() {
                 />
               </div>
 
+              <div className="group flex flex-col gap-2.5 pt-2 border-t border-border/60">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
+                    KÍCH THƯỚC TRANG PHỤC (FIT)
+                  </label>
+                  <span className="text-[10px] font-bold text-foreground font-mono bg-muted px-2 py-0.5 rounded-full border border-border">
+                    {itemScaleModifier}%
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { label: 'Gọn gàng', value: 85 },
+                    { label: 'Cân đối', value: 100 },
+                    { label: 'Phóng to', value: 115 },
+                  ].map((preset) => (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      onClick={() => handleScaleModifierChange(preset.value)}
+                      disabled={isGenerating}
+                      className={cn(
+                        'px-2 py-1.5 text-[9px] font-bold uppercase tracking-wider transition-colors border rounded-full text-center',
+                        itemScaleModifier === preset.value
+                          ? 'bg-foreground text-background border-foreground shadow-xs'
+                          : 'bg-transparent text-foreground border-border hover:border-foreground'
+                      )}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 pt-0.5">
+                  <span className="text-[9px] font-bold text-muted-foreground">70%</span>
+                  <input
+                    type="range"
+                    min={70}
+                    max={130}
+                    step={5}
+                    value={itemScaleModifier}
+                    onChange={(e) => handleScaleModifierChange(Number(e.target.value))}
+                    disabled={isGenerating}
+                    className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-foreground"
+                  />
+                  <span className="text-[9px] font-bold text-muted-foreground">130%</span>
+                </div>
+                <p className="text-[9px] text-muted-foreground/80 tracking-tight">
+                  Chuẩn hoá khung hình & điều chỉnh tỉ lệ trang phục trước khi hiển thị trên Canvas
+                </p>
+              </div>
+
               {/* <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-widest text-foreground">
@@ -554,7 +523,7 @@ function AIStylistContent() {
           if (activeGhostItem) {
             const activeFashionId = activeGhostItem.fashionItem?.id || activeGhostItem.id;
             const canvasItem = selectedItems.find((x) => x.clothingItemId === activeFashionId);
-            if (canvasItem) handleSwap(canvasItem._role);
+            if (canvasItem && canvasItem._role) handleSwap(canvasItem._role);
             logGhostAction(activeGhostItem.id, 'swap');
             setIsImpactPanelOpen(false);
           }

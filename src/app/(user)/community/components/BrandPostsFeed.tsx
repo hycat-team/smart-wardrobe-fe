@@ -6,7 +6,9 @@ import Link from 'next/link';
 
 export function BrandPostsFeed() {
   // Sort posts by date descending
-  const sortedPosts = [...mockBrandPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const sortedPosts = [...mockBrandPosts].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   return (
     <div className="flex flex-col gap-12 mb-10">
@@ -15,20 +17,28 @@ export function BrandPostsFeed() {
         <div className="h-px bg-border flex-1"></div>
       </div>
 
-      {sortedPosts.map(post => {
-        const brand = mockBrands.find(b => b.id === post.brandId);
+      {sortedPosts.map((post) => {
+        const brand = mockBrands.find((b) => b.id === post.brandId);
         if (!brand) return null;
 
         return (
-          <div key={post.id} className="mx-auto max-w-[550px] w-full flex flex-col bg-card text-card-foreground border border-border rounded-2xl overflow-hidden transition-colors">
+          <div
+            key={post.id}
+            className="mx-auto max-w-[550px] w-full flex flex-col bg-card text-card-foreground border border-border rounded-2xl overflow-hidden transition-colors"
+          >
             {/* Header Section */}
             <div className="px-3 py-2.5 flex items-center justify-between bg-card">
-              <Link href={`/brands/${brand.id}`} className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity">
+              <Link
+                href={`/brands/${brand.id}`}
+                className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity"
+              >
                 <Avatar className="w-8 h-8 rounded-full relative overflow-hidden flex-shrink-0 ring-1 ring-border bg-muted">
                   <AvatarImage src={brand.logoUrl} className="object-cover" />
-                  <AvatarFallback className="bg-foreground text-background text-[10px] font-semibold">{brand.name[0]}</AvatarFallback>
+                  <AvatarFallback className="bg-foreground text-background text-[10px] font-semibold">
+                    {brand.name[0]}
+                  </AvatarFallback>
                 </Avatar>
-                
+
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold text-[13px] text-foreground leading-tight truncate">
@@ -39,7 +49,9 @@ export function BrandPostsFeed() {
                       {new Date(post.createdAt).toLocaleDateString('vi-VN')}
                     </span>
                   </div>
-                  <span className="text-[10px] font-medium text-muted-foreground mt-0.5">{post.type}</span>
+                  <span className="text-[10px] font-medium text-muted-foreground mt-0.5">
+                    {post.type}
+                  </span>
                 </div>
               </Link>
             </div>
@@ -54,7 +66,9 @@ export function BrandPostsFeed() {
               {post.taggedProductIds.length > 0 && (
                 <div className="absolute bottom-2 left-2 bg-background/90 backdrop-blur-sm px-2 py-1 flex items-center gap-1 shadow-sm rounded-full cursor-pointer hover:bg-background transition-colors border border-border">
                   <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
-                  <span className="text-[8px] font-bold tracking-widest uppercase text-foreground">Shoppable Look</span>
+                  <span className="text-[8px] font-bold tracking-widest uppercase text-foreground">
+                    Shoppable Look
+                  </span>
                 </div>
               )}
             </div>
@@ -88,7 +102,10 @@ export function BrandPostsFeed() {
 
               {/* Title & Content */}
               <div className="mt-1 text-[13px] text-foreground leading-relaxed break-words line-clamp-2">
-                <Link href={`/brands/${brand.id}`} className="font-semibold mr-1.5 hover:underline cursor-pointer">
+                <Link
+                  href={`/brands/${brand.id}`}
+                  className="font-semibold mr-1.5 hover:underline cursor-pointer"
+                >
                   {brand.name}
                 </Link>
                 <span>{post.caption}</span>

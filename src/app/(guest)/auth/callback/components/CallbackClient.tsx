@@ -78,7 +78,7 @@ export function CallbackClient() {
         if (role === "ADMIN") {
           router.replace("/admin/dashboard");
         } else {
-          router.replace("/brands");
+          router.replace("/wardrobe");
         }
       } catch (err: any) {
         console.error("Lỗi xác nhận phiên callback:", err);

@@ -1,37 +1,64 @@
 'use client';
 
 import React from 'react';
-import { DailyQuota, UserSubscription } from '../types';
+import { DailyQuota, UserSubscription, WardrobeStats } from '../types';
 import { useToggleAutoRenewMutation } from '../queries/subscription.queries';
-import { Calendar, RefreshCw, Layers, ScanLine } from 'lucide-react';
+import { Calendar, RefreshCw, Layers, ScanLine, Sparkles, MessageSquare } from 'lucide-react';
+import { formatQuotaItem } from '../utils/quota';
 
 interface CurrentPlanCardProps {
   subscription: UserSubscription;
   quota: DailyQuota;
+  stats?: WardrobeStats;
 }
 
-export const CurrentPlanCard = ({ subscription, quota }: CurrentPlanCardProps) => {
+export const CurrentPlanCard = ({ subscription, quota, stats }: CurrentPlanCardProps) => {
   const toggleMutation = useToggleAutoRenewMutation();
-  const [autoRenew, setAutoRenew] = React.useState(subscription.isAutoRenewEnabled || subscription.IsAutoRenewEnabled || false);
+  const [autoRenew, setAutoRenew] = React.useState(
+    subscription.isAutoRenewEnabled || subscription.IsAutoRenewEnabled || false
+  );
 
   const handleToggle = () => {
     const newValue = !autoRenew;
     setAutoRenew(newValue);
     toggleMutation.mutate(newValue, {
-      onError: () => setAutoRenew(!newValue) // revert on error
+      onError: () => setAutoRenew(!newValue), // revert on error
     });
   };
 
   const expiresAtStr = subscription.expiresAt || subscription.ExpiresAt;
-  const daysRemaining = expiresAtStr ? Math.max(
-    0,
-    Math.ceil((new Date(expiresAtStr).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
-  ) : 'Vô hạn';
+  const daysRemaining = expiresAtStr
+    ? Math.max(
+        0,
+        Math.ceil((new Date(expiresAtStr).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+      )
+    : 'Vô hạn';
+
+  const wardrobeItem = formatQuotaItem(
+    stats?.activeItemsCount,
+    quota.maxWardrobeItems ?? quota.MaxWardrobeItems,
+    'MÓN'
+  );
+
+  const outfitItem = formatQuotaItem(
+    stats?.outfitsCount,
+    quota.maxOutfits ?? quota.MaxOutfits,
+    'BỘ'
+  );
+
+  const aiOutfitItem = formatQuotaItem(
+    quota.outfitRecommendCount ?? quota.OutfitRecommendCount,
+    quota.aiOutfitDailyQuota ?? quota.AiOutfitDailyQuota
+  );
+
+  const aiChatItem = formatQuotaItem(
+    quota.aiUsageCount ?? quota.AiUsageCount,
+    quota.aiChatDailyQuota ?? quota.AiChatDailyQuota
+  );
 
   return (
     <div className="bg-foreground text-background rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
       <div className="flex flex-col md:flex-row justify-between gap-8 md:gap-12 relative z-10">
-
         {/* Left: Plan Info */}
         <div className="flex-1">
           <div className="flex items-center gap-4 mb-6">
@@ -49,7 +76,11 @@ export const CurrentPlanCard = ({ subscription, quota }: CurrentPlanCardProps) =
               <div className="leading-relaxed">
                 <span className="block mb-1">Thời hạn còn lại</span>
                 <strong className="text-background text-[14px]">{daysRemaining} NGÀY</strong>
-                {expiresAtStr && <span className="block mt-1 text-background/50 lowercase tracking-normal">Hết hạn: {new Date(expiresAtStr).toLocaleDateString('vi-VN')}</span>}
+                {expiresAtStr && (
+                  <span className="block mt-1 text-background/50 lowercase tracking-normal">
+                    Hết hạn: {new Date(expiresAtStr).toLocaleDateString('vi-VN')}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -62,13 +93,15 @@ export const CurrentPlanCard = ({ subscription, quota }: CurrentPlanCardProps) =
                   aria-checked={autoRenew}
                   onClick={handleToggle}
                   disabled={toggleMutation.isPending}
-                  className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-secondary focus:ring-offset-1 focus:ring-offset-foreground ${autoRenew ? 'bg-secondary' : 'bg-background/20'
-                    }`}
+                  className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-secondary focus:ring-offset-1 focus:ring-offset-foreground ${
+                    autoRenew ? 'bg-secondary' : 'bg-background/20'
+                  }`}
                 >
                   <span
                     aria-hidden="true"
-                    className={`pointer-events-none inline-block h-4 w-4 transform bg-foreground transition duration-200 ease-in-out rounded-full ${autoRenew ? 'translate-x-4' : 'translate-x-0'
-                      }`}
+                    className={`pointer-events-none inline-block h-4 w-4 transform bg-foreground transition duration-200 ease-in-out rounded-full ${
+                      autoRenew ? 'translate-x-4' : 'translate-x-0'
+                    }`}
                   />
                 </button>
               </div>
@@ -76,55 +109,78 @@ export const CurrentPlanCard = ({ subscription, quota }: CurrentPlanCardProps) =
           </div>
         </div>
 
-        {/* Right: Daily Quota Usage */}
+        {/* Right: Quota & Usage */}
         <div className="flex-1 bg-background/10 p-6 md:p-8 border border-background/10 rounded-2xl">
-          <h3 className="font-bold text-[11px] text-secondary uppercase tracking-[0.2em] mb-8 border-b border-background/10 pb-4">
-            HẠN MỨC GÓI CƯỚC
+          <h3 className="font-bold text-[11px] text-secondary uppercase tracking-[0.2em] mb-6 border-b border-background/10 pb-4">
+            HẠN MỨC & SỬ DỤNG
           </h3>
 
-          <div className="space-y-8">
-            {/* Max Items */}
-            <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider">
-              <span className="flex items-center gap-2 text-background/70"><Layers size={14} /> TỐI ĐA MÓN ĐỒ</span>
-              <span className="font-medium text-background">{quota.maxWardrobeItems || quota.maxWardrobeItems || '∞'} MÓN</span>
-            </div>
-
-            {/* Max Outfits */}
-            <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider">
-              <span className="flex items-center gap-2 text-background/70"><Layers size={14} /> TỐI ĐA BỘ PHỐI ĐỒ</span>
-              <span className="font-medium text-background">{quota.maxOutfits || quota.MaxOutfits || '∞'} BỘ</span>
-            </div>
-
-            {/* Outfits Quota */}
+          <div className="space-y-6">
+            {/* Wardrobe Items */}
             <div>
-              <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider mb-3">
-                <span className="flex items-center gap-2 text-background/70"><ScanLine size={14} /> TẠO PHỐI ĐỒ AI</span>
-                <span className="font-medium text-background">{quota.outfitRecommendCount || quota.OutfitRecommendCount || 0} / {quota.aiOutfitDailyQuota || quota.AiOutfitDailyQuota || '∞'}</span>
+              <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider mb-2">
+                <span className="flex items-center gap-2 text-background/70">
+                  <Layers size={14} /> SỨC CHỨA TỦ ĐỒ
+                </span>
+                <span className="font-medium text-background">{wardrobeItem.text}</span>
               </div>
               <div className="w-full bg-background/20 h-2 rounded-full overflow-hidden">
                 <div
-                  className="bg-primary h-full transition-all duration-1000 min-w-[8px] rounded-full"
-                  style={{ width: `${Math.min(100, ((quota.outfitRecommendCount || quota.OutfitRecommendCount || 0) / (quota.aiOutfitDailyQuota || quota.AiOutfitDailyQuota || 1)) * 100)}%` }}
+                  className="bg-primary h-full transition-all duration-700 min-w-[4px] rounded-full"
+                  style={{ width: `${wardrobeItem.percentage}%` }}
                 />
               </div>
             </div>
 
-            {/* Scans Quota */}
+            {/* Outfits */}
             <div>
-              <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider mb-3">
-                <span className="flex items-center gap-2 text-background/70"><ScanLine size={14} /> CHAT VỚI AI</span>
-                <span className="font-medium text-background">{quota.aiUsageCount || quota.AiUsageCount || 0} / {quota.aiChatDailyQuota || quota.AiChatDailyQuota || '∞'}</span>
+              <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider mb-2">
+                <span className="flex items-center gap-2 text-background/70">
+                  <ScanLine size={14} /> BỘ PHỐI ĐỒ (OUTFIT)
+                </span>
+                <span className="font-medium text-background">{outfitItem.text}</span>
               </div>
               <div className="w-full bg-background/20 h-2 rounded-full overflow-hidden">
                 <div
-                  className="bg-primary h-full transition-all duration-1000 min-w-[8px] rounded-full"
-                  style={{ width: `${Math.min(100, ((quota.aiUsageCount || quota.AiUsageCount || 0) / (quota.aiChatDailyQuota || quota.AiChatDailyQuota || 1)) * 100)}%` }}
+                  className="bg-primary h-full transition-all duration-700 min-w-[4px] rounded-full"
+                  style={{ width: `${outfitItem.percentage}%` }}
+                />
+              </div>
+            </div>
+
+            {/* AI Outfits Quota */}
+            <div>
+              <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider mb-2">
+                <span className="flex items-center gap-2 text-background/70">
+                  <Sparkles size={14} /> TẠO PHỐI ĐỒ AI (NGÀY)
+                </span>
+                <span className="font-medium text-background">{aiOutfitItem.text}</span>
+              </div>
+              <div className="w-full bg-background/20 h-2 rounded-full overflow-hidden">
+                <div
+                  className="bg-primary h-full transition-all duration-700 min-w-[4px] rounded-full"
+                  style={{ width: `${aiOutfitItem.percentage}%` }}
+                />
+              </div>
+            </div>
+
+            {/* AI Chat Quota */}
+            <div>
+              <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider mb-2">
+                <span className="flex items-center gap-2 text-background/70">
+                  <MessageSquare size={14} /> CHAT VỚI AI (NGÀY)
+                </span>
+                <span className="font-medium text-background">{aiChatItem.text}</span>
+              </div>
+              <div className="w-full bg-background/20 h-2 rounded-full overflow-hidden">
+                <div
+                  className="bg-primary h-full transition-all duration-700 min-w-[4px] rounded-full"
+                  style={{ width: `${aiChatItem.percentage}%` }}
                 />
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
