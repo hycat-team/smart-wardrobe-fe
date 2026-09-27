@@ -416,3 +416,114 @@ export function swapCanvasItemByRole(
 
   return updatedItems;
 }
+
+export interface RestoredPlacement {
+  x: number;
+  y: number;
+  zIndex: number;
+  role: FashionRole;
+}
+
+/**
+ * Chuẩn hóa toạ độ khi tải một outfit item đã lưu từ backend:
+ * - Khắc phục dữ liệu cũ từng bị đảo dấu bởi hàm Math.abs() (ví dụ: áo/top bị đảo từ -140 thành +140)
+ * - Tự động định vị giải phẫu chuẩn nếu toạ độ bị rỗng hoặc gần 0
+ * - Bổ sung role và kích thước chuẩn cho từng item trên canvas
+ */
+export function restoreCanvasOutfitItem(
+  item: any,
+  compositionType: OutfitCompositionType = "SEPARATE_PIECES"
+): RestoredPlacement {
+  const fashionItem = item.fashionItem || item.wardrobeItem;
+  const catSlug =
+    fashionItem?.category?.slug ||
+    item.wardrobeItem?.category?.slug ||
+    item.category?.slug;
+  const rawRole = item._role || item.role || item.wardrobeItem?.role;
+  const role = normalizeFashionRole(rawRole, catSlug);
+
+  const coordinateMap =
+    compositionType === "FULLBODY"
+      ? ROLE_COORDINATES_FULLBODY
+      : ROLE_COORDINATES_SEPARATE;
+  const defaultCoord = coordinateMap[role] || coordinateMap.other;
+
+  let x = typeof item.positionX === "number" ? item.positionX : defaultCoord.x;
+  let y = typeof item.positionY === "number" ? item.positionY : defaultCoord.y;
+  let zIndex = item.layerOrder || defaultCoord.zIndex || 1;
+
+  // 1. Khắc phục lỗi Math.abs() của dữ liệu cũ:
+  // Đối với các vai trò thân trên (top, headwear, outerwear, fullbody),
+  // toạ độ Y trên canvas chuẩn luôn phải là số âm (nằm trên tâm/thắt lưng).
+  // Nếu y > 0 (ví dụ: +140 cho áo thun), đảo dấu lại thành âm:
+  if (
+    (role === "top" || role === "headwear" || role === "outerwear" || role === "fullbody") &&
+    y > 0
+  ) {
+    y = -y;
+  }
+
+  // 2. Khắc phục x = 1 do Math.max(1, 0)
+  if (Math.abs(x) === 1 && defaultCoord.x === 0) {
+    x = 0;
+  }
+
+  // 3. Khắc phục x = 25 cho outerwear (nguyên gốc là x = -25)
+  if (role === "outerwear" && x === 25) {
+    x = -25;
+  }
+
+  // 4. Tự động nâng vị trí giày dép lên 295 nếu lưu ở toạ độ cũ 305
+  if (role === "footwear" && y === 305) {
+    y = 295;
+  }
+
+  // 5. Nếu toạ độ quá gần 0 (missing hoặc chưa được bố cục)
+  if (Math.abs(x) < 2 && Math.abs(y) < 2 && (defaultCoord.x !== 0 || defaultCoord.y !== 0)) {
+    x = defaultCoord.x;
+    y = defaultCoord.y;
+    zIndex = defaultCoord.zIndex;
+  }
+
+  return { x, y, zIndex, role };
+}
+
+/**
+ * Khôi phục danh sách CanvasItem hoàn chỉnh từ dữ liệu Outfit Res của backend
+ */
+export function restoreCanvasOutfitItems(items: any[]): CanvasItem[] {
+  if (!items || items.length === 0) return [];
+
+  const compositionType = detectCompositionType(
+    items.map((i) => ({
+      role: i._role || i.role || i.wardrobeItem?.role,
+      primary: i.fashionItem || i.wardrobeItem || i,
+    }))
+  );
+
+  return items
+    .map((item) => {
+      const fashionItem = item.fashionItem || item.wardrobeItem;
+      const wardrobeItem = item.wardrobeItem || (item.fashionItem ? {
+        ...item,
+        id: item.fashionItem.id || item.id,
+        category: item.fashionItem.category,
+      } : {});
+
+      const { x, y, zIndex, role } = restoreCanvasOutfitItem(item, compositionType);
+
+      return {
+        ...wardrobeItem,
+        id: item.id || fashionItem?.id || crypto.randomUUID(),
+        clothingItemId: fashionItem?.id || wardrobeItem.id || item.clothingItemId,
+        imageUrl: fashionItem?.imageUrl || wardrobeItem.imageUrl || item.imageUrl || "",
+        category: fashionItem?.category || wardrobeItem.category || item.category,
+        _role: role,
+        scale: Math.round((item.scale || 1) * 100),
+        x,
+        y,
+        zIndex,
+      };
+    })
+    .filter((x) => x.clothingItemId || x.id);
+}

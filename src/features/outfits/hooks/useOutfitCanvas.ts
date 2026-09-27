@@ -49,6 +49,7 @@ export function useOutfitCanvas() {
         ...prev,
         {
           ...item,
+          _role: role,
           scale,
           x,
           y,

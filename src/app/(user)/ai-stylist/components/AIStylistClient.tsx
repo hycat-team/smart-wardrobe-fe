@@ -203,8 +203,8 @@ function AIStylistContent() {
         coverImageUrl: uploadedUrl,
         items: selectedItems.map((item) => ({
           fashionItemId: item.clothingItemId,
-          positionX: Math.max(1, Math.abs(item.x || 0)),
-          positionY: Math.max(1, Math.abs(item.y || 0)),
+          positionX: Math.round(item.x || 0),
+          positionY: Math.round(item.y || 0),
           scale: (item.scale || 100) / 100,
           layerOrder: item.zIndex || 1,
         })),

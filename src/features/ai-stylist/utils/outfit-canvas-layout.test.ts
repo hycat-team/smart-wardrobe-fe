@@ -7,6 +7,8 @@ import {
   ROLE_BOUNDING_BOX_RATIOS,
   ROLE_COORDINATES_SEPARATE,
   ROLE_COORDINATES_FULLBODY,
+  restoreCanvasOutfitItem,
+  restoreCanvasOutfitItems,
 } from "./outfit-canvas-layout";
 import type { AIOutfitItem, AIOutfitProduct } from "@/features/ai-stylist/types";
 
@@ -423,5 +425,150 @@ describe("resolveCanvasOutfitItems - User Story 6 (Pre-generation Size / Scale M
 
     expect(top?.scale).toBe(100);
     expect(footwear?.scale).toBe(80);
+  });
+});
+
+describe("restoreCanvasOutfitItems - Restoring and Sanitizing Coordinates for Outfit Detail", () => {
+  it("fixes the legacy Math.abs bug where top was saved with positive Y (140) placing it below bottom (110)", () => {
+    // Exactly matches the user's issue in the screenshot:
+    // Pants at y = 110, Shirt at y = 140, Shoes at y = 295
+    const legacySavedItems = [
+      {
+        id: "item-1",
+        fashionItemId: "fi-top",
+        fashionItem: {
+          id: "fi-top",
+          imageUrl: "https://example.com/shirt.png",
+          category: { id: "cat-ao", name: "Áo", slug: "ao" },
+        },
+        positionX: 1, // Math.max(1, Math.abs(0))
+        positionY: 140, // Math.max(1, Math.abs(-140))
+        scale: 1,
+        layerOrder: 5,
+      },
+      {
+        id: "item-2",
+        fashionItemId: "fi-bottom",
+        fashionItem: {
+          id: "fi-bottom",
+          imageUrl: "https://example.com/pants.png",
+          category: { id: "cat-quan", name: "Quần", slug: "quan" },
+        },
+        positionX: 1,
+        positionY: 110,
+        scale: 1,
+        layerOrder: 4,
+      },
+      {
+        id: "item-3",
+        fashionItemId: "fi-shoes",
+        fashionItem: {
+          id: "fi-shoes",
+          imageUrl: "https://example.com/shoes.png",
+          category: { id: "cat-giay", name: "Giày", slug: "giay" },
+        },
+        positionX: 1,
+        positionY: 305, // older footwear coord
+        scale: 0.8,
+        layerOrder: 3,
+      },
+    ];
+
+    const restored = restoreCanvasOutfitItems(legacySavedItems);
+
+    expect(restored).toHaveLength(3);
+
+    const top = restored.find((i) => i._role === "top");
+    const bottom = restored.find((i) => i._role === "bottom");
+    const shoes = restored.find((i) => i._role === "footwear");
+
+    expect(top).toBeDefined();
+    expect(bottom).toBeDefined();
+    expect(shoes).toBeDefined();
+
+    // Top must be restored to negative Y (-140) so it's above pants
+    expect(top?.y).toBe(-140);
+    expect(top?.x).toBe(0);
+
+    // Bottom stays at y = 110
+    expect(bottom?.y).toBe(110);
+    expect(bottom?.x).toBe(0);
+
+    // Shoes upgraded to 295
+    expect(shoes?.y).toBe(295);
+    expect(shoes?.x).toBe(0);
+
+    // Top is physically ABOVE bottom (smaller Y means higher on screen)
+    expect(top!.y).toBeLessThan(bottom!.y);
+    expect(bottom!.y).toBeLessThan(shoes!.y);
+  });
+
+  it("fixes outerwear saved as x = 25, y = 145 back to x = -25, y = -145", () => {
+    const legacyOuterwear = [
+      {
+        id: "item-ow",
+        fashionItem: {
+          id: "fi-ow",
+          imageUrl: "https://example.com/jacket.png",
+          category: { id: "cat-ao-khoac", name: "Áo khoác", slug: "ao-khoac" },
+        },
+        positionX: 25,
+        positionY: 145,
+        scale: 1.05,
+        layerOrder: 7,
+      },
+    ];
+
+    const restored = restoreCanvasOutfitItems(legacyOuterwear);
+    const ow = restored[0];
+
+    expect(ow._role).toBe("outerwear");
+    expect(ow.x).toBe(-25);
+    expect(ow.y).toBe(-145);
+  });
+
+  it("fixes headwear saved with positive Y (330) back to -330", () => {
+    const legacyHeadwear = [
+      {
+        id: "item-hw",
+        fashionItem: {
+          id: "fi-hw",
+          imageUrl: "https://example.com/hat.png",
+          category: { id: "cat-mu", name: "Mũ", slug: "mu" },
+        },
+        positionX: 1,
+        positionY: 330,
+        scale: 0.8,
+        layerOrder: 8,
+      },
+    ];
+
+    const restored = restoreCanvasOutfitItems(legacyHeadwear);
+    const hw = restored[0];
+
+    expect(hw._role).toBe("headwear");
+    expect(hw.x).toBe(0);
+    expect(hw.y).toBe(-330);
+  });
+
+  it("preserves custom user drag positions with legitimate negative Y", () => {
+    const customPositionItem = [
+      {
+        id: "item-custom",
+        fashionItem: {
+          id: "fi-shirt",
+          imageUrl: "https://example.com/shirt.png",
+          category: { id: "cat-ao", name: "Áo", slug: "ao" },
+        },
+        positionX: 45,
+        positionY: -125,
+        scale: 1,
+        layerOrder: 5,
+      },
+    ];
+
+    const restored = restoreCanvasOutfitItems(customPositionItem);
+    expect(restored[0].x).toBe(45);
+    expect(restored[0].y).toBe(-125);
   });
 });
