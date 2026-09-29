@@ -8,8 +8,8 @@ import gsap from "gsap";
 import { useSystemCatalogItems, useInitClosetFromCatalog } from "@/features/wardrobe/queries/wardrobe.queries";
 import { useUserCategories } from "@/features/admin/queries/admin.queries";
 import { WardrobeItemRes } from "@/features/wardrobe/types";
-import { Loader2, Plus, ArrowLeft, Search } from "lucide-react";
-import { WardrobeCard } from "../../components/WardrobeCard";
+import { Loader2, Plus, Search } from "lucide-react";
+import { WardrobeCardV2 } from "../../components/WardrobeCardV2";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Pagination,
@@ -269,7 +269,7 @@ export function SystemCatalogClient() {
                 const isSelected = selectedIds.has(item.id);
                 return (
                   <div key={item.id} className="catalog-card h-full">
-                    <WardrobeCard
+                    <WardrobeCardV2
                       item={item}
                       isLocked={false}
                       isProcessing={false}

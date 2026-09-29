@@ -38,6 +38,7 @@ export function MobileBottomNav() {
             {isActive && (
               <motion.div
                 layoutId="mobileActivePill"
+                initial={false}
                 className="absolute inset-x-2 inset-y-1 rounded-xl bg-[#F4EEE8]/70 dark:bg-white/[0.06] -z-10"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
@@ -77,6 +78,7 @@ export function MobileBottomNav() {
             {isActive && (
               <motion.div
                 layoutId="mobileActiveIndicator"
+                initial={false}
                 className="w-1.5 h-1.5 rounded-full bg-[#D9C5B2] shadow-[0_0_8px_rgba(217,197,178,0.8)] absolute bottom-0.5"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />

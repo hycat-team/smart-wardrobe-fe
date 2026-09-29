@@ -50,7 +50,7 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
-  { icon: Globe, label: "Cộng Đồng", path: "/community" },
+  { icon: Globe, label: 'Cộng Đồng', path: '/community' },
   // { icon: Compass, label: "Khám Phá", path: "/brands" },
   { icon: Shirt, label: 'Tủ Quần Áo', path: '/wardrobe' },
   { icon: Sparkles, label: 'AI Phối Đồ', path: '/ai-stylist' },
@@ -80,6 +80,11 @@ export function Sidebar() {
       setIsCollapsed(true);
     }
   }, [setIsCollapsed]);
+
+  // Reset hover state whenever route changes to avoid phantom gliding
+  useEffect(() => {
+    setHoveredPath(null);
+  }, [pathname]);
 
   const handleToggleCollapse = () => {
     toggleCollapse();
@@ -145,7 +150,7 @@ export function Sidebar() {
       </div>
 
       {/* Elegant User Profile with Dropdown */}
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <div
             className={cn(
@@ -318,9 +323,7 @@ export function Sidebar() {
                 <LogOut className="size-4" />
               </div>
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-[13px] font-medium leading-tight">
-                  Đăng xuất
-                </span>
+                <span className="text-[13px] font-medium leading-tight">Đăng xuất</span>
                 <span className="text-[10.5px] text-red-400/80 truncate">
                   Kết thúc phiên làm việc
                 </span>
@@ -331,10 +334,7 @@ export function Sidebar() {
       </DropdownMenu>
 
       {/* Main Navigation (Minimalist List with Motion) */}
-      <nav 
-        className="flex-1 flex flex-col gap-1.5"
-        onMouseLeave={() => setHoveredPath(null)}
-      >
+      <nav className="flex-1 flex flex-col gap-1.5" onMouseLeave={() => setHoveredPath(null)}>
         {NAV_ITEMS.map((item) => {
           const isActive =
             item.path === '/wardrobe'
@@ -353,19 +353,14 @@ export function Sidebar() {
                 isCollapsed ? 'justify-center p-3' : 'gap-4 px-4 py-3'
               )}
             >
-              {/* Floating Hover Pill (Glides smoothly between items when hovering) */}
+              {/* Hover Pill (Fade in/out on hovered item without phantom gliding) */}
               {hoveredPath === item.path && !isActive && (
                 <motion.div
-                  layoutId="sidebar-hover-pill"
-                  className="absolute inset-0 rounded-xl bg-muted/50 dark:bg-white/[0.04] pointer-events-none"
+                  className="absolute inset-0 rounded-xl bg-stone-100/80 dark:bg-white/[0.05] pointer-events-none"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 420,
-                    damping: 32,
-                  }}
+                  transition={{ duration: 0.05 }}
                 />
               )}
 
@@ -373,6 +368,7 @@ export function Sidebar() {
               {isActive && (
                 <motion.div
                   layoutId="sidebar-active-pill"
+                  initial={false}
                   className="absolute inset-0 rounded-xl bg-[#F4EEE8] dark:bg-white/[0.08] border border-[#D9C5B2]/30 shadow-[0_1px_4px_rgba(0,0,0,0.03)] pointer-events-none"
                   transition={{
                     type: 'spring',
@@ -387,6 +383,7 @@ export function Sidebar() {
               {isActive && (
                 <motion.span
                   layoutId="sidebar-active-indicator"
+                  initial={false}
                   className={cn(
                     'absolute left-0 top-1/2 -translate-y-1/2 bg-[#D9C5B2] rounded-r-full z-20 pointer-events-none shadow-[0_0_12px_rgba(217,197,178,0.7)]',
                     isCollapsed ? 'w-1 h-5' : 'w-1.5 h-6'
@@ -426,7 +423,9 @@ export function Sidebar() {
                   <span
                     className={cn(
                       'font-body-sm text-[14px] tracking-wide truncate relative z-10 transition-colors duration-200',
-                      isActive ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground group-hover:text-foreground'
+                      isActive
+                        ? 'font-semibold text-foreground'
+                        : 'font-medium text-muted-foreground group-hover:text-foreground'
                     )}
                   >
                     {item.label}

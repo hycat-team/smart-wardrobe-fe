@@ -73,7 +73,7 @@ export function AdminSidebar() {
       </div>
 
       {/* Elegant User Profile with Dropdown */}
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <div className="flex items-center gap-4 mb-8 p-3 bg-muted/50 border border-border hover:border-primary transition-all cursor-pointer group outline-none shadow-sm rounded-2xl">
             <div className="flex flex-col flex-1 min-w-0 pl-1">

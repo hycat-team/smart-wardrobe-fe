@@ -53,7 +53,7 @@ import {
   WardrobeItemStatus,
 } from "@/features/wardrobe/types";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
-import { WardrobeCard } from "./WardrobeCard";
+import { WardrobeCardV2 } from "./WardrobeCardV2";
 import { WardrobeCategoryDistributionPanel } from "./WardrobeCategoryDistributionPanel";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { toast } from "sonner";
@@ -454,7 +454,7 @@ export default function WardrobeClient({
 
               return (
                 <div key={item.id} className="wardrobe-card">
-                  <WardrobeCard
+                  <WardrobeCardV2
                     item={item}
                     isLocked={!!item.isLocked}
                     isProcessing={isProcessing}
