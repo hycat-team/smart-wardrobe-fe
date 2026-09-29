@@ -116,8 +116,11 @@ export interface UpdatePostReq {
 export interface UploadSignatureResult {
   apiKey: string;
   folder: string;
-  publicId: string;
+  // Vắng với endpoint /posts/upload-signature (BE không ký public_id) — xem contract §3.5
+  publicId?: string;
   signature: string;
   timestamp: number;
   resourceType: 'image' | 'video';
+  // BE ký field này — FE phải gửi kèm nguyên văn dưới key `allowed_formats`
+  allowedFormats: string;
 }

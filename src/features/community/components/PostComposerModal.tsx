@@ -9,7 +9,7 @@ import { useCreatePost, useUpdatePost } from '../queries/community.queries';
 import { communityApi } from '../api/community.api';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import { validateMediaFile } from '../utils/community.utils';
-import { Loader2, Shirt, Image as ImageIcon, Video, X, Sparkles, AlertCircle } from 'lucide-react';
+import { Loader2, Shirt, Image as ImageIcon, Video, X } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -86,6 +86,9 @@ export const PostComposerModal: React.FC<PostComposerModalProps> = ({
     }
 
     const filesToProcess = files.slice(0, availableSlots);
+    if (files.length > availableSlots) {
+      toast.warning('Mỗi bài viết chỉ được đính kèm tối đa 10 tệp media.');
+    }
     const newItems: LocalMediaItem[] = [];
 
     for (const file of filesToProcess) {
@@ -139,26 +142,22 @@ export const PostComposerModal: React.FC<PostComposerModalProps> = ({
 
     try {
       setIsSubmitting(true);
-      const uploadedMedia: PostMediaReq[] = [];
 
-      // 1. Process media uploads
-      for (let i = 0; i < mediaList.length; i++) {
-        const item = mediaList[i];
-        if (item.isExisting) {
-          uploadedMedia.push({
-            mediaType: item.mediaType,
-            mediaUrl: item.previewUrl,
-            publicId: item.publicId,
-            sortOrder: i,
-          });
-        } else if (item.file) {
-          // Get signature for resourceType
+      // 1. Process media uploads (parallel, per-file error isolation)
+      const uploadedMedia: PostMediaReq[] = [];
+      const failedFileNames: string[] = [];
+      const newMediaItems = mediaList
+        .map((item, index) => ({ item, index }))
+        .filter(({ item }) => !item.isExisting);
+
+      const results = await Promise.allSettled(
+        newMediaItems.map(async ({ item, index }) => {
           const sig = await communityApi.getPostUploadSignature({
             resourceType: item.mediaType,
           });
 
           const cloudRes = await uploadToCloudinary({
-            file: item.file,
+            file: item.file!,
             signatureParams: {
               apiKey: sig.apiKey,
               timestamp: sig.timestamp,
@@ -166,20 +165,53 @@ export const PostComposerModal: React.FC<PostComposerModalProps> = ({
               folder: sig.folder,
               publicId: sig.publicId,
               resourceType: sig.resourceType,
+              allowedFormats: sig.allowedFormats,
             },
             resourceType: item.mediaType,
           });
 
+          return { item, index, mediaUrl: cloudRes.secure_url, publicId: cloudRes.public_id };
+        })
+      );
+
+      // Existing media preserved (no re-upload), keep their position in sortOrder
+      mediaList.forEach((item, index) => {
+        if (item.isExisting) {
           uploadedMedia.push({
             mediaType: item.mediaType,
-            mediaUrl: cloudRes.secure_url,
-            publicId: cloudRes.public_id,
-            sortOrder: i,
+            mediaUrl: item.previewUrl,
+            publicId: item.publicId,
+            sortOrder: index,
           });
         }
+      });
+
+      results.forEach((result, i) => {
+        const { item, index } = newMediaItems[i];
+        if (result.status === 'fulfilled') {
+          uploadedMedia.push({
+            mediaType: result.value.item.mediaType,
+            mediaUrl: result.value.mediaUrl,
+            publicId: result.value.publicId,
+            sortOrder: index,
+          });
+        } else {
+          failedFileNames.push(item.file?.name || `Tệp ${index + 1}`);
+        }
+      });
+
+      // 2. Submit post — only block when there is no content AND no successfully uploaded file
+      const canSubmit = trimmedContent.trim().length > 0 || uploadedMedia.length > 0;
+      if (!canSubmit) {
+        toast.error('Bài viết phải có ít nhất nội dung chia sẻ hoặc 1 hình ảnh/video.');
+        setIsSubmitting(false);
+        return;
       }
 
-      // 2. Submit post
+      if (failedFileNames.length > 0) {
+        toast.warning(`Một số tệp tải lên thất bại: ${failedFileNames.join(', ')}.`);
+      }
+
       if (isEditing && editingPost) {
         updatePost(
           {
@@ -219,8 +251,10 @@ export const PostComposerModal: React.FC<PostComposerModalProps> = ({
           }
         );
       }
-    } catch (error: any) {
-      toast.error(error?.message || 'Có lỗi xảy ra khi tải ảnh/video lên.');
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : 'Có lỗi xảy ra khi tải ảnh/video lên.';
+      toast.error(message);
       setIsSubmitting(false);
     }
   };

@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Roboto_Mono } from 'next/font/google';
 import { BrandDiscoverySidebar } from './BrandDiscoverySidebar';
+import { CommunitySearch } from './CommunitySearch';
 // import { BrandPostsFeed } from './BrandPostsFeed';
 import { mockBrands } from '@/lib/mock-data/b2b';
 import Link from 'next/link';
@@ -24,6 +25,7 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
   const [feedSort, setFeedSort] = React.useState<'hot' | 'latest'>('hot');
   const [editingPost, setEditingPost] = React.useState<PostRes | null>(null);
   const [isComposerOpen, setIsComposerOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteCommunity({
     type: feedType,
@@ -31,6 +33,7 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
   });
 
   const displayData = data || (initialData ? { pages: [initialData], pageParams: [1] } : undefined);
+  const isSearching = searchQuery.trim().length > 0;
 
   return (
     <div className="flex-1 bg-background text-foreground pb-20">
@@ -101,25 +104,32 @@ export default function CommunityClient({ initialData }: CommunityClientProps) {
               </div>
             </div>
 
-            <CommunityList
-              data={displayData}
-              fetchNextPage={fetchNextPage}
-              hasNextPage={hasNextPage || false}
-              isFetchingNextPage={isFetchingNextPage}
-              isLoading={isLoading && !initialData}
-              feedType={feedType}
-              onFeedTypeChange={setFeedType}
-              feedSort={feedSort}
-              onFeedSortChange={setFeedSort}
-              onOpenComposer={() => {
-                setEditingPost(null);
-                setIsComposerOpen(true);
-              }}
-              onEditPost={(post) => {
-                setEditingPost(post);
-                setIsComposerOpen(true);
-              }}
+            <CommunitySearch
+              query={searchQuery}
+              onQueryChange={setSearchQuery}
             />
+
+            {!isSearching && (
+              <CommunityList
+                data={displayData}
+                fetchNextPage={fetchNextPage}
+                hasNextPage={hasNextPage || false}
+                isFetchingNextPage={isFetchingNextPage}
+                isLoading={isLoading && !initialData}
+                feedType={feedType}
+                onFeedTypeChange={setFeedType}
+                feedSort={feedSort}
+                onFeedSortChange={setFeedSort}
+                onOpenComposer={() => {
+                  setEditingPost(null);
+                  setIsComposerOpen(true);
+                }}
+                onEditPost={(post) => {
+                  setEditingPost(post);
+                  setIsComposerOpen(true);
+                }}
+              />
+            )}
 
             {/* B2B Mock Brand Posts injected after API data */}
             {/* <BrandPostsFeed /> */}

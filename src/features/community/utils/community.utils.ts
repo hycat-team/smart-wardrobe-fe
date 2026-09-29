@@ -6,19 +6,35 @@ export interface MediaValidationResult {
   mediaType?: 'image' | 'video';
 }
 
+const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const VIDEO_MIME_TYPES = ['video/mp4', 'video/webm'];
+
 /**
  * Kiểm tra tính hợp lệ của tệp hình ảnh hoặc video tải lên theo giới hạn kỹ thuật của backend 022
  * - Ảnh: <= 10MB, định dạng jpg, png, webp
  * - Video: <= 100MB, <= 60s, định dạng mp4, webm
  */
 export async function validateMediaFile(file: File): Promise<MediaValidationResult> {
-  const isImage = file.type.startsWith('image/');
-  const isVideo = file.type.startsWith('video/');
+  const isImage = IMAGE_MIME_TYPES.includes(file.type);
+  const isVideo = VIDEO_MIME_TYPES.includes(file.type);
 
   if (!isImage && !isVideo) {
+    if (file.type.startsWith('image/')) {
+      return {
+        isValid: false,
+        error: 'Ảnh chỉ hỗ trợ định dạng jpg, png, webp.',
+      };
+    }
+    if (file.type.startsWith('video/')) {
+      return {
+        isValid: false,
+        error: 'Video chỉ hỗ trợ định dạng mp4, webm.',
+      };
+    }
     return {
       isValid: false,
-      error: 'Định dạng tệp không được hỗ trợ. Vui lòng chọn ảnh (jpg, png, webp) hoặc video (mp4, webm).',
+      error:
+        'Định dạng tệp không được hỗ trợ. Vui lòng chọn ảnh (jpg, png, webp) hoặc video (mp4, webm).',
     };
   }
 

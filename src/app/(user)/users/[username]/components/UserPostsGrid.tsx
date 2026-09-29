@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUserPosts } from '@/features/community/queries/user-social.queries';
-import { Heart, MessageCircle, Shirt, Video, AlertCircle, Loader2 } from 'lucide-react';
+import { Heart, MessageCircle, Shirt, Video, AlertCircle, Loader2, Images, ImageOff } from 'lucide-react';
 import { PostRes } from '@/features/community/types';
 
 interface UserPostsGridProps {
@@ -14,6 +14,7 @@ interface UserPostsGridProps {
 export const UserPostsGrid: React.FC<UserPostsGridProps> = ({ username }) => {
   const [page, setPage] = useState(1);
   const { data, isLoading, isFetching } = useUserPosts(username, page);
+  const [brokenCovers, setBrokenCovers] = useState<Record<string, boolean>>({});
 
   const posts = data?.items || [];
   const metadata = data?.metadata;
@@ -48,7 +49,8 @@ export const UserPostsGrid: React.FC<UserPostsGridProps> = ({ username }) => {
         {posts.map((post: PostRes) => {
           const isOutfit = post.postType === 'outfit';
           const outfitCover = post.outfit?.coverImageUrl;
-          const firstMedia = post.media && post.media.length > 0 ? post.media[0] : null;
+          const mediaList = (post.media || []).slice().sort((a, b) => a.sortOrder - b.sortOrder);
+          const firstMedia = mediaList.length > 0 ? mediaList[0] : null;
           const isVideo = firstMedia?.mediaType === 'video';
           const coverUrl = isOutfit ? outfitCover : firstMedia?.mediaUrl;
 
@@ -58,17 +60,21 @@ export const UserPostsGrid: React.FC<UserPostsGridProps> = ({ username }) => {
               href={`/posts/${post.publicId}`}
               className="group relative aspect-square bg-muted/40 rounded-xl overflow-hidden border border-border/60 shadow-sm"
             >
-              {coverUrl ? (
+              {coverUrl && !brokenCovers[post.publicId] ? (
                 <Image
                   src={coverUrl}
                   alt={post.title || 'Post image'}
                   fill
                   sizes="(max-width: 640px) 50vw, 33vw"
+                  onError={() =>
+                    setBrokenCovers((prev) => ({ ...prev, [post.publicId]: true }))
+                  }
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center p-4 bg-muted text-muted-foreground text-center text-xs font-medium">
-                  {post.title || post.content.slice(0, 50)}
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4 bg-muted text-muted-foreground text-center text-xs font-medium">
+                  <ImageOff className="w-6 h-6 opacity-50" />
+                  <span>{post.title || post.content.slice(0, 50)}</span>
                 </div>
               )}
 
@@ -82,6 +88,12 @@ export const UserPostsGrid: React.FC<UserPostsGridProps> = ({ username }) => {
                 {isVideo && (
                   <div className="p-1.5 rounded-full bg-black/60 text-white backdrop-blur-sm shadow-md" title="Video">
                     <Video className="w-3.5 h-3.5" />
+                  </div>
+                )}
+                {!isOutfit && mediaList.length > 1 && (
+                  <div className="flex items-center gap-1 px-1.5 py-1 rounded-full bg-black/60 text-white backdrop-blur-sm shadow-md text-[10px] font-bold" title={`${mediaList.length} tệp`}>
+                    <Images className="w-3 h-3" />
+                    <span>{mediaList.length}</span>
                   </div>
                 )}
               </div>

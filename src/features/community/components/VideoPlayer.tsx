@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Video } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface VideoPlayerProps {
@@ -21,9 +21,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [isMuted, setIsMuted] = useState(true);
   const [showControls, setShowControls] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (!videoRef.current) return;
 
     if (isPlaying) {
@@ -37,18 +39,37 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (!videoRef.current) return;
 
     videoRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
 
+  if (hasError) {
+    return (
+      <div
+        className={cn(
+          'relative w-full h-full overflow-hidden bg-muted flex items-center justify-center',
+          className
+        )}
+      >
+        <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+          <Video className="w-8 h-8 opacity-50 stroke-1" />
+          <span className="text-xs font-medium">Video không khả dụng</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
-      className={cn('relative w-full h-full overflow-hidden bg-black flex items-center justify-center group', className)}
+      className={cn(
+        'relative w-full h-full overflow-hidden bg-black flex items-center justify-center group',
+        className
+      )}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
-      onClick={togglePlay}
     >
       <video
         ref={videoRef}
@@ -61,14 +82,22 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         className="w-full h-full object-cover"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
+        onError={() => setHasError(true)}
       />
 
-      {/* Play/Pause overlay button when paused */}
+      {/* Play overlay when paused: dim layer is pointer-events-none so clicks
+          outside the circle button bubble to a parent <Link> (feed navigation);
+          only the circle button itself toggles playback */}
       {!isPlaying && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px] transition-opacity">
-          <div className="w-14 h-14 rounded-full bg-background/80 text-foreground flex items-center justify-center shadow-lg transform transition-transform hover:scale-110">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px] transition-opacity pointer-events-none">
+          <button
+            type="button"
+            onClick={togglePlay}
+            className="pointer-events-auto w-14 h-14 rounded-full bg-background/80 text-foreground flex items-center justify-center shadow-lg transform transition-transform hover:scale-110 cursor-pointer"
+            aria-label="Phát video"
+          >
             <Play className="w-6 h-6 ml-1 fill-current" />
-          </div>
+          </button>
         </div>
       )}
 
@@ -79,6 +108,15 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
         )}
       >
+        <button
+          type="button"
+          onClick={togglePlay}
+          className="p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors backdrop-blur-sm"
+          title={isPlaying ? 'Tạm dừng video' : 'Phát video'}
+          aria-label={isPlaying ? 'Tạm dừng video' : 'Phát video'}
+        >
+          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+        </button>
         <button
           type="button"
           onClick={toggleMute}

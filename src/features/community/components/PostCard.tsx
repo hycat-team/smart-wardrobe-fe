@@ -9,6 +9,7 @@ import { useProfile } from '@/features/profile/queries/profile.queries';
 import { PostCommentsModal } from './PostCommentsModal';
 import { PostShareModal } from './PostShareModal';
 import { PostLikesModal } from './PostLikesModal';
+import { PostMediaGallery } from './PostMediaGallery';
 import { VideoPlayer } from './VideoPlayer';
 import { FollowButton } from './FollowButton';
 import { cn } from '@/lib/utils';
@@ -16,13 +17,25 @@ import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { getCommunityUserAvatar, getCommunityUserDisplayName } from '../utils/community.utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface PostCardProps {
   post: PostRes;
   onEdit?: (post: PostRes) => void;
+  mediaVariant?: 'full' | 'compact';
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, onEdit }) => {
+export const PostCard: React.FC<PostCardProps> = ({ post, onEdit, mediaVariant = 'compact' }) => {
   const heartIconRef = useRef<SVGSVGElement>(null);
   const { mutate: likePost } = useLikePost();
   const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
@@ -36,6 +49,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit }) => {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isLikesOpen, setIsLikesOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasImageError, setHasImageError] = useState(false);
@@ -60,10 +74,12 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit }) => {
     likePost({ postPublicID: post.publicId, isLiked: newIsLiked });
   };
 
-  const handleDelete = () => {
-    if (confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
-      deletePost(post.publicId);
-    }
+  const handleConfirmDelete = () => {
+    deletePost(post.publicId, {
+      onSettled: () => {
+        setIsDeleteDialogOpen(false);
+      },
+    });
   };
 
   const handleShare = () => {
@@ -72,8 +88,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit }) => {
 
   // Determine media URL and type
   const isOutfit = post.postType === 'outfit';
+  const isMedia = post.postType === 'media';
   const outfitCover = post.outfit?.coverImageUrl;
-  const firstMedia = post.media && post.media.length > 0 ? post.media[0] : null;
+  const mediaList = (post.media || []).slice().sort((a, b) => a.sortOrder - b.sortOrder);
+  const firstMedia = mediaList.length > 0 ? mediaList[0] : null;
   const isVideo = firstMedia?.mediaType === 'video';
   const mediaUrl = isOutfit ? outfitCover : firstMedia?.mediaUrl;
   const hasMedia = !!mediaUrl;
@@ -147,7 +165,8 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit }) => {
                   </button>
                 )}
                 <button
-                  onClick={handleDelete}
+                  type="button"
+                  onClick={() => setIsDeleteDialogOpen(true)}
                   disabled={isDeleting}
                   className="text-muted-foreground hover:text-destructive transition-colors p-1.5 rounded-full hover:bg-muted disabled:opacity-60"
                   title="Xóa bài viết"
@@ -160,7 +179,14 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit }) => {
         </div>
 
         {/* Media Section */}
-        {hasMedia && (
+        {isMedia && mediaList.length > 0 ? (
+          <PostMediaGallery
+            media={mediaList}
+            title={post.title}
+            variant={mediaVariant}
+            linkHref={mediaVariant === 'compact' ? `/posts/${post.publicId}` : undefined}
+          />
+        ) : hasMedia ? (
           <div className="relative w-full aspect-[4/5] bg-muted/20 overflow-hidden flex items-center justify-center border-y border-border">
             {/* Tag for Outfit post */}
             {isOutfit && post.outfit && (
@@ -173,7 +199,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit }) => {
             )}
 
             {isVideo && firstMedia ? (
-              <VideoPlayer src={firstMedia.mediaUrl} />
+              <Link href={`/posts/${post.publicId}`} className="relative w-full h-full block" aria-label="Xem chi tiết bài viết">
+                <VideoPlayer src={firstMedia.mediaUrl} />
+              </Link>
             ) : (
               <Link href={`/posts/${post.publicId}`} className="relative w-full h-full block">
                 {!isImageLoaded && !hasImageError && (
@@ -201,7 +229,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit }) => {
               </Link>
             )}
           </div>
-        )}
+        ) : null}
 
         {/* Content Section */}
         <div className="px-3.5 pt-2 pb-3 flex flex-col bg-card">
@@ -303,6 +331,47 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onEdit }) => {
             onClose={() => setIsLikesOpen(false)}
             postPublicId={post.publicId}
           />
+
+          <AlertDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={(open) => {
+              if (!isDeleting) {
+                setIsDeleteDialogOpen(open);
+              }
+            }}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogMedia className="bg-destructive/10 text-destructive">
+                  <Trash2 className="w-5 h-5" />
+                </AlertDialogMedia>
+                <AlertDialogTitle>Xác nhận xóa bài viết</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  disabled={isDeleting}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleConfirmDelete();
+                  }}
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+                      <span>Đang xóa...</span>
+                    </>
+                  ) : (
+                    <span>Xóa</span>
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </>
       )}
     </>

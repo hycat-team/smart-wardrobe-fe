@@ -13,6 +13,17 @@ import { getCommunityUserAvatar, getCommunityUserDisplayName } from '@/features/
 import { Button } from '@/components/ui/button';
 import { EyeOff, RefreshCcw, Trash2, Loader2, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface AdminCommentsModerationProps {
   searchTerm: string;
@@ -21,6 +32,7 @@ interface AdminCommentsModerationProps {
 export const AdminCommentsModeration: React.FC<AdminCommentsModerationProps> = ({ searchTerm }) => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
   const { data, isLoading, isError, isFetching } = useAdminComments({
     q: searchTerm.trim() || undefined,
@@ -164,11 +176,7 @@ export const AdminCommentsModeration: React.FC<AdminCommentsModerationProps> = (
 
                   <Button
                     disabled={isBusy}
-                    onClick={() => {
-                      if (confirm('Bạn có chắc chắn muốn xóa vĩnh viễn bình luận này không?')) {
-                        deleteComment(comment.id);
-                      }
-                    }}
+                    onClick={() => setCommentToDelete(comment.id)}
                     variant="outline"
                     size="sm"
                     className="rounded-full gap-1 text-[11px] font-semibold h-8 px-3 border-destructive/30 text-destructive hover:bg-destructive/10"
@@ -209,6 +217,52 @@ export const AdminCommentsModeration: React.FC<AdminCommentsModerationProps> = (
           </Button>
         </div>
       )}
+
+      {/* Delete Confirmation Alert Dialog */}
+      <AlertDialog
+        open={!!commentToDelete}
+        onOpenChange={(open) => {
+          if (!open && !isBusy) {
+            setCommentToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive">
+              <Trash2 className="w-5 h-5" />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Xóa bình luận</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa vĩnh viễn bình luận này không? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBusy}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={isBusy}
+              onClick={(e) => {
+                e.preventDefault();
+                if (commentToDelete) {
+                  deleteComment(commentToDelete, {
+                    onSettled: () => setCommentToDelete(null),
+                  });
+                }
+              }}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+                  <span>Đang xóa...</span>
+                </>
+              ) : (
+                <span>Xác nhận xóa</span>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

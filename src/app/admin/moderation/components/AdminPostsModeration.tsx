@@ -20,6 +20,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { PostCommentsModal } from '@/features/community/components/PostCommentsModal';
 
 interface AdminPostsModerationProps {
@@ -30,6 +41,7 @@ export const AdminPostsModeration: React.FC<AdminPostsModerationProps> = ({ sear
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [activeCommentsPost, setActiveCommentsPost] = useState<PostRes | null>(null);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
 
   const { data, isLoading, isError, isFetching } = useAdminPosts({
     q: searchTerm.trim() || undefined,
@@ -253,11 +265,7 @@ export const AdminPostsModeration: React.FC<AdminPostsModerationProps> = ({ sear
 
                   <Button
                     disabled={isBusy}
-                    onClick={() => {
-                      if (confirm('Bạn có chắc chắn muốn xóa bài viết này không?')) {
-                        deletePost(post.publicId || post.id);
-                      }
-                    }}
+                    onClick={() => setPostToDelete(post.publicId || post.id)}
                     variant="outline"
                     size="sm"
                     className="rounded-full gap-1.5 text-[11px] font-semibold h-8 px-3 border-destructive/30 text-destructive hover:bg-destructive/10 w-full"
@@ -307,6 +315,52 @@ export const AdminPostsModeration: React.FC<AdminPostsModerationProps> = ({ sear
           post={activeCommentsPost}
         />
       )}
+
+      {/* Delete Confirmation Alert Dialog */}
+      <AlertDialog
+        open={!!postToDelete}
+        onOpenChange={(open) => {
+          if (!open && !isBusy) {
+            setPostToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive">
+              <Trash2 className="w-5 h-5" />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Xóa bài viết</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBusy}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={isBusy}
+              onClick={(e) => {
+                e.preventDefault();
+                if (postToDelete) {
+                  deletePost(postToDelete, {
+                    onSettled: () => setPostToDelete(null),
+                  });
+                }
+              }}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+                  <span>Đang xóa...</span>
+                </>
+              ) : (
+                <span>Xác nhận xóa</span>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

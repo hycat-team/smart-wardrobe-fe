@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { usePostComments, useAddComment } from '../queries/community.queries';
-import { useProfile } from '@/features/profile/queries/profile.queries';
 import { Loader2, X } from 'lucide-react';
 import { PostRes } from '../types';
 import { CommentItem } from './CommentItem';
-import { VideoPlayer } from './VideoPlayer';
+import { PostMediaGallery } from './PostMediaGallery';
 import Image from 'next/image';
 import { getCommunityUserAvatar, getCommunityUserDisplayName } from '../utils/community.utils';
 
@@ -21,7 +20,6 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
   const [replyingTo, setReplyingTo] = useState<{ commentId: string; username: string } | null>(null);
   const { data: comments, isLoading } = usePostComments(post.publicId, isOpen);
   const { mutate: addComment, isPending } = useAddComment();
-  const { data: profile } = useProfile();
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,13 +44,9 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
   const authorUsername = post.user?.username || 'user';
   const authorAvatar = getCommunityUserAvatar(post.user);
 
-  const isPostOwner = Boolean(
-    profile && post.user && (profile.id === post.user.userId || profile.username === post.user.username)
-  );
-
   const isOutfit = post.postType === 'outfit';
   const outfitCover = post.outfit?.coverImageUrl;
-  const firstMedia = post.media && post.media.length > 0 ? post.media[0] : null;
+  const mediaList = (post.media || []).slice().sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -71,23 +65,9 @@ export const PostCommentsModal = ({ isOpen, onClose, post }: PostCommentsModalPr
                 className="w-full h-full object-contain"
               />
             </div>
-          ) : firstMedia?.mediaType === 'video' ? (
-            <div className="w-full h-full flex items-center justify-center p-4">
-              <VideoPlayer 
-                src={firstMedia.mediaUrl}
-                autoPlay={false}
-                className="max-h-full max-w-full rounded-xl"
-              />
-            </div>
-          ) : firstMedia?.mediaUrl ? (
-            <div className="relative w-full h-full">
-              <Image 
-                fill 
-                sizes="(max-width: 1200px) 50vw, 60vw" 
-                src={firstMedia.mediaUrl}
-                alt="Post Media"
-                className="w-full h-full object-contain"
-              />
+          ) : mediaList.length > 0 ? (
+            <div className="w-full h-full overflow-y-auto">
+              <PostMediaGallery media={mediaList} title={post.title} />
             </div>
           ) : (
             <div className="w-full h-full flex items-center justify-center p-12 bg-muted text-foreground">

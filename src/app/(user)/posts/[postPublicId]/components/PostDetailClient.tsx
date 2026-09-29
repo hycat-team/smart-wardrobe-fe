@@ -45,7 +45,7 @@ export default function PostDetailClient({ postPublicId, initialData }: PostDeta
         QUAY LẠI CỘNG ĐỒNG
       </button>
       
-      <PostCard post={post} />
+      <PostCard post={post} mediaVariant="full" />
     </div>
   );
 }
