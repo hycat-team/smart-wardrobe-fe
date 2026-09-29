@@ -7,8 +7,20 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useMyOutfits, useDeleteOutfit } from "@/features/outfits/queries/outfits.queries";
 import { OutfitRes as Outfit } from "@/features/outfits/types";
-import { OutfitCard } from "./OutfitCard";
+import { OutfitCardV2 } from "./OutfitCardV2";
+import { OutfitFilterBarV2, OutfitSortOption } from "./OutfitFilterBarV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+import { PaginationResult } from "@/types/api";
+
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import {
@@ -22,31 +34,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationLink,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
-import { PaginationResult } from "@/types/api";
 
 gsap.registerPlugin(useGSAP);
 
 interface OutfitsClientProps {
   initialData?: PaginationResult<Outfit> | null;
 }
-
-type SortOption = "Mới Nhất" | "Cũ Nhất";
 
 export function OutfitsClient({ initialData }: OutfitsClientProps) {
   const router = useRouter();
@@ -69,7 +62,7 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
   const lastPushedQ = useRef(searchParam);
 
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
-  const [sortParam, setSortParam] = useState<SortOption>("Mới Nhất");
+  const [sortParam, setSortParam] = useState<OutfitSortOption>("Mới Nhất");
   const [outfitToDelete, setOutfitToDelete] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
@@ -245,48 +238,14 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
             {renderActions()}
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mt-4">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
-              {[
-                { label: "Tất cả", value: "all" },
-                { label: "Tạo bởi AI", value: "ai" },
-                { label: "Thủ công", value: "manual" },
-              ].map(tab => {
-                const isActive = filterParam === tab.value;
-                return (
-                  <button
-                    key={tab.value}
-                    onClick={() => handleFilterChange(tab.value)}
-                    className={cn(
-                      "relative pb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors duration-200 group",
-                      isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground font-medium"
-                    )}
-                  >
-                    {tab.label}
-                    <span className={cn(
-                      "absolute bottom-0 left-0 h-[2px] bg-foreground transition-all duration-300",
-                      isActive ? "w-full" : "w-0 group-hover:w-full"
-                    )} />
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">Sort:</span>
-                <Select value={sortParam} onValueChange={(value) => setSortParam(value as SortOption)}>
-                  <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-[11px] font-semibold uppercase tracking-widest text-foreground w-auto gap-1">
-                    <SelectValue placeholder="Mới nhất" />
-                  </SelectTrigger>
-                  <SelectContent align="end" alignItemWithTrigger={false} className="rounded-2xl border-border bg-card mt-1">
-                    <SelectItem value="Mới Nhất" className="font-semibold text-[11px] uppercase tracking-widest hover:bg-muted">Mới nhất</SelectItem>
-                    <SelectItem value="Cũ Nhất" className="font-semibold text-[11px] uppercase tracking-widest hover:bg-muted">Cũ nhất</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
+          <OutfitFilterBarV2
+            filterParam={filterParam}
+            onFilterChange={handleFilterChange}
+            sortParam={sortParam}
+            onSortChange={setSortParam}
+            outfits={outfits}
+            totalItems={metadata?.totalItems ?? outfits.length}
+          />
         </div>
 
         {isLoading && !outfits.length ? (
@@ -314,11 +273,9 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
           >
             {filteredAndSortedOutfits.map((outfit: Outfit, index: number) => (
               <div key={outfit.id} className="outfit-card h-full">
-                <OutfitCard
+                <OutfitCardV2
                   outfit={outfit}
                   index={index}
-                  isFavorite={favorites[outfit.id] || false}
-                  onToggleFavorite={toggleFavorite}
                   onDelete={handleDeleteOutfit}
                 />
               </div>

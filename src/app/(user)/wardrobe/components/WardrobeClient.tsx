@@ -54,6 +54,7 @@ import {
 } from "@/features/wardrobe/types";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { WardrobeCardV2 } from "./WardrobeCardV2";
+import { WardrobeFilterBarV2 } from "./WardrobeFilterBarV2";
 import { WardrobeCategoryDistributionPanel } from "./WardrobeCategoryDistributionPanel";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { toast } from "sonner";
@@ -367,41 +368,15 @@ export default function WardrobeClient({
             error={distributionQuery.error}
             onRetry={() => void distributionQuery.refetch()}
           />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
-            <div className="flex flex-wrap gap-x-8 gap-y-4">
-              <button
-                onClick={() => handleCategoryChange("")}
-                className={cn("text-xs font-semibold uppercase tracking-[0.2em] relative transition-colors duration-200 group pb-2", !categoryParam ? "text-foreground" : "text-muted-foreground hover:text-foreground")}
-              >
-                Tất cả
-                <span className={cn("absolute bottom-0 left-0 h-[2px] bg-primary transition-all duration-300", !categoryParam ? "w-full" : "w-0 group-hover:w-full")} />
-              </button>
-              {category?.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryChange(cat.slug)}
-                  className={cn("text-xs font-semibold uppercase tracking-[0.2em] relative transition-colors duration-200 group pb-2", categoryParam === cat.slug ? "text-foreground" : "text-muted-foreground hover:text-foreground")}
-                >
-                  {cat.name}
-                  <span className={cn("absolute bottom-0 left-0 h-[2px] bg-primary transition-all duration-300", categoryParam === cat.slug ? "w-full" : "w-0 group-hover:w-full")} />
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-4 rounded-xl border border-border px-4 py-2">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Sắp xếp</span>
-              <Select value={sortParam} onValueChange={(value) => handleSortChange(value as string)}>
-                <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-xs font-semibold uppercase tracking-widest text-foreground w-auto">
-                  <SelectValue placeholder="Mới nhất" />
-                </SelectTrigger>
-                <SelectContent alignItemWithTrigger={false} align="end" sideOffset={4}>
-                  <SelectItem value="Mới nhất" className="text-xs font-semibold uppercase tracking-widest">Mới nhất</SelectItem>
-                  <SelectItem value="Cũ nhất" className="text-xs font-semibold uppercase tracking-widest">Cũ nhất</SelectItem>
-                  <SelectItem value="Tên" className="text-xs font-semibold uppercase tracking-widest">Theo tên</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <WardrobeFilterBarV2
+            categories={category}
+            selectedCategorySlug={categoryParam}
+            onSelectCategory={handleCategoryChange}
+            sortParam={sortParam}
+            onSortChange={(value) => handleSortChange(value)}
+            distribution={distributionQuery.data}
+            totalItems={stats?.activeItemsCount ?? metadata?.totalItems ?? items.length}
+          />
         </div>
 
         {isLoadingItems && !items.length ? (

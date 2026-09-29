@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Sparkles, Save, RefreshCw, Layers, SlidersHorizontal } from 'lucide-react';
+import { Sparkles, Save, RefreshCw, Layers, SlidersHorizontal, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { aiApi } from '@/features/ai-stylist/api/ai.api';
 import type { AIOutfitRecommendationRes } from '@/features/ai-stylist/types';
@@ -47,6 +47,7 @@ function AIStylistContent() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
+  const [outfitName, setOutfitName] = useState<string>('');
 
   const {
     ghostClosetEnabled,
@@ -116,6 +117,7 @@ function AIStylistContent() {
       });
       setSelectedItems(initialItems);
       setAlternativeIndices({});
+      setOutfitName(res.title || `Outfit ${new Date().toLocaleDateString('vi-VN')}`);
       toast.success('Đã tạo bộ phối đồ thành công!');
     } catch (error) {
       console.error(error);
@@ -155,6 +157,12 @@ function AIStylistContent() {
   const handleSaveOutfit = async () => {
     if (!outfitData || selectedItems.length === 0 || !canvasRef.current) return;
 
+    const trimmedName = outfitName.trim();
+    if (!trimmedName) {
+      toast.error('Vui lòng nhập tên cho bộ trang phục trước khi lưu!');
+      return;
+    }
+
     try {
       const invalidItems = selectedItems.filter((item) => !item.clothingItemId);
       if (invalidItems.length > 0) {
@@ -167,39 +175,65 @@ function AIStylistContent() {
       setIsSaving(true);
       toast.loading('Đang tạo ảnh preview...', { id: 'save_outfit' });
 
-      const elementsToHide = canvasRef.current.querySelectorAll('.action-button');
-      elementsToHide.forEach((el) => ((el as HTMLElement).style.display = 'none'));
+      // 1. Tạm ẩn các nút điều khiển trên canvas
+      const controls = document.querySelectorAll('.canvas-item-controls');
+      controls.forEach((el) => ((el as HTMLElement).style.opacity = '0'));
+      await new Promise((resolve) => setTimeout(resolve, 80));
 
-      const blob = await htmlToImage.toBlob(canvasRef.current, {
-        quality: 1,
-        pixelRatio: 3,
-        backgroundColor: 'transparent',
-        cacheBust: true,
-      });
+      let uploadedUrl = '';
 
-      elementsToHide.forEach((el) => ((el as HTMLElement).style.display = ''));
+      try {
+        // Cố gắng chụp Canvas bằng htmlToImage với timeout 4 giây
+        const capturePromise = htmlToImage.toBlob(canvasRef.current, {
+          quality: 0.92,
+          pixelRatio: 1.5,
+          backgroundColor: 'transparent',
+          skipFonts: true, // Không tải web fonts để tránh bị treo vĩnh viễn
+          cacheBust: false, // Không thêm query param làm hỏng cache CORS của Cloudinary
+          filter: (node: HTMLElement) => {
+            return !node.classList?.contains('canvas-item-controls') && !node.classList?.contains('action-button');
+          },
+        });
 
-      if (!blob) throw new Error('Không thể tạo ảnh từ Canvas');
+        const timeoutPromise = new Promise<null>((_, reject) =>
+          setTimeout(() => reject(new Error('Canvas preview capture timeout')), 4000)
+        );
 
-      toast.loading('Đang lưu hình ảnh...', { id: 'save_outfit' });
+        const blob = await Promise.race([capturePromise, timeoutPromise]);
 
-      const signatureResult = await wardrobeApi.getUploadSignature();
-      const uploadResData = await uploadToCloudinary({
-        file: blob,
-        signatureParams: {
-          apiKey: signatureResult.apiKey,
-          timestamp: signatureResult.timestamp,
-          signature: signatureResult.signature,
-          folder: signatureResult.folder,
-        },
-      });
+        if (blob) {
+          toast.loading('Đang lưu hình ảnh...', { id: 'save_outfit' });
+          const signatureResult = await wardrobeApi.getUploadSignature();
+          const uploadResData = await uploadToCloudinary({
+            file: blob,
+            signatureParams: {
+              apiKey: signatureResult.apiKey,
+              timestamp: signatureResult.timestamp,
+              signature: signatureResult.signature,
+              folder: signatureResult.folder,
+            },
+          });
+          uploadedUrl = uploadResData.secure_url;
+        }
+      } catch (captureErr) {
+        console.warn('Canvas preview capture không thành công, dùng ảnh gốc của món đồ chính:', captureErr);
+      } finally {
+        controls.forEach((el) => ((el as HTMLElement).style.opacity = '1'));
+      }
 
-      const uploadedUrl = uploadResData.secure_url;
+      // Fallback nếu không chụp được canvas: dùng ảnh của món đồ đầu tiên trong outfit
+      if (!uploadedUrl) {
+        uploadedUrl =
+          selectedItems[0]?.fashionItem?.imageUrl ||
+          (selectedItems[0] as any)?.imageUrl ||
+          '';
+      }
+
       toast.loading('Đang lưu tủ đồ...', { id: 'save_outfit' });
 
       await createOutfitMutation.mutateAsync({
-        name: `Outfit ${new Date().toLocaleDateString('vi-VN')}`,
-        description: outfitData.title || 'Gợi ý từ AI',
+        name: trimmedName,
+        description: outfitData.explanation || outfitData.title || 'Gợi ý từ AI',
         coverImageUrl: uploadedUrl,
         items: selectedItems.map((item) => ({
           fashionItemId: item.clothingItemId,
@@ -228,7 +262,7 @@ function AIStylistContent() {
     <div className="min-h-full flex flex-col pt-4 md:pt-8 bg-background max-w-[1600px] w-full mx-auto pb-10">
       <div className="flex flex-col h-full gap-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-1 items-start">
-          <div className="lg:col-span-8 flex flex-col gap-0 relative min-h-[600px] h-[600px] lg:h-[800px] border border-border bg-card shadow-sm rounded-2xl overflow-hidden">
+          <div className="lg:col-span-8 flex flex-col gap-0 relative min-h-[600px] h-[600px] lg:h-[800px] border border-border bg-card shadow-sm rounded-2xl overflow-hidden pb-24 sm:pb-20">
             {outfitData ? (
               <>
                 <div className="absolute top-4 left-4 z-20">
@@ -286,23 +320,55 @@ function AIStylistContent() {
                   }
                 />
 
-                <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center border-t border-border bg-card z-20">
-                  <button
-                    onClick={() => {
-                      setOutfitData(null);
-                      setSelectedItems([]);
-                    }}
-                    className="w-1/2 px-6 py-4 border-r border-border text-foreground font-bold text-[11px] uppercase tracking-widest hover:bg-muted transition-colors flex items-center justify-center gap-2"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" /> LÀM MỚI
-                  </button>
-                  <button
-                    onClick={handleSaveOutfit}
-                    disabled={isSaving}
-                    className="w-1/2 px-8 py-4 bg-primary text-primary-foreground font-bold text-[11px] uppercase tracking-widest hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    <Save className="w-3.5 h-3.5" /> {isSaving ? 'ĐANG LƯU...' : 'LƯU VÀO TỦ ĐỒ'}
-                  </button>
+                <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-card/95 backdrop-blur-md z-20 p-3 sm:p-3.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+                  {/* Outfit Name Input */}
+                  <div className="relative flex-1 flex items-center">
+                    <div className="absolute left-3 text-muted-foreground pointer-events-none flex items-center gap-1.5">
+                      <Sparkles className="size-3.5 text-amber-500 shrink-0" />
+                      <span className="text-[10px] font-mono uppercase tracking-wider font-semibold text-muted-foreground">Tên:</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={outfitName}
+                      onChange={(e) => setOutfitName(e.target.value)}
+                      placeholder="Nhập tên bộ trang phục..."
+                      maxLength={70}
+                      className="w-full pl-16 pr-8 py-2 bg-muted/70 hover:bg-muted focus:bg-background border border-border focus:border-foreground rounded-xl text-xs sm:text-sm font-medium text-foreground placeholder:text-muted-foreground/60 outline-none transition-all shadow-xs"
+                    />
+                    {outfitName && (
+                      <button
+                        type="button"
+                        onClick={() => setOutfitName('')}
+                        className="absolute right-2.5 text-muted-foreground hover:text-foreground p-1 transition-colors"
+                        title="Xóa tên"
+                      >
+                        <X className="size-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOutfitData(null);
+                        setSelectedItems([]);
+                        setOutfitName('');
+                      }}
+                      className="flex-1 sm:flex-none px-4 py-2 border border-border text-foreground font-bold text-[11px] uppercase tracking-wider hover:bg-muted rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <RefreshCw className="size-3.5" /> Làm mới
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveOutfit}
+                      disabled={isSaving}
+                      className="flex-1 sm:flex-none px-5 py-2 bg-primary text-primary-foreground font-bold text-[11px] uppercase tracking-wider hover:bg-primary/90 rounded-xl transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-xs"
+                    >
+                      <Save className="size-3.5" /> {isSaving ? 'ĐANG LƯU...' : 'LƯU VÀO TỦ ĐỒ'}
+                    </button>
+                  </div>
                 </div>
               </>
             ) : (
@@ -331,6 +397,30 @@ function AIStylistContent() {
           </div>
 
           <div className="lg:col-span-4 h-auto lg:h-[800px] border border-border bg-card flex flex-col relative shadow-sm overflow-hidden rounded-2xl">
+            {outfitData && (
+              <div className="p-4 sm:p-5 border-b border-border bg-gradient-to-br from-stone-100/60 via-stone-50/40 to-stone-100/60 dark:from-stone-900/60 dark:via-stone-950/40 dark:to-stone-900/60 flex flex-col gap-2 shrink-0">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-background/90 dark:bg-stone-900/90 backdrop-blur-md border border-border/70 text-foreground shadow-xs">
+                    <Sparkles className="size-3 text-amber-500 fill-amber-500/20" />
+                    GỢI Ý TỪ AI
+                  </span>
+                  {outfitData.remainingQuota !== undefined && (
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      Còn {outfitData.remainingQuota} lượt
+                    </span>
+                  )}
+                </div>
+                <h4 className="font-semibold text-sm sm:text-base text-foreground tracking-tight">
+                  {outfitData.title}
+                </h4>
+                {outfitData.explanation && (
+                  <p className="text-xs text-muted-foreground leading-relaxed italic border-l-2 border-primary/40 pl-3">
+                    &ldquo;{outfitData.explanation}&rdquo;
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="p-5 border-b border-border bg-muted flex items-center gap-3">
               <SlidersHorizontal className="w-4 h-4 text-foreground" />
               <h3 className="font-bold text-[13px] text-foreground uppercase tracking-widest">
