@@ -67,6 +67,22 @@ export const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
+export interface GalleryTestimonialItem {
+  image: string;
+  text: string;
+}
+
+export const GEN_Z_GALLERY_ITEMS: GalleryTestimonialItem[] = [
+  { image: "/landing-page/testimonials/card-1.png", text: "" },
+  { image: "/landing-page/testimonials/card-2.png", text: "" },
+  { image: "/landing-page/testimonials/card-3.png", text: "" },
+  { image: "/landing-page/testimonials/card-4.png", text: "" },
+  { image: "/landing-page/testimonials/card-5.png", text: "" },
+  { image: "/landing-page/testimonials/card-6.png", text: "" },
+  { image: "/landing-page/testimonials/card-7.png", text: "" },
+  { image: "/landing-page/testimonials/card-8.png", text: "" },
+];
+
 // ─── Feed Cards ──────────────────────────────────────────────────
 export interface FeedData {
   src: string;

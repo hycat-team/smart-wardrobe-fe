@@ -15,6 +15,7 @@ import { getUserAvatar } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -120,64 +121,116 @@ export const CommunityList: React.FC<CommunityListProps> = ({
       {/* Feed Controls: Tabs & Sort Filter */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-card border border-border p-3 rounded-2xl shadow-sm">
         {/* Tabs: Explore vs Following */}
-        <div className="flex items-center gap-1 bg-muted p-1 rounded-xl">
-          <button
+        <div className="relative flex items-center p-1 bg-muted/80 dark:bg-muted/50 rounded-xl border border-border/40">
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.96 }}
             onClick={() => onFeedTypeChange?.('explore')}
             className={cn(
-              'px-4 py-2 rounded-lg text-xs font-bold transition-all uppercase tracking-wider',
+              'relative px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors duration-200 outline-none select-none z-10',
               feedType === 'explore'
-                ? 'bg-background text-foreground shadow-sm'
+                ? 'text-foreground font-extrabold'
                 : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            Khám phá
-          </button>
-          <button
+            {feedType === 'explore' && (
+              <motion.div
+                layoutId="community-feed-type-pill"
+                className="absolute inset-0 bg-background rounded-lg shadow-sm border border-border/40 -z-10"
+                transition={{
+                  type: 'spring',
+                  stiffness: 400,
+                  damping: 32,
+                  mass: 0.8,
+                }}
+              />
+            )}
+            <span className="relative z-10">Khám phá</span>
+          </motion.button>
+
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.96 }}
             onClick={handleFollowingTabClick}
             className={cn(
-              'px-4 py-2 rounded-lg text-xs font-bold transition-all uppercase tracking-wider flex items-center gap-1.5',
+              'relative px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors duration-200 outline-none select-none flex items-center gap-1.5 z-10',
               feedType === 'following'
-                ? 'bg-background text-foreground shadow-sm'
+                ? 'text-foreground font-extrabold'
                 : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            <span>Đang theo dõi</span>
-            {!user && <span className="text-[10px] text-muted-foreground opacity-60">🔒</span>}
-          </button>
+            {feedType === 'following' && (
+              <motion.div
+                layoutId="community-feed-type-pill"
+                className="absolute inset-0 bg-background rounded-lg shadow-sm border border-border/40 -z-10"
+                transition={{
+                  type: 'spring',
+                  stiffness: 400,
+                  damping: 32,
+                  mass: 0.8,
+                }}
+              />
+            )}
+            <span className="relative z-10">Đang theo dõi</span>
+            {!user && <span className="text-[10px] text-muted-foreground opacity-60 relative z-10">🔒</span>}
+          </motion.button>
         </div>
 
         {/* Sort: Hot vs Latest */}
-        <div className="flex items-center gap-1 justify-end">
-          <button
+        <div className="relative flex items-center p-1 bg-muted/60 dark:bg-muted/40 rounded-xl border border-border/30 justify-end">
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.96 }}
             onClick={() => onFeedSortChange?.('hot')}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors',
+              'relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-200 outline-none select-none z-10',
               feedSort === 'hot'
-                ? 'bg-primary/10 text-primary border border-primary/20'
-                : 'text-muted-foreground hover:bg-muted'
+                ? 'text-primary font-bold'
+                : 'text-muted-foreground hover:text-foreground'
             )}
             title="Sắp xếp theo độ nổi bật"
           >
-            <Flame className="w-3.5 h-3.5" />
-            <span>Nổi bật</span>
-          </button>
-          <button
+            {feedSort === 'hot' && (
+              <motion.div
+                layoutId="community-feed-sort-pill"
+                className="absolute inset-0 bg-background dark:bg-card rounded-lg shadow-xs border border-primary/20 -z-10"
+                transition={{
+                  type: 'spring',
+                  stiffness: 400,
+                  damping: 30,
+                }}
+              />
+            )}
+            <Flame className="w-3.5 h-3.5 relative z-10" />
+            <span className="relative z-10">Nổi bật</span>
+          </motion.button>
+
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.96 }}
             onClick={() => onFeedSortChange?.('latest')}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors',
+              'relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-200 outline-none select-none z-10',
               feedSort === 'latest'
-                ? 'bg-primary/10 text-primary border border-primary/20'
-                : 'text-muted-foreground hover:bg-muted'
+                ? 'text-primary font-bold'
+                : 'text-muted-foreground hover:text-foreground'
             )}
             title="Sắp xếp theo thời gian mới nhất"
           >
-            <Clock className="w-3.5 h-3.5" />
-            <span>Mới nhất</span>
-          </button>
+            {feedSort === 'latest' && (
+              <motion.div
+                layoutId="community-feed-sort-pill"
+                className="absolute inset-0 bg-background dark:bg-card rounded-lg shadow-xs border border-primary/20 -z-10"
+                transition={{
+                  type: 'spring',
+                  stiffness: 400,
+                  damping: 30,
+                }}
+              />
+            )}
+            <Clock className="w-3.5 h-3.5 relative z-10" />
+            <span className="relative z-10">Mới nhất</span>
+          </motion.button>
         </div>
       </div>
 

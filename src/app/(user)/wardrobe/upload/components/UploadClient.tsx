@@ -255,7 +255,7 @@ export function UploadClient() {
   return (
     <div
       ref={containerRef}
-      className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 mt-12 font-sans selection:bg-accent selection:text-accent-foreground"
+      className="w-full max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 mt-12 font-sans selection:bg-accent selection:text-accent-foreground"
     >
       {/* Editorial Header */}
       <div className="flex flex-col gap-6 border-b border-border pb-8 gsap-header">

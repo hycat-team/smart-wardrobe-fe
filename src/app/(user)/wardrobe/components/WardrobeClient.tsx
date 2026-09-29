@@ -338,7 +338,7 @@ export default function WardrobeClient({
   return (
     <>
       <div className={cn("fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500", isCollapsed ? "md:left-[88px]" : "md:left-[280px]", isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none")}>
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="hidden md:flex items-center gap-2">
             <span className="text-2xl font-semibold uppercase tracking-wide text-foreground whitespace-nowrap">Tủ đồ</span>
           </div>
@@ -346,13 +346,15 @@ export default function WardrobeClient({
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans" ref={containerRef}>
+      <div className="w-full max-w-[1400px] mx-auto space-y-8 pb-16 px-4 sm:px-8 lg:px-12 font-sans" ref={containerRef}>
         <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-border pb-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-4 max-w-2xl">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase whitespace-nowrap">Tủ đồ</h1>
               <p className="text-sm text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l border-border pl-4">
-                {items.length > 0 ? ` Bạn đang lưu trữ ${stats?.activeItemsCount ?? metadata?.totalItems ?? items.length} / ${maxWardrobeItems === 0 ? '∞' : (maxWardrobeItems || '-')} món đồ` : "Hãy bắt đầu thêm đồ."}
+                {(stats?.activeItemsCount ?? metadata?.totalItems ?? items.length) > 0
+                  ? ` Bạn đang lưu trữ ${stats?.activeItemsCount ?? metadata?.totalItems ?? items.length} / ${maxWardrobeItems === 0 ? '∞' : (maxWardrobeItems || '-')} món đồ`
+                  : "Hãy bắt đầu thêm đồ."}
               </p>
             </div>
             {renderActions()}
@@ -403,7 +405,7 @@ export default function WardrobeClient({
         </div>
 
         {isLoadingItems && !items.length ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+          <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="flex flex-col h-full rounded-2xl border border-border bg-card">
                 <Skeleton className="image-frame relative aspect-[4/5] flex-shrink-0 bg-muted/60 p-3 md:p-6" />
@@ -415,7 +417,7 @@ export default function WardrobeClient({
             ))}
           </div>
         ) : sortedItems.length > 0 ? (
-          <div className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", isFetching && "opacity-60 blur-[1px]")}>
+          <div className={cn("w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 transition-all duration-300", isFetching && "opacity-60 blur-[1px]")}>
             {sortedItems.map((item, index) => {
 
               const isProcessing =
@@ -467,31 +469,52 @@ export default function WardrobeClient({
             })}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
+          <div className="w-full flex flex-col items-center justify-center min-h-[460px] py-12 space-y-8 text-center max-w-md mx-auto">
             <div className="flex size-24 items-center justify-center rounded-2xl bg-accent-soft text-muted-foreground">
               <Tag className="size-10 stroke-1" />
             </div>
             <div className="space-y-4">
-              <h3 className="text-4xl font-semibold text-foreground uppercase tracking-tight">Trống</h3>
+              <h3 className="text-4xl font-semibold text-foreground uppercase tracking-tight">
+                {searchParam
+                  ? "Không tìm thấy"
+                  : categoryParam
+                    ? "Danh mục trống"
+                    : "Tủ đồ trống"}
+              </h3>
               <p className="text-xs font-semibold uppercase tracking-widest leading-relaxed text-muted-foreground">
-                Tủ đồ của bạn đang trống. Hãy bắt đầu số hóa các món đồ thực tế của bạn để tạo ra những bộ phối đồ mới.
+                {searchParam
+                  ? `Không tìm thấy món đồ nào phù hợp với từ khóa "${searchParam}".`
+                  : categoryParam
+                    ? "Chưa có món đồ nào trong phân loại này. Hãy thêm đồ mới hoặc chọn danh mục khác."
+                    : "Tủ đồ của bạn đang trống. Hãy bắt đầu số hóa các món đồ thực tế của bạn để tạo ra những bộ phối đồ mới."}
               </p>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="mt-4 h-14 rounded-full border-border px-8 text-xs font-semibold uppercase tracking-[0.2em] text-foreground hover:bg-muted">
-                  <Plus className="mr-2 size-4" /> Thêm đồ
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {(categoryParam || searchParam || colorParam || tagParam) && (
+                <Button
+                  variant="outline"
+                  onClick={() => updateParams({ categorySlug: null, color: null, tag: null, q: null, page: "1" })}
+                  className="h-12 rounded-full border-border px-6 text-xs font-semibold uppercase tracking-[0.15em] text-foreground hover:bg-muted"
+                >
+                  Xóa bộ lọc
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-[200px] rounded-2xl border border-border bg-card p-2 shadow-xl">
-                <DropdownMenuItem onClick={() => router.push("/wardrobe/upload")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted flex items-center gap-2">
-                  <UploadCloud className="w-4 h-4" /> Tự tải lên ảnh
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/wardrobe/explore")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted mt-1 flex items-center gap-2">
-                  <Library className="w-4 h-4" /> Lấy từ thư viện
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="default" className="h-12 rounded-full bg-primary px-8 text-xs font-semibold uppercase tracking-[0.15em] text-primary-foreground hover:bg-primary/90">
+                    <Plus className="mr-2 size-4" /> Thêm đồ
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-[200px] rounded-2xl border border-border bg-card p-2 shadow-xl">
+                  <DropdownMenuItem onClick={() => router.push("/wardrobe/upload")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted flex items-center gap-2">
+                    <UploadCloud className="w-4 h-4" /> Tự tải lên ảnh
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push("/wardrobe/explore")} className="cursor-pointer rounded-xl px-3 py-2.5 font-semibold text-[11px] uppercase tracking-widest text-foreground hover:bg-muted mt-1 flex items-center gap-2">
+                    <Library className="w-4 h-4" /> Lấy từ thư viện
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         )}
 

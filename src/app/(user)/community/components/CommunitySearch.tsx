@@ -14,6 +14,7 @@ import {
 } from '@/features/community/utils/community.utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 type TabType = 'all' | 'users' | 'posts';
 
@@ -94,21 +95,30 @@ export function CommunitySearch({ query, onQueryChange }: CommunitySearchProps) 
                   value: 'posts' as TabType,
                 },
               ].map((tab) => (
-                <button
+                <motion.button
                   key={tab.value}
+                  whileTap={{ scale: 0.96 }}
                   onClick={() => handleTabChange(tab.value)}
                   className={cn(
-                    'pb-3 text-xs sm:text-sm font-semibold tracking-wide relative transition-all whitespace-nowrap',
+                    'pb-3 text-xs sm:text-sm font-semibold tracking-wide relative transition-colors duration-200 whitespace-nowrap outline-none',
                     activeTab === tab.value
                       ? 'text-foreground font-bold'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  {tab.label}
+                  <span>{tab.label}</span>
                   {activeTab === tab.value && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                    <motion.div
+                      layoutId="community-search-tab-underline"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"
+                      transition={{
+                        type: 'spring',
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                    />
                   )}
-                </button>
+                </motion.button>
               ))}
             </div>
 

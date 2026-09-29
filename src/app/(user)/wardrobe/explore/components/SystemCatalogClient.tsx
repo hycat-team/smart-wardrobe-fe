@@ -21,6 +21,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
+import { useSidebarStore } from "@/store/useSidebarStore";
 
 
 
@@ -28,6 +29,7 @@ export function SystemCatalogClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 
   const { data: categoriesData } = useUserCategories();
   const categories = categoriesData || [];
@@ -174,11 +176,12 @@ export function SystemCatalogClient() {
       {/* Sticky Top Action Bar */}
       <div
         className={cn(
-          "fixed top-0 left-0 md:left-[280px] right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-300",
+          isCollapsed ? "md:left-[88px]" : "md:left-[280px]",
           isScrolled ? "translate-y-0 shadow-sm opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
         )}
       >
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="hidden md:flex items-center gap-2">
             <span className="font-semibold text-2xl text-foreground uppercase tracking-wide">
               Explore
@@ -188,20 +191,13 @@ export function SystemCatalogClient() {
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto space-y-8 pb-32 px-4 sm:px-8 lg:px-12 font-sans" ref={containerRef}>
+      <div className="w-full max-w-[1400px] mx-auto space-y-8 pb-32 px-4 sm:px-8 lg:px-12 font-sans" ref={containerRef}>
         {/* High-end Editorial Header */}
         <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-border pb-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-4 max-w-2xl flex items-center gap-4">
-              {/* <button 
-              onClick={() => router.back()}
-              className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
-              aria-label="Back"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </button> */}
               <div>
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.1] uppercase">
                   Explore
                 </h1>
                 <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-primary pl-4 mt-4">
@@ -247,10 +243,10 @@ export function SystemCatalogClient() {
         </div>
 
         {/* Grid */}
-        <div className="px-6 py-8">
+        <div className="py-6">
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-              {[...Array(10)].map((_, i) => (
+            <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-5">
+              {[...Array(14)].map((_, i) => (
                 <div key={i} className="flex flex-col h-full bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
                   <Skeleton className="relative aspect-[4/5] bg-muted p-3 md:p-6 overflow-hidden flex-shrink-0" />
                   <div className="flex flex-col p-3 md:p-4 md:pt-5 flex-grow justify-between gap-2 md:gap-3 bg-card border-t border-border">
@@ -268,7 +264,7 @@ export function SystemCatalogClient() {
               Không có trang phục nào trong catalog.
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+            <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-5">
               {items.map((item) => {
                 const isSelected = selectedIds.has(item.id);
                 return (

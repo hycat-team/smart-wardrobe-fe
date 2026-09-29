@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import { UserCircle, ShoppingBag } from "lucide-react";
 import { cn, getUserAvatar } from "@/lib/utils";
 import Image from "next/image";
@@ -29,33 +30,57 @@ export function MobileBottomNav() {
             key={item.path} 
             href={item.path}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full h-full transition-colors active:scale-95 relative",
+              "flex flex-col items-center justify-center gap-1 w-full h-full relative outline-none",
               isActive ? "text-[#D9C5B2]" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            {item.path === '/profile' ? (
-              <div className={cn(
-                "size-6 rounded-full overflow-hidden transition-all duration-300 flex items-center justify-center ring-2 ring-offset-1 ring-offset-[#FAFAFA] dark:ring-offset-[#111111]",
-                isActive ? "ring-[#D9C5B2]" : "ring-transparent"
-              )}>
-                <Image
-                  src={getUserAvatar(user)}
-                  alt={user?.username || "User"}
-                  width={24}
-                  height={24}
-                  className="size-full object-cover"
-                />
-              </div>
-            ) : (
-              <Icon 
-                className={cn(
-                  "size-5 transition-transform duration-300", 
-                  isActive ? "text-[#D9C5B2] scale-110" : "text-muted-foreground"
-                )} 
-                strokeWidth={isActive ? 2.5 : 1.5} 
+            {/* Active Mobile Subtle Pill */}
+            {isActive && (
+              <motion.div
+                layoutId="mobileActivePill"
+                className="absolute inset-x-2 inset-y-1 rounded-xl bg-[#F4EEE8]/70 dark:bg-white/[0.06] -z-10"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
             )}
-            {isActive && <div className="w-1 h-1 rounded-full bg-[#D9C5B2] mt-1 absolute bottom-0" />}
+
+            <motion.div
+              whileTap={{ scale: 0.88 }}
+              animate={{ scale: isActive ? 1.08 : 1 }}
+              transition={{ type: "spring", stiffness: 450, damping: 25 }}
+              className="flex items-center justify-center"
+            >
+              {item.path === '/profile' ? (
+                <div className={cn(
+                  "size-6 rounded-full overflow-hidden transition-all duration-300 flex items-center justify-center ring-2 ring-offset-1 ring-offset-[#FAFAFA] dark:ring-offset-[#111111]",
+                  isActive ? "ring-[#D9C5B2]" : "ring-transparent"
+                )}>
+                  <Image
+                    src={getUserAvatar(user)}
+                    alt={user?.username || "User"}
+                    width={24}
+                    height={24}
+                    className="size-full object-cover"
+                  />
+                </div>
+              ) : (
+                <Icon 
+                  className={cn(
+                    "size-5 transition-colors duration-200", 
+                    isActive ? "text-[#D9C5B2]" : "text-muted-foreground"
+                  )} 
+                  strokeWidth={isActive ? 2.5 : 1.5} 
+                />
+              )}
+            </motion.div>
+
+            {/* Magnetic Active Indicator Dot */}
+            {isActive && (
+              <motion.div
+                layoutId="mobileActiveIndicator"
+                className="w-1.5 h-1.5 rounded-full bg-[#D9C5B2] shadow-[0_0_8px_rgba(217,197,178,0.8)] absolute bottom-0.5"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
+            )}
           </Link>
         );
       })}

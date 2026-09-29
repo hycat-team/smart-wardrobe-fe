@@ -118,7 +118,8 @@ export function WardrobeCard({
       </div>
 
       {/* Information Area - 25% Visual Weight */}
-      <div className="flex flex-grow flex-col border-t border-border p-3 md:p-4 md:pt-5">
+      {(!hideTitle || !hideDetails) && (
+        <div className="flex flex-grow flex-col border-t border-border p-3 md:p-4 md:pt-5">
         <div>
           {!hideTitle && (
             <h3 className="line-clamp-2 text-[22px] font-semibold leading-[130%] text-card-foreground">
@@ -147,7 +148,8 @@ export function WardrobeCard({
             </div> */}
           </>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

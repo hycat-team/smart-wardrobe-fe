@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles, ArrowDown, Check, Heart, MessageCircle, Share2,
-  Smartphone, Target,
+  Smartphone, Target, ChevronLeft, ChevronRight,
 } from "lucide-react";
 
 // Extracted components & data
@@ -18,16 +18,17 @@ import { ScrollProgressBar } from "./ScrollProgressBar";
 import { HowItWorksSection } from "./sections/HowItWorksSection";
 import { FAQs } from "@/components/faqs-component";
 import { WeatherWidget } from "@/components/WeatherWidget";
-import { StaggerTestimonials } from "@/components/stagger-testimonials";
+import CircularGallery, { CircularGalleryHandle } from "@/components/CircularGallery";
 import { useScrollytelling } from "./hooks/useScrollytelling";
 import {
   METRICS, BEFORE_ITEMS, AFTER_ITEMS, TESTIMONIALS,
-  FEED_CARDS, NON_OUTFIT_CARDS, OUTFIT_CARDS,
+  FEED_CARDS, NON_OUTFIT_CARDS, OUTFIT_CARDS, GEN_Z_GALLERY_ITEMS,
 } from "./data/landing-data";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export function LandingClient() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<CircularGalleryHandle>(null);
   const { user } = useAuthStore();
 
   // All GSAP animations in custom hook (mobile-aware + a11y)
@@ -320,18 +321,57 @@ export function LandingClient() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          5. TESTIMONIALS
+          5. TESTIMONIALS (3D Circular Gallery)
           ═══════════════════════════════════════════════════════ */}
       <section
-        className="testimonials-section w-full py-24 md:py-32 px-6 bg-[#EBE7E2] relative z-10"
+        className="testimonials-section w-full py-20 md:py-28 px-4 md:px-6 bg-[#EBE7E2] relative z-10 overflow-hidden"
         role="region"
         aria-labelledby="testimonials-heading"
       >
-        <h2 id="testimonials-heading" className="font-heading text-3xl sm:text-4xl md:text-6xl text-center text-[#1A1A1A] mb-12 md:mb-16 font-medium">
-          Gen Z nói gì về Closy?
-        </h2>
-        <div className="max-w-4xl mx-auto flex flex-col">
-          <StaggerTestimonials />
+        <div className="max-w-4xl mx-auto text-center mb-8 md:mb-12">
+          <h2 id="testimonials-heading" className="font-heading text-3xl sm:text-4xl md:text-6xl text-center text-[#1A1A1A] font-medium tracking-tight">
+            Gen Z nói gì về Closy?
+          </h2>
+          <p className="text-[#6B645D] text-base md:text-lg mt-3">
+            Trải nghiệm thực tế từ cộng đồng yêu thời trang thông minh
+          </p>
+        </div>
+
+        {/* 3D Circular Gallery Viewport */}
+        <div className="w-full max-w-7xl mx-auto relative">
+          <div className="h-[520px] sm:h-[580px] md:h-[640px] w-full relative">
+            <CircularGallery
+              ref={galleryRef}
+              items={GEN_Z_GALLERY_ITEMS}
+              bend={3}
+              textColor="#1A1A1A"
+              borderRadius={0.06}
+              scrollEase={0.03}
+              scrollSpeed={2.5}
+              font="600 24px 'Be Vietnam Pro', system-ui, sans-serif"
+              showTitle={false}
+            />
+          </div>
+
+          {/* Navigation Controls matching the original UI */}
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => galleryRef.current?.prev()}
+              aria-label="Xem đánh giá trước"
+              className="size-11 rounded border border-[#1A1A1A]/15 bg-white hover:bg-[#F4F1EE] text-[#1A1A1A] flex items-center justify-center transition-all duration-200 hover:scale-105 shadow-sm active:scale-95 cursor-pointer"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => galleryRef.current?.next()}
+              aria-label="Xem đánh giá tiếp theo"
+              className="size-11 rounded border border-[#1A1A1A]/15 bg-white hover:bg-[#F4F1EE] text-[#1A1A1A] flex items-center justify-center transition-all duration-200 hover:scale-105 shadow-sm active:scale-95 cursor-pointer"
+            >
+              <ChevronRight className="size-5" />
+            </button>
+          </div>
         </div>
       </section>
 

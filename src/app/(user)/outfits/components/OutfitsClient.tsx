@@ -228,7 +228,7 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
         </div>
       </div>
 
-      <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-foreground">
+      <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 w-full pb-24 text-foreground">
         <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-border pb-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-4 max-w-2xl">
@@ -237,7 +237,9 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
               </h1>
               <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-border pl-4">
                 Kho lưu trữ phong cách cá nhân của bạn. <br />
-                {outfits.length > 0 ? ` Đang lưu trữ ${metadata?.totalItems || outfits.length} bộ phối.` : " Hãy bắt đầu tạo bộ phối của bạn."}
+                {(metadata?.totalItems ?? outfits.length) > 0
+                  ? ` Đang lưu trữ ${metadata?.totalItems ?? outfits.length} bộ phối.`
+                  : " Hãy bắt đầu tạo bộ phối của bạn."}
               </p>
             </div>
             {renderActions()}
@@ -323,22 +325,48 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
+          <div className="flex flex-col items-center justify-center min-h-[460px] py-12 space-y-8 text-center max-w-md mx-auto">
             <div className="size-20 bg-muted border border-border rounded-2xl flex items-center justify-center text-muted-foreground">
               <Shirt className="size-8 stroke-1" />
             </div>
             <div className="space-y-4">
-              <h3 className="font-semibold text-3xl text-foreground uppercase tracking-tight">Trống</h3>
+              <h3 className="font-semibold text-3xl text-foreground uppercase tracking-tight">
+                {searchParam
+                  ? "Không tìm thấy"
+                  : filterParam !== "all"
+                    ? "Không có bộ phối"
+                    : "Chưa có bộ phối"}
+              </h3>
               <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground leading-relaxed">
-                Không có bộ phối nào phù hợp với bộ lọc hiện tại. Hãy chọn tất cả hoặc tạo bộ phối mới.
+                {searchParam
+                  ? `Không tìm thấy bộ phối nào phù hợp với từ khóa "${searchParam}".`
+                  : filterParam !== "all"
+                    ? "Không có bộ phối nào phù hợp với bộ lọc hiện tại. Hãy chọn tất cả hoặc tạo bộ phối mới."
+                    : "Kho trang phục của bạn đang trống. Hãy tạo bộ phối mới với AI Stylist hoặc tự phối thủ công."}
               </p>
             </div>
-            <button
-              onClick={() => handleFilterChange("all")}
-              className="h-11 px-8 border border-foreground text-foreground font-semibold text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background rounded-full transition-colors duration-200 mt-4"
-            >
-              Xóa Bộ Lọc
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {(filterParam !== "all" || searchParam) && (
+                <button
+                  onClick={() => updateParams({ filter: null, q: null, page: "1" })}
+                  className="h-11 px-8 border border-border text-foreground font-semibold text-[11px] uppercase tracking-widest hover:border-foreground rounded-full transition-colors duration-200"
+                >
+                  Xóa Bộ Lọc
+                </button>
+              )}
+              <button
+                onClick={() => router.push("/ai-stylist")}
+                className="h-11 px-6 border border-border text-foreground font-semibold text-[11px] uppercase tracking-widest hover:border-foreground rounded-full transition-colors duration-200 flex items-center justify-center gap-2"
+              >
+                <Sparkles className="size-3.5" /> Tạo bằng AI
+              </button>
+              <button
+                onClick={() => router.push("/outfits/create")}
+                className="h-11 px-8 bg-primary text-primary-foreground font-semibold text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-primary/90 rounded-full transition-colors duration-200"
+              >
+                <Plus className="size-4" /> Tạo Bộ Phối
+              </button>
+            </div>
           </div>
         )}
 
