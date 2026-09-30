@@ -88,7 +88,16 @@ api.interceptors.response.use(
           return api(originalRequest);
         } catch (err) {
           processQueue(err, null);
-          if (!hasShownSessionExpiredToast && !silent) {
+          const isPublicPath =
+            typeof window !== 'undefined' &&
+            (window.location.pathname === '/' ||
+              window.location.pathname === '/privacy' ||
+              window.location.pathname.startsWith('/privacy') ||
+              window.location.pathname === '/delete-account' ||
+              window.location.pathname.startsWith('/delete-account') ||
+              window.location.pathname.startsWith('/auth'));
+
+          if (!hasShownSessionExpiredToast && !silent && !isPublicPath) {
             toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
             hasShownSessionExpiredToast = true;
           }

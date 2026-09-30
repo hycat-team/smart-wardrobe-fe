@@ -12,7 +12,12 @@ export const metadata: Metadata = {
 
 const SUPPORT_EMAIL = "hycat.support@gmail.com";
 
-const sections: { title: string; bullets: string[]; note?: string }[] = [
+const sections: {
+  title: string;
+  bullets: string[];
+  note?: string;
+  actionLink?: { href: string; label: string };
+}[] = [
   {
     title: "1. Dữ liệu chúng tôi thu thập",
     bullets: [
@@ -39,11 +44,15 @@ const sections: { title: string; bullets: string[]; note?: string }[] = [
     ],
   },
   {
-    title: "4. Quyền của bạn",
+    title: "4. Quyền của bạn & Yêu cầu xóa tài khoản",
     bullets: [
       "Yêu cầu xem, sửa hoặc xóa dữ liệu tài khoản qua email hỗ trợ bên dưới.",
       "Gỡ cài đặt app không tự động xóa dữ liệu máy chủ — hãy gửi yêu cầu xóa nếu bạn muốn xóa toàn bộ.",
     ],
+    actionLink: {
+      href: "/delete-account",
+      label: "Xem hướng dẫn chi tiết quy trình & định dạng viết email xóa tài khoản →",
+    },
   },
   {
     title: "5. Thời gian lưu trữ",
@@ -75,9 +84,18 @@ const sections: { title: string; bullets: string[]; note?: string }[] = [
 export default function PrivacyPage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-5 py-10">
-      <Link href="/" className="text-sm text-muted-foreground hover:underline">
-        ← Về trang chủ Closy
-      </Link>
+      <div className="flex items-center justify-between text-sm">
+        <Link href="/" className="text-muted-foreground hover:underline">
+          ← Về trang chủ Closy
+        </Link>
+        <Link
+          href="/delete-account"
+          className="font-medium text-foreground hover:underline"
+        >
+          Yêu cầu xóa tài khoản →
+        </Link>
+      </div>
+
       <h1 className="mt-4 text-3xl font-bold">Chính sách bảo mật</h1>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
         Smart Wardrobe (Closy) tôn trọng và bảo vệ dữ liệu cá nhân của bạn.
@@ -104,6 +122,16 @@ export default function PrivacyPage() {
               <p className="mt-3 text-xs italic leading-relaxed text-muted-foreground">
                 {s.note}
               </p>
+            )}
+            {s.actionLink && (
+              <div className="mt-3 pt-3 border-t">
+                <Link
+                  href={s.actionLink.href}
+                  className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
+                >
+                  {s.actionLink.label}
+                </Link>
+              </div>
             )}
           </section>
         ))}

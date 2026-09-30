@@ -415,11 +415,26 @@ export function LandingClient() {
       <footer className="w-full bg-[#1A1A1A] bg-[url('/footer.png')] bg-cover bg-center border-t border-white/10 text-[#707070] py-10 md:py-12 px-6 relative z-10" role="contentinfo">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="font-heading text-5xl md:text-6xl font-bold text-[#1A1A1A]">CLOSY</div>
-          <div className="flex gap-6 md:gap-8 text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 text-sm">
             {/* <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Instagram">Instagram</a>
             <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="TikTok">TikTok</a> */}
-            <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Chính sách bảo mật">Chính sách</a>
-            <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Liên hệ">Liên hệ</a>
+            <Link href="/privacy" className="hover:text-[#D9C5B2] transition-colors" aria-label="Chính sách bảo mật">
+              Chính sách bảo mật
+            </Link>
+            <Link href="/delete-account" className="hover:text-[#D9C5B2] transition-colors" aria-label="Yêu cầu xóa tài khoản">
+              Yêu cầu xóa tài khoản
+            </Link>
+            <a
+              href="/downloads/closy.apk"
+              download="closy.apk"
+              className="hover:text-[#D9C5B2] transition-colors"
+              aria-label="Tải file APK Android"
+            >
+              Tải file APK
+            </a>
+            <a href="mailto:hycat.support@gmail.com" className="hover:text-[#D9C5B2] transition-colors" aria-label="Liên hệ">
+              Liên hệ
+            </a>
           </div>
           <p className="text-xs md:text-sm">© 2026 Closy. Built by HYCAT TEAM.</p>
         </div>

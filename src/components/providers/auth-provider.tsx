@@ -41,7 +41,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       cleanLegacyHostCookies();
 
-      const isPublicRoute = pathname === "/" || pathname?.startsWith("/auth");
+      const isPublicRoute =
+        pathname === "/" ||
+        pathname === "/privacy" ||
+        pathname?.startsWith("/privacy") ||
+        pathname === "/delete-account" ||
+        pathname?.startsWith("/delete-account") ||
+        pathname?.startsWith("/auth");
       if (!isPublicRoute) {
         toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
         router.push("/auth/login");
