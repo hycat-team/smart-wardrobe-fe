@@ -1,30 +1,20 @@
-"use client";
-import { useState, useRef, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  UploadCloud,
-  X,
-  Sparkles,
-  Loader2,
-  ImagePlus,
-  ArrowLeft,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+'use client';
+import { useState, useRef, useMemo } from 'react';
+import { Button } from '@/components/ui/button';
+import { UploadCloud, X, Sparkles, Loader2, ImagePlus, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   useBatchUploadWardrobeItems,
   useCategories,
-} from "@/features/wardrobe/queries/wardrobe.queries";
-import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
-import { toast } from "sonner";
-import {
-  uploadToCloudinary,
-  applyCloudinaryBackgroundRemoval,
-} from "@/lib/cloudinary";
+} from '@/features/wardrobe/queries/wardrobe.queries';
+import { wardrobeApi } from '@/features/wardrobe/api/wardrobe.api';
+import { toast } from 'sonner';
+import { uploadToCloudinary, applyCloudinaryBackgroundRemoval } from '@/lib/cloudinary';
 
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import Image from "next/image";
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import Image from 'next/image';
 
 gsap.registerPlugin(useGSAP);
 
@@ -42,28 +32,22 @@ export function UploadClient() {
 
   const [files, setFiles] = useState<SelectedFile[]>([]);
   const [uploadState, setUploadState] = useState<{
-    status: "idle" | "uploading" | "analyzing" | "success";
+    status: 'idle' | 'uploading' | 'analyzing' | 'success';
     current: number;
     total: number;
   }>({
-    status: "idle",
+    status: 'idle',
     current: 0,
     total: 0,
   });
 
-  const { data: categories = [], isLoading: isLoadingCategories } =
-    useCategories();
+  const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
 
   const defaultCategoryId = useMemo(() => {
     const otherCat = categories.find(
-      (c) =>
-        c.name.toLowerCase() === "khác" || c.name.toLowerCase() === "other",
+      (c) => c.name.toLowerCase() === 'khác' || c.name.toLowerCase() === 'other'
     );
-    return otherCat
-      ? otherCat.id
-      : categories.length > 0
-        ? categories[0].id
-        : "";
+    return otherCat ? otherCat.id : categories.length > 0 ? categories[0].id : '';
   }, [categories]);
 
   const batchUploadMutation = useBatchUploadWardrobeItems();
@@ -73,7 +57,7 @@ export function UploadClient() {
       const selectedFiles = Array.from(e.target.files);
 
       if (files.length + selectedFiles.length > 5) {
-        toast.error("Bạn chỉ được upload tối đa 5 ảnh mỗi lần!");
+        toast.error('Bạn chỉ được upload tối đa 5 ảnh mỗi lần!');
         return;
       }
 
@@ -94,16 +78,16 @@ export function UploadClient() {
 
   const handleUploadAndAnalyze = async () => {
     if (files.length === 0) {
-      toast.error("Vui lòng chọn ít nhất 1 ảnh!");
+      toast.error('Vui lòng chọn ít nhất 1 ảnh!');
       return;
     }
 
     if (files.length > 5) {
-      toast.error("Chỉ được upload tối đa 5 ảnh!");
+      toast.error('Chỉ được upload tối đa 5 ảnh!');
       return;
     }
 
-    setUploadState({ status: "uploading", current: 0, total: files.length });
+    setUploadState({ status: 'uploading', current: 0, total: files.length });
     try {
       // 1. Get secure upload signature
       const signatureResult = await wardrobeApi.getUploadSignature();
@@ -114,7 +98,7 @@ export function UploadClient() {
       for (let i = 0; i < files.length; i++) {
         const item = files[i];
         setUploadState({
-          status: "uploading",
+          status: 'uploading',
           current: i + 1,
           total: files.length,
         });
@@ -145,7 +129,7 @@ export function UploadClient() {
 
       // 4. Send crop & analysis request to backend
       setUploadState({
-        status: "analyzing",
+        status: 'analyzing',
         current: files.length,
         total: files.length,
       });
@@ -155,28 +139,23 @@ export function UploadClient() {
 
       // 5. Success redirect to wardrobe
       setUploadState({
-        status: "success",
+        status: 'success',
         current: files.length,
         total: files.length,
       });
-      toast.success("Đã gửi ảnh cho AI phân tích thành công!");
+      toast.success('Đã gửi ảnh cho AI phân tích thành công!');
       router.refresh();
-      router.push("/wardrobe");
-
+      router.push('/wardrobe');
     } catch (err: unknown) {
       console.error(err);
-      toast.error(
-        err instanceof Error
-          ? err.message
-          : "Đã xảy ra lỗi trong quá trình upload.",
-      );
-      setUploadState({ status: "idle", current: 0, total: 0 });
+      toast.error(err instanceof Error ? err.message : 'Đã xảy ra lỗi trong quá trình upload.');
+      setUploadState({ status: 'idle', current: 0, total: 0 });
     }
   };
 
   const handleReset = () => {
     setFiles([]);
-    setUploadState({ status: "idle", current: 0, total: 0 });
+    setUploadState({ status: 'idle', current: 0, total: 0 });
   };
 
   // GSAP Animations
@@ -184,19 +163,19 @@ export function UploadClient() {
     () => {
       // Entrance animation
       const tl = gsap.timeline();
-      tl.from(".gsap-header", {
+      tl.from('.gsap-header', {
         y: 30,
         opacity: 0,
         duration: 0.8,
-        ease: "power3.out",
+        ease: 'power3.out',
         stagger: 0.1,
       }).from(
-        ".gsap-step",
-        { y: 20, opacity: 0, duration: 0.6, ease: "power2.out", stagger: 0.15 },
-        "-=0.4",
+        '.gsap-step',
+        { y: 20, opacity: 0, duration: 0.6, ease: 'power2.out', stagger: 0.15 },
+        '-=0.4'
       );
     },
-    { scope: containerRef },
+    { scope: containerRef }
   );
 
   // Transition animation when preview changes
@@ -204,7 +183,7 @@ export function UploadClient() {
     () => {
       if (files.length > 0) {
         gsap.fromTo(
-          ".gsap-preview-container",
+          '.gsap-preview-container',
           {
             opacity: 0,
             y: 20,
@@ -213,11 +192,11 @@ export function UploadClient() {
             opacity: 1,
             y: 0,
             duration: 0.6,
-            ease: "power3.out",
-          },
+            ease: 'power3.out',
+          }
         );
         gsap.fromTo(
-          ".preview-card",
+          '.preview-card',
           {
             opacity: 0,
             scale: 0.9,
@@ -227,12 +206,12 @@ export function UploadClient() {
             scale: 1,
             duration: 0.4,
             stagger: 0.1,
-            ease: "back.out(1.5)",
-          },
+            ease: 'back.out(1.5)',
+          }
         );
       } else {
         gsap.fromTo(
-          ".gsap-upload-container",
+          '.gsap-upload-container',
           {
             opacity: 0,
             y: 20,
@@ -241,16 +220,15 @@ export function UploadClient() {
             opacity: 1,
             y: 0,
             duration: 0.6,
-            ease: "power3.out",
-          },
+            ease: 'power3.out',
+          }
         );
       }
     },
-    { scope: containerRef, dependencies: [files.length] },
+    { scope: containerRef, dependencies: [files.length] }
   );
 
-  const isUploading =
-    uploadState.status !== "idle" && uploadState.status !== "success";
+  const isUploading = uploadState.status !== 'idle' && uploadState.status !== 'success';
 
   return (
     <div
@@ -270,8 +248,8 @@ export function UploadClient() {
             DIGITAL FASHION
           </h1>
           <p className="max-w-md border-l border-border pl-4 text-[11px] font-semibold uppercase tracking-[0.1em] leading-relaxed text-muted-foreground">
-            Tải lên tối đa 5 ảnh thô cùng lúc. AI sẽ tự động tách nền, tối ưu
-            dung lượng, và phân tích các thông số về chất liệu & phong cách.
+            Tải lên tối đa 5 ảnh thô cùng lúc. AI sẽ tự động tách nền, tối ưu dung lượng, và phân
+            tích các thông số về chất liệu & phong cách.
           </p>
         </div>
       </div>
@@ -303,7 +281,7 @@ export function UploadClient() {
                 </div>
                 <div className="space-y-3 text-center px-4">
                   <p className="text-2xl font-semibold tracking-[0.02em] text-foreground">
-                    Thả Nhiều File Vào Đây
+                    Tải File Ảnh Lên
                   </p>
                   <p className="font-semibold text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                     PNG, JPG, HEIC (Tối đa 5 file, mỗi file max 5MB)
@@ -370,7 +348,7 @@ export function UploadClient() {
                     {/* Uploading Overlay */}
                     {isUploading &&
                       uploadState.current === idx + 1 &&
-                      uploadState.status === "uploading" && (
+                      uploadState.status === 'uploading' && (
                         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
                           <div className="mb-3 size-8 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-foreground" />
                           <span className="rounded-full bg-card/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground shadow-sm">
@@ -379,8 +357,7 @@ export function UploadClient() {
                         </div>
                       )}
                     {isUploading &&
-                      (uploadState.current > idx + 1 ||
-                        uploadState.status === "analyzing") && (
+                      (uploadState.current > idx + 1 || uploadState.status === 'analyzing') && (
                         <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
                           <div className="mb-2 rounded-full bg-primary p-1.5 text-primary-foreground">
                             <Sparkles className="size-4" />
@@ -399,7 +376,7 @@ export function UploadClient() {
                         className="line-clamp-1 text-[16px] font-semibold leading-[130%] text-foreground"
                         title={item.file.name}
                       >
-                        {item.file.name.replace(/\.[^/.]+$/, "")}
+                        {item.file.name.replace(/\.[^/.]+$/, '')}
                       </h3>
                     </div>
                   </div>
@@ -427,9 +404,9 @@ export function UploadClient() {
               </h2>
 
               <p className="max-w-sm border-l border-border pl-5 text-[11px] font-semibold leading-relaxed tracking-[0.05em] text-muted-foreground">
-                Các hình ảnh sẽ được gửi qua nền tảng đám mây để AI loại bỏ
-                phông nền, tối ưu hóa kích thước, sau đó đi qua hệ thống AI
-                Stylist để phân tích dữ liệu thời trang. Danh mục mặc định sẽ là
+                Các hình ảnh sẽ được gửi qua nền tảng đám mây để AI loại bỏ phông nền, tối ưu hóa
+                kích thước, sau đó đi qua hệ thống AI Stylist để phân tích dữ liệu thời trang. Danh
+                mục mặc định sẽ là
                 {`"Khác".`}
               </p>
 
@@ -437,16 +414,11 @@ export function UploadClient() {
                 <div className="space-y-3 pt-4">
                   <div className="flex justify-between text-[10px] font-semibold uppercase tracking-[0.1em] text-foreground">
                     <span>
-                      {uploadState.status === "uploading"
+                      {uploadState.status === 'uploading'
                         ? `Đang tải ảnh lên (${uploadState.current}/${uploadState.total})`
                         : `AI Đang phân tích (${uploadState.total} ảnh)`}
                     </span>
-                    <span>
-                      {Math.round(
-                        (uploadState.current / uploadState.total) * 100,
-                      )}
-                      %
-                    </span>
+                    <span>{Math.round((uploadState.current / uploadState.total) * 100)}%</span>
                   </div>
                   <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
                     <div

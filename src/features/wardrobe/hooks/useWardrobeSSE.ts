@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { wardrobeApi } from "../api/wardrobe.api";
 import { WARDROBE_QUERY_KEYS } from "../queries/wardrobe.queries";
 import { WardrobeItemRes, WardrobeItemStatus, WardrobeTaskSSEPayload } from "../types";
+import { getAnalysisErrorMessage } from "../utils/analysis-status";
 
 /**
  * Custom hook to automatically listen to realtime SSE updates for any wardrobe items
@@ -14,6 +15,7 @@ import { WardrobeItemRes, WardrobeItemStatus, WardrobeTaskSSEPayload } from "../
 export function useWardrobeSSE(items?: WardrobeItemRes[], onTaskUpdate?: () => void) {
   const queryClient = useQueryClient();
   const activeControllers = useRef<Map<string, AbortController>>(new Map());
+  const fallbackTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const previousProcessingIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -92,9 +94,9 @@ export function useWardrobeSSE(items?: WardrobeItemRes[], onTaskUpdate?: () => v
         const sseItemData = payload.data || payload.item;
 
         if (itemStatus === "failed") {
-          toast.error(payload.error || "AI phân tích hình ảnh không thành công.");
+          toast.error(getAnalysisErrorMessage(payload.error));
         } else if (itemStatus === "needs_review") {
-          toast.info("Một số hình ảnh cần bạn chọn lại danh mục.");
+          toast.info(getAnalysisErrorMessage(payload.error || "uncertain_category"));
         }
 
         let nextStatus = WardrobeItemStatus.InWardrobe;
@@ -108,6 +110,15 @@ export function useWardrobeSSE(items?: WardrobeItemRes[], onTaskUpdate?: () => v
 
         const incomingCategory = sseItemData?.category || sseItemData?.fashionItem?.category;
         const incomingFashionItem = sseItemData?.fashionItem || (sseItemData?.imageUrl ? sseItemData : null);
+
+        const processingErrorReason =
+          itemStatus === "failed"
+            ? (payload.error as any) || sseItemData?.fashionItem?.processingErrorReason
+            : undefined;
+        const reviewReason =
+          itemStatus === "needs_review"
+            ? (payload.error as any) || sseItemData?.fashionItem?.reviewReason || "uncertain_category"
+            : undefined;
 
         // 1. Optimistically update item in lists cache
         queryClient.setQueriesData(
@@ -130,6 +141,8 @@ export function useWardrobeSSE(items?: WardrobeItemRes[], onTaskUpdate?: () => v
                   fashionItem: {
                     ...(it.fashionItem || {}),
                     ...(incomingFashionItem || {}),
+                    ...(processingErrorReason !== undefined ? { processingErrorReason } : {}),
+                    ...(reviewReason !== undefined ? { reviewReason } : {}),
                   },
                   status: nextStatus,
                 };
@@ -151,6 +164,8 @@ export function useWardrobeSSE(items?: WardrobeItemRes[], onTaskUpdate?: () => v
                 fashionItem: {
                   ...(oldItem.fashionItem || {}),
                   ...(incomingFashionItem || {}),
+                  ...(processingErrorReason !== undefined ? { processingErrorReason } : {}),
+                  ...(reviewReason !== undefined ? { reviewReason } : {}),
                 },
                 status: nextStatus,
               };
@@ -209,8 +224,24 @@ export function useWardrobeSSE(items?: WardrobeItemRes[], onTaskUpdate?: () => v
           }
         }, 800);
 
+        const timer = fallbackTimers.current.get(taskId);
+        if (timer) {
+          clearTimeout(timer);
+          fallbackTimers.current.delete(taskId);
+        }
+
         activeControllers.current.delete(taskId);
       };
+
+      // Set fallback timer for task resilience (15s)
+      if (!fallbackTimers.current.has(taskId)) {
+        const timer = setTimeout(() => {
+          console.log(`[SSE Task ${taskId}] Fallback timeout reached. Refetching lists...`);
+          queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
+          queryClient.refetchQueries({ queryKey: WARDROBE_QUERY_KEYS.lists(), type: "active" });
+        }, 15000);
+        fallbackTimers.current.set(taskId, timer);
+      }
 
       wardrobeApi.subscribeTaskSSE(
         taskId,
@@ -222,6 +253,11 @@ export function useWardrobeSSE(items?: WardrobeItemRes[], onTaskUpdate?: () => v
         },
         (error: Error) => {
           console.warn(`[SSE Task ${taskId}] Error:`, error);
+          const timer = fallbackTimers.current.get(taskId);
+          if (timer) {
+            clearTimeout(timer);
+            fallbackTimers.current.delete(taskId);
+          }
           queryClient.refetchQueries({
             queryKey: WARDROBE_QUERY_KEYS.lists(),
             type: "active",
@@ -236,13 +272,18 @@ export function useWardrobeSSE(items?: WardrobeItemRes[], onTaskUpdate?: () => v
 
 
 
-  // Cleanup all SSE connections on unmount
+  // Cleanup all SSE connections and timers on unmount
   useEffect(() => {
     return () => {
       activeControllers.current.forEach((controller) => {
         controller.abort();
       });
       activeControllers.current.clear();
+
+      fallbackTimers.current.forEach((timer) => {
+        clearTimeout(timer);
+      });
+      fallbackTimers.current.clear();
     };
   }, []);
 }
