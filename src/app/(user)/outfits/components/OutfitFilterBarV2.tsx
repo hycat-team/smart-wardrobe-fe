@@ -46,8 +46,8 @@ export function OutfitFilterBarV2({
 
     return [
       { label: "Tất cả", value: "all", count: allCount },
-      { label: "Tạo bởi AI", value: "ai", count: aiCount },
-      { label: "Thủ công", value: "manual", count: manualCount },
+      // { label: "Tạo bởi AI", value: "ai", count: aiCount },
+      // { label: "Thủ công", value: "manual", count: manualCount },
     ];
   }, [outfits, totalItems]);
 

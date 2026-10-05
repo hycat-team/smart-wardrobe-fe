@@ -89,7 +89,7 @@ export function OutfitCardV2({ outfit, onDelete, index = 0 }: OutfitCardV2Props)
         {/* ── Top Bar: Badges & Quick Controls ── */}
         <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none z-10">
           {/* Badge phân loại AI / Lookbook */}
-          <div>
+          {/* <div>
             {outfit.status === 1 ? (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-background/90 dark:bg-stone-900/90 backdrop-blur-md border border-border/60 text-foreground shadow-xs">
                 <Sparkles className="size-3 text-amber-500 fill-amber-500/20" />
@@ -101,7 +101,7 @@ export function OutfitCardV2({ outfit, onDelete, index = 0 }: OutfitCardV2Props)
                 <span>Lookbook</span>
               </span>
             )}
-          </div>
+          </div> */}
 
           {/* Controls: Nút Xóa nhanh khi hover */}
           <div className="flex items-center pointer-events-auto">
