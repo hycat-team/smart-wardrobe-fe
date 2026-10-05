@@ -4,10 +4,11 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Sparkles, Eye, Lock } from 'lucide-react';
+import { Check, Sparkles, Eye, Lock, AlertCircle, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { WardrobeItemRes as WardrobeItem } from '@/features/wardrobe/types';
+import { WardrobeItemStatus, WardrobeItemRes as WardrobeItem } from '@/features/wardrobe/types';
 import { applyCloudinaryTrim } from '@/lib/cloudinary';
+import { isInvalidImageError } from '@/features/wardrobe/utils/analysis-status';
 
 export interface WardrobeCardV2Props {
   item: WardrobeItem;
@@ -41,6 +42,11 @@ export function WardrobeCardV2({
 
   // Trích xuất metadata thời trang
   const fashion = item.fashionItem;
+  const isFailed = item.status === WardrobeItemStatus.Failed || (item as any).status === 4;
+  const isNeedsReview = item.status === WardrobeItemStatus.NeedsReview || (item as any).status === 5;
+  const reason = item.fashionItem?.processingErrorReason || item.fashionItem?.reviewReason || (item as any).error;
+  const isInvalid = isInvalidImageError(reason);
+
   const categoryName =
     item.category?.name ||
     fashion?.category?.name ||
@@ -71,7 +77,9 @@ export function WardrobeCardV2({
         'group relative flex flex-col h-full rounded-2xl bg-card dark:bg-[#18181b] border border-stone-200/90 dark:border-stone-800 overflow-hidden cursor-pointer select-none',
         'shadow-[0_4px_16px_-4px_rgba(0,0,0,0.05),0_1px_3px_0_rgba(0,0,0,0.02)] hover:shadow-[0_16px_36px_-8px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_16px_36px_-8px_rgba(0,0,0,0.5)] transition-shadow duration-300',
         isSelectMode && isSelected && 'ring-2 ring-foreground border-transparent shadow-md',
-        isLocked && 'opacity-65 grayscale-[0.3]'
+        isLocked && 'opacity-65 grayscale-[0.3]',
+        isFailed && 'border-destructive/40 bg-destructive/5',
+        isNeedsReview && 'border-amber-500/40 bg-amber-500/5'
       )}
       style={{
         boxShadow:
@@ -99,12 +107,24 @@ export function WardrobeCardV2({
           />
         </div>
 
-        {/* Top Header: Badge Danh mục & Swatch Màu */}
+        {/* Top Header: Badge Danh mục / Trạng thái & Swatch Màu */}
         <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none z-10">
-          {/* Badge Danh mục */}
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-background/90 dark:bg-stone-900/90 backdrop-blur-md border border-border/60 text-foreground/80 shadow-xs">
-            {categoryName}
-          </span>
+          {/* Badge Danh mục hoặc Trạng thái rà soát/lỗi */}
+          {isFailed ? (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-destructive/90 text-white shadow-xs">
+              <AlertCircle className="size-3" />
+              {isInvalid ? 'Ảnh không hợp lệ' : 'Phân tích thất bại'}
+            </span>
+          ) : isNeedsReview ? (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-amber-600/90 text-white shadow-xs">
+              <AlertTriangle className="size-3" />
+              Cần chọn danh mục
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-background/90 dark:bg-stone-900/90 backdrop-blur-md border border-border/60 text-foreground/80 shadow-xs">
+              {categoryName}
+            </span>
+          )}
 
           {/* Color Indicator với Halo */}
           {colorHex && (
@@ -170,33 +190,49 @@ export function WardrobeCardV2({
               transition={{ type: 'spring', stiffness: 450, damping: 30 }}
               className="absolute bottom-3 inset-x-3 z-20 flex items-center justify-center gap-1.5 p-1 rounded-xl bg-background/95 dark:bg-stone-900/95 backdrop-blur-md border border-border/80 shadow-lg"
             >
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onQuickOutfit) {
-                    onQuickOutfit(item);
-                  } else {
-                    router.push('/outfits/create');
-                  }
-                }}
-                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold text-foreground hover:bg-muted transition-colors active:scale-95"
-              >
-                <Sparkles className="size-3.5 text-[#D9C5B2]" />
-                <span>Phối đồ</span>
-              </button>
-              <div className="w-px h-3.5 bg-border" />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClick();
-                }}
-                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors active:scale-95"
-              >
-                <Eye className="size-3.5" />
-                <span>Chi tiết</span>
-              </button>
+              {isFailed || isNeedsReview ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClick();
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold text-foreground hover:bg-muted transition-colors active:scale-95"
+                >
+                  <Eye className="size-3.5" />
+                  <span>{isNeedsReview ? 'Chọn danh mục' : 'Xem chi tiết'}</span>
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onQuickOutfit) {
+                        onQuickOutfit(item);
+                      } else {
+                        router.push('/outfits/create');
+                      }
+                    }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold text-foreground hover:bg-muted transition-colors active:scale-95"
+                  >
+                    <Sparkles className="size-3.5 text-[#D9C5B2]" />
+                    <span>Phối đồ</span>
+                  </button>
+                  <div className="w-px h-3.5 bg-border" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClick();
+                    }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors active:scale-95"
+                  >
+                    <Eye className="size-3.5" />
+                    <span>Chi tiết</span>
+                  </button>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

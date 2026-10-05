@@ -38,8 +38,8 @@ export function DashboardKpiGrid({
 }) {
   if (isLoading && !data) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, index) => (
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
           <Skeleton key={index} className="h-36 rounded-3xl" />
         ))}
       </div>
@@ -84,19 +84,19 @@ export function DashboardKpiGrid({
       helper: 'Người dùng hoạt động',
       icon: Activity,
     },
-    {
-      label: 'Thương hiệu',
-      value: formatNumber(data.totalBrands),
-      helper: 'Đang hoạt động',
-      icon: Building2,
-    },
-    {
-      label: 'Thương hiệu chờ phê duyệt',
-      value: formatNumber(data.pendingReviewBrands),
-      helper: 'Yêu cầu cần xử lý',
-      icon: ShieldAlert,
-      warning: data.pendingReviewBrands > 0,
-    },
+    // {
+    //   label: 'Thương hiệu',
+    //   value: formatNumber(data.totalBrands),
+    //   helper: 'Đang hoạt động',
+    //   icon: Building2,
+    // },
+    // {
+    //   label: 'Thương hiệu chờ phê duyệt',
+    //   value: formatNumber(data.pendingReviewBrands),
+    //   helper: 'Yêu cầu cần xử lý',
+    //   icon: ShieldAlert,
+    //   warning: data.pendingReviewBrands > 0,
+    // },
     {
       label: 'Doanh thu subscription',
       value: formatVND(data.subscriptionRevenueVnd),
@@ -117,7 +117,7 @@ export function DashboardKpiGrid({
       <h2 id="kpi-heading" className="sr-only">
         Chỉ số KPI hệ thống
       </h2>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => {
           const Icon = card.icon;
           return (

@@ -14,6 +14,7 @@ import {
   CategoryRes,
   WardrobeStatsRes,
   WardrobeTaskSSEPayload,
+  RetryWardrobeItemReq,
 } from '../types';
 
 export const wardrobeApi = {
@@ -83,7 +84,8 @@ export const wardrobeApi = {
 
         const decoder = new TextDecoder();
         let buffer = '';
-        let processedCount = 0;
+        let processedTerminalCount = 0;
+        const processedTerminalItemIds = new Set<string>();
         let totalItems = 0;
 
         while (true) {
@@ -134,7 +136,6 @@ export const wardrobeApi = {
               if (typeof parsedData.total === 'number') {
                 totalItems = parsedData.total;
               }
-              processedCount++;
 
               onMessage(parsedData as WardrobeTaskSSEPayload);
 
@@ -145,11 +146,25 @@ export const wardrobeApi = {
                 statusLower === 'failed' ||
                 statusLower === 'needs_review';
 
+              if (isTerminalStatus) {
+                if (parsedData.itemId) {
+                  processedTerminalItemIds.add(parsedData.itemId);
+                } else {
+                  processedTerminalCount++;
+                }
+              }
+
+              const terminalCount = Math.max(
+                processedTerminalItemIds.size,
+                processedTerminalCount,
+              );
+
               if (
-                (totalItems > 0 && processedCount >= totalItems) ||
+                eventType === 'done' ||
+                (totalItems > 0 && terminalCount >= totalItems) ||
                 (isTerminalStatus && (!totalItems || totalItems <= 1))
               ) {
-                console.log(`[SSE Task ${taskId}] All ${totalItems || processedCount} items processed.`);
+                console.log(`[SSE Task ${taskId}] All ${totalItems || terminalCount} items processed.`);
                 onDone();
                 return;
               }
@@ -179,8 +194,8 @@ export const wardrobeApi = {
 
 
 
-  retryWardrobeItemAnalysis: async (id: string): Promise<WardrobeItemRes & { message?: string }> => {
-    const res = await api.post<APIResponse<WardrobeItemRes>>(`/wardrobe-items/${id}/retry-analysis`);
+  retryWardrobeItemAnalysis: async (id: string, data?: RetryWardrobeItemReq): Promise<WardrobeItemRes & { message?: string }> => {
+    const res = await api.post<APIResponse<WardrobeItemRes>>(`/wardrobe-items/${id}/retry-analysis`, data);
     const result = res.data.data! as WardrobeItemRes & { message?: string };
     if (result) result.message = res.data.message;
     return result;

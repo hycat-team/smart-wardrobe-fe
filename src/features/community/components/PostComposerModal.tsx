@@ -8,6 +8,7 @@ import { PostRes, OutfitBriefRes, PostMediaReq } from '../types';
 import { useCreatePost, useUpdatePost } from '../queries/community.queries';
 import { communityApi } from '../api/community.api';
 import { uploadToCloudinary } from '@/lib/cloudinary';
+import { compressImageToWebP } from '@/lib/image-compression';
 import { validateMediaFile } from '../utils/community.utils';
 import { Loader2, Shirt, Image as ImageIcon, Video, X } from 'lucide-react';
 import Image from 'next/image';
@@ -152,12 +153,22 @@ export const PostComposerModal: React.FC<PostComposerModalProps> = ({
 
       const results = await Promise.allSettled(
         newMediaItems.map(async ({ item, index }) => {
+          let fileToUpload = item.file!;
+          if (item.mediaType === 'image') {
+            try {
+              fileToUpload = await compressImageToWebP(item.file!);
+            } catch (err) {
+              console.warn('[PostComposerModal] Không thể nén ảnh sang WebP, dùng ảnh gốc:', err);
+              fileToUpload = item.file!;
+            }
+          }
+
           const sig = await communityApi.getPostUploadSignature({
             resourceType: item.mediaType,
           });
 
           const cloudRes = await uploadToCloudinary({
-            file: item.file!,
+            file: fileToUpload,
             signatureParams: {
               apiKey: sig.apiKey,
               timestamp: sig.timestamp,

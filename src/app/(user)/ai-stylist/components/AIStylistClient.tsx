@@ -235,6 +235,7 @@ function AIStylistContent() {
         name: trimmedName,
         description: outfitData.explanation || outfitData.title || 'Gợi ý từ AI',
         coverImageUrl: uploadedUrl,
+        status: 1, // 1: Do AI phối (AI Curated)
         items: selectedItems.map((item) => ({
           fashionItemId: item.clothingItemId,
           positionX: Math.round(item.x || 0),

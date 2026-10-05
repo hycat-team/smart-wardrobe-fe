@@ -1,30 +1,24 @@
-"use client";
-import { useState, useRef, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  UploadCloud,
-  X,
-  Sparkles,
-  Loader2,
-  ImagePlus,
-  ArrowLeft,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+'use client';
+import { useState, useRef, useMemo, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { UploadCloud, X, Sparkles, Loader2, ImagePlus, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   useBatchUploadWardrobeItems,
   useCategories,
-} from "@/features/wardrobe/queries/wardrobe.queries";
-import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
-import { toast } from "sonner";
-import {
-  uploadToCloudinary,
-  applyCloudinaryBackgroundRemoval,
-} from "@/lib/cloudinary";
+} from '@/features/wardrobe/queries/wardrobe.queries';
+import { wardrobeApi } from '@/features/wardrobe/api/wardrobe.api';
+import { toast } from 'sonner';
+import { uploadToCloudinary, applyCloudinaryBackgroundRemoval } from '@/lib/cloudinary';
+import { compressImageToWebP } from '@/lib/image-compression';
+import { useFileDropzone } from '@/features/wardrobe/hooks/useFileDropzone';
+import { validateDroppedFiles } from '@/features/wardrobe/utils/file-validation';
+import { cn } from '@/lib/utils';
 
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import Image from "next/image";
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import Image from 'next/image';
 
 gsap.registerPlugin(useGSAP);
 
@@ -42,42 +36,31 @@ export function UploadClient() {
 
   const [files, setFiles] = useState<SelectedFile[]>([]);
   const [uploadState, setUploadState] = useState<{
-    status: "idle" | "uploading" | "analyzing" | "success";
+    status: 'idle' | 'uploading' | 'analyzing' | 'success';
     current: number;
     total: number;
   }>({
-    status: "idle",
+    status: 'idle',
     current: 0,
     total: 0,
   });
 
-  const { data: categories = [], isLoading: isLoadingCategories } =
-    useCategories();
+  const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
 
   const defaultCategoryId = useMemo(() => {
     const otherCat = categories.find(
-      (c) =>
-        c.name.toLowerCase() === "khác" || c.name.toLowerCase() === "other",
+      (c) => c.name.toLowerCase() === 'khác' || c.name.toLowerCase() === 'other'
     );
-    return otherCat
-      ? otherCat.id
-      : categories.length > 0
-        ? categories[0].id
-        : "";
+    return otherCat ? otherCat.id : categories.length > 0 ? categories[0].id : '';
   }, [categories]);
 
   const batchUploadMutation = useBatchUploadWardrobeItems();
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selectedFiles = Array.from(e.target.files);
+  const isUploading = uploadState.status !== 'idle' && uploadState.status !== 'success';
 
-      if (files.length + selectedFiles.length > 5) {
-        toast.error("Bạn chỉ được upload tối đa 5 ảnh mỗi lần!");
-        return;
-      }
-
-      const newFiles = selectedFiles.map((file) => ({
+  const handleIncomingAcceptedFiles = useCallback(
+    (acceptedFiles: File[]) => {
+      const newFiles = acceptedFiles.map((file) => ({
         id: Math.random().toString(36).substring(7),
         file,
         preview: URL.createObjectURL(file),
@@ -85,6 +68,52 @@ export function UploadClient() {
       }));
 
       setFiles((prev) => [...prev, ...newFiles]);
+    },
+    [defaultCategoryId]
+  );
+
+  const emptyDropzone = useFileDropzone({
+    onFilesDrop: handleIncomingAcceptedFiles,
+    maxFiles: 5,
+    currentCount: 0,
+    disabled: isUploading || isLoadingCategories,
+  });
+
+  const previewDropzone = useFileDropzone({
+    onFilesDrop: handleIncomingAcceptedFiles,
+    maxFiles: 5,
+    currentCount: files.length,
+    existingFiles: files.map((f) => f.file),
+    disabled: isUploading || files.length >= 5,
+  });
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      const { acceptedFiles, rejectedFiles } = validateDroppedFiles(selectedFiles, {
+        maxFiles: 5,
+        currentCount: files.length,
+        existingFiles: files.map((f) => f.file),
+      });
+
+      const shownMessages = new Set<string>();
+      rejectedFiles.forEach((rejected) => {
+        if (shownMessages.has(rejected.message)) return;
+        shownMessages.add(rejected.message);
+
+        if (rejected.reason === 'EXCEEDS_COUNT') {
+          toast.warning(rejected.message);
+        } else if (rejected.reason === 'DUPLICATE_FILE') {
+          toast.info(rejected.message);
+        } else {
+          toast.error(rejected.message);
+        }
+      });
+
+      if (acceptedFiles.length > 0) {
+        handleIncomingAcceptedFiles(acceptedFiles);
+      }
+      e.target.value = '';
     }
   };
 
@@ -94,16 +123,16 @@ export function UploadClient() {
 
   const handleUploadAndAnalyze = async () => {
     if (files.length === 0) {
-      toast.error("Vui lòng chọn ít nhất 1 ảnh!");
+      toast.error('Vui lòng chọn ít nhất 1 ảnh!');
       return;
     }
 
     if (files.length > 5) {
-      toast.error("Chỉ được upload tối đa 5 ảnh!");
+      toast.error('Chỉ được upload tối đa 5 ảnh!');
       return;
     }
 
-    setUploadState({ status: "uploading", current: 0, total: files.length });
+    setUploadState({ status: 'uploading', current: 0, total: files.length });
     try {
       // 1. Get secure upload signature
       const signatureResult = await wardrobeApi.getUploadSignature();
@@ -114,13 +143,22 @@ export function UploadClient() {
       for (let i = 0; i < files.length; i++) {
         const item = files[i];
         setUploadState({
-          status: "uploading",
+          status: 'uploading',
           current: i + 1,
           total: files.length,
         });
 
+        // Nén ảnh sang WebP sắc nét trước khi tải lên Cloudinary
+        let fileToUpload = item.file;
+        try {
+          fileToUpload = await compressImageToWebP(item.file);
+        } catch (compressionErr) {
+          console.warn('[UploadClient] Không thể nén ảnh, tiếp tục với ảnh gốc:', compressionErr);
+          fileToUpload = item.file;
+        }
+
         const uploadResData = await uploadToCloudinary({
-          file: item.file,
+          file: fileToUpload,
           signatureParams: {
             apiKey: signatureResult.apiKey,
             timestamp: signatureResult.timestamp,
@@ -145,7 +183,7 @@ export function UploadClient() {
 
       // 4. Send crop & analysis request to backend
       setUploadState({
-        status: "analyzing",
+        status: 'analyzing',
         current: files.length,
         total: files.length,
       });
@@ -155,28 +193,23 @@ export function UploadClient() {
 
       // 5. Success redirect to wardrobe
       setUploadState({
-        status: "success",
+        status: 'success',
         current: files.length,
         total: files.length,
       });
-      toast.success("Đã gửi ảnh cho AI phân tích thành công!");
+      toast.success('Đã gửi ảnh cho AI phân tích thành công!');
       router.refresh();
-      router.push("/wardrobe");
-
+      router.push('/wardrobe');
     } catch (err: unknown) {
       console.error(err);
-      toast.error(
-        err instanceof Error
-          ? err.message
-          : "Đã xảy ra lỗi trong quá trình upload.",
-      );
-      setUploadState({ status: "idle", current: 0, total: 0 });
+      toast.error(err instanceof Error ? err.message : 'Đã xảy ra lỗi trong quá trình upload.');
+      setUploadState({ status: 'idle', current: 0, total: 0 });
     }
   };
 
   const handleReset = () => {
     setFiles([]);
-    setUploadState({ status: "idle", current: 0, total: 0 });
+    setUploadState({ status: 'idle', current: 0, total: 0 });
   };
 
   // GSAP Animations
@@ -184,19 +217,19 @@ export function UploadClient() {
     () => {
       // Entrance animation
       const tl = gsap.timeline();
-      tl.from(".gsap-header", {
+      tl.from('.gsap-header', {
         y: 30,
         opacity: 0,
         duration: 0.8,
-        ease: "power3.out",
+        ease: 'power3.out',
         stagger: 0.1,
       }).from(
-        ".gsap-step",
-        { y: 20, opacity: 0, duration: 0.6, ease: "power2.out", stagger: 0.15 },
-        "-=0.4",
+        '.gsap-step',
+        { y: 20, opacity: 0, duration: 0.6, ease: 'power2.out', stagger: 0.15 },
+        '-=0.4'
       );
     },
-    { scope: containerRef },
+    { scope: containerRef }
   );
 
   // Transition animation when preview changes
@@ -204,7 +237,7 @@ export function UploadClient() {
     () => {
       if (files.length > 0) {
         gsap.fromTo(
-          ".gsap-preview-container",
+          '.gsap-preview-container',
           {
             opacity: 0,
             y: 20,
@@ -213,11 +246,11 @@ export function UploadClient() {
             opacity: 1,
             y: 0,
             duration: 0.6,
-            ease: "power3.out",
-          },
+            ease: 'power3.out',
+          }
         );
         gsap.fromTo(
-          ".preview-card",
+          '.preview-card',
           {
             opacity: 0,
             scale: 0.9,
@@ -227,12 +260,12 @@ export function UploadClient() {
             scale: 1,
             duration: 0.4,
             stagger: 0.1,
-            ease: "back.out(1.5)",
-          },
+            ease: 'back.out(1.5)',
+          }
         );
       } else {
         gsap.fromTo(
-          ".gsap-upload-container",
+          '.gsap-upload-container',
           {
             opacity: 0,
             y: 20,
@@ -241,16 +274,13 @@ export function UploadClient() {
             opacity: 1,
             y: 0,
             duration: 0.6,
-            ease: "power3.out",
-          },
+            ease: 'power3.out',
+          }
         );
       }
     },
-    { scope: containerRef, dependencies: [files.length] },
+    { scope: containerRef, dependencies: [files.length] }
   );
-
-  const isUploading =
-    uploadState.status !== "idle" && uploadState.status !== "success";
 
   return (
     <div
@@ -270,8 +300,8 @@ export function UploadClient() {
             DIGITAL FASHION
           </h1>
           <p className="max-w-md border-l border-border pl-4 text-[11px] font-semibold uppercase tracking-[0.1em] leading-relaxed text-muted-foreground">
-            Tải lên tối đa 5 ảnh thô cùng lúc. AI sẽ tự động tách nền, tối ưu
-            dung lượng, và phân tích các thông số về chất liệu & phong cách.
+            Tải lên tối đa 5 ảnh thô cùng lúc. AI sẽ tự động tách nền, tối ưu dung lượng, và phân
+            tích các thông số về chất liệu & phong cách.
           </p>
         </div>
       </div>
@@ -295,18 +325,57 @@ export function UploadClient() {
               </div>
             ) : (
               <div
+                {...emptyDropzone.getRootProps()}
                 onClick={() => fileInputRef.current?.click()}
-                className="group flex aspect-[16/9] w-full cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-border bg-card transition-all duration-200 hover:bg-accent-soft md:aspect-[21/9]"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInputRef.current?.click();
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label="Tải ảnh lên tủ đồ"
+                className={cn(
+                  'group flex aspect-[16/9] w-full cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed transition-all duration-200 outline-none md:aspect-[21/9]',
+                  emptyDropzone.isDragReject
+                    ? 'border-2 border-destructive bg-destructive/5'
+                    : emptyDropzone.isDragActive
+                    ? 'border-2 border-primary bg-primary/5 scale-[1.01] shadow-lg ring-2 ring-primary/20'
+                    : 'border-border bg-card hover:bg-accent-soft hover:border-primary/40 focus-visible:ring-2 focus-visible:ring-ring',
+                  (isUploading || isLoadingCategories) &&
+                    'pointer-events-none opacity-60 cursor-not-allowed'
+                )}
               >
-                <div className="flex size-16 items-center justify-center rounded-2xl border border-border bg-background text-foreground shadow-sm transition-all duration-200 group-hover:scale-105">
-                  <UploadCloud className="size-6 stroke-[1.5]" />
+                <div
+                  className={cn(
+                    'flex size-16 items-center justify-center rounded-2xl border border-border bg-background text-foreground shadow-sm transition-all duration-200',
+                    emptyDropzone.isDragReject
+                      ? 'border-destructive text-destructive'
+                      : emptyDropzone.isDragActive
+                      ? 'scale-110 text-primary border-primary shadow-md'
+                      : 'group-hover:scale-105'
+                  )}
+                >
+                  <UploadCloud
+                    className={cn(
+                      'size-6 stroke-[1.5]',
+                      emptyDropzone.isDragActive && 'animate-bounce text-primary'
+                    )}
+                  />
                 </div>
-                <div className="space-y-3 text-center px-4">
+                <div className="space-y-3 text-center px-4 pointer-events-none select-none">
                   <p className="text-2xl font-semibold tracking-[0.02em] text-foreground">
-                    Thả Nhiều File Vào Đây
+                    {emptyDropzone.isDragReject
+                      ? 'Tệp không hợp lệ hoặc đã đủ 5 ảnh'
+                      : emptyDropzone.isDragActive
+                      ? 'Thả file vào đây để tải lên'
+                      : 'Tải File Ảnh Lên'}
                   </p>
                   <p className="font-semibold text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                    PNG, JPG, HEIC (Tối đa 5 file, mỗi file max 5MB)
+                    {emptyDropzone.isDragActive
+                      ? 'Thả chuột để thêm ngay vào danh sách phân tích'
+                      : 'Kéo thả hoặc bấm để chọn • PNG, JPG, HEIC (Tối đa 5 file, mỗi file max 5MB)'}
                   </p>
                 </div>
               </div>
@@ -325,7 +394,14 @@ export function UploadClient() {
       ) : (
         // Step 2: Preview & Send Action
         <div className="w-full grid md:grid-cols-12 gap-12 items-start gsap-preview-container">
-          <div className="md:col-span-7 flex flex-col h-full space-y-6 pt-2">
+          <div
+            {...previewDropzone.getRootProps()}
+            className={cn(
+              'md:col-span-7 flex flex-col h-full space-y-6 pt-2 rounded-2xl transition-all duration-200 p-2',
+              previewDropzone.isDragActive &&
+                'ring-2 ring-dashed ring-primary/40 bg-primary/[0.02]'
+            )}
+          >
             <div className="flex items-center justify-between border-b border-border pb-4">
               <h2 className="text-2xl font-semibold uppercase tracking-[0.05em] text-foreground">
                 Đã chọn {files.length}/5 ảnh
@@ -370,7 +446,7 @@ export function UploadClient() {
                     {/* Uploading Overlay */}
                     {isUploading &&
                       uploadState.current === idx + 1 &&
-                      uploadState.status === "uploading" && (
+                      uploadState.status === 'uploading' && (
                         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
                           <div className="mb-3 size-8 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-foreground" />
                           <span className="rounded-full bg-card/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground shadow-sm">
@@ -379,8 +455,7 @@ export function UploadClient() {
                         </div>
                       )}
                     {isUploading &&
-                      (uploadState.current > idx + 1 ||
-                        uploadState.status === "analyzing") && (
+                      (uploadState.current > idx + 1 || uploadState.status === 'analyzing') && (
                         <div className="absolute inset-0 bg-background/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
                           <div className="mb-2 rounded-full bg-primary p-1.5 text-primary-foreground">
                             <Sparkles className="size-4" />
@@ -399,12 +474,57 @@ export function UploadClient() {
                         className="line-clamp-1 text-[16px] font-semibold leading-[130%] text-foreground"
                         title={item.file.name}
                       >
-                        {item.file.name.replace(/\.[^/.]+$/, "")}
+                        {item.file.name.replace(/\.[^/.]+$/, '')}
                       </h3>
                     </div>
                   </div>
                 </div>
               ))}
+
+              {/* Add more dropzone card when under 5 files */}
+              {!isUploading && files.length < 5 && (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Thêm ảnh vào danh sách"
+                  className={cn(
+                    'preview-card group relative flex aspect-[4/5] cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border border-dashed transition-all duration-200 outline-none',
+                    previewDropzone.isDragReject
+                      ? 'border-2 border-destructive bg-destructive/5'
+                      : previewDropzone.isDragActive
+                      ? 'border-2 border-primary bg-primary/5 scale-[1.02] shadow-md ring-2 ring-primary/20'
+                      : 'border-border bg-card/60 hover:bg-accent-soft hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring'
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'flex size-12 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm transition-all duration-200',
+                      previewDropzone.isDragActive
+                        ? 'scale-110 text-primary border-primary shadow-sm'
+                        : 'group-hover:scale-105'
+                    )}
+                  >
+                    <ImagePlus className="size-5 stroke-[1.5]" />
+                  </div>
+                  <div className="space-y-1 text-center px-3 pointer-events-none select-none">
+                    <p className="text-sm font-semibold tracking-[0.02em] text-foreground">
+                      {previewDropzone.isDragActive ? 'Thả ảnh vào đây' : 'Thêm ảnh'}
+                    </p>
+                    <p className="font-semibold text-[9px] uppercase tracking-[0.1em] text-muted-foreground">
+                      {previewDropzone.isDragActive
+                        ? 'Thả để thêm ảnh'
+                        : `Kéo thả • Còn ${5 - files.length} chỗ`}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <input
@@ -427,9 +547,9 @@ export function UploadClient() {
               </h2>
 
               <p className="max-w-sm border-l border-border pl-5 text-[11px] font-semibold leading-relaxed tracking-[0.05em] text-muted-foreground">
-                Các hình ảnh sẽ được gửi qua nền tảng đám mây để AI loại bỏ
-                phông nền, tối ưu hóa kích thước, sau đó đi qua hệ thống AI
-                Stylist để phân tích dữ liệu thời trang. Danh mục mặc định sẽ là
+                Các hình ảnh sẽ được gửi qua nền tảng đám mây để AI loại bỏ phông nền, tối ưu hóa
+                kích thước, sau đó đi qua hệ thống AI Stylist để phân tích dữ liệu thời trang. Danh
+                mục mặc định sẽ là
                 {`"Khác".`}
               </p>
 
@@ -437,16 +557,11 @@ export function UploadClient() {
                 <div className="space-y-3 pt-4">
                   <div className="flex justify-between text-[10px] font-semibold uppercase tracking-[0.1em] text-foreground">
                     <span>
-                      {uploadState.status === "uploading"
+                      {uploadState.status === 'uploading'
                         ? `Đang tải ảnh lên (${uploadState.current}/${uploadState.total})`
                         : `AI Đang phân tích (${uploadState.total} ảnh)`}
                     </span>
-                    <span>
-                      {Math.round(
-                        (uploadState.current / uploadState.total) * 100,
-                      )}
-                      %
-                    </span>
+                    <span>{Math.round((uploadState.current / uploadState.total) * 100)}%</span>
                   </div>
                   <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
                     <div

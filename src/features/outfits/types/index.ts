@@ -13,6 +13,7 @@ export interface SaveOutfitReq {
   description?: string;
   coverImageUrl?: string;
   coverPublicId?: string;
+  status?: number;
   items: SaveOutfitItemReq[];
 }
 

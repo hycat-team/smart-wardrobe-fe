@@ -44,12 +44,31 @@ describe('validateMediaFile', () => {
     expect(mov.error).toBe('Video chỉ hỗ trợ định dạng mp4, webm.');
   });
 
-  it('từ chối video vượt quá 100MB', async () => {
-    const result = await validateMediaFile(
-      createFile('video/mp4', 100 * 1024 * 1024 + 1, 'big.mp4')
-    );
+  it('từ chối video vượt quá 100MB với thông báo chính xác', async () => {
+    const bigFile = createFile('video/mp4', 100 * 1024 * 1024 + 1, 'big.mp4');
+    const result = await validateMediaFile(bigFile);
     expect(result.isValid).toBe(false);
-    expect(result.error).toContain('vượt quá dung lượng tối đa 100MB');
+    expect(result.error).toBe('Video "big.mp4" vượt quá dung lượng tối đa 100MB.');
+
+    // Kiểm tra tệp 105MB
+    const hugeFile = createFile('video/webm', 105 * 1024 * 1024, 'huge.webm');
+    const hugeResult = await validateMediaFile(hugeFile);
+    expect(hugeResult.isValid).toBe(false);
+    expect(hugeResult.error).toBe('Video "huge.webm" vượt quá dung lượng tối đa 100MB.');
+
+    // Kiểm tra video > 100MB có định dạng mov vẫn bị chặn bởi dung lượng trước tiên
+    const bigMov = createFile('video/quicktime', 120 * 1024 * 1024, 'clip.mov');
+    const movResult = await validateMediaFile(bigMov);
+    expect(movResult.isValid).toBe(false);
+    expect(movResult.error).toBe('Video "clip.mov" vượt quá dung lượng tối đa 100MB.');
+  });
+
+  it('chấp nhận video đúng ngưỡng 100MB (104,857,600 bytes) và thời lượng <= 60s', async () => {
+    mockVideoDuration(30);
+    const boundaryFile = createFile('video/mp4', 100 * 1024 * 1024, 'boundary.mp4');
+    const result = await validateMediaFile(boundaryFile);
+    expect(result.isValid).toBe(true);
+    expect(result.mediaType).toBe('video');
   });
 
   it('từ chối tệp không phải ảnh/video', async () => {

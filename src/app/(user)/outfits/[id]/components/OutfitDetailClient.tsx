@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useMyWardrobe } from "@/features/wardrobe/queries/wardrobe.queries";
 import { useOutfitDetail, useUpdateOutfit } from "@/features/outfits/queries/outfits.queries";
-import { OutfitRes as Outfit } from "@/features/outfits/types";
+import { OutfitRes as Outfit, SaveOutfitReq } from "@/features/outfits/types";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
@@ -168,10 +168,11 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
 
       // 3. Chuẩn bị payload và gửi API tạo Outfit
       // Tính toán position % tương đối để dễ lưu (mặc dù ảnh cover đã có đầy đủ rồi)
-      const payload = {
+      const payload: SaveOutfitReq = {
         name: outfitName,
         description: customOccasion || occasion,
         coverImageUrl: coverImageUrl,
+        status: outfit?.status ?? 0,
         items: selectedItems.map((item) => ({
           fashionItemId: item.fashionItem?.id || (item as any).fashionItemId || item.clothingItemId,
           positionX: Math.round(item.x || 0),

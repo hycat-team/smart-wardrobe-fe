@@ -1,14 +1,21 @@
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   useWardrobeItemDetail,
   useBulkDeleteWardrobeItems,
   useRetryWardrobeItemAnalysis,
+  useCategories,
 } from "@/features/wardrobe/queries/wardrobe.queries";
 import { useWardrobeSSE } from "@/features/wardrobe/hooks/useWardrobeSSE";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, Loader2, AlertCircle, Sparkles, RotateCcw } from "lucide-react";
+import { ArrowLeft, Loader2, AlertCircle, Sparkles, RotateCcw, Upload } from "lucide-react";
+import {
+  getAnalysisErrorMessage,
+  isInvalidImageError,
+  canRetryWardrobeAnalysis,
+} from "@/features/wardrobe/utils/analysis-status";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +45,8 @@ export function WardrobeItemDetailClient({
   initialItem,
 }: WardrobeItemDetailClientProps) {
   const router = useRouter();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const { data: categories = [] } = useCategories();
 
   const {
     data: item,
@@ -98,6 +107,15 @@ export function WardrobeItemDetailClient({
 
   const isProcessing = item.status === WardrobeItemStatus.Processing;
   const isFailed = item.status === WardrobeItemStatus.Failed;
+  const isNeedsReview = item.status === WardrobeItemStatus.NeedsReview;
+
+  const reason =
+    item.fashionItem?.processingErrorReason ||
+    item.fashionItem?.reviewReason ||
+    (item as any).error;
+  const reasonMessage = getAnalysisErrorMessage(reason);
+  const isInvalidImage = isInvalidImageError(reason);
+  const canRetry = canRetryWardrobeAnalysis(item.status, reason);
 
   const categoryName =
     item.category?.name ||
@@ -207,40 +225,133 @@ export function WardrobeItemDetailClient({
                 )}
                 {isFailed && (
                   <span className="rounded-full bg-destructive px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-primary-foreground shadow-sm">
-                    Phân tích thất bại
+                    {isInvalidImage ? "Ảnh không hợp lệ" : "Phân tích thất bại"}
+                  </span>
+                )}
+                {isNeedsReview && (
+                  <span className="rounded-full bg-amber-600 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-white shadow-sm">
+                    Cần chọn danh mục
                   </span>
                 )}
               </div>
             </div>
 
-            {/* AI Retry banner when failed */}
-            {isFailed && (
-              <div className="p-4 rounded-2xl border border-destructive/20 bg-destructive/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <AlertCircle className="size-4 text-destructive shrink-0" />
-                  <p className="text-[12px] font-medium text-destructive">
-                    AI chưa thể nhận diện trang phục này.
-                  </p>
+            {/* Needs Review banner */}
+            {isNeedsReview && (
+              <div className="p-4 sm:p-5 rounded-2xl border border-amber-500/30 bg-amber-500/5 dark:bg-amber-950/20 flex flex-col gap-4">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="size-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[13px] font-semibold text-amber-700 dark:text-amber-300">
+                      {reasonMessage}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      AI đã nhận diện được một món trang phục nhưng chưa chắc chắn về danh mục. Vui lòng chọn danh mục chính xác để AI phân tích lại ở chế độ danh mục cố định.
+                    </p>
+                  </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={isRetrying}
-                  onClick={() => retryAnalysis(itemId)}
-                  className="rounded-full border-destructive/30 text-destructive hover:bg-destructive/10 text-[10px] font-semibold uppercase tracking-wider shrink-0"
-                >
-                  {isRetrying ? (
-                    <>
-                      <Loader2 className="mr-1.5 size-3 animate-spin" />
-                      Đang thử lại...
-                    </>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+                  <div className="flex-1">
+                    <select
+                      value={selectedCategoryId}
+                      onChange={(e) => setSelectedCategoryId(e.target.value)}
+                      className="w-full h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs text-foreground shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring"
+                    >
+                      <option value="">-- Chọn danh mục phù hợp --</option>
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    disabled={!selectedCategoryId || isRetrying}
+                    onClick={() => {
+                      if (!selectedCategoryId) return;
+                      retryAnalysis({ id: itemId, categoryId: selectedCategoryId });
+                    }}
+                    className="rounded-full bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold tracking-wider shrink-0 disabled:opacity-50"
+                  >
+                    {isRetrying ? (
+                      <>
+                        <Loader2 className="mr-1.5 size-3 animate-spin" />
+                        Đang gửi...
+                      </>
+                    ) : (
+                      <>
+                        <RotateCcw className="mr-1.5 size-3" />
+                        Gửi phân tích lại
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* AI Failure / Retry banner when failed */}
+            {isFailed && (
+              <div className="p-4 rounded-2xl border border-destructive/20 bg-destructive/5 flex flex-col gap-3">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="size-4 text-destructive shrink-0 mt-0.5" />
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[13px] font-semibold text-destructive">
+                      {reasonMessage}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      {isInvalidImage
+                        ? "Ảnh tải lên không đạt tiêu chuẩn phân tích của AI. Vui lòng tải ảnh khác rõ ràng hoặc xóa món đồ này."
+                        : "Quá trình phân tích gặp sự cố tạm thời. Bạn có thể nhấn thử lại bên dưới."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  {canRetry ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isRetrying}
+                      onClick={() => retryAnalysis({ id: itemId })}
+                      className="rounded-full border-destructive/30 text-destructive hover:bg-destructive/10 text-[10px] font-semibold uppercase tracking-wider shrink-0"
+                    >
+                      {isRetrying ? (
+                        <>
+                          <Loader2 className="mr-1.5 size-3 animate-spin" />
+                          Đang thử lại...
+                        </>
+                      ) : (
+                        <>
+                          <RotateCcw className="mr-1.5 size-3" />
+                          Thử phân tích lại
+                        </>
+                      )}
+                    </Button>
                   ) : (
-                    <>
-                      <RotateCcw className="mr-1.5 size-3" />
-                      Thử phân tích lại
-                    </>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => router.push("/wardrobe/upload")}
+                      className="rounded-full text-[11px] font-semibold tracking-wider shrink-0"
+                    >
+                      <Upload className="mr-1.5 size-3.5" />
+                      Tải ảnh khác
+                    </Button>
                   )}
-                </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={isDeleting}
+                    onClick={handleDelete}
+                    className="rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 text-[11px] font-semibold tracking-wider shrink-0"
+                  >
+                    {isDeleting ? "Đang xóa..." : "Xóa món đồ"}
+                  </Button>
+                </div>
               </div>
             )}
           </div>

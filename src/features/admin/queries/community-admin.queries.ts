@@ -8,6 +8,8 @@ export const ADMIN_COMMUNITY_QUERY_KEYS = {
   all: ['admin-community'] as const,
   posts: (params?: Record<string, any>) => [...ADMIN_COMMUNITY_QUERY_KEYS.all, 'posts', params] as const,
   comments: (params?: Record<string, any>) => [...ADMIN_COMMUNITY_QUERY_KEYS.all, 'comments', params] as const,
+  metrics: () => [...ADMIN_COMMUNITY_QUERY_KEYS.all, 'metrics'] as const,
+  postComments: (postPublicID: string | null) => [...ADMIN_COMMUNITY_QUERY_KEYS.all, 'post-comments', postPublicID] as const,
 };
 
 export const useAdminPosts = (params?: {
@@ -34,6 +36,36 @@ export const useAdminComments = (params?: {
   });
 };
 
+export const useAdminPostComments = (postPublicID: string | null) => {
+  return useQuery({
+    queryKey: ADMIN_COMMUNITY_QUERY_KEYS.postComments(postPublicID),
+    queryFn: () => (postPublicID ? communityAdminApi.getPostComments(postPublicID) : Promise.resolve([])),
+    enabled: !!postPublicID,
+  });
+};
+
+export const useAdminCommunityMetrics = () => {
+  return useQuery({
+    queryKey: ADMIN_COMMUNITY_QUERY_KEYS.metrics(),
+    queryFn: async () => {
+      const [allPostsRes, hiddenPostsRes, allCommentsRes, activeCommentsRes] = await Promise.all([
+        communityAdminApi.getAdminPosts({ limit: 1 }).catch(() => null),
+        communityAdminApi.getAdminPosts({ status: 'hidden', limit: 1 }).catch(() => null),
+        communityAdminApi.getAdminComments({ limit: 1 }).catch(() => null),
+        communityAdminApi.getAdminComments({ status: 'active', limit: 1 }).catch(() => null),
+      ]);
+
+      return {
+        totalPosts: allPostsRes?.metadata?.totalItems ?? 0,
+        hiddenPosts: hiddenPostsRes?.metadata?.totalItems ?? 0,
+        totalComments: allCommentsRes?.metadata?.totalItems ?? 0,
+        activeComments: activeCommentsRes?.metadata?.totalItems ?? 0,
+      };
+    },
+    staleTime: 30_000,
+  });
+};
+
 export const useAdminHidePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -41,10 +73,10 @@ export const useAdminHidePost = () => {
     onSuccess: (res: any) => {
       queryClient.invalidateQueries({ queryKey: ADMIN_COMMUNITY_QUERY_KEYS.all });
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.all });
-      toast.success(res?.message || 'Đã ẩn bài viết thành công.');
+      toast.success(res?.message || 'Đã ẩn bài viết khỏi bảng tin cộng đồng.');
     },
     onError: (error) => {
-      handleApiError(error, 'Không thể ẩn bài viết.');
+      handleApiError(error, 'Không thể ẩn bài viết, vui lòng thử lại.');
     },
   });
 };
@@ -56,7 +88,7 @@ export const useAdminRestorePost = () => {
     onSuccess: (res: any) => {
       queryClient.invalidateQueries({ queryKey: ADMIN_COMMUNITY_QUERY_KEYS.all });
       queryClient.invalidateQueries({ queryKey: COMMUNITY_QUERY_KEYS.all });
-      toast.success(res?.message || 'Đã khôi phục bài viết thành công.');
+      toast.success(res?.message || 'Đã khôi phục bài viết về trạng thái công khai.');
     },
     onError: (error) => {
       handleApiError(error, 'Không thể khôi phục bài viết.');

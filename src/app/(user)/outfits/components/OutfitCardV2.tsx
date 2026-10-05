@@ -98,7 +98,7 @@ export function OutfitCardV2({ outfit, onDelete, index = 0 }: OutfitCardV2Props)
             ) : (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-background/90 dark:bg-stone-900/90 backdrop-blur-md border border-border/60 text-foreground/80 shadow-xs">
                 <Layers className="size-3 text-stone-500" />
-                <span>Lookbook</span>
+                <span>Thủ công</span>
               </span>
             )}
           </div> */}

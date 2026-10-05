@@ -107,7 +107,7 @@ export function GuestHeader() {
                 </Link> */}
                 {user?.roleSlug === 'admin' && (
                   <Link
-                    href="/admin/brands"
+                    href="/admin/dashboard"
                     className={`
                       font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                       hover:opacity-100 text-red-500/80 hover:text-red-500
