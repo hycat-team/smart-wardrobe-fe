@@ -40,6 +40,11 @@ export const communityAdminApi = {
     return res.data.data as PaginationResult<CommentRes>;
   },
 
+  getPostComments: async (postPublicID: string): Promise<CommentRes[]> => {
+    const res = await api.get<APIResponse<CommentRes[]>>(`/posts/${postPublicID}/comments`);
+    return res.data.data || [];
+  },
+
   hideComment: async (id: string): Promise<any> => {
     const res = await api.patch<APIResponse>(`/admin/comments/${id}/hide`);
     return res.data;

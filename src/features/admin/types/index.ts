@@ -169,3 +169,4 @@ export interface CommentRes {
 }
 
 export * from './dashboard';
+export * from './community-admin';

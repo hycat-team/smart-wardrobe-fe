@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { UploadCloud, X, Sparkles, Loader2, ImagePlus, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,9 @@ import {
 import { wardrobeApi } from '@/features/wardrobe/api/wardrobe.api';
 import { toast } from 'sonner';
 import { uploadToCloudinary, applyCloudinaryBackgroundRemoval } from '@/lib/cloudinary';
+import { useFileDropzone } from '@/features/wardrobe/hooks/useFileDropzone';
+import { validateDroppedFiles } from '@/features/wardrobe/utils/file-validation';
+import { cn } from '@/lib/utils';
 
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -52,16 +55,11 @@ export function UploadClient() {
 
   const batchUploadMutation = useBatchUploadWardrobeItems();
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selectedFiles = Array.from(e.target.files);
+  const isUploading = uploadState.status !== 'idle' && uploadState.status !== 'success';
 
-      if (files.length + selectedFiles.length > 5) {
-        toast.error('Bạn chỉ được upload tối đa 5 ảnh mỗi lần!');
-        return;
-      }
-
-      const newFiles = selectedFiles.map((file) => ({
+  const handleIncomingAcceptedFiles = useCallback(
+    (acceptedFiles: File[]) => {
+      const newFiles = acceptedFiles.map((file) => ({
         id: Math.random().toString(36).substring(7),
         file,
         preview: URL.createObjectURL(file),
@@ -69,6 +67,52 @@ export function UploadClient() {
       }));
 
       setFiles((prev) => [...prev, ...newFiles]);
+    },
+    [defaultCategoryId]
+  );
+
+  const emptyDropzone = useFileDropzone({
+    onFilesDrop: handleIncomingAcceptedFiles,
+    maxFiles: 5,
+    currentCount: 0,
+    disabled: isUploading || isLoadingCategories,
+  });
+
+  const previewDropzone = useFileDropzone({
+    onFilesDrop: handleIncomingAcceptedFiles,
+    maxFiles: 5,
+    currentCount: files.length,
+    existingFiles: files.map((f) => f.file),
+    disabled: isUploading || files.length >= 5,
+  });
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      const { acceptedFiles, rejectedFiles } = validateDroppedFiles(selectedFiles, {
+        maxFiles: 5,
+        currentCount: files.length,
+        existingFiles: files.map((f) => f.file),
+      });
+
+      const shownMessages = new Set<string>();
+      rejectedFiles.forEach((rejected) => {
+        if (shownMessages.has(rejected.message)) return;
+        shownMessages.add(rejected.message);
+
+        if (rejected.reason === 'EXCEEDS_COUNT') {
+          toast.warning(rejected.message);
+        } else if (rejected.reason === 'DUPLICATE_FILE') {
+          toast.info(rejected.message);
+        } else {
+          toast.error(rejected.message);
+        }
+      });
+
+      if (acceptedFiles.length > 0) {
+        handleIncomingAcceptedFiles(acceptedFiles);
+      }
+      e.target.value = '';
     }
   };
 
@@ -228,8 +272,6 @@ export function UploadClient() {
     { scope: containerRef, dependencies: [files.length] }
   );
 
-  const isUploading = uploadState.status !== 'idle' && uploadState.status !== 'success';
-
   return (
     <div
       ref={containerRef}
@@ -273,18 +315,57 @@ export function UploadClient() {
               </div>
             ) : (
               <div
+                {...emptyDropzone.getRootProps()}
                 onClick={() => fileInputRef.current?.click()}
-                className="group flex aspect-[16/9] w-full cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed border-border bg-card transition-all duration-200 hover:bg-accent-soft md:aspect-[21/9]"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInputRef.current?.click();
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label="Tải ảnh lên tủ đồ"
+                className={cn(
+                  'group flex aspect-[16/9] w-full cursor-pointer flex-col items-center justify-center gap-6 rounded-2xl border border-dashed transition-all duration-200 outline-none md:aspect-[21/9]',
+                  emptyDropzone.isDragReject
+                    ? 'border-2 border-destructive bg-destructive/5'
+                    : emptyDropzone.isDragActive
+                    ? 'border-2 border-primary bg-primary/5 scale-[1.01] shadow-lg ring-2 ring-primary/20'
+                    : 'border-border bg-card hover:bg-accent-soft hover:border-primary/40 focus-visible:ring-2 focus-visible:ring-ring',
+                  (isUploading || isLoadingCategories) &&
+                    'pointer-events-none opacity-60 cursor-not-allowed'
+                )}
               >
-                <div className="flex size-16 items-center justify-center rounded-2xl border border-border bg-background text-foreground shadow-sm transition-all duration-200 group-hover:scale-105">
-                  <UploadCloud className="size-6 stroke-[1.5]" />
+                <div
+                  className={cn(
+                    'flex size-16 items-center justify-center rounded-2xl border border-border bg-background text-foreground shadow-sm transition-all duration-200',
+                    emptyDropzone.isDragReject
+                      ? 'border-destructive text-destructive'
+                      : emptyDropzone.isDragActive
+                      ? 'scale-110 text-primary border-primary shadow-md'
+                      : 'group-hover:scale-105'
+                  )}
+                >
+                  <UploadCloud
+                    className={cn(
+                      'size-6 stroke-[1.5]',
+                      emptyDropzone.isDragActive && 'animate-bounce text-primary'
+                    )}
+                  />
                 </div>
-                <div className="space-y-3 text-center px-4">
+                <div className="space-y-3 text-center px-4 pointer-events-none select-none">
                   <p className="text-2xl font-semibold tracking-[0.02em] text-foreground">
-                    Tải File Ảnh Lên
+                    {emptyDropzone.isDragReject
+                      ? 'Tệp không hợp lệ hoặc đã đủ 5 ảnh'
+                      : emptyDropzone.isDragActive
+                      ? 'Thả file vào đây để tải lên'
+                      : 'Tải File Ảnh Lên'}
                   </p>
                   <p className="font-semibold text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                    PNG, JPG, HEIC (Tối đa 5 file, mỗi file max 5MB)
+                    {emptyDropzone.isDragActive
+                      ? 'Thả chuột để thêm ngay vào danh sách phân tích'
+                      : 'Kéo thả hoặc bấm để chọn • PNG, JPG, HEIC (Tối đa 5 file, mỗi file max 5MB)'}
                   </p>
                 </div>
               </div>
@@ -303,7 +384,14 @@ export function UploadClient() {
       ) : (
         // Step 2: Preview & Send Action
         <div className="w-full grid md:grid-cols-12 gap-12 items-start gsap-preview-container">
-          <div className="md:col-span-7 flex flex-col h-full space-y-6 pt-2">
+          <div
+            {...previewDropzone.getRootProps()}
+            className={cn(
+              'md:col-span-7 flex flex-col h-full space-y-6 pt-2 rounded-2xl transition-all duration-200 p-2',
+              previewDropzone.isDragActive &&
+                'ring-2 ring-dashed ring-primary/40 bg-primary/[0.02]'
+            )}
+          >
             <div className="flex items-center justify-between border-b border-border pb-4">
               <h2 className="text-2xl font-semibold uppercase tracking-[0.05em] text-foreground">
                 Đã chọn {files.length}/5 ảnh
@@ -382,6 +470,51 @@ export function UploadClient() {
                   </div>
                 </div>
               ))}
+
+              {/* Add more dropzone card when under 5 files */}
+              {!isUploading && files.length < 5 && (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Thêm ảnh vào danh sách"
+                  className={cn(
+                    'preview-card group relative flex aspect-[4/5] cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border border-dashed transition-all duration-200 outline-none',
+                    previewDropzone.isDragReject
+                      ? 'border-2 border-destructive bg-destructive/5'
+                      : previewDropzone.isDragActive
+                      ? 'border-2 border-primary bg-primary/5 scale-[1.02] shadow-md ring-2 ring-primary/20'
+                      : 'border-border bg-card/60 hover:bg-accent-soft hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring'
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'flex size-12 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm transition-all duration-200',
+                      previewDropzone.isDragActive
+                        ? 'scale-110 text-primary border-primary shadow-sm'
+                        : 'group-hover:scale-105'
+                    )}
+                  >
+                    <ImagePlus className="size-5 stroke-[1.5]" />
+                  </div>
+                  <div className="space-y-1 text-center px-3 pointer-events-none select-none">
+                    <p className="text-sm font-semibold tracking-[0.02em] text-foreground">
+                      {previewDropzone.isDragActive ? 'Thả ảnh vào đây' : 'Thêm ảnh'}
+                    </p>
+                    <p className="font-semibold text-[9px] uppercase tracking-[0.1em] text-muted-foreground">
+                      {previewDropzone.isDragActive
+                        ? 'Thả để thêm ảnh'
+                        : `Kéo thả • Còn ${5 - files.length} chỗ`}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <input
