@@ -21,6 +21,7 @@ import {
   ShieldAlert,
   Shirt,
   Building,
+  Gift,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -28,6 +29,7 @@ import { useLogout } from '@/features/auth/queries/auth.queries';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboardIcon },
+  { href: '/admin/campaigns', label: 'Chiến dịch tặng gói', icon: Gift },
   { href: '/admin/users', label: 'Người dùng', icon: UsersIcon },
   { href: '/admin/community', label: 'Cộng đồng', icon: MessageSquareIcon },
   { href: '/admin/wardrobe', label: 'Trang phục', icon: Shirt },

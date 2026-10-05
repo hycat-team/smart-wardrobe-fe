@@ -11,6 +11,7 @@ import {
 import { wardrobeApi } from '@/features/wardrobe/api/wardrobe.api';
 import { toast } from 'sonner';
 import { uploadToCloudinary, applyCloudinaryBackgroundRemoval } from '@/lib/cloudinary';
+import { compressImageToWebP } from '@/lib/image-compression';
 import { useFileDropzone } from '@/features/wardrobe/hooks/useFileDropzone';
 import { validateDroppedFiles } from '@/features/wardrobe/utils/file-validation';
 import { cn } from '@/lib/utils';
@@ -147,8 +148,17 @@ export function UploadClient() {
           total: files.length,
         });
 
+        // Nén ảnh sang WebP sắc nét trước khi tải lên Cloudinary
+        let fileToUpload = item.file;
+        try {
+          fileToUpload = await compressImageToWebP(item.file);
+        } catch (compressionErr) {
+          console.warn('[UploadClient] Không thể nén ảnh, tiếp tục với ảnh gốc:', compressionErr);
+          fileToUpload = item.file;
+        }
+
         const uploadResData = await uploadToCloudinary({
-          file: item.file,
+          file: fileToUpload,
           signatureParams: {
             apiKey: signatureResult.apiKey,
             timestamp: signatureResult.timestamp,
