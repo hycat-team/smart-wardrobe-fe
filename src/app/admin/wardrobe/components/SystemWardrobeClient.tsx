@@ -95,7 +95,7 @@ export function SystemWardrobeClient() {
         </div>
 
         <div className="flex items-center gap-6 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-          <span>Tổng số bản ghi: <strong className="text-foreground">{items.length}</strong></span>
+          <span>Tổng số bản ghi: <strong className="text-foreground">{data?.metadata.totalItems || 0}</strong></span>
           <span>Trạng thái: <strong className="text-primary">Online</strong></span>
         </div>
       </div>

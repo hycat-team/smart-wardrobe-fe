@@ -31,7 +31,7 @@ import { Loader2 } from 'lucide-react';
 
 export function CommunityAdminClient() {
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [postSearchTerm, setPostSearchTerm] = useState('');
   const [postStatusFilter, setPostStatusFilter] = useState('all');
 
   // Modals state
@@ -77,29 +77,27 @@ export function CommunityAdminClient() {
 
           {/* Search bar & Refresh */}
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="relative flex-1 md:w-80">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder={
-                  activeTab === 'posts'
-                    ? 'Tìm bài viết, tác giả, hashtag...'
-                    : 'Tìm bình luận, người gửi...'
-                }
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-11 w-full pl-10 pr-9 bg-card border border-border/80 focus:border-primary focus:ring-1 focus:ring-primary text-xs font-medium transition-all outline-none rounded-full text-foreground placeholder:text-muted-foreground shadow-sm"
-              />
-              {searchTerm && (
-                <button
-                  type="button"
-                  onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="size-3.5" />
-                </button>
-              )}
-            </div>
+            {activeTab === 'posts' && (
+              <div className="relative flex-1 md:w-80">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Tìm bài viết, tác giả, hashtag..."
+                  value={postSearchTerm}
+                  onChange={(e) => setPostSearchTerm(e.target.value)}
+                  className="h-11 w-full pl-10 pr-9 bg-card border border-border/80 focus:border-primary focus:ring-1 focus:ring-primary text-xs font-medium transition-all outline-none rounded-full text-foreground placeholder:text-muted-foreground shadow-sm"
+                />
+                {postSearchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setPostSearchTerm('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                )}
+              </div>
+            )}
 
             <Button
               type="button"
@@ -148,7 +146,7 @@ export function CommunityAdminClient() {
 
         <TabsContent value="posts" className="space-y-6 outline-none">
           <PostModerationTable
-            searchTerm={searchTerm}
+            searchTerm={postSearchTerm}
             statusFilter={postStatusFilter}
             onStatusFilterChange={setPostStatusFilter}
             onSelectPostPreview={(post) => setSelectedPostPreview(post)}
@@ -157,7 +155,7 @@ export function CommunityAdminClient() {
         </TabsContent>
 
         <TabsContent value="comments" className="space-y-6 outline-none">
-          <CommentModerationTable searchTerm={searchTerm} />
+          <CommentModerationTable />
         </TabsContent>
       </Tabs>
 

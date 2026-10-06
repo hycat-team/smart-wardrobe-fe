@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   useAdminComments,
@@ -12,6 +12,8 @@ import { CommentRes } from '@/features/community/types';
 import { getCommunityUserAvatar, getCommunityUserDisplayName } from '@/features/community/utils/community.utils';
 import { Button } from '@/components/ui/button';
 import {
+  Search,
+  X,
   EyeOff,
   RefreshCcw,
   Trash2,
@@ -34,17 +36,43 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export interface CommentModerationTableProps {
-  searchTerm: string;
+  searchTerm?: string;
+  initialSearchTerm?: string;
 }
 
-export function CommentModerationTable({ searchTerm }: CommentModerationTableProps) {
+export function CommentModerationTable({
+  searchTerm = '',
+  initialSearchTerm = '',
+}: CommentModerationTableProps = {}) {
+  const defaultSearch = searchTerm || initialSearchTerm;
+  const [searchInput, setSearchInput] = useState(defaultSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(defaultSearch);
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [commentToDelete, setCommentToDelete] = useState<CommentRes | null>(null);
 
+  useEffect(() => {
+    if (searchTerm !== undefined && searchTerm !== searchInput) {
+      setSearchInput(searchTerm);
+      setDebouncedSearch(searchTerm.trim());
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchInput.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchInput]);
+
+  const handleClearSearch = () => {
+    setSearchInput('');
+    setDebouncedSearch('');
+    setPage(1);
+  };
+
   const { data, isLoading, isError, isFetching, refetch } = useAdminComments({
-    q: searchTerm.trim() || undefined,
-    status: statusFilter === 'all' ? undefined : statusFilter,
+    q: debouncedSearch || undefined,
     page,
     limit: 15,
   });
@@ -67,39 +95,33 @@ export function CommentModerationTable({ searchTerm }: CommentModerationTablePro
 
   return (
     <div className="space-y-6">
-      {/* Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-card p-4 rounded-3xl border border-border/80 shadow-sm">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mr-1">
-            Trạng thái:
-          </span>
-          {[
-            { key: 'all', label: 'Tất cả' },
-            { key: 'active', label: 'Hoạt động' },
-            { key: 'hidden', label: 'Đang ẩn' },
-            { key: 'deleted', label: 'Đã xóa' },
-          ].map((st) => (
+      {/* Search and Stats Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card p-4 rounded-3xl border border-border/80 shadow-sm">
+        <div className="relative flex-1 max-w-md w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm nội dung bình luận..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="h-10 w-full pl-10 pr-9 bg-muted/40 border border-border/80 focus:border-primary focus:bg-card focus:ring-1 focus:ring-primary text-xs font-medium transition-all outline-none rounded-full text-foreground placeholder:text-muted-foreground shadow-sm"
+          />
+          {isFetching && !isLoading ? (
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 text-primary animate-spin" />
+          ) : searchInput ? (
             <button
-              key={st.key}
               type="button"
-              onClick={() => {
-                setStatusFilter(st.key);
-                setPage(1);
-              }}
-              className={cn(
-                'px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer',
-                statusFilter === st.key
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted'
-              )}
+              onClick={handleClearSearch}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              title="Xóa tìm kiếm"
             >
-              {st.label}
+              <X className="size-3.5" />
             </button>
-          ))}
+          ) : null}
         </div>
 
         {metadata && (
-          <span className="text-xs text-muted-foreground font-medium">
+          <span className="text-xs text-muted-foreground font-medium shrink-0">
             Tổng cộng <strong className="text-foreground">{metadata.totalItems}</strong> bình luận
           </span>
         )}
@@ -129,7 +151,9 @@ export function CommentModerationTable({ searchTerm }: CommentModerationTablePro
         <div className="p-16 text-center bg-card rounded-3xl border border-dashed border-border text-muted-foreground space-y-2">
           <p className="text-sm font-semibold text-foreground">Không tìm thấy bình luận nào</p>
           <p className="text-xs text-muted-foreground">
-            {searchTerm ? `Không có bình luận khớp với từ khóa "${searchTerm}".` : 'Chưa có bình luận nào trong trạng thái này.'}
+            {debouncedSearch
+              ? `Không có bình luận khớp với từ khóa "${debouncedSearch}".`
+              : 'Chưa có bình luận nào trên toàn sàn.'}
           </p>
         </div>
       ) : (

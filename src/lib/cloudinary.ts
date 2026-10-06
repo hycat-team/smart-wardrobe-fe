@@ -50,12 +50,14 @@ export async function uploadToCloudinary({
     formData.append("allowed_formats", signatureParams.allowedFormats);
   }
 
-  // Chỉ gửi `public_id` khi backend đã ký nó (trả về publicId khác rỗng).
-  // KHÔNG gửi thêm field camelCase `publicId`: Cloudinary không có param này
-  // và sẽ đưa nó vào string-to-sign gây Invalid Signature.
+  // Chỉ gửi `public_id` và `overwrite` khi backend đã ký nó (trả về publicId khác rỗng).
+  // Endpoint avatar-signature ký cả public_id và overwrite=true. Cloudinary tính lại chữ ký
+  // từ đúng các field client gửi lên — thiếu overwrite là lệch chữ ký gây Invalid Signature.
+  // KHÔNG gửi thêm field camelCase `publicId`: Cloudinary không có param này và sẽ làm hỏng chữ ký.
   const pid = signatureParams.publicId || signatureParams.public_id;
   if (pid) {
     formData.append("public_id", pid);
+    formData.append("overwrite", "true");
   }
 
   const preset = signatureParams.uploadPreset || signatureParams.upload_preset;

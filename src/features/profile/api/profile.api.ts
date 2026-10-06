@@ -24,8 +24,8 @@ export const profileApi = {
     return { message: res.data.message };
   },
 
-  getAvatarSignature: async (): Promise<{ signature: string; timestamp: number; folder: string; apiKey: string }> => {
-    const res = await api.get<{ data: { signature: string; timestamp: number; folder: string; apiKey: string } }>('/me/avatar-signature');
+  getAvatarSignature: async (): Promise<{ signature: string; timestamp: number; folder: string; apiKey: string; publicId?: string }> => {
+    const res = await api.get<{ data: { signature: string; timestamp: number; folder: string; apiKey: string; publicId?: string } }>('/me/avatar-signature');
     return res.data.data;
   },
 

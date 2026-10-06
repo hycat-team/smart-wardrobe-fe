@@ -32,7 +32,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { useAdminUsers, useUpdateUserStatus } from "@/features/admin/queries/admin.queries";
-import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function UsersClient() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,13 +103,12 @@ export function UsersClient() {
                 <TableRow key={user.id} className={cn("border-b border-border hover:bg-muted/50 transition-colors", !isActive && "opacity-60")}>
                   <TableCell className="py-5">
                     <div className="flex items-center gap-4">
-                      <div className="size-10 bg-muted flex items-center justify-center font-semibold text-lg text-foreground overflow-hidden shrink-0 rounded-full">
-                        {user.avatarUrl ? (
-                          <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={user.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
-                        ) : (
-                          displayName.charAt(0).toUpperCase()
-                        )}
-                      </div>
+                      <Avatar className="size-10 shrink-0">
+                        <AvatarImage src={user.avatarUrl || undefined} alt={displayName} className="object-cover" />
+                        <AvatarFallback className="font-semibold text-base text-foreground bg-muted">
+                          {displayName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
                       <div className="flex flex-col overflow-hidden">
                         <span className="font-semibold font-medium text-base text-foreground truncate">{displayName}</span>
                         <span className="font-semibold text-[10px] text-muted-foreground truncate uppercase tracking-wider mt-0.5">{user.email}</span>
@@ -224,13 +223,12 @@ export function UsersClient() {
           {selectedUser && (
             <div className="flex flex-col">
               <div className="p-8 border-b border-border flex flex-col items-center gap-6">
-                <div className="size-24 bg-muted flex items-center justify-center font-semibold text-3xl text-foreground rounded-full overflow-hidden">
-                  {selectedUser.avatarUrl ? (
-                    <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={selectedUser.avatarUrl} alt={selectedUser.username} className="w-full h-full object-cover" />
-                  ) : (
-                    (selectedUser.firstName?.[0] || selectedUser.username?.[0] || 'U').toUpperCase()
-                  )}
-                </div>
+                <Avatar className="size-24 shrink-0">
+                  <AvatarImage src={selectedUser.avatarUrl || undefined} alt={selectedUser.username} className="object-cover" />
+                  <AvatarFallback className="font-semibold text-3xl text-foreground bg-muted">
+                    {(selectedUser.firstName?.[0] || selectedUser.username?.[0] || 'U').toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="text-center space-y-1">
                   <h3 className="font-semibold text-3xl font-medium text-foreground">
                     {`${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim() || selectedUser.username || 'Người dùng'}

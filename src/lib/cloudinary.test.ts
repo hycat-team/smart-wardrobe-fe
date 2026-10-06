@@ -53,24 +53,35 @@ describe('uploadToCloudinary form contract (Cloudinary signature)', () => {
     expect(fd.get('publicId')).toBeNull();
   });
 
-  it('KHÔNG gửi field camelCase publicId (làm hỏng chữ ký)', async () => {
+  it('gửi public_id và overwrite="true" khi có publicId, KHÔNG gửi field camelCase publicId', async () => {
     await uploadToCloudinary({
       file: new File(['a'], 'a.jpg', { type: 'image/jpeg' }),
       signatureParams: {
         apiKey: 'key',
         timestamp: 1,
         signature: 'sig',
-        folder: 'smart_wardrobe/items',
+        folder: 'smart_wardrobe/avatars',
         publicId: 'some-id',
       },
     });
 
     const fd = lastFormData();
     expect(fd.get('public_id')).toBe('some-id');
+    expect(fd.get('overwrite')).toBe('true');
     expect(fd.get('publicId')).toBeNull();
+    // Bắt buộc đúng 7 field: file, api_key, timestamp, signature, folder, public_id, overwrite
+    expect(formKeys(fd)).toEqual([
+      'api_key',
+      'file',
+      'folder',
+      'overwrite',
+      'public_id',
+      'signature',
+      'timestamp',
+    ]);
   });
 
-  it('không gửi allowed_formats khi backend không ký (endpoint cũ)', async () => {
+  it('không gửi allowed_formats, public_id, overwrite khi backend không ký (endpoint upload thường)', async () => {
     await uploadToCloudinary({
       file: new File(['a'], 'a.jpg', { type: 'image/jpeg' }),
       signatureParams: {
@@ -83,5 +94,8 @@ describe('uploadToCloudinary form contract (Cloudinary signature)', () => {
 
     const fd = lastFormData();
     expect(formKeys(fd)).toEqual(['api_key', 'file', 'folder', 'signature', 'timestamp']);
+    expect(fd.get('public_id')).toBeNull();
+    expect(fd.get('overwrite')).toBeNull();
+    expect(fd.get('allowed_formats')).toBeNull();
   });
 });
