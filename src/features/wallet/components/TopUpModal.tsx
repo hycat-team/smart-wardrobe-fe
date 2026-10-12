@@ -27,8 +27,10 @@ export function TopUpModal({ open, onOpenChange }: Props) {
     }
     setError('');
 
+    const resultUrl = `${window.location.origin}/payment/result?flow=topup&next=${encodeURIComponent('/profile?tab=wallet')}`;
+
     topUpMutation.mutate(
-      { amount: numAmount, returnUrl: window.location.href, cancelUrl: window.location.href },
+      { amount: numAmount, returnUrl: resultUrl, cancelUrl: resultUrl },
       {
         onSuccess: (data) => {
           if (data.paymentUrl) {

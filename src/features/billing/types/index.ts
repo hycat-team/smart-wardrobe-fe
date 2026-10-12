@@ -17,14 +17,19 @@ export interface Statement {
 
 export interface DirectPurchaseReq {
   planSlug: string;
+  returnUrl?: string;
+  cancelUrl?: string;
 }
 
 export interface TopUpReq {
   amount: number;
+  returnUrl?: string;
+  cancelUrl?: string;
 }
 
 export interface PaymentLinkRes {
   checkoutUrl?: string;
   paymentUrl?: string;
   paymentLinkId?: string;
+  orderCode?: number;
 }
