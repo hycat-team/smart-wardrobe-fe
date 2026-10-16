@@ -136,3 +136,44 @@ export const isNotFoundError = (error: unknown) =>
   error.response !== null &&
   'status' in error.response &&
   error.response.status === 404;
+
+export const DASHBOARD_PALETTE = [
+  '#0f766e',
+  '#d97706',
+  '#2563eb',
+  '#dc2626',
+  '#7c3aed',
+  '#64748b',
+];
+
+export const PLAN_COLORS: Record<string, string> = {
+  free: '#0f766e',
+  'premium-monthly': '#d97706',
+  'premium_monthly': '#d97706',
+  'premium-yearly': '#2563eb',
+  'premium_yearly': '#2563eb',
+};
+
+export const getPlanColor = (planCode?: string | null, fallbackIndex = 0): string => {
+  if (!planCode) {
+    return DASHBOARD_PALETTE[fallbackIndex % DASHBOARD_PALETTE.length];
+  }
+
+  const normalized = planCode.toLowerCase().trim().replace(/[\s_-]+/g, '-');
+
+  if (PLAN_COLORS[normalized]) {
+    return PLAN_COLORS[normalized];
+  }
+
+  if (normalized.includes('yearly') || normalized.includes('annual')) {
+    return '#2563eb';
+  }
+  if (normalized.includes('premium') || normalized.includes('monthly')) {
+    return '#d97706';
+  }
+  if (normalized.includes('free')) {
+    return '#0f766e';
+  }
+
+  return DASHBOARD_PALETTE[fallbackIndex % DASHBOARD_PALETTE.length];
+};

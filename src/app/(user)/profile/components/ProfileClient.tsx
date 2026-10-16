@@ -1,6 +1,7 @@
 'use client';
 import { useAuthStore } from '@/store/useAuthStore';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Settings,
   Crown,
@@ -19,7 +20,7 @@ import { WalletPageContent } from '@/features/wallet/components/WalletPageConten
 import { UserRes } from '@/features/profile/types';
 import { useProfile, useUpdateAvatar } from '@/features/profile/queries/profile.queries';
 import { getUserAvatar } from '@/lib/utils';
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { useDailyQuota, useMySubscription } from '@/features/subscription/queries/subscription.queries';
 import { useWardrobeStats } from '@/features/wardrobe/queries/wardrobe.queries';
@@ -31,6 +32,10 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
 export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+
   // Pass initialProfile to useProfile so React Query hydrates it immediately
   const { data: profile } = useProfile(initialProfile);
 
@@ -47,7 +52,9 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   const { data: wardrobeStats } = useWardrobeStats();
 
   const [isUploading, setIsUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'wallet'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'wallet'>(
+    tabParam === 'wallet' ? 'wallet' : 'overview'
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutate: updateAvatar } = useUpdateAvatar();
 
@@ -168,7 +175,10 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
 
       <Tabs
         value={activeTab}
-        onValueChange={(val) => setActiveTab(val as 'overview' | 'wallet')}
+        onValueChange={(val) => {
+          setActiveTab(val as 'overview' | 'wallet');
+          router.replace('/profile?tab=' + val, { scroll: false });
+        }}
         className="w-full"
       >
         <TabsList className="relative grid w-full grid-cols-2 max-w-[400px] mb-8 p-1.5 h-13 rounded-full mx-auto md:mx-0 bg-stone-100/95 dark:bg-stone-900/95 border border-stone-200/90 dark:border-stone-800 shadow-[0_12px_28px_-4px_rgba(0,0,0,0.22),0_4px_12px_-2px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_32px_-4px_rgba(0,0,0,0.7)] backdrop-blur-md">

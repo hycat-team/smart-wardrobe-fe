@@ -15,7 +15,8 @@ export const TopupModal = () => {
 
   const handleTopup = () => {
     if (!amount || amount < 10000) return;
-    topupMutation.mutate({ amount: Number(amount) });
+    const resultUrl = `${window.location.origin}/payment/result?flow=topup&next=${encodeURIComponent('/profile?tab=wallet')}`;
+    topupMutation.mutate({ amount: Number(amount), returnUrl: resultUrl, cancelUrl: resultUrl });
   };
 
   return (

@@ -27,10 +27,9 @@ import {
   formatCompactNumber,
   formatNumber,
   formatVND,
+  getPlanColor,
   isNotFoundError,
 } from '@/features/admin/utils/dashboard';
-
-const COLORS = ['#0f766e', '#d97706', '#2563eb', '#dc2626', '#7c3aed', '#64748b'];
 
 type QueryState<T> = Pick<
   UseQueryResult<T | null>,
@@ -97,9 +96,6 @@ function DistributionPanel({ query }: { query: QueryState<SubscriptionDistributi
   if (data && !data.distribution && data.data) {
     data = data.data;
   }
-  if (data && !data.distribution && data.data) {
-    data = data.data;
-  }
 
   const rows = data?.distribution ?? [];
   const totalUsers = data?.totalUsers ?? 0;
@@ -132,7 +128,7 @@ function DistributionPanel({ query }: { query: QueryState<SubscriptionDistributi
                     className="h-full rounded-full"
                     style={{
                       width: `${Math.min(100, item.percentage)}%`,
-                      backgroundColor: COLORS[index % COLORS.length],
+                      backgroundColor: getPlanColor(item.planCode, index),
                     }}
                   />
                 </div>
@@ -156,13 +152,9 @@ function RevenuePanel({ query }: { query: QueryState<RevenueBreakdown> }) {
   if (data && !data.breakdown && data.data) {
     data = data.data;
   }
-  if (data && !data.breakdown && data.data) {
-    data = data.data;
-  }
 
   const breakdown = data?.breakdown ?? [];
   const totalRevenueVnd = data?.totalRevenueVnd ?? 0;
-  console.log(data)
   const plans = Array.from(new Set(breakdown.map((item: any) => item.planCode)));
   const rows = Array.from(new Set(breakdown.map((item: any) => item.month)))
     .sort()
@@ -205,7 +197,7 @@ function RevenuePanel({ query }: { query: QueryState<RevenueBreakdown> }) {
                     key={plan}
                     dataKey={plan}
                     stackId="revenue"
-                    fill={COLORS[index % COLORS.length]}
+                    fill={getPlanColor(plan, index)}
                     radius={index === plans.length - 1 ? [4, 4, 0, 0] : 0}
                   />
                 ))}

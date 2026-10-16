@@ -1,6 +1,7 @@
 import {
   buildAdminAnalyticsRequest,
   getDefaultDashboardDateRange,
+  getPlanColor,
   normalizeDashboardFilters,
   safePercentage,
 } from './dashboard';
@@ -75,5 +76,30 @@ describe('dashboard utils', () => {
   it('không chia cho 0 khi tính phần trăm', () => {
     expect(safePercentage(2, 10)).toBe(20);
     expect(safePercentage(2, 0)).toBe(0);
+  });
+
+  describe('getPlanColor', () => {
+    it('trả về màu amber nhất quán cho gói Premium', () => {
+      expect(getPlanColor('premium-monthly', 0)).toBe('#d97706');
+      expect(getPlanColor('PREMIUM_MONTHLY', 0)).toBe('#d97706');
+      expect(getPlanColor('premium_monthly', 1)).toBe('#d97706');
+      expect(getPlanColor('premium', 0)).toBe('#d97706');
+    });
+
+    it('trả về màu teal cho gói Free', () => {
+      expect(getPlanColor('free', 0)).toBe('#0f766e');
+      expect(getPlanColor('FREE', 1)).toBe('#0f766e');
+    });
+
+    it('trả về màu blue cho gói Premium Yearly', () => {
+      expect(getPlanColor('premium-yearly', 0)).toBe('#2563eb');
+      expect(getPlanColor('PREMIUM_YEARLY', 1)).toBe('#2563eb');
+    });
+
+    it('fallback màu theo index khi không xác định được mã gói', () => {
+      expect(getPlanColor(undefined, 0)).toBe('#0f766e');
+      expect(getPlanColor(undefined, 1)).toBe('#d97706');
+      expect(getPlanColor('unknown-custom-plan', 2)).toBe('#2563eb');
+    });
   });
 });
