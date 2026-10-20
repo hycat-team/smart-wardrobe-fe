@@ -8,6 +8,7 @@ import * as queries from '@/features/admin/queries/dashboard.queries';
 
 const mockPush = jest.fn();
 const mockOverviewRefetch = jest.fn().mockResolvedValue({});
+const mockPayosRefetch = jest.fn().mockResolvedValue({});
 const mockMarginRefetch = jest.fn().mockResolvedValue({});
 const mockAnalyticsRefetch = jest.fn().mockResolvedValue({});
 const mockEventsRefetch = jest.fn().mockResolvedValue({});
@@ -28,11 +29,11 @@ jest.mock('@/features/admin/queries/dashboard.queries');
 jest.mock('./DashboardToolbar', () => ({
   DashboardToolbar: (props: {
     onRefresh: () => void;
-    onApply: (from: string, to: string) => void;
+    onApply: (period: { preset: string; fromDate: string; toDate: string }) => void;
   }) => (
     <div>
       <button onClick={props.onRefresh}>Làm mới test</button>
-      <button onClick={() => props.onApply('2026-07-01', '2026-07-23')}>
+      <button onClick={() => props.onApply({ preset: 'this_month', fromDate: '2026-07-01', toDate: '2026-07-23' })}>
         Áp dụng test
       </button>
     </div>
@@ -113,6 +114,9 @@ const queryResult = (
 describe('DashboardClient', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (queries.useDashboardPayOSReconciliation as jest.Mock).mockReturnValue(
+      queryResult(null, mockPayosRefetch),
+    );
     (queries.useDashboardOverview as jest.Mock).mockReturnValue(
       queryResult(initialData.overview, mockOverviewRefetch),
     );
@@ -156,6 +160,7 @@ describe('DashboardClient', () => {
 
     await waitFor(() => {
       expect(mockOverviewRefetch).toHaveBeenCalled();
+      expect(mockPayosRefetch).toHaveBeenCalled();
       expect(mockAnalyticsRefetch).toHaveBeenCalled();
       expect(mockEventsRefetch).toHaveBeenCalled();
       expect(mockDistributionRefetch).toHaveBeenCalled();
@@ -176,7 +181,7 @@ describe('DashboardClient', () => {
 
     fireEvent.click(screen.getByText('Áp dụng test'));
     expect(mockPush).toHaveBeenCalledWith(
-      '/admin/dashboard?fromDate=2026-07-01&toDate=2026-07-23',
+      '/admin/dashboard?preset=this_month&fromDate=2026-07-01&toDate=2026-07-23&aiPage=1',
       { scroll: false },
     );
 

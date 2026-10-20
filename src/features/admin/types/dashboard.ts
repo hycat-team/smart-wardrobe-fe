@@ -1,4 +1,5 @@
 import type { PaginationResult } from '@/types/api';
+import type { PeriodPreset } from './period';
 
 export const ADMIN_METRIC_KEYS = [
   'total_users',
@@ -157,6 +158,7 @@ export interface AIEventQuery {
 export type AIEventList = PaginationResult<AIEvent>;
 
 export interface DashboardFilters {
+  preset?: PeriodPreset;
   fromDate: string;
   toDate: string;
   aiStatus: string;

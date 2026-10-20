@@ -1,80 +1,72 @@
-import {
-  format,
-  isValid,
-} from 'date-fns';
+import { isValid } from 'date-fns';
 import {
   ADMIN_METRIC_KEYS,
   DashboardFilters,
   DashboardSearchParams,
   DynamicQueryRequest,
 } from '../types';
+import {
+  daysAgoVN,
+  getPeriodDateRange as getCommonPeriodDateRange,
+  parsePeriodFromParams,
+  startOfMonthVN,
+  todayVN,
+} from './period';
+
+export * from './period';
 
 export const DASHBOARD_DATE_FORMAT = 'yyyy-MM-dd';
-export const DASHBOARD_DEFAULT_LOOKBACK_DAYS = 29; // 30 ngày lịch tính cả hôm nay
+export const DASHBOARD_DEFAULT_LOOKBACK_DAYS = 29; // 30 ngày lịch tính cả hôm nay (legacy reference)
 export const DASHBOARD_MAX_DATE_RANGE_DAYS = 730;
 export const DASHBOARD_AI_EVENTS_LIMIT = 20;
 
 const firstValue = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 
-// Sinh chuỗi YYYY-MM-DD theo LỊCH VN — KHÔNG dùng toISOString() (UTC)
-export const vnDate = (d: Date): string =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(d);
-
-export const todayVN = (now = new Date()): string => vnDate(now);
-
-export const startOfMonthVN = (now = new Date()): string => todayVN(now).slice(0, 8) + '01'; // YYYY-MM-01
-
-export const daysAgoVN = (n: number, now = new Date()): string =>
-  vnDate(new Date(now.getTime() - n * 86_400_000));
-
 export const getPresetDateRange = (
   preset: 'today' | 'this_month' | 'last_30_days',
-  now = new Date(),
+  now = new Date()
 ) => {
-  const today = todayVN(now);
-  switch (preset) {
-    case 'today':
-      return { fromDate: today, toDate: today };
-    case 'this_month':
-      return { fromDate: startOfMonthVN(now), toDate: today };
-    case 'last_30_days':
-      return { fromDate: daysAgoVN(29, now), toDate: today };
+  if (preset === 'last_30_days') {
+    return { fromDate: daysAgoVN(29, now), toDate: todayVN(now) };
   }
+  return getCommonPeriodDateRange(preset, now);
 };
 
 export const getDefaultDashboardDateRange = (now = new Date()) => {
   return {
-    fromDate: daysAgoVN(DASHBOARD_DEFAULT_LOOKBACK_DAYS, now),
+    fromDate: startOfMonthVN(now),
     toDate: todayVN(now),
   };
 };
 
 /**
  * Chuẩn hóa tham số dashboard.
+ * Mặc định khi không có query param là "Tháng này" (01 đến hôm nay giờ VN).
  * LƯU Ý: Không im lặng chuyển khoảng ngày sai về 30 ngày mặc định
  * để người dùng nhận diện lỗi (hoặc BE trả 400 và FE hiển thị rõ).
  */
 export const normalizeDashboardFilters = (
   params: DashboardSearchParams,
-  now = new Date(),
+  now = new Date()
 ): DashboardFilters => {
-  const fallback = getDefaultDashboardDateRange(now);
-  const rawFrom = firstValue(params.fromDate)?.trim();
-  const rawTo = firstValue(params.toDate)?.trim();
-
-  // Chỉ fallback khi không truyền tham số
-  const fromDate = rawFrom || fallback.fromDate;
-  const toDate = rawTo || fallback.toDate;
+  const parsedPeriod = parsePeriodFromParams(
+    {
+      preset: firstValue(params.preset),
+      fromDate: firstValue(params.fromDate),
+      toDate: firstValue(params.toDate),
+    },
+    now
+  );
 
   const page = Number.parseInt(firstValue(params.aiPage) ?? '1', 10);
-  const insightTab = firstValue(params.insightTab) === 'ai'
-    ? 'ai'
-    : 'subscriptions';
+  const insightTab =
+    firstValue(params.insightTab) === 'ai' ? 'ai' : 'subscriptions';
 
   return {
-    fromDate,
-    toDate,
+    preset: parsedPeriod.preset,
+    fromDate: parsedPeriod.fromDate,
+    toDate: parsedPeriod.toDate,
     aiStatus: firstValue(params.aiStatus)?.trim() ?? '',
     aiPage: Number.isFinite(page) && page > 0 ? page : 1,
     insightTab,
@@ -83,7 +75,7 @@ export const normalizeDashboardFilters = (
 
 export const hasCustomDashboardDateRange = (
   filters: DashboardFilters,
-  now = new Date(),
+  now = new Date()
 ) => {
   const fallback = getDefaultDashboardDateRange(now);
   return (
@@ -93,7 +85,7 @@ export const hasCustomDashboardDateRange = (
 };
 
 export const buildAdminAnalyticsRequest = (
-  filters: DashboardFilters,
+  filters: DashboardFilters
 ): DynamicQueryRequest => ({
   targetDashboard: 'admin',
   metrics: [...ADMIN_METRIC_KEYS],
@@ -164,7 +156,11 @@ export const formatDashboardDateTime = (value?: string | null) => {
 };
 
 export const safePercentage = (numerator: number, denominator: number) => {
-  if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator <= 0) {
+  if (
+    !Number.isFinite(numerator) ||
+    !Number.isFinite(denominator) ||
+    denominator <= 0
+  ) {
     return 0;
   }
   return (numerator / denominator) * 100;
@@ -191,12 +187,15 @@ export const DASHBOARD_PALETTE = [
 export const PLAN_COLORS: Record<string, string> = {
   free: '#0f766e',
   'premium-monthly': '#d97706',
-  'premium_monthly': '#d97706',
+  premium_monthly: '#d97706',
   'premium-yearly': '#2563eb',
-  'premium_yearly': '#2563eb',
+  premium_yearly: '#2563eb',
 };
 
-export const getPlanColor = (planCode?: string | null, fallbackIndex = 0): string => {
+export const getPlanColor = (
+  planCode?: string | null,
+  fallbackIndex = 0
+): string => {
   if (!planCode) {
     return DASHBOARD_PALETTE[fallbackIndex % DASHBOARD_PALETTE.length];
   }

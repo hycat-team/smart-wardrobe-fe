@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useActivityEvents } from '@/features/admin/queries/activity.queries';
 import type { ActivityEventQuery } from '@/features/admin/types/activity';
+import { parsePeriodFromParams } from '@/features/admin/utils/period';
 import { ActivityEventsToolbar } from './ActivityEventsToolbar';
 import { ActivityEventsTable } from './ActivityEventsTable';
 
@@ -14,16 +15,24 @@ export function ActivityEventsClient() {
   // Read URL search params
   const userIdParam = searchParams.get('userId') || undefined;
   const activityTypeParam = searchParams.get('activityType') || undefined;
-  const fromDateParam = searchParams.get('fromDate') || undefined;
-  const toDateParam = searchParams.get('toDate') || undefined;
+  const rawPreset = searchParams.get('preset') || undefined;
+  const rawFromDate = searchParams.get('fromDate') || undefined;
+  const rawToDate = searchParams.get('toDate') || undefined;
   const pageParam = Number(searchParams.get('page')) || 1;
   const limitParam = Number(searchParams.get('limit')) || 20;
+
+  // Chuẩn hóa kỳ theo URL hoặc mặc định Tháng này
+  const period = parsePeriodFromParams({
+    preset: rawPreset,
+    fromDate: rawFromDate,
+    toDate: rawToDate,
+  });
 
   const queryParams: ActivityEventQuery = {
     userId: userIdParam,
     activityType: activityTypeParam,
-    fromDate: fromDateParam,
-    toDate: toDateParam,
+    fromDate: period.fromDate,
+    toDate: period.toDate,
     page: pageParam,
     limit: limitParam,
   };
@@ -36,7 +45,9 @@ export function ActivityEventsClient() {
     error: listError,
   } = useActivityEvents(queryParams);
 
-  const updateParams = (updates: Record<string, string | number | null | undefined>) => {
+  const updateParams = (
+    updates: Record<string, string | number | null | undefined>
+  ) => {
     const next = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
       if (value === null || value === undefined || value === '') {
@@ -49,10 +60,25 @@ export function ActivityEventsClient() {
     router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
 
+  const handleReset = () => {
+    updateParams({
+      userId: null,
+      activityType: null,
+      preset: null,
+      fromDate: null,
+      toDate: null,
+      page: 1,
+    });
+  };
+
   // Error message extraction from backend response
+  const listErr = listError as {
+    response?: { data?: { message?: string } };
+    message?: string;
+  } | null;
   const errorMessage =
-    (listError as any)?.response?.data?.message ||
-    (listError as any)?.message ||
+    listErr?.response?.data?.message ||
+    listErr?.message ||
     null;
 
   return (
@@ -60,29 +86,12 @@ export function ActivityEventsClient() {
       <ActivityEventsToolbar
         userId={userIdParam}
         activityType={activityTypeParam}
-        fromDate={fromDateParam}
-        toDate={toDateParam}
+        preset={period.preset}
+        fromDate={period.fromDate}
+        toDate={period.toDate}
         limit={limitParam}
-        onFilterChange={({ userId, activityType, fromDate, toDate, limit }) =>
-          updateParams({
-            userId: userId !== undefined ? userId : userIdParam,
-            activityType: activityType !== undefined ? activityType : activityTypeParam,
-            fromDate: fromDate !== undefined ? fromDate : fromDateParam,
-            toDate: toDate !== undefined ? toDate : toDateParam,
-            limit: limit !== undefined ? limit : limitParam,
-            page: 1, // Reset to page 1 on filter change
-          })
-        }
-        onReset={() =>
-          updateParams({
-            userId: null,
-            activityType: null,
-            fromDate: null,
-            toDate: null,
-            page: null,
-            limit: null,
-          })
-        }
+        onFilterChange={updateParams}
+        onReset={handleReset}
         onRefresh={() => void refetchList()}
         isRefreshing={isListFetching}
         errorMessage={errorMessage}
@@ -92,18 +101,10 @@ export function ActivityEventsClient() {
         data={listData}
         isLoading={isListLoading}
         isFetching={isListFetching}
-        error={listError}
+        page={pageParam}
+        limit={limitParam}
         onPageChange={(page) => updateParams({ page })}
-        onClearFilters={() =>
-          updateParams({
-            userId: null,
-            activityType: null,
-            fromDate: null,
-            toDate: null,
-            page: 1,
-          })
-        }
-        onRetry={() => void refetchList()}
+        onUserClick={(userId) => updateParams({ userId, page: 1 })}
       />
     </div>
   );

@@ -13,9 +13,9 @@ import {
 describe('dashboard utils', () => {
   const now = new Date(2026, 6, 23, 12, 0, 0); // 2026-07-23 12:00:00
 
-  it('tạo khoảng ngày mặc định 30 ngày (29 ngày lùi + hôm nay) theo giờ Việt Nam', () => {
+  it('tạo khoảng ngày mặc định tháng này (01 đến hôm nay) theo giờ Việt Nam', () => {
     expect(getDefaultDashboardDateRange(now)).toEqual({
-      fromDate: '2026-06-24',
+      fromDate: '2026-07-01',
       toDate: '2026-07-23',
     });
   });
@@ -61,9 +61,10 @@ describe('dashboard utils', () => {
           aiPage: '3',
           insightTab: 'ai',
         },
-        now,
-      ),
+        now
+      )
     ).toEqual({
+      preset: 'this_month',
       fromDate: '2026-07-01',
       toDate: '2026-07-23',
       aiStatus: 'FAILED',
@@ -79,9 +80,10 @@ describe('dashboard utils', () => {
     expect(result.toDate).toBe('2026-07-23');
   });
 
-  it('fallback về mặc định khi không truyền fromDate hoặc toDate', () => {
+  it('fallback về mặc định Tháng này khi không truyền fromDate hoặc toDate', () => {
     const emptyResult = normalizeDashboardFilters({}, now);
-    expect(emptyResult.fromDate).toBe('2026-06-24');
+    expect(emptyResult.preset).toBe('this_month');
+    expect(emptyResult.fromDate).toBe('2026-07-01');
     expect(emptyResult.toDate).toBe('2026-07-23');
   });
 
@@ -102,7 +104,7 @@ describe('dashboard utils', () => {
         'net_ai_margin_vnd',
       ],
       timeframe: {
-        fromDate: '2026-06-24',
+        fromDate: '2026-07-01',
         toDate: '2026-07-23',
       },
       granularity: 'day',

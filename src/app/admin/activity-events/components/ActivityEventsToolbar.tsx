@@ -1,12 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { format, parse } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import type { DateRange } from 'react-day-picker';
+import { useState } from 'react';
 import {
   AlertCircle,
-  CalendarDays,
   Filter,
   RefreshCw,
   RotateCcw,
@@ -14,13 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -28,15 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  DASHBOARD_DATE_FORMAT,
-  getPresetDateRange,
-} from '@/features/admin/utils/dashboard';
+import { AdminPeriodNavigator } from '@/features/admin/components/AdminPeriodNavigator';
+import type { PeriodPreset } from '@/features/admin/types/period';
 import { isValidUUID } from '@/features/admin/utils/activity';
 
 export function ActivityEventsToolbar({
   userId,
   activityType,
+  preset,
   fromDate,
   toDate,
   limit,
@@ -48,15 +37,18 @@ export function ActivityEventsToolbar({
 }: {
   userId?: string;
   activityType?: string;
-  fromDate?: string;
-  toDate?: string;
+  preset?: PeriodPreset;
+  fromDate: string;
+  toDate: string;
   limit: number;
   onFilterChange: (updates: {
     userId?: string | null;
     activityType?: string | null;
+    preset?: string | null;
     fromDate?: string | null;
     toDate?: string | null;
     limit?: number;
+    page?: number;
   }) => void;
   onReset: () => void;
   onRefresh: () => void;
@@ -64,66 +56,31 @@ export function ActivityEventsToolbar({
   errorMessage?: string | null;
 }) {
   const [searchInput, setSearchInput] = useState(userId || '');
+  const [prevUserId, setPrevUserId] = useState(userId || '');
   const [uuidError, setUuidError] = useState<string | null>(null);
 
-  useEffect(() => {
+  if (userId !== prevUserId) {
+    setPrevUserId(userId || '');
     setSearchInput(userId || '');
-  }, [userId]);
-
-  const [range, setRange] = useState<DateRange | undefined>(() => {
-    if (fromDate && toDate) {
-      try {
-        return {
-          from: parse(fromDate, DASHBOARD_DATE_FORMAT, new Date()),
-          to: parse(toDate, DASHBOARD_DATE_FORMAT, new Date()),
-        };
-      } catch {
-        return undefined;
-      }
-    }
-    return undefined;
-  });
+  }
 
   const handleSearchSubmit = () => {
     const trimmed = searchInput.trim();
     if (trimmed && !isValidUUID(trimmed)) {
-      setUuidError('Mã người dùng phải đúng định dạng UUID (ví dụ: 1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f)');
+      setUuidError(
+        'Mã người dùng phải đúng định dạng UUID (ví dụ: 1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f)'
+      );
       return;
     }
     setUuidError(null);
-    onFilterChange({ userId: trimmed || null });
+    onFilterChange({ userId: trimmed || null, page: 1 });
   };
 
   const handleClearSearch = () => {
     setSearchInput('');
     setUuidError(null);
-    onFilterChange({ userId: null });
+    onFilterChange({ userId: null, page: 1 });
   };
-
-  const applyRange = (newRange: DateRange | undefined) => {
-    if (!newRange?.from || !newRange.to) return;
-    onFilterChange({
-      fromDate: format(newRange.from, DASHBOARD_DATE_FORMAT),
-      toDate: format(newRange.to, DASHBOARD_DATE_FORMAT),
-    });
-  };
-
-  const applyPreset = (preset: 'today' | 'this_month' | 'last_30_days') => {
-    const p = getPresetDateRange(preset);
-    setRange({
-      from: parse(p.fromDate, DASHBOARD_DATE_FORMAT, new Date()),
-      to: parse(p.toDate, DASHBOARD_DATE_FORMAT, new Date()),
-    });
-    onFilterChange({ fromDate: p.fromDate, toDate: p.toDate });
-  };
-
-  const rangeLabel =
-    fromDate && toDate
-      ? `${format(parse(fromDate, DASHBOARD_DATE_FORMAT, new Date()), 'dd/MM/yyyy')} – ${format(
-          parse(toDate, DASHBOARD_DATE_FORMAT, new Date()),
-          'dd/MM/yyyy',
-        )}`
-      : 'Khoảng thời gian';
 
   return (
     <div className="flex flex-col gap-4 border-b border-border pb-6 pt-6">
@@ -136,7 +93,8 @@ export function ActivityEventsToolbar({
             </h1>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Tra cứu nhật ký đăng nhập và làm mới phiên xác thực người dùng theo thời gian thực (Giờ Việt Nam).
+            Tra cứu nhật ký đăng nhập và làm mới phiên xác thực người dùng theo
+            thời gian thực (Giờ Việt Nam).
           </p>
         </div>
 
@@ -162,7 +120,7 @@ export function ActivityEventsToolbar({
             <RefreshCw
               className={`mr-1.5 size-3.5 ${isRefreshing ? 'animate-spin' : ''}`}
             />
-            Làm mới
+            {isRefreshing ? 'Đang tải' : 'Làm mới'}
           </Button>
         </div>
       </div>
@@ -214,6 +172,7 @@ export function ActivityEventsToolbar({
           onValueChange={(val) =>
             onFilterChange({
               activityType: val === 'all' ? null : val,
+              page: 1,
             })
           }
         >
@@ -228,106 +187,26 @@ export function ActivityEventsToolbar({
           </SelectContent>
         </Select>
 
-        {/* Preset Range Buttons */}
-        <div className="hidden items-center gap-1 xl:flex">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => applyPreset('today')}
-            className="h-9 text-xs"
-          >
-            Hôm nay
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => applyPreset('this_month')}
-            className="h-9 text-xs"
-          >
-            Tháng này
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => applyPreset('last_30_days')}
-            className="h-9 text-xs"
-          >
-            30 ngày gần nhất
-          </Button>
-        </div>
-
-        {/* Date Range Picker Popover */}
-        <Popover>
-          <PopoverTrigger
-            className="inline-flex h-9 items-center justify-start gap-2 rounded-xl border border-border bg-background px-3 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted outline-none"
-            aria-label="Chọn khoảng ngày"
-          >
-            <CalendarDays className="size-3.5 text-muted-foreground" />
-            {rangeLabel}
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-3" align="start">
-            <div className="flex flex-col gap-2 pb-2 sm:flex-row sm:items-center sm:justify-between border-b border-border">
-              <span className="text-xs font-medium text-muted-foreground">
-                Chọn khoảng ngày (giờ Việt Nam)
-              </span>
-              <div className="flex items-center gap-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => applyPreset('today')}
-                  className="h-7 text-xs"
-                >
-                  Hôm nay
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => applyPreset('this_month')}
-                  className="h-7 text-xs"
-                >
-                  Tháng này
-                </Button>
-              </div>
-            </div>
-            <Calendar
-              mode="range"
-              selected={range}
-              onSelect={setRange}
-              locale={vi}
-              disabled={{ after: new Date() }}
-              defaultMonth={range?.from}
-              captionLayout="dropdown"
-            />
-            <div className="mt-2 flex items-center justify-between border-t border-border pt-3">
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  setRange(undefined);
-                  onFilterChange({ fromDate: null, toDate: null });
-                }}
-              >
-                Xóa ngày
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => applyRange(range)}
-                disabled={!range?.from || !range.to}
-              >
-                Áp dụng
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        {/* Shared Period Navigator */}
+        <AdminPeriodNavigator
+          preset={preset}
+          fromDate={fromDate}
+          toDate={toDate}
+          onChange={(p) =>
+            onFilterChange({
+              preset: p.preset,
+              fromDate: p.fromDate,
+              toDate: p.toDate,
+              page: 1,
+            })
+          }
+          isLoading={isRefreshing}
+        />
 
         {/* Limit Selector */}
         <Select
           value={String(limit)}
-          onValueChange={(val) => onFilterChange({ limit: Number(val) })}
+          onValueChange={(val) => onFilterChange({ limit: Number(val), page: 1 })}
         >
           <SelectTrigger className="h-9 w-[120px] text-xs">
             <SelectValue placeholder="Số bản ghi" />

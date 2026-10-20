@@ -147,15 +147,12 @@ export function DashboardClient({
   return (
     <div className="mx-auto flex w-full max-w-[1400px] animate-in flex-col gap-8 fade-in pb-24 text-foreground duration-500">
       <DashboardToolbar
-        key={`${filters.fromDate}-${filters.toDate}`}
+        key={`${filters.preset}-${filters.fromDate}-${filters.toDate}`}
         filters={filters}
         updatedAt={overview?.kpiCards?.updatedAt}
         isRefreshing={isRefreshing}
-        onApply={(fromDate, toDate) =>
-          updateParams({ fromDate, toDate })
-        }
-        onReset={() =>
-          updateParams({ fromDate: null, toDate: null })
+        onApply={({ preset, fromDate, toDate }) =>
+          updateParams({ preset, fromDate, toDate, aiPage: '1' })
         }
         onRefresh={() => void refreshAll()}
       />

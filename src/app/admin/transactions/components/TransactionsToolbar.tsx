@@ -1,23 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { format, parse } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import type { DateRange } from 'react-day-picker';
-import {
-  AlertCircle,
-  CalendarDays,
-  Filter,
-  RefreshCw,
-  RotateCcw,
-} from 'lucide-react';
+import { AlertCircle, Filter, RefreshCw, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -25,14 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  DASHBOARD_DATE_FORMAT,
-  getPresetDateRange,
-} from '@/features/admin/utils/dashboard';
+import { AdminPeriodNavigator } from '@/features/admin/components/AdminPeriodNavigator';
+import type { PeriodPreset } from '@/features/admin/types/period';
 import { TRANSACTION_STATUS_OPTIONS } from '@/features/admin/utils/transactions';
 
 export function TransactionsToolbar({
   status,
+  preset,
   fromDate,
   toDate,
   limit,
@@ -43,119 +26,80 @@ export function TransactionsToolbar({
   errorMessage,
 }: {
   status?: string;
-  fromDate?: string;
-  toDate?: string;
+  preset?: PeriodPreset;
+  fromDate: string;
+  toDate: string;
   limit: number;
   onFilterChange: (updates: {
     status?: string | null;
+    preset?: string | null;
     fromDate?: string | null;
     toDate?: string | null;
     limit?: number;
+    page?: number;
   }) => void;
   onReset: () => void;
   onRefresh: () => void;
   isRefreshing: boolean;
   errorMessage?: string | null;
 }) {
-  const [range, setRange] = useState<DateRange | undefined>(() => {
-    if (fromDate && toDate) {
-      try {
-        return {
-          from: parse(fromDate, DASHBOARD_DATE_FORMAT, new Date()),
-          to: parse(toDate, DASHBOARD_DATE_FORMAT, new Date()),
-        };
-      } catch {
-        return undefined;
-      }
-    }
-    return undefined;
-  });
-
-  const applyRange = (newRange: DateRange | undefined) => {
-    if (!newRange?.from || !newRange.to) return;
-    onFilterChange({
-      fromDate: format(newRange.from, DASHBOARD_DATE_FORMAT),
-      toDate: format(newRange.to, DASHBOARD_DATE_FORMAT),
-    });
-  };
-
-  const applyPreset = (preset: 'today' | 'this_month' | 'last_30_days') => {
-    const p = getPresetDateRange(preset);
-    setRange({
-      from: parse(p.fromDate, DASHBOARD_DATE_FORMAT, new Date()),
-      to: parse(p.toDate, DASHBOARD_DATE_FORMAT, new Date()),
-    });
-    onFilterChange({ fromDate: p.fromDate, toDate: p.toDate });
-  };
-
-  const rangeLabel =
-    fromDate && toDate
-      ? `${format(parse(fromDate, DASHBOARD_DATE_FORMAT, new Date()), 'dd/MM/yyyy')} – ${format(
-          parse(toDate, DASHBOARD_DATE_FORMAT, new Date()),
-          'dd/MM/yyyy',
-        )}`
-      : 'Khoảng thời gian';
-
   return (
     <div className="flex flex-col gap-4 border-b border-border pb-6 pt-6">
-      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+      {/* Title & Actions Row */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-            <span className="size-2 rounded-full bg-primary" />
-            Cổng thanh toán PayOS
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+              Giao Dịch payOS
+            </h1>
           </div>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-            Giao dịch & Đối soát
-          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Theo dõi, tra cứu trạng thái và thực hiện các quyết định xử lý đối soát thanh toán thủ công.
+            Theo dõi và đối soát thủ công các giao dịch thanh toán gói và nạp ví
+            (Giờ Việt Nam).
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Button
-            type="button"
             variant="outline"
-            className="h-10 text-xs"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-          >
-            <RefreshCw
-              className={`mr-1.5 size-3.5 ${isRefreshing ? 'animate-spin' : ''}`}
-            />
-            {isRefreshing ? 'Đang tải' : 'Làm mới'}
-          </Button>
-
-          <Button
-            type="button"
-            variant="ghost"
             size="sm"
             onClick={onReset}
-            className="h-10 text-xs text-muted-foreground hover:text-foreground"
+            className="text-xs text-muted-foreground hover:text-foreground"
+            title="Đặt lại toàn bộ bộ lọc"
           >
             <RotateCcw className="mr-1.5 size-3.5" />
             Đặt lại
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="text-xs"
+            title="Tải lại dữ liệu"
+          >
+            <RefreshCw
+              className={`mr-1.5 size-3.5 ${isRefreshing ? 'animate-spin' : ''}`}
+            />
+            Làm mới
+          </Button>
         </div>
       </div>
 
-      {errorMessage && (
-        <div className="flex items-center gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-xs font-medium text-destructive">
-          <AlertCircle className="size-4 shrink-0" />
-          <span>{errorMessage}</span>
-        </div>
-      )}
-
+      {/* Filter Controls Row */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Status Filter */}
         <div className="w-full sm:w-56">
           <Select
             value={status || 'all'}
             onValueChange={(val) =>
-              onFilterChange({ status: val === 'all' ? null : val })
+              onFilterChange({
+                status: val === 'all' ? null : val,
+                page: 1,
+              })
             }
           >
-            <SelectTrigger className="h-10 text-xs">
+            <SelectTrigger className="h-9 text-xs">
               <Filter className="mr-2 size-3.5 text-muted-foreground" />
               <SelectValue placeholder="Tất cả trạng thái" />
             </SelectTrigger>
@@ -170,88 +114,30 @@ export function TransactionsToolbar({
           </Select>
         </div>
 
-        {/* Date Presets */}
-        <div className="flex items-center gap-1 rounded-xl border border-border bg-muted/40 p-1">
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            className="h-8 rounded-lg px-2.5 text-xs"
-            onClick={() => applyPreset('today')}
-          >
-            Hôm nay
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            className="h-8 rounded-lg px-2.5 text-xs"
-            onClick={() => applyPreset('this_month')}
-          >
-            Tháng này
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            className="h-8 rounded-lg px-2.5 text-xs"
-            onClick={() => applyPreset('last_30_days')}
-          >
-            30 ngày
-          </Button>
-        </div>
-
-        {/* Date Picker Popover */}
-        <Popover>
-          <PopoverTrigger
-            className="inline-flex h-10 items-center justify-start gap-2 rounded-xl border border-border bg-background px-3.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted outline-none"
-            aria-label="Chọn khoảng ngày"
-          >
-            <CalendarDays className="size-3.5 text-muted-foreground" />
-            {rangeLabel}
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-3" align="start">
-            <Calendar
-              mode="range"
-              selected={range}
-              onSelect={setRange}
-              locale={vi}
-              disabled={{ after: new Date() }}
-              defaultMonth={range?.from}
-              captionLayout="dropdown"
-            />
-            <div className="mt-2 flex items-center justify-between border-t border-border pt-3">
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  setRange(undefined);
-                  onFilterChange({ fromDate: null, toDate: null });
-                }}
-              >
-                Xóa ngày
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => applyRange(range)}
-                disabled={!range?.from || !range.to}
-              >
-                Áp dụng
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        {/* Shared Period Navigator */}
+        <AdminPeriodNavigator
+          preset={preset}
+          fromDate={fromDate}
+          toDate={toDate}
+          onChange={(p) =>
+            onFilterChange({
+              preset: p.preset,
+              fromDate: p.fromDate,
+              toDate: p.toDate,
+              page: 1,
+            })
+          }
+          isLoading={isRefreshing}
+        />
 
         {/* Page Limit */}
         <div className="ml-auto flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Hiển thị:</span>
           <Select
             value={String(limit)}
-            onValueChange={(val) => onFilterChange({ limit: Number(val) })}
+            onValueChange={(val) => onFilterChange({ limit: Number(val), page: 1 })}
           >
-            <SelectTrigger className="h-10 w-24 text-xs">
+            <SelectTrigger className="h-9 w-24 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -262,6 +148,14 @@ export function TransactionsToolbar({
           </Select>
         </div>
       </div>
+
+      {/* Validation / API Error Banner */}
+      {errorMessage && (
+        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-xs text-destructive">
+          <AlertCircle className="size-4 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
     </div>
   );
 }
