@@ -12,6 +12,7 @@ import {
   useDashboardAIUsageByOperation,
   useDashboardAnalytics,
   useDashboardOverview,
+  useDashboardPayOSReconciliation,
   useDashboardRenewalStats,
   useDashboardRevenueBreakdown,
   useDashboardSubscriptionDistribution,
@@ -38,6 +39,9 @@ export function DashboardClient({
   const searchParams = useSearchParams();
 
   const overviewQuery = useDashboardOverview(initialData.overview);
+  const payosQuery = useDashboardPayOSReconciliation(filters, {
+    initialData: initialData.payosReconciliation ?? initialData.overview?.payosReconcile,
+  });
   const aiMarginQuery = useDashboardAIMargin(filters, {
     enabled: hasCustomDateRange,
     initialData: hasCustomDateRange ? initialData.aiMargin : undefined,
@@ -49,15 +53,18 @@ export function DashboardClient({
   const aiEventsQuery = useDashboardAIEvents(filters, initialData.aiEvents);
 
   const isSubscriptionTab = filters.insightTab === 'subscriptions';
-  const subscriptionDistributionQuery = useDashboardSubscriptionDistribution({
-    enabled: isSubscriptionTab,
-    initialData: initialData.subscriptionDistribution,
-  });
-  const revenueBreakdownQuery = useDashboardRevenueBreakdown({
+  const subscriptionDistributionQuery = useDashboardSubscriptionDistribution(
+    filters,
+    {
+      enabled: isSubscriptionTab,
+      initialData: initialData.subscriptionDistribution,
+    },
+  );
+  const revenueBreakdownQuery = useDashboardRevenueBreakdown(filters, {
     enabled: isSubscriptionTab,
     initialData: initialData.revenueBreakdown,
   });
-  const renewalStatsQuery = useDashboardRenewalStats({
+  const renewalStatsQuery = useDashboardRenewalStats(filters, {
     enabled: isSubscriptionTab,
     initialData: initialData.renewalStats,
   });
@@ -65,7 +72,7 @@ export function DashboardClient({
     enabled: !isSubscriptionTab,
     initialData: initialData.aiUsageByOperation,
   });
-  const aiErrorBreakdownQuery = useDashboardAIErrorBreakdown({
+  const aiErrorBreakdownQuery = useDashboardAIErrorBreakdown(filters, {
     enabled: !isSubscriptionTab,
     initialData: initialData.aiErrorBreakdown,
   });
@@ -90,6 +97,7 @@ export function DashboardClient({
   const refreshAll = async () => {
     const requests: Promise<unknown>[] = [
       overviewQuery.refetch(),
+      payosQuery.refetch(),
       analyticsQuery.refetch(),
       aiEventsQuery.refetch(),
     ];
@@ -113,6 +121,7 @@ export function DashboardClient({
 
   const isRefreshing =
     overviewQuery.isFetching ||
+    payosQuery.isFetching ||
     analyticsQuery.isFetching ||
     aiEventsQuery.isFetching ||
     (hasCustomDateRange && aiMarginQuery.isFetching) ||
@@ -167,10 +176,12 @@ export function DashboardClient({
           onRetry={() => void retryAIMargin()}
         />
         <PayOSPanel
-          data={overview?.payosReconcile}
-          isLoading={overviewQuery.isLoading}
-          error={overviewQuery.error}
-          onRetry={() => void overviewQuery.refetch()}
+          data={payosQuery.data ?? overview?.payosReconcile}
+          isLoading={payosQuery.isLoading}
+          error={payosQuery.error}
+          fromDate={filters.fromDate}
+          toDate={filters.toDate}
+          onRetry={() => void payosQuery.refetch()}
         />
       </div>
 

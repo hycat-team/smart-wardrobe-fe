@@ -20,6 +20,7 @@ import {
   formatCompactNumber,
   formatNumber,
   formatVND,
+  formatVNDateString,
   isNotFoundError,
 } from '@/features/admin/utils/dashboard';
 import { cn } from '@/lib/utils';
@@ -28,10 +29,10 @@ const labels: Record<AdminMetricKey, string> = {
   total_users: 'Tổng người dùng',
   new_users: 'Người dùng mới',
   active_users_dau: 'DAU',
-  ai_requests_count: 'AI requests',
-  ai_error_count: 'AI errors',
+  ai_requests_count: 'Lượt gọi AI',
+  ai_error_count: 'Lỗi AI',
   ai_error_rate: 'Tỷ lệ lỗi AI',
-  subscription_revenue_vnd: 'Doanh thu',
+  subscription_revenue_vnd: 'Doanh thu gói',
   net_ai_margin_vnd: 'Biên lợi nhuận AI',
 };
 
@@ -52,6 +53,21 @@ const formatMetric = (metric: AdminMetricKey, value: number) => {
   if (metric.endsWith('_vnd')) return formatVND(value);
   if (metric.endsWith('_rate')) return `${formatNumber(value)}%`;
   return formatNumber(value);
+};
+
+const formatGranularity = (g?: string) => {
+  switch (g) {
+    case 'day':
+      return 'Ngày';
+    case 'week':
+      return 'Tuần';
+    case 'month':
+      return 'Tháng';
+    case 'hour':
+      return 'Giờ';
+    default:
+      return g || 'Ngày';
+  }
 };
 
 export function DashboardTrendChart({
@@ -81,7 +97,7 @@ export function DashboardTrendChart({
   if (error && !data && !isNotFoundError(error))
     return (
       <section className="rounded-3xl border border-destructive/30 bg-card p-8">
-        <h2 className="text-xl font-semibold">Không thể tải biểu đồ xu hướng</h2>
+        <h2 className="text-xl font-semibold text-destructive">Không thể tải biểu đồ xu hướng</h2>
         <Button className="mt-5" variant="outline" onClick={onRetry}>
           Thử lại
         </Button>
@@ -124,18 +140,17 @@ export function DashboardTrendChart({
           <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
             {fromDate && toDate && (
               <p className="text-xs text-muted-foreground">
-                {new Date(fromDate).toLocaleDateString('vi-VN')} –{' '}
-                {new Date(toDate).toLocaleDateString('vi-VN')}
+                Kỳ: {formatVNDateString(fromDate)} – {formatVNDateString(toDate)}
               </p>
             )}
-            <p>Tính theo : {data.granularity}</p>
+            <p>Độ chi tiết: {formatGranularity(data.granularity)}</p>
           </div>
         </div>
         <Tabs value={tab} onValueChange={(value) => setTab(value as TrendTab)}>
           <TabsList aria-label="Nhóm dữ liệu biểu đồ">
             <TabsTrigger value="activity">Hoạt động</TabsTrigger>
             <TabsTrigger value="finance">Tài chính</TabsTrigger>
-            <TabsTrigger value="ai">AI Health</TabsTrigger>
+            <TabsTrigger value="ai">Sức khỏe AI</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -152,12 +167,7 @@ export function DashboardTrendChart({
               tickLine={false}
               axisLine={false}
               minTickGap={28}
-              tickFormatter={(value) =>
-                new Date(String(value)).toLocaleDateString('vi-VN', {
-                  day: '2-digit',
-                  month: '2-digit',
-                })
-              }
+              tickFormatter={(value) => formatVNDateString(String(value)).slice(0, 5)}
             />
             <YAxis
               yAxisId="left"
@@ -178,7 +188,7 @@ export function DashboardTrendChart({
               />
             )}
             <Tooltip
-              labelFormatter={(value) => new Date(String(value)).toLocaleDateString('vi-VN')}
+              labelFormatter={(value) => formatVNDateString(String(value))}
               formatter={(value, name) =>
                 formatMetric(String(name) as AdminMetricKey, Number(value))
               }

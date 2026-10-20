@@ -40,6 +40,8 @@ export interface PayOSReconciliation {
   totalTransactions: number;
   successCount: number;
   failedCount: number;
+  pendingCount?: number;
+  voidedCount?: number;
   totalSuccessValue: number;
 }
 
@@ -142,6 +144,7 @@ export interface AIEvent {
   model: string;
   statusCode: number;
   errorMessage: string;
+  errorCode?: string;
   createdAt: string;
 }
 
@@ -171,6 +174,7 @@ export interface DashboardInitialData {
   aiMargin: AIMarginAnalytics | null;
   analytics: DynamicQueryResponse | null;
   aiEvents: AIEventList | null;
+  payosReconciliation?: PayOSReconciliation | null;
   subscriptionDistribution?: SubscriptionDistribution | null;
   revenueBreakdown?: RevenueBreakdown | null;
   renewalStats?: RenewalStats | null;

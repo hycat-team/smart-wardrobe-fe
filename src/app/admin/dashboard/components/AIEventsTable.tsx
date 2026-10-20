@@ -103,7 +103,7 @@ export function AIEventsTable({
           </p>
         </div>
         <Select
-          value={filters.aiStatus || 'Tất cả'}
+          value={filters.aiStatus || 'all'}
           onValueChange={(value) =>
             onStatusChange(value === 'all' ? '' : String(value))
           }
@@ -112,7 +112,7 @@ export function AIEventsTable({
             className="w-full md:w-44"
             aria-label="Lọc trạng thái sự kiện AI"
           >
-            <SelectValue placeholder="Tất cả lỗi" />
+            <SelectValue placeholder="Tất cả trạng thái" />
           </SelectTrigger>
           <SelectContent
             align="end"
@@ -140,8 +140,9 @@ export function AIEventsTable({
               <TableRow>
                 <TableHead className="pl-6 md:pl-8">Mã yêu cầu</TableHead>
                 <TableHead>Nhà cung cấp</TableHead>
-                <TableHead>Loại</TableHead>
+                <TableHead>Mô hình</TableHead>
                 <TableHead>HTTP</TableHead>
+                <TableHead>Mã lỗi</TableHead>
                 <TableHead>Thông báo lỗi</TableHead>
                 <TableHead className="pr-6 text-right md:pr-8">
                   Thời gian
@@ -166,6 +167,9 @@ export function AIEventsTable({
                     >
                       {event.statusCode || '—'}
                     </Badge>
+                  </TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">
+                    {event.errorCode || '—'}
                   </TableCell>
                   <TableCell className="max-w-sm whitespace-normal">
                     {event.errorMessage ? (

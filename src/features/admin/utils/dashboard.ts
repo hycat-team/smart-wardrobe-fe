@@ -1,11 +1,6 @@
 import {
-  differenceInCalendarDays,
   format,
-  isAfter,
   isValid,
-  parse,
-  startOfDay,
-  subDays,
 } from 'date-fns';
 import {
   ADMIN_METRIC_KEYS,
@@ -15,47 +10,62 @@ import {
 } from '../types';
 
 export const DASHBOARD_DATE_FORMAT = 'yyyy-MM-dd';
-export const DASHBOARD_DEFAULT_LOOKBACK_DAYS = 30;
+export const DASHBOARD_DEFAULT_LOOKBACK_DAYS = 29; // 30 ngày lịch tính cả hôm nay
 export const DASHBOARD_MAX_DATE_RANGE_DAYS = 730;
 export const DASHBOARD_AI_EVENTS_LIMIT = 20;
 
 const firstValue = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 
-const parseDateParam = (value: string | undefined) => {
-  if (!value) return null;
-  const parsed = parse(value, DASHBOARD_DATE_FORMAT, new Date());
-  if (!isValid(parsed) || format(parsed, DASHBOARD_DATE_FORMAT) !== value) {
-    return null;
+// Sinh chuỗi YYYY-MM-DD theo LỊCH VN — KHÔNG dùng toISOString() (UTC)
+export const vnDate = (d: Date): string =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(d);
+
+export const todayVN = (now = new Date()): string => vnDate(now);
+
+export const startOfMonthVN = (now = new Date()): string => todayVN(now).slice(0, 8) + '01'; // YYYY-MM-01
+
+export const daysAgoVN = (n: number, now = new Date()): string =>
+  vnDate(new Date(now.getTime() - n * 86_400_000));
+
+export const getPresetDateRange = (
+  preset: 'today' | 'this_month' | 'last_30_days',
+  now = new Date(),
+) => {
+  const today = todayVN(now);
+  switch (preset) {
+    case 'today':
+      return { fromDate: today, toDate: today };
+    case 'this_month':
+      return { fromDate: startOfMonthVN(now), toDate: today };
+    case 'last_30_days':
+      return { fromDate: daysAgoVN(29, now), toDate: today };
   }
-  return startOfDay(parsed);
 };
 
 export const getDefaultDashboardDateRange = (now = new Date()) => {
-  const today = startOfDay(now);
   return {
-    fromDate: format(subDays(today, DASHBOARD_DEFAULT_LOOKBACK_DAYS), DASHBOARD_DATE_FORMAT),
-    toDate: format(today, DASHBOARD_DATE_FORMAT),
+    fromDate: daysAgoVN(DASHBOARD_DEFAULT_LOOKBACK_DAYS, now),
+    toDate: todayVN(now),
   };
 };
 
+/**
+ * Chuẩn hóa tham số dashboard.
+ * LƯU Ý: Không im lặng chuyển khoảng ngày sai về 30 ngày mặc định
+ * để người dùng nhận diện lỗi (hoặc BE trả 400 và FE hiển thị rõ).
+ */
 export const normalizeDashboardFilters = (
   params: DashboardSearchParams,
   now = new Date(),
 ): DashboardFilters => {
   const fallback = getDefaultDashboardDateRange(now);
-  const today = startOfDay(now);
-  const rawFrom = firstValue(params.fromDate);
-  const rawTo = firstValue(params.toDate);
-  const parsedFrom = parseDateParam(rawFrom);
-  const parsedTo = parseDateParam(rawTo);
+  const rawFrom = firstValue(params.fromDate)?.trim();
+  const rawTo = firstValue(params.toDate)?.trim();
 
-  const hasValidRange =
-    parsedFrom !== null &&
-    parsedTo !== null &&
-    !isAfter(parsedFrom, parsedTo) &&
-    !isAfter(parsedTo, today) &&
-    differenceInCalendarDays(parsedTo, parsedFrom) <= DASHBOARD_MAX_DATE_RANGE_DAYS;
+  // Chỉ fallback khi không truyền tham số
+  const fromDate = rawFrom || fallback.fromDate;
+  const toDate = rawTo || fallback.toDate;
 
   const page = Number.parseInt(firstValue(params.aiPage) ?? '1', 10);
   const insightTab = firstValue(params.insightTab) === 'ai'
@@ -63,8 +73,8 @@ export const normalizeDashboardFilters = (
     : 'subscriptions';
 
   return {
-    fromDate: hasValidRange ? format(parsedFrom, DASHBOARD_DATE_FORMAT) : fallback.fromDate,
-    toDate: hasValidRange ? format(parsedTo, DASHBOARD_DATE_FORMAT) : fallback.toDate,
+    fromDate,
+    toDate,
     aiStatus: firstValue(params.aiStatus)?.trim() ?? '',
     aiPage: Number.isFinite(page) && page > 0 ? page : 1,
     insightTab,
@@ -111,11 +121,43 @@ export const formatCompactNumber = (value: number) =>
     maximumFractionDigits: 1,
   }).format(value);
 
+export const formatVNDateString = (dateStr?: string | null): string => {
+  if (!dateStr) return '—';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [y, m, d] = dateStr.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return new Intl.DateTimeFormat('vi-VN', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date);
+};
+
+export const formatVNDateTime = (dateStr?: string | null): string => {
+  if (!dateStr) return '—';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return new Intl.DateTimeFormat('vi-VN', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(date);
+};
+
 export const formatDashboardDateTime = (value?: string | null) => {
   if (!value) return 'Chưa cập nhật';
   const date = new Date(value);
   if (!isValid(date)) return 'Chưa cập nhật';
   return new Intl.DateTimeFormat('vi-VN', {
+    timeZone: 'Asia/Ho_Chi_Minh',
     dateStyle: 'short',
     timeStyle: 'short',
   }).format(date);

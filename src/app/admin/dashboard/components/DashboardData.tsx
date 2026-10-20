@@ -8,6 +8,7 @@ import type {
   DashboardInitialData,
   DashboardSearchParams,
   DynamicQueryResponse,
+  PayOSReconciliation,
   RenewalStats,
   RevenueBreakdown,
   SubscriptionDistribution,
@@ -43,26 +44,31 @@ export default async function DashboardData({
     toDate: filters.toDate,
   });
 
-  const [overview, analytics, aiEvents, customMargin] = await Promise.all([
-    serverFetch<AdminOverview>('/admin/dashboard/overview', {
-      cache: 'no-store',
-    }),
-    serverFetch<DynamicQueryResponse>('/dashboard/analytics/query', {
-      method: 'POST',
-      cache: 'no-store',
-      body: JSON.stringify(analyticsRequest),
-    }),
-    serverFetch<AIEventList>(
-      `/admin/dashboard/drilldown/ai-events?${eventParams.toString()}`,
-      { cache: 'no-store' },
-    ),
-    shouldFetchCustomMargin
-      ? serverFetch<AIMarginAnalytics>(
-          `/admin/dashboard/ai-margin?${marginParams.toString()}`,
-          { cache: 'no-store' },
-        )
-      : Promise.resolve(null),
-  ]);
+  const [overview, analytics, aiEvents, customMargin, payosReconciliation] =
+    await Promise.all([
+      serverFetch<AdminOverview>('/admin/dashboard/overview', {
+        cache: 'no-store',
+      }),
+      serverFetch<DynamicQueryResponse>('/dashboard/analytics/query', {
+        method: 'POST',
+        cache: 'no-store',
+        body: JSON.stringify(analyticsRequest),
+      }),
+      serverFetch<AIEventList>(
+        `/admin/dashboard/drilldown/ai-events?${eventParams.toString()}`,
+        { cache: 'no-store' },
+      ),
+      shouldFetchCustomMargin
+        ? serverFetch<AIMarginAnalytics>(
+            `/admin/dashboard/ai-margin?${marginParams.toString()}`,
+            { cache: 'no-store' },
+          )
+        : Promise.resolve(null),
+      serverFetch<PayOSReconciliation>(
+        `/admin/dashboard/payos-reconciliation?${marginParams.toString()}`,
+        { cache: 'no-store' },
+      ),
+    ]);
 
   let subscriptionDistribution: SubscriptionDistribution | null | undefined;
   let revenueBreakdown: RevenueBreakdown | null | undefined;
@@ -74,15 +80,15 @@ export default async function DashboardData({
     [subscriptionDistribution, revenueBreakdown, renewalStats] =
       await Promise.all([
         serverFetch<SubscriptionDistribution>(
-          '/admin/dashboard/subscriptions/distribution',
+          `/admin/dashboard/subscriptions/distribution?${marginParams.toString()}`,
           { cache: 'no-store' },
         ),
         serverFetch<RevenueBreakdown>(
-          '/admin/dashboard/subscriptions/revenue-breakdown',
+          `/admin/dashboard/subscriptions/revenue-breakdown?${marginParams.toString()}`,
           { cache: 'no-store' },
         ),
         serverFetch<RenewalStats>(
-          '/admin/dashboard/subscriptions/renewal-stats',
+          `/admin/dashboard/subscriptions/renewal-stats?${marginParams.toString()}`,
           { cache: 'no-store' },
         ),
       ]);
@@ -93,7 +99,7 @@ export default async function DashboardData({
         { cache: 'no-store' },
       ),
       serverFetch<AIErrorBreakdown>(
-        '/admin/dashboard/ai/error-breakdown',
+        `/admin/dashboard/ai/error-breakdown?${marginParams.toString()}`,
         { cache: 'no-store' },
       ),
     ]);
@@ -105,6 +111,7 @@ export default async function DashboardData({
       : overview?.aiMargin ?? null,
     analytics,
     aiEvents,
+    payosReconciliation,
     subscriptionDistribution,
     revenueBreakdown,
     renewalStats,

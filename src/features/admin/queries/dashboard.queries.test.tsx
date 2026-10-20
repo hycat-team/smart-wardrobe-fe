@@ -7,6 +7,7 @@ import {
   useDashboardAIMargin,
   useDashboardAIUsageByOperation,
   useDashboardAnalytics,
+  useDashboardPayOSReconciliation,
   useDashboardRevenueBreakdown,
   useDashboardSubscriptionDistribution,
 } from './dashboard.queries';
@@ -16,6 +17,7 @@ jest.mock('../api/dashboard.api', () => ({
   dashboardApi: {
     getOverview: jest.fn(),
     getAIMargin: jest.fn(),
+    getPayOSReconciliation: jest.fn(),
     queryAnalytics: jest.fn(),
     getAIEvents: jest.fn(),
     getSubscriptionDistribution: jest.fn(),
@@ -63,6 +65,12 @@ describe('dashboard queries', () => {
       '',
       1,
     ]);
+    expect(dashboardQueryKeys.payosReconciliation(filters)).toEqual([
+      'admin-dashboard',
+      'payos-reconciliation',
+      '2026-07-01',
+      '2026-07-23',
+    ]);
   });
 
   it('không gọi AI margin riêng khi query bị disable', () => {
@@ -77,7 +85,7 @@ describe('dashboard queries', () => {
   it('không gọi query của tab chưa được bật', () => {
     const wrapper = createWrapper();
     renderHook(
-      () => useDashboardSubscriptionDistribution({ enabled: false }),
+      () => useDashboardSubscriptionDistribution(filters, { enabled: false }),
       { wrapper },
     );
     renderHook(
@@ -89,21 +97,36 @@ describe('dashboard queries', () => {
     expect(dashboardApi.getAIUsageByOperation).not.toHaveBeenCalled();
   });
 
-  it('calls revenue breakdown without date filters', async () => {
+  it('calls revenue breakdown with date filters', async () => {
     (dashboardApi.getRevenueBreakdown as jest.Mock).mockResolvedValue(null);
 
     const { result } = renderHook(
-      () => useDashboardRevenueBreakdown(),
+      () => useDashboardRevenueBreakdown(filters),
       { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(dashboardApi.getRevenueBreakdown).toHaveBeenCalledWith();
-    expect(dashboardQueryKeys.revenueBreakdown()).toEqual([
+    expect(dashboardApi.getRevenueBreakdown).toHaveBeenCalledWith(filters);
+    expect(dashboardQueryKeys.revenueBreakdown(filters)).toEqual([
       'admin-dashboard',
       'revenue-breakdown',
+      '2026-07-01',
+      '2026-07-23',
     ]);
   });
+
+  it('calls payos reconciliation with date filters', async () => {
+    (dashboardApi.getPayOSReconciliation as jest.Mock).mockResolvedValue(null);
+
+    const { result } = renderHook(
+      () => useDashboardPayOSReconciliation(filters),
+      { wrapper: createWrapper() },
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(dashboardApi.getPayOSReconciliation).toHaveBeenCalledWith(filters);
+  });
+
   it('dùng request admin hợp lệ cho analytics', async () => {
     (dashboardApi.queryAnalytics as jest.Mock).mockResolvedValue({
       targetDashboard: 'admin',
