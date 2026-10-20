@@ -56,11 +56,11 @@ export function ActivityEventsToolbar({
   errorMessage?: string | null;
 }) {
   const [searchInput, setSearchInput] = useState(userId || '');
-  const [prevUserId, setPrevUserId] = useState(userId || '');
+  const [prevUserId, setPrevUserId] = useState(userId);
   const [uuidError, setUuidError] = useState<string | null>(null);
 
   if (userId !== prevUserId) {
-    setPrevUserId(userId || '');
+    setPrevUserId(userId);
     setSearchInput(userId || '');
   }
 
