@@ -422,7 +422,7 @@ export function LandingClient() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-start">
             {/* Column 1: Brand & Slogan */}
             <div className="md:col-span-5 flex flex-col items-start text-left">
-              <div className="font-heading text-4xl sm:text-5xl font-bold tracking-tight text-white mb-2">
+              <div className="font-heading text-4xl sm:text-5xl font-bold tracking-tight text-black mb-2">
                 CLOSY
               </div>
               <p className="text-xs uppercase font-bold tracking-widest text-[#D9C5B2] mb-3">
@@ -478,10 +478,6 @@ export function LandingClient() {
                 Tải ngay ứng dụng Closy trên điện thoại để quản lý tủ đồ và phối đồ thông minh mọi lúc, mọi nơi.
               </p>
               <GooglePlayBadge size="md" />
-              <div className="flex items-center gap-2 mt-3 text-xs text-[#707070]">
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-                <span>Đã có sẵn trên Google Play</span>
-              </div>
             </div>
           </div>
 
