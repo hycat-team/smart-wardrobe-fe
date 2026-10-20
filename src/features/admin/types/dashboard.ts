@@ -1,4 +1,5 @@
 import type { PaginationResult } from '@/types/api';
+import type { PeriodPreset } from './period';
 
 export const ADMIN_METRIC_KEYS = [
   'total_users',
@@ -40,6 +41,8 @@ export interface PayOSReconciliation {
   totalTransactions: number;
   successCount: number;
   failedCount: number;
+  pendingCount?: number;
+  voidedCount?: number;
   totalSuccessValue: number;
 }
 
@@ -142,6 +145,7 @@ export interface AIEvent {
   model: string;
   statusCode: number;
   errorMessage: string;
+  errorCode?: string;
   createdAt: string;
 }
 
@@ -154,6 +158,7 @@ export interface AIEventQuery {
 export type AIEventList = PaginationResult<AIEvent>;
 
 export interface DashboardFilters {
+  preset?: PeriodPreset;
   fromDate: string;
   toDate: string;
   aiStatus: string;
@@ -171,6 +176,7 @@ export interface DashboardInitialData {
   aiMargin: AIMarginAnalytics | null;
   analytics: DynamicQueryResponse | null;
   aiEvents: AIEventList | null;
+  payosReconciliation?: PayOSReconciliation | null;
   subscriptionDistribution?: SubscriptionDistribution | null;
   revenueBreakdown?: RevenueBreakdown | null;
   renewalStats?: RenewalStats | null;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +23,8 @@ export function PaymentResultClient() {
   const isCancelled = cancel === 'true' || status === 'CANCELLED';
 
   const [isUpdating, setIsUpdating] = useState(isSuccess);
+  const [countdown, setCountdown] = useState(5);
+  const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
     if (!isSuccess) return;
@@ -63,15 +65,40 @@ export function PaymentResultClient() {
     };
   }, [isSuccess, queryClient]);
 
-  const getTargetUrl = () => {
+  const getTargetUrl = useCallback(() => {
     if (next && next.startsWith('/') && !next.startsWith('//')) {
       return next;
     }
     return flow === 'purchase' ? '/pricing' : '/profile?tab=wallet';
-  };
+  }, [flow, next]);
+
+  const navigateToTarget = useCallback(() => {
+    if (hasRedirectedRef.current) return;
+    hasRedirectedRef.current = true;
+    router.replace(getTargetUrl());
+  }, [router, getTargetUrl]);
+
+  useEffect(() => {
+    if (!isSuccess || isUpdating) return;
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          navigateToTarget();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [isSuccess, isUpdating, navigateToTarget]);
 
   const handleContinue = () => {
-    router.replace(getTargetUrl());
+    navigateToTarget();
   };
 
   return (
@@ -125,6 +152,12 @@ export function PaymentResultClient() {
               <span>Đang cập nhật dữ liệu tài khoản...</span>
             </div>
           )}
+
+          {isSuccess && !isUpdating && (
+            <div className="flex items-center justify-center gap-2 py-1 text-xs text-muted-foreground">
+              <span>Tự động chuyển tiếp sau {countdown} giây...</span>
+            </div>
+          )}
         </CardContent>
 
         <CardFooter>
@@ -137,6 +170,11 @@ export function PaymentResultClient() {
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Đang cập nhật...
+              </>
+            ) : isSuccess ? (
+              <>
+                Tiếp tục ({countdown}s)
+                <ArrowRight className="ml-2 h-4 w-4" />
               </>
             ) : (
               <>

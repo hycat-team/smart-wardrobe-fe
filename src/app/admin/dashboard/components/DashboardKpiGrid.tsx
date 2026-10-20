@@ -1,9 +1,10 @@
 import type { ComponentType } from 'react';
 import {
   Activity,
-  Building2,
   CircleDollarSign,
-  ShieldAlert,
+  Clock,
+  CreditCard,
+  Info,
   TrendingUp,
   Users,
 } from 'lucide-react';
@@ -11,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { AdminKPICards } from '@/features/admin/types';
 import {
+  formatDashboardDateTime,
   formatNumber,
   formatVND,
   isNotFoundError,
@@ -49,7 +51,7 @@ export function DashboardKpiGrid({
   if (error && !data && !isNotFoundError(error)) {
     return (
       <div className="rounded-3xl border border-destructive/30 bg-destructive/5 p-8">
-        <h2 className="text-lg font-semibold">Không thể tải KPI hệ thống</h2>
+        <h2 className="text-lg font-semibold text-destructive">Không thể tải KPI hệ thống</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Các phần còn lại của dashboard vẫn có thể tiếp tục hoạt động.
         </p>
@@ -75,48 +77,43 @@ export function DashboardKpiGrid({
     {
       label: 'Tổng người dùng',
       value: formatNumber(data.totalUsers),
-      helper: 'Tài khoản đã đăng ký',
+      helper: 'Tài khoản đăng ký toàn hệ thống',
       icon: Users,
     },
     {
       label: 'DAU hôm nay',
       value: formatNumber(data.activeUsersDau),
-      helper: 'Người dùng hoạt động',
+      helper: 'Snapshot định kỳ (~15 phút/lần)',
       icon: Activity,
     },
-    // {
-    //   label: 'Thương hiệu',
-    //   value: formatNumber(data.totalBrands),
-    //   helper: 'Đang hoạt động',
-    //   icon: Building2,
-    // },
-    // {
-    //   label: 'Thương hiệu chờ phê duyệt',
-    //   value: formatNumber(data.pendingReviewBrands),
-    //   helper: 'Yêu cầu cần xử lý',
-    //   icon: ShieldAlert,
-    //   warning: data.pendingReviewBrands > 0,
-    // },
     {
-      label: 'Doanh thu subscription',
+      label: 'Doanh thu hôm nay (ảnh chụp)',
       value: formatVND(data.subscriptionRevenueVnd),
-      helper: 'Snapshot gần nhất',
+      helper: 'Doanh thu mua gói trực tiếp trong ngày',
       icon: CircleDollarSign,
     },
     {
       label: 'Biên lợi nhuận AI',
       value: formatVND(data.netAiMarginVnd),
-      helper: 'Doanh thu trừ chi phí AI',
+      helper: 'Doanh thu trừ chi phí AI (30 ngày)',
       icon: TrendingUp,
       warning: data.netAiMarginVnd < 0,
     },
   ];
 
   return (
-    <section aria-labelledby="kpi-heading">
-      <h2 id="kpi-heading" className="sr-only">
-        Chỉ số KPI hệ thống
-      </h2>
+    <section aria-labelledby="kpi-heading" className="space-y-3">
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <Clock className="size-3.5 text-primary" />
+          <span>Ảnh chụp định kỳ (Snapshot)</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Info className="size-3" />
+          <span>Số liệu định kỳ, cập nhật lúc: <strong className="text-foreground">{formatDashboardDateTime(data.updatedAt)}</strong></span>
+        </div>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => {
           const Icon = card.icon;

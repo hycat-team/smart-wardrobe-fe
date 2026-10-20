@@ -41,6 +41,31 @@ describe('dashboardApi', () => {
     });
   });
 
+  it('gửi đúng khoảng ngày cho PayOS reconciliation', async () => {
+    const mockRecon = {
+      totalCount: 10,
+      totalSuccessValue: 500000,
+      successCount: 8,
+      failedCount: 1,
+      reconciliationRequiredCount: 1,
+      pendingCount: 0,
+      voidedCount: 0,
+    };
+    mock.onGet('/admin/dashboard/payos-reconciliation').reply((config) => {
+      expect(config.params).toEqual({
+        fromDate: '2026-07-01',
+        toDate: '2026-07-23',
+      });
+      return [200, { data: mockRecon }];
+    });
+
+    const result = await dashboardApi.getPayOSReconciliation({
+      fromDate: '2026-07-01',
+      toDate: '2026-07-23',
+    });
+    expect(result).toEqual(mockRecon);
+  });
+
   it('gửi đúng body dynamic query', async () => {
     const request = {
       targetDashboard: 'admin' as const,
@@ -76,31 +101,72 @@ describe('dashboardApi', () => {
       limit: 20,
     });
   });
+
   it.each([
-    ['distribution', '/admin/dashboard/subscriptions/distribution', () => dashboardApi.getSubscriptionDistribution()],
-    ['AI errors', '/admin/dashboard/ai/error-breakdown', () => dashboardApi.getAIErrorBreakdown()],
-    ['renewal', '/admin/dashboard/subscriptions/renewal-stats', () => dashboardApi.getRenewalStats()],
-  ])('gọi đúng endpoint %s', async (_label, endpoint, request) => {
-    mock.onGet(endpoint).reply(200, { data: { ok: true } });
-    await expect(request()).resolves.toEqual({ ok: true });
+    [
+      'distribution',
+      '/admin/dashboard/subscriptions/distribution',
+      (filters?: any) => dashboardApi.getSubscriptionDistribution(filters),
+    ],
+    [
+      'revenue breakdown',
+      '/admin/dashboard/subscriptions/revenue-breakdown',
+      (filters?: any) => dashboardApi.getRevenueBreakdown(filters),
+    ],
+    [
+      'renewal stats',
+      '/admin/dashboard/subscriptions/renewal-stats',
+      (filters?: any) => dashboardApi.getRenewalStats(filters),
+    ],
+    [
+      'AI error breakdown',
+      '/admin/dashboard/ai/error-breakdown',
+      (filters?: any) => dashboardApi.getAIErrorBreakdown(filters),
+    ],
+    [
+      'AI usage by operation',
+      '/admin/dashboard/ai/usage-by-operation',
+      (filters?: any) => dashboardApi.getAIUsageByOperation(filters),
+    ],
+  ])('gửi khoảng ngày cho %s khi có filters', async (_label, endpoint, request) => {
+    mock.onGet(endpoint).reply((config) => {
+      expect(config.params).toEqual({
+        fromDate: '2026-07-01',
+        toDate: '2026-07-23',
+      });
+      return [200, { data: null }];
+    });
+
+    await request({ fromDate: '2026-07-01', toDate: '2026-07-23' });
   });
 
-  it('does not send date params for revenue breakdown', async () => {
-    mock.onGet('/admin/dashboard/subscriptions/revenue-breakdown').reply((config) => {
+  it.each([
+    [
+      'distribution không có filter',
+      '/admin/dashboard/subscriptions/distribution',
+      () => dashboardApi.getSubscriptionDistribution(),
+    ],
+    [
+      'revenue breakdown không có filter',
+      '/admin/dashboard/subscriptions/revenue-breakdown',
+      () => dashboardApi.getRevenueBreakdown(),
+    ],
+    [
+      'renewal stats không có filter',
+      '/admin/dashboard/subscriptions/renewal-stats',
+      () => dashboardApi.getRenewalStats(),
+    ],
+    [
+      'AI error breakdown không có filter',
+      '/admin/dashboard/ai/error-breakdown',
+      () => dashboardApi.getAIErrorBreakdown(),
+    ],
+  ])('không gửi params cho %s khi không truyền filters', async (_label, endpoint, request) => {
+    mock.onGet(endpoint).reply((config) => {
       expect(config.params).toBeUndefined();
       return [200, { data: null }];
     });
 
-    await dashboardApi.getRevenueBreakdown();
-  });
-
-  it.each([
-    ['AI usage', '/admin/dashboard/ai/usage-by-operation', (filters: { fromDate: string; toDate: string }) => dashboardApi.getAIUsageByOperation(filters)],
-  ])('gửi khoảng ngày toolbar cho %s', async (_label, endpoint, request) => {
-    mock.onGet(endpoint).reply((config) => {
-      expect(config.params).toEqual({ fromDate: '2026-07-01', toDate: '2026-07-23' });
-      return [200, { data: null }];
-    });
-    await request({ fromDate: '2026-07-01', toDate: '2026-07-23' });
+    await request();
   });
 });

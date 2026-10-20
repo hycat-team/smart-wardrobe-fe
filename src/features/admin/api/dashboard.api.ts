@@ -10,6 +10,7 @@ import type {
   DashboardFilters,
   DynamicQueryRequest,
   DynamicQueryResponse,
+  PayOSReconciliation,
   RenewalStats,
   RevenueBreakdown,
   SubscriptionDistribution,
@@ -22,6 +23,16 @@ export const dashboardApi = {
   getOverview: async (): Promise<AdminOverview | null> => {
     const response = await api.get<APIResponse<AdminOverview>>(
       '/admin/dashboard/overview',
+    );
+    return unwrap(response);
+  },
+
+  getPayOSReconciliation: async (
+    params?: Pick<DashboardFilters, 'fromDate' | 'toDate'>,
+  ): Promise<PayOSReconciliation | null> => {
+    const response = await api.get<APIResponse<PayOSReconciliation>>(
+      '/admin/dashboard/payos-reconciliation',
+      { params },
     );
     return unwrap(response);
   },
@@ -47,16 +58,22 @@ export const dashboardApi = {
     return unwrap(response);
   },
 
-  getSubscriptionDistribution: async (): Promise<SubscriptionDistribution | null> => {
+  getSubscriptionDistribution: async (
+    params?: Pick<DashboardFilters, 'fromDate' | 'toDate'>,
+  ): Promise<SubscriptionDistribution | null> => {
     const response = await api.get<APIResponse<SubscriptionDistribution>>(
       '/admin/dashboard/subscriptions/distribution',
+      { params },
     );
     return unwrap(response);
   },
 
-  getRevenueBreakdown: async (): Promise<RevenueBreakdown | null> => {
+  getRevenueBreakdown: async (
+    params?: Pick<DashboardFilters, 'fromDate' | 'toDate'>,
+  ): Promise<RevenueBreakdown | null> => {
     const response = await api.get<APIResponse<RevenueBreakdown>>(
       '/admin/dashboard/subscriptions/revenue-breakdown',
+      { params },
     );
     return unwrap(response);
   },
@@ -72,19 +89,26 @@ export const dashboardApi = {
     return unwrap(response);
   },
 
-  getAIErrorBreakdown: async (): Promise<AIErrorBreakdown | null> => {
+  getAIErrorBreakdown: async (
+    params?: Pick<DashboardFilters, 'fromDate' | 'toDate'>,
+  ): Promise<AIErrorBreakdown | null> => {
     const response = await api.get<APIResponse<AIErrorBreakdown>>(
       '/admin/dashboard/ai/error-breakdown',
+      { params },
     );
     return unwrap(response);
   },
 
-  getRenewalStats: async (): Promise<RenewalStats | null> => {
+  getRenewalStats: async (
+    params?: Pick<DashboardFilters, 'fromDate' | 'toDate'>,
+  ): Promise<RenewalStats | null> => {
     const response = await api.get<APIResponse<RenewalStats>>(
       '/admin/dashboard/subscriptions/renewal-stats',
+      { params },
     );
     return unwrap(response);
   },
+
   getAIEvents: async (params: AIEventQuery): Promise<AIEventList | null> => {
     const response = await api.get<APIResponse<AIEventList>>(
       '/admin/dashboard/drilldown/ai-events',

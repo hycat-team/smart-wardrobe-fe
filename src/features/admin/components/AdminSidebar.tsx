@@ -22,6 +22,8 @@ import {
   Shirt,
   Building,
   Gift,
+  Activity,
+  ReceiptText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -29,6 +31,8 @@ import { useLogout } from '@/features/auth/queries/auth.queries';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboardIcon },
+  { href: '/admin/transactions', label: 'Giao dịch payOS', icon: ReceiptText },
+  { href: '/admin/activity-events', label: 'Hoạt động người dùng', icon: Activity },
   { href: '/admin/campaigns', label: 'Chiến dịch tặng gói', icon: Gift },
   { href: '/admin/users', label: 'Người dùng', icon: UsersIcon },
   { href: '/admin/community', label: 'Cộng đồng', icon: MessageSquareIcon },

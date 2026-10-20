@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles, ArrowDown, Check, Heart, MessageCircle, Share2,
-  Smartphone, Target, ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 
 // Extracted components & data
@@ -19,9 +19,10 @@ import { HowItWorksSection } from "./sections/HowItWorksSection";
 import { FAQs } from "@/components/faqs-component";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import CircularGallery, { CircularGalleryHandle } from "@/components/CircularGallery";
+import { GooglePlayBadge } from "@/components/common/GooglePlayBadge";
 import { useScrollytelling } from "./hooks/useScrollytelling";
 import {
-  METRICS, BEFORE_ITEMS, AFTER_ITEMS, TESTIMONIALS,
+  METRICS, BEFORE_ITEMS, AFTER_ITEMS,
   FEED_CARDS, NON_OUTFIT_CARDS, OUTFIT_CARDS, GEN_Z_GALLERY_ITEMS,
 } from "./data/landing-data";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -412,31 +413,91 @@ export function LandingClient() {
       {/* ═══════════════════════════════════════════════════════
           8. FOOTER
           ═══════════════════════════════════════════════════════ */}
-      <footer className="w-full bg-[#1A1A1A] bg-[url('/footer.png')] bg-cover bg-center border-t border-white/10 text-[#707070] py-10 md:py-12 px-6 relative z-10" role="contentinfo">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="font-heading text-5xl md:text-6xl font-bold text-[#1A1A1A]">CLOSY</div>
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 text-sm">
-            {/* <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Instagram">Instagram</a>
-            <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="TikTok">TikTok</a> */}
-            <Link href="/privacy" className="hover:text-[#D9C5B2] transition-colors" aria-label="Chính sách bảo mật">
-              Chính sách bảo mật
-            </Link>
-            <Link href="/delete-account" className="hover:text-[#D9C5B2] transition-colors" aria-label="Yêu cầu xóa tài khoản">
-              Yêu cầu xóa tài khoản
-            </Link>
-            <a
-              href="/downloads/closy.apk"
-              download="closy.apk"
-              className="hover:text-[#D9C5B2] transition-colors"
-              aria-label="Tải file APK Android"
-            >
-              Tải file APK
-            </a>
-            <a href="mailto:hycat.support@gmail.com" className="hover:text-[#D9C5B2] transition-colors" aria-label="Liên hệ">
-              Liên hệ
-            </a>
+      <footer
+        className="w-full bg-[#141414] bg-[url('/footer.png')] bg-cover bg-center border-t border-white/10 text-[#707070] pt-12 md:pt-16 pb-8 md:pb-10 px-6 relative z-10"
+        role="contentinfo"
+      >
+        <div className="max-w-6xl mx-auto">
+          {/* Main 3-Column Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-start">
+            {/* Column 1: Brand & Slogan */}
+            <div className="md:col-span-5 flex flex-col items-start text-left">
+              <div className="font-heading text-4xl sm:text-5xl font-bold tracking-tight text-white mb-2">
+                CLOSY
+              </div>
+              <p className="text-xs uppercase font-bold tracking-widest text-[#D9C5B2] mb-3">
+                Tủ Đồ Thông Minh Số
+              </p>
+              <p className="text-sm text-[#A3A3A3] max-w-sm leading-relaxed mb-4">
+                Trợ lý quản lý tủ đồ & gợi ý phong cách thời trang cá nhân hóa bằng AI. Tối ưu tủ đồ và tỏa sáng phong cách mỗi ngày.
+              </p>
+            </div>
+
+            {/* Column 2: Navigation & Legal */}
+            <div className="md:col-span-3 flex flex-col items-start text-left">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-[#D9C5B2] mb-4">
+                Khám phá & Pháp lý
+              </h3>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link
+                    href="/privacy"
+                    className="text-[#A3A3A3] hover:text-[#D9C5B2] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9C5B2] rounded"
+                    aria-label="Chính sách bảo mật"
+                  >
+                    Chính sách bảo mật
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/delete-account"
+                    className="text-[#A3A3A3] hover:text-[#D9C5B2] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9C5B2] rounded"
+                    aria-label="Yêu cầu xóa tài khoản"
+                  >
+                    Yêu cầu xóa tài khoản
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="mailto:hycat.support@gmail.com"
+                    className="text-[#A3A3A3] hover:text-[#D9C5B2] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9C5B2] rounded"
+                    aria-label="Liên hệ hỗ trợ"
+                  >
+                    Liên hệ hỗ trợ
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Mobile App Download */}
+            <div className="md:col-span-4 flex flex-col items-start text-left">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-[#D9C5B2] mb-4">
+                Ứng dụng di động
+              </h3>
+              <p className="text-sm text-[#A3A3A3] leading-relaxed mb-4">
+                Tải ngay ứng dụng Closy trên điện thoại để quản lý tủ đồ và phối đồ thông minh mọi lúc, mọi nơi.
+              </p>
+              <GooglePlayBadge size="md" />
+              <div className="flex items-center gap-2 mt-3 text-xs text-[#707070]">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+                <span>Đã có sẵn trên Google Play</span>
+              </div>
+            </div>
           </div>
-          <p className="text-xs md:text-sm">© 2026 Closy. Built by HYCAT TEAM.</p>
+
+          {/* Bottom Bar: Copyright & Credits */}
+          <div className="w-full border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#707070]">
+            <p>© 2026 Closy. Built with care by HYCAT TEAM.</p>
+            <p className="flex items-center gap-1">
+              Email hỗ trợ:{" "}
+              <a
+                href="mailto:hycat.support@gmail.com"
+                className="text-[#A3A3A3] hover:text-[#D9C5B2] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#D9C5B2] rounded"
+              >
+                hycat.support@gmail.com
+              </a>
+            </p>
+          </div>
         </div>
       </footer>
     </div>
