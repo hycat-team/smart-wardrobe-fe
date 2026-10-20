@@ -101,10 +101,10 @@ export function ActivityEventsClient() {
         data={listData}
         isLoading={isListLoading}
         isFetching={isListFetching}
-        page={pageParam}
-        limit={limitParam}
+        error={listError}
         onPageChange={(page) => updateParams({ page })}
-        onUserClick={(userId) => updateParams({ userId, page: 1 })}
+        onClearFilters={handleReset}
+        onRetry={() => void refetchList()}
       />
     </div>
   );
