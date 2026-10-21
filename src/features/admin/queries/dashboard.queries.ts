@@ -8,6 +8,7 @@ import type {
   AdminOverview,
   DashboardFilters,
   DynamicQueryResponse,
+  PayOSReconciliation,
   RenewalStats,
   RevenueBreakdown,
   SubscriptionDistribution,
@@ -26,22 +27,27 @@ type InsightQueryOptions<T> = {
   enabled?: boolean;
   initialData?: T | null;
 };
+
 export const dashboardQueryKeys = {
   all: ['admin-dashboard'] as const,
   overview: () => [...dashboardQueryKeys.all, 'overview'] as const,
+  payosReconciliation: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
+    [...dashboardQueryKeys.all, 'payos-reconciliation', filters.fromDate, filters.toDate] as const,
   aiMargin: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
     [...dashboardQueryKeys.all, 'ai-margin', filters.fromDate, filters.toDate] as const,
   analytics: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
     [...dashboardQueryKeys.all, 'analytics', filters.fromDate, filters.toDate] as const,
-  subscriptionDistribution: () =>
-    [...dashboardQueryKeys.all, 'subscription-distribution'] as const,
-  revenueBreakdown: () =>
-    [...dashboardQueryKeys.all, 'revenue-breakdown'] as const,
+  subscriptionDistribution: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
+    [...dashboardQueryKeys.all, 'subscription-distribution', filters.fromDate, filters.toDate] as const,
+  revenueBreakdown: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
+    [...dashboardQueryKeys.all, 'revenue-breakdown', filters.fromDate, filters.toDate] as const,
   aiUsageByOperation: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
     [...dashboardQueryKeys.all, 'ai-usage-by-operation', filters.fromDate, filters.toDate] as const,
-  aiErrorBreakdown: () =>
-    [...dashboardQueryKeys.all, 'ai-error-breakdown'] as const,
-  renewalStats: () => [...dashboardQueryKeys.all, 'renewal-stats'] as const,  aiEvents: (filters: Pick<DashboardFilters, 'aiStatus' | 'aiPage'>) =>
+  aiErrorBreakdown: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
+    [...dashboardQueryKeys.all, 'ai-error-breakdown', filters.fromDate, filters.toDate] as const,
+  renewalStats: (filters: Pick<DashboardFilters, 'fromDate' | 'toDate'>) =>
+    [...dashboardQueryKeys.all, 'renewal-stats', filters.fromDate, filters.toDate] as const,
+  aiEvents: (filters: Pick<DashboardFilters, 'aiStatus' | 'aiPage'>) =>
     [...dashboardQueryKeys.all, 'ai-events', filters.aiStatus, filters.aiPage] as const,
 };
 
@@ -50,6 +56,22 @@ export const useDashboardOverview = (initialData?: AdminOverview | null) =>
     queryKey: dashboardQueryKeys.overview(),
     queryFn: dashboardApi.getOverview,
     initialData,
+    ...DASHBOARD_QUERY_OPTIONS,
+  });
+
+export const useDashboardPayOSReconciliation = (
+  filters: DashboardFilters,
+  options?: {
+    enabled?: boolean;
+    initialData?: PayOSReconciliation | null;
+  },
+) =>
+  useQuery({
+    queryKey: dashboardQueryKeys.payosReconciliation(filters),
+    queryFn: () => dashboardApi.getPayOSReconciliation(filters),
+    enabled: options?.enabled ?? true,
+    initialData: options?.initialData ?? undefined,
+    placeholderData: keepPreviousData,
     ...DASHBOARD_QUERY_OPTIONS,
   });
 
@@ -82,22 +104,25 @@ export const useDashboardAnalytics = (
   });
 
 export const useDashboardSubscriptionDistribution = (
+  filters: DashboardFilters,
   options?: InsightQueryOptions<SubscriptionDistribution>,
 ) =>
   useQuery({
-    queryKey: dashboardQueryKeys.subscriptionDistribution(),
-    queryFn: dashboardApi.getSubscriptionDistribution,
+    queryKey: dashboardQueryKeys.subscriptionDistribution(filters),
+    queryFn: () => dashboardApi.getSubscriptionDistribution(filters),
     enabled: options?.enabled ?? true,
     initialData: options?.initialData ?? undefined,
+    placeholderData: keepPreviousData,
     ...DASHBOARD_QUERY_OPTIONS,
   });
 
 export const useDashboardRevenueBreakdown = (
+  filters: DashboardFilters,
   options?: InsightQueryOptions<RevenueBreakdown>,
 ) =>
   useQuery({
-    queryKey: dashboardQueryKeys.revenueBreakdown(),
-    queryFn: () => dashboardApi.getRevenueBreakdown(),
+    queryKey: dashboardQueryKeys.revenueBreakdown(filters),
+    queryFn: () => dashboardApi.getRevenueBreakdown(filters),
     enabled: options?.enabled ?? true,
     initialData: options?.initialData ?? undefined,
     placeholderData: keepPreviousData,
@@ -118,26 +143,31 @@ export const useDashboardAIUsageByOperation = (
   });
 
 export const useDashboardAIErrorBreakdown = (
+  filters: DashboardFilters,
   options?: InsightQueryOptions<AIErrorBreakdown>,
 ) =>
   useQuery({
-    queryKey: dashboardQueryKeys.aiErrorBreakdown(),
-    queryFn: dashboardApi.getAIErrorBreakdown,
+    queryKey: dashboardQueryKeys.aiErrorBreakdown(filters),
+    queryFn: () => dashboardApi.getAIErrorBreakdown(filters),
     enabled: options?.enabled ?? true,
     initialData: options?.initialData ?? undefined,
+    placeholderData: keepPreviousData,
     ...DASHBOARD_QUERY_OPTIONS,
   });
 
 export const useDashboardRenewalStats = (
+  filters: DashboardFilters,
   options?: InsightQueryOptions<RenewalStats>,
 ) =>
   useQuery({
-    queryKey: dashboardQueryKeys.renewalStats(),
-    queryFn: dashboardApi.getRenewalStats,
+    queryKey: dashboardQueryKeys.renewalStats(filters),
+    queryFn: () => dashboardApi.getRenewalStats(filters),
     enabled: options?.enabled ?? true,
     initialData: options?.initialData ?? undefined,
+    placeholderData: keepPreviousData,
     ...DASHBOARD_QUERY_OPTIONS,
   });
+
 export const useDashboardAIEvents = (
   filters: DashboardFilters,
   initialData?: AIEventList | null,

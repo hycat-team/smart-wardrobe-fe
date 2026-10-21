@@ -12,6 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { brandPortalApi } from "@/features/brand-portal/api/brand-portal.api";
 import { BrandItemRes } from "@/features/brand-portal/types";
+import { useBrandItemSSE } from "@/features/brand-portal/hooks/useBrandItemSSE";
+import { getAnalysisErrorMessage } from "@/features/wardrobe/utils/analysis-status";
 import { toast } from "sonner";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import {
@@ -28,6 +30,8 @@ export function BrandProductsClient({ brandId }: { brandId: string }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  useBrandItemSSE(brandId, products, () => fetchProducts());
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -214,13 +218,48 @@ export function BrandProductsClient({ brandId }: { brandId: string }) {
                 <TableCell className="text-sm text-muted-foreground whitespace-nowrap">{product.productCode || '-'}</TableCell>
                 <TableCell className="text-sm font-bold text-primary whitespace-nowrap">{product.price?.toLocaleString()}đ</TableCell>
                 <TableCell>
-                  <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap rounded-full ${
-                    product.status === 'ACTIVE' 
-                      ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {product.status || 'DRAFT'}
-                  </span>
+                  {(() => {
+                    const statusLower = String(product.status || '').toLowerCase();
+                    if (statusLower === 'active') {
+                      return (
+                        <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                          ACTIVE
+                        </span>
+                      );
+                    }
+                    if (statusLower === 'processing' || (product as any).status === 3) {
+                      return (
+                        <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400 inline-flex items-center gap-1">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Đang phân tích
+                        </span>
+                      );
+                    }
+                    if (statusLower === 'failed') {
+                      const reason = product.processingErrorReason || product.fashionItem?.processingErrorReason;
+                      const msg = reason ? getAnalysisErrorMessage(reason) : "Phân tích thất bại";
+                      return (
+                        <span
+                          title={msg}
+                          className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap rounded-full bg-destructive/15 text-destructive"
+                        >
+                          {msg}
+                        </span>
+                      );
+                    }
+                    if (statusLower === 'needs_review') {
+                      return (
+                        <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                          Cần chọn danh mục
+                        </span>
+                      );
+                    }
+                    return (
+                      <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap rounded-full bg-muted text-muted-foreground">
+                        {product.status || 'DRAFT'}
+                      </span>
+                    );
+                  })()}
                 </TableCell>
                 <TableCell className="text-right">
                   <button

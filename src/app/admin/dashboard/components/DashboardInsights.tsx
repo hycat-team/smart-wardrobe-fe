@@ -27,10 +27,9 @@ import {
   formatCompactNumber,
   formatNumber,
   formatVND,
+  getPlanColor,
   isNotFoundError,
 } from '@/features/admin/utils/dashboard';
-
-const COLORS = ['#0f766e', '#d97706', '#2563eb', '#dc2626', '#7c3aed', '#64748b'];
 
 type QueryState<T> = Pick<
   UseQueryResult<T | null>,
@@ -57,9 +56,9 @@ function EmptyState({ label }: { label: string }) {
 function QueryError({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="flex min-h-44 flex-col items-center justify-center rounded-2xl border border-destructive/30 p-6 text-center">
-      <p className="text-sm font-medium">Không thể tải báo cáo này.</p>
+      <p className="text-sm font-medium text-destructive">Không thể tải báo cáo này.</p>
       <Button className="mt-4" size="sm" variant="outline" onClick={onRetry}>
-        <RefreshCw className="size-4" /> Thử lại
+        <RefreshCw className="mr-1.5 size-3.5" /> Thử lại
       </Button>
     </div>
   );
@@ -81,7 +80,7 @@ function Panel({
       className={`rounded-3xl border border-border bg-card p-6 shadow-sm transition-opacity ${isFetching ? 'opacity-70' : ''}`}
     >
       <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">{eyebrow}</p>
-      <h3 className="mt-2 text-xl font-semibold">{title}</h3>
+      <h3 className="mt-1 text-xl font-semibold text-foreground">{title}</h3>
       <div className="mt-5">{children}</div>
     </section>
   );
@@ -92,11 +91,8 @@ function DistributionPanel({ query }: { query: QueryState<SubscriptionDistributi
   if (query.error && !query.data && !isNotFoundError(query.error)) {
     return <QueryError onRetry={() => void query.refetch()} />;
   }
-  
+
   let data: any = query.data;
-  if (data && !data.distribution && data.data) {
-    data = data.data;
-  }
   if (data && !data.distribution && data.data) {
     data = data.data;
   }
@@ -106,7 +102,7 @@ function DistributionPanel({ query }: { query: QueryState<SubscriptionDistributi
 
   return (
     <Panel
-      eyebrow="Subscriptions"
+      eyebrow="Đăng ký gói"
       title="Phân bổ người dùng theo gói"
       isFetching={query.isFetching}
     >
@@ -117,7 +113,7 @@ function DistributionPanel({ query }: { query: QueryState<SubscriptionDistributi
           <p className="text-3xl font-semibold tabular-nums">
             {formatCompactNumber(totalUsers)}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">Tổng người dùng có subscription</p>
+          <p className="mt-1 text-xs text-muted-foreground">Người dùng có gói hiệu lực giao với kỳ</p>
           <div className="mt-6 space-y-4">
             {rows.map((item: any, index: number) => (
               <div key={item.planCode}>
@@ -132,13 +128,16 @@ function DistributionPanel({ query }: { query: QueryState<SubscriptionDistributi
                     className="h-full rounded-full"
                     style={{
                       width: `${Math.min(100, item.percentage)}%`,
-                      backgroundColor: COLORS[index % COLORS.length],
+                      backgroundColor: getPlanColor(item.planCode, index),
                     }}
                   />
                 </div>
               </div>
             ))}
           </div>
+          <p className="mt-5 text-[11px] text-muted-foreground border-t border-border pt-3">
+            * Thống kê theo gói hiện tại của người dùng có hiệu lực giao với kỳ đã chọn.
+          </p>
         </>
       )}
     </Panel>
@@ -150,19 +149,14 @@ function RevenuePanel({ query }: { query: QueryState<RevenueBreakdown> }) {
   if (query.error && !query.data && !isNotFoundError(query.error)) {
     return <QueryError onRetry={() => void query.refetch()} />;
   }
-  
-  // Resilient data extraction
+
   let data: any = query.data;
-  if (data && !data.breakdown && data.data) {
-    data = data.data;
-  }
   if (data && !data.breakdown && data.data) {
     data = data.data;
   }
 
   const breakdown = data?.breakdown ?? [];
   const totalRevenueVnd = data?.totalRevenueVnd ?? 0;
-  console.log(data)
   const plans = Array.from(new Set(breakdown.map((item: any) => item.planCode)));
   const rows = Array.from(new Set(breakdown.map((item: any) => item.month)))
     .sort()
@@ -177,16 +171,16 @@ function RevenuePanel({ query }: { query: QueryState<RevenueBreakdown> }) {
     });
 
   return (
-    <Panel eyebrow="Revenue" title="Doanh thu theo gói và tháng" isFetching={query.isFetching}>
+    <Panel eyebrow="Doanh thu gói" title="Doanh thu theo gói và tháng" isFetching={query.isFetching}>
       {!rows.length && !totalRevenueVnd ? (
         <EmptyState label="Chưa có giao dịch subscription trong kỳ." />
       ) : (
         <>
           <div className="mb-5">
-            <p className="text-3xl font-semibold tabular-nums">
+            <p className="text-3xl font-semibold tabular-nums text-foreground">
               {formatVND(totalRevenueVnd)}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">Tổng doanh thu trong kỳ</p>
+            <p className="mt-1 text-xs text-muted-foreground">Tổng doanh thu theo kỳ đã chọn</p>
           </div>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -205,7 +199,7 @@ function RevenuePanel({ query }: { query: QueryState<RevenueBreakdown> }) {
                     key={plan}
                     dataKey={plan}
                     stackId="revenue"
-                    fill={COLORS[index % COLORS.length]}
+                    fill={getPlanColor(plan, index)}
                     radius={index === plans.length - 1 ? [4, 4, 0, 0] : 0}
                   />
                 ))}
@@ -225,38 +219,41 @@ function RenewalPanel({ query }: { query: QueryState<RenewalStats> }) {
   }
   const data = query.data;
   return (
-    <Panel eyebrow="Renewal" title="Hiệu quả gia hạn" isFetching={query.isFetching}>
+    <Panel eyebrow="Gia hạn gói" title="Hiệu quả gia hạn trong kỳ" isFetching={query.isFetching}>
       {!data ? (
-        <EmptyState label="Chưa có dữ liệu gia hạn." />
+        <EmptyState label="Chưa có dữ liệu gia hạn trong kỳ." />
       ) : (
         <>
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-4xl font-semibold">{formatNumber(data.successRate)}%</p>
-              <p className="mt-1 text-xs text-muted-foreground">Tỷ lệ thành công</p>
+              <p className="text-4xl font-semibold tabular-nums">{formatNumber(data.successRate)}%</p>
+              <p className="mt-1 text-xs text-muted-foreground">Tỷ lệ gia hạn thành công</p>
             </div>
-            <WalletCards className="size-9 text-primary" />
+            <WalletCards className="size-8 text-primary" />
           </div>
-          <div className="mt-5 h-2 overflow-hidden rounded-full bg-muted">
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-primary"
               style={{ width: `${Math.min(100, data.successRate)}%` }}
             />
           </div>
-          <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
+          <div className="mt-6 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
             <div className="rounded-2xl bg-muted/50 p-4">
               <p className="text-xs text-muted-foreground">Thành công</p>
               <p className="mt-1 text-xl font-semibold">{formatNumber(data.successCount)}</p>
             </div>
             <div className="rounded-2xl bg-muted/50 p-4">
               <p className="text-xs text-muted-foreground">Thất bại</p>
-              <p className="mt-1 text-xl font-semibold">{formatNumber(data.failedCount)}</p>
+              <p className="mt-1 text-xl font-semibold text-destructive">{formatNumber(data.failedCount)}</p>
             </div>
-            <div className="col-span-2 rounded-2xl bg-muted/50 p-4">
+            <div className="col-span-2 sm:col-span-1 rounded-2xl bg-muted/50 p-4">
               <p className="text-xs text-muted-foreground">Thử lại trung bình</p>
               <p className="mt-1 text-xl font-semibold">{formatNumber(data.avgRetryCount)}</p>
             </div>
           </div>
+          <p className="mt-4 text-[11px] text-muted-foreground border-t border-border pt-3">
+            * Chỉ tính các lượt thử gia hạn tạo trong kỳ (loại bỏ các lượt đang xử lý).
+          </p>
         </>
       )}
     </Panel>
@@ -315,14 +312,14 @@ function AIErrorPanel({ query }: { query: QueryState<AIErrorBreakdown> }) {
     return <QueryError onRetry={() => void query.refetch()} />;
   const data = query.data;
   return (
-    <Panel eyebrow="Độ tin cậy của AI" title="Phân tích lỗi AI" isFetching={query.isFetching}>
+    <Panel eyebrow="Độ tin cậy AI" title="Phân tích lỗi AI cùng kỳ" isFetching={query.isFetching}>
       {!data ? (
-        <EmptyState label="Chưa có dữ liệu lỗi AI." />
+        <EmptyState label="Chưa có dữ liệu lỗi AI trong kỳ." />
       ) : (
         <>
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl bg-muted/50 p-4">
-              <p className="text-xs text-muted-foreground">Tổng lượt</p>
+              <p className="text-xs text-muted-foreground">Tổng lượt gọi</p>
               <p className="mt-1 text-2xl font-semibold">
                 {formatCompactNumber(data.totalRequests)}
               </p>
@@ -332,7 +329,7 @@ function AIErrorPanel({ query }: { query: QueryState<AIErrorBreakdown> }) {
               <p className="mt-1 text-2xl font-semibold">{formatCompactNumber(data.totalErrors)}</p>
             </div>
             <div className="rounded-2xl bg-destructive/10 p-4">
-              <p className="text-xs text-destructive">Tỷ lệ lỗi</p>
+              <p className="text-xs text-destructive">Tỷ lệ lỗi (cùng kỳ)</p>
               <p className="mt-1 text-2xl font-semibold text-destructive">
                 {formatNumber(data.errorRate)}%
               </p>
@@ -344,8 +341,8 @@ function AIErrorPanel({ query }: { query: QueryState<AIErrorBreakdown> }) {
                 <thead className="border-b text-xs text-muted-foreground">
                   <tr>
                     <th className="pb-3">Mã lỗi</th>
-                    <th className="pb-3">Provider</th>
-                    <th className="pb-3">Model</th>
+                    <th className="pb-3">Nhà cung cấp</th>
+                    <th className="pb-3">Mô hình</th>
                     <th className="pb-3 text-right">Số lỗi</th>
                   </tr>
                 </thead>
@@ -355,10 +352,10 @@ function AIErrorPanel({ query }: { query: QueryState<AIErrorBreakdown> }) {
                       key={`${item.errorCode}-${item.provider}-${item.model}`}
                       className="border-b border-border/60 last:border-0"
                     >
-                      <td className="py-3 font-medium">{humanize(item.errorCode)}</td>
+                      <td className="py-3 font-medium font-mono text-xs">{item.errorCode}</td>
                       <td className="py-3">{humanize(item.provider)}</td>
                       <td className="py-3">{item.model || 'Không xác định'}</td>
-                      <td className="py-3 text-right font-mono">{formatNumber(item.errorCount)}</td>
+                      <td className="py-3 text-right font-mono font-semibold">{formatNumber(item.errorCount)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -402,7 +399,7 @@ export function DashboardInsights({
               <WalletCards className="size-4" /> Đăng ký
             </TabsTrigger>
             <TabsTrigger value="ai">
-              <Bot className="size-4" /> AI{' '}
+              <Bot className="size-4" /> Trí tuệ nhân tạo (AI)
             </TabsTrigger>
           </TabsList>
         </Tabs>

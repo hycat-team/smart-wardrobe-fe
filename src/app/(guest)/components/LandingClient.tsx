@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles, ArrowDown, Check, Heart, MessageCircle, Share2,
-  Smartphone, Target,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 
 // Extracted components & data
@@ -18,16 +18,18 @@ import { ScrollProgressBar } from "./ScrollProgressBar";
 import { HowItWorksSection } from "./sections/HowItWorksSection";
 import { FAQs } from "@/components/faqs-component";
 import { WeatherWidget } from "@/components/WeatherWidget";
-import { StaggerTestimonials } from "@/components/stagger-testimonials";
+import CircularGallery, { CircularGalleryHandle } from "@/components/CircularGallery";
+import { GooglePlayBadge } from "@/components/common/GooglePlayBadge";
 import { useScrollytelling } from "./hooks/useScrollytelling";
 import {
-  METRICS, BEFORE_ITEMS, AFTER_ITEMS, TESTIMONIALS,
-  FEED_CARDS, NON_OUTFIT_CARDS, OUTFIT_CARDS,
+  METRICS, BEFORE_ITEMS, AFTER_ITEMS,
+  FEED_CARDS, NON_OUTFIT_CARDS, OUTFIT_CARDS, GEN_Z_GALLERY_ITEMS,
 } from "./data/landing-data";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export function LandingClient() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<CircularGalleryHandle>(null);
   const { user } = useAuthStore();
 
   // All GSAP animations in custom hook (mobile-aware + a11y)
@@ -320,18 +322,57 @@ export function LandingClient() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          5. TESTIMONIALS
+          5. TESTIMONIALS (3D Circular Gallery)
           ═══════════════════════════════════════════════════════ */}
       <section
-        className="testimonials-section w-full py-24 md:py-32 px-6 bg-[#EBE7E2] relative z-10"
+        className="testimonials-section w-full py-20 md:py-28 px-4 md:px-6 bg-[#EBE7E2] relative z-10 overflow-hidden"
         role="region"
         aria-labelledby="testimonials-heading"
       >
-        <h2 id="testimonials-heading" className="font-heading text-3xl sm:text-4xl md:text-6xl text-center text-[#1A1A1A] mb-12 md:mb-16 font-medium">
-          Gen Z nói gì về Closy?
-        </h2>
-        <div className="max-w-4xl mx-auto flex flex-col">
-          <StaggerTestimonials />
+        <div className="max-w-4xl mx-auto text-center mb-8 md:mb-12">
+          <h2 id="testimonials-heading" className="font-heading text-3xl sm:text-4xl md:text-6xl text-center text-[#1A1A1A] font-medium tracking-tight">
+            Gen Z nói gì về Closy?
+          </h2>
+          <p className="text-[#6B645D] text-base md:text-lg mt-3">
+            Trải nghiệm thực tế từ cộng đồng yêu thời trang thông minh
+          </p>
+        </div>
+
+        {/* 3D Circular Gallery Viewport */}
+        <div className="w-full max-w-7xl mx-auto relative">
+          <div className="h-[520px] sm:h-[580px] md:h-[640px] w-full relative">
+            <CircularGallery
+              ref={galleryRef}
+              items={GEN_Z_GALLERY_ITEMS}
+              bend={3}
+              textColor="#1A1A1A"
+              borderRadius={0.06}
+              scrollEase={0.03}
+              scrollSpeed={2.5}
+              font="600 24px 'Be Vietnam Pro', system-ui, sans-serif"
+              showTitle={false}
+            />
+          </div>
+
+          {/* Navigation Controls matching the original UI */}
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => galleryRef.current?.prev()}
+              aria-label="Xem đánh giá trước"
+              className="size-11 rounded border border-[#1A1A1A]/15 bg-white hover:bg-[#F4F1EE] text-[#1A1A1A] flex items-center justify-center transition-all duration-200 hover:scale-105 shadow-sm active:scale-95 cursor-pointer"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => galleryRef.current?.next()}
+              aria-label="Xem đánh giá tiếp theo"
+              className="size-11 rounded border border-[#1A1A1A]/15 bg-white hover:bg-[#F4F1EE] text-[#1A1A1A] flex items-center justify-center transition-all duration-200 hover:scale-105 shadow-sm active:scale-95 cursor-pointer"
+            >
+              <ChevronRight className="size-5" />
+            </button>
+          </div>
         </div>
       </section>
 
@@ -372,16 +413,87 @@ export function LandingClient() {
       {/* ═══════════════════════════════════════════════════════
           8. FOOTER
           ═══════════════════════════════════════════════════════ */}
-      <footer className="w-full bg-[#1A1A1A] bg-[url('/footer.png')] bg-cover bg-center border-t border-white/10 text-[#707070] py-10 md:py-12 px-6 relative z-10" role="contentinfo">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="font-heading text-5xl md:text-6xl font-bold text-[#1A1A1A]">CLOSY</div>
-          <div className="flex gap-6 md:gap-8 text-sm">
-            {/* <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Instagram">Instagram</a>
-            <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="TikTok">TikTok</a> */}
-            <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Chính sách bảo mật">Chính sách</a>
-            <a href="#" className="hover:text-[#D9C5B2] transition-colors" aria-label="Liên hệ">Liên hệ</a>
+      <footer
+        className="w-full bg-[#141414] bg-[url('/footer.png')] bg-cover bg-center border-t border-white/10 text-[#707070] pt-12 md:pt-16 pb-8 md:pb-10 px-6 relative z-10"
+        role="contentinfo"
+      >
+        <div className="max-w-6xl mx-auto">
+          {/* Main 3-Column Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 items-start">
+            {/* Column 1: Brand & Slogan */}
+            <div className="md:col-span-5 flex flex-col items-start text-left">
+              <div className="font-heading text-4xl sm:text-5xl font-bold tracking-tight text-black mb-2">
+                CLOSY
+              </div>
+              <p className="text-xs uppercase font-bold tracking-widest text-[#D9C5B2] mb-3">
+                Tủ Đồ Thông Minh Số
+              </p>
+              <p className="text-sm text-[#A3A3A3] max-w-sm leading-relaxed mb-4">
+                Trợ lý quản lý tủ đồ & gợi ý phong cách thời trang cá nhân hóa bằng AI. Tối ưu tủ đồ và tỏa sáng phong cách mỗi ngày.
+              </p>
+            </div>
+
+            {/* Column 2: Navigation & Legal */}
+            <div className="md:col-span-3 flex flex-col items-start text-left">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-[#D9C5B2] mb-4">
+                Khám phá & Pháp lý
+              </h3>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link
+                    href="/privacy"
+                    className="text-[#A3A3A3] hover:text-[#D9C5B2] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9C5B2] rounded"
+                    aria-label="Chính sách bảo mật"
+                  >
+                    Chính sách bảo mật
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/delete-account"
+                    className="text-[#A3A3A3] hover:text-[#D9C5B2] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9C5B2] rounded"
+                    aria-label="Yêu cầu xóa tài khoản"
+                  >
+                    Yêu cầu xóa tài khoản
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="mailto:hycat.support@gmail.com"
+                    className="text-[#A3A3A3] hover:text-[#D9C5B2] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D9C5B2] rounded"
+                    aria-label="Liên hệ hỗ trợ"
+                  >
+                    Liên hệ hỗ trợ
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Mobile App Download */}
+            <div className="md:col-span-4 flex flex-col items-start text-left">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-[#D9C5B2] mb-4">
+                Ứng dụng di động
+              </h3>
+              <p className="text-sm text-[#A3A3A3] leading-relaxed mb-4">
+                Tải ngay ứng dụng Closy trên điện thoại để quản lý tủ đồ và phối đồ thông minh mọi lúc, mọi nơi.
+              </p>
+              <GooglePlayBadge size="md" />
+            </div>
           </div>
-          <p className="text-xs md:text-sm">© 2026 Closy. Built by HYCAT TEAM.</p>
+
+          {/* Bottom Bar: Copyright & Credits */}
+          <div className="w-full border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#707070]">
+            <p>© 2026 Closy. Built with care by HYCAT TEAM.</p>
+            <p className="flex items-center gap-1">
+              Email hỗ trợ:{" "}
+              <a
+                href="mailto:hycat.support@gmail.com"
+                className="text-[#A3A3A3] hover:text-[#D9C5B2] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#D9C5B2] rounded"
+              >
+                hycat.support@gmail.com
+              </a>
+            </p>
+          </div>
         </div>
       </footer>
     </div>

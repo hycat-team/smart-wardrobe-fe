@@ -11,13 +11,14 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useMyWardrobe } from "@/features/wardrobe/queries/wardrobe.queries";
 import { useOutfitDetail, useUpdateOutfit } from "@/features/outfits/queries/outfits.queries";
-import { OutfitRes as Outfit } from "@/features/outfits/types";
+import { OutfitRes as Outfit, SaveOutfitReq } from "@/features/outfits/types";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
 import * as htmlToImage from "html-to-image";
 import { useOutfitCanvas } from "@/features/outfits/hooks/useOutfitCanvas";
 import { OutfitCanvasBoard } from "@/features/outfits/components/OutfitCanvasBoard";
+import { restoreCanvasOutfitItems } from "@/features/ai-stylist/utils/outfit-canvas-layout";
 import { uploadToCloudinary, applyCloudinaryTrim } from "@/lib/cloudinary";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -101,65 +102,7 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
         setCustomOccasion(outfit.description || "");
       }
 
-      let brandYOffset = -150;
-      let accessoryYOffset = -150;
-      
-      const initialItems = (outfit.items || []).map((item: any) => {
-        const wardrobeItem = item.wardrobeItem || (item.fashionItem ? {
-          ...item,
-          id: item.fashionItem.id || item.id,
-          category: item.fashionItem.category,
-        } : {});
-        let x = item.positionX || 0;
-        let y = item.positionY || 0;
-        let zIndex = item.layerOrder || 1;
-        
-        // Apply smart fallback positioning if coordinates are near 0 or missing
-        if (Math.abs(x) < 5 && Math.abs(y) < 5) {
-          const isBrand = wardrobeItem.isGhost || wardrobeItem.brandName;
-          
-          if (isBrand) {
-            x = 280; // Right side
-            y = brandYOffset;
-            brandYOffset += 240;
-            zIndex = 10;
-          } else {
-            const slug = (wardrobeItem.category?.slug || '').toLowerCase();
-            const role = (wardrobeItem.role || '').toLowerCase();
-            
-            if (slug === 'phu-kien' || slug.startsWith('phu-kien-') || slug.includes('accessory') || role.includes('phụ kiện')) {
-              x = -280; // Left side
-              y = accessoryYOffset;
-              accessoryYOffset += 240;
-              zIndex = 5;
-            } else if (slug === 'mu' || slug === 'non' || slug.includes('hat') || role.includes('mũ') || role.includes('nón')) {
-              y = -350;
-              zIndex = 4;
-            } else if (slug === 'ao' || slug.startsWith('ao-') || slug.includes('top') || slug.includes('jacket') || role.includes('áo')) {
-              y = -180;
-              zIndex = 3;
-            } else if (slug === 'quan' || slug === 'vay' || slug.startsWith('quan-') || slug.startsWith('vay-') || slug.includes('bottom') || slug.includes('skirt') || role.includes('quần') || role.includes('váy')) {
-              y = 120;
-              zIndex = 2;
-            } else if (slug === 'giay' || slug.startsWith('giay-') || slug.includes('shoes') || slug.includes('footwear') || role.includes('giày')) {
-              y = 270;
-              zIndex = 3;
-            } else {
-              y = (Math.random() * 80 - 40);
-              x = (Math.random() * 80 - 40);
-            }
-          }
-        }
-
-        return {
-          ...wardrobeItem,
-          scale: Math.round((item.scale || 1) * 100),
-          x,
-          y,
-          zIndex,
-        };
-      }).filter((x: any) => x.id);
-
+      const initialItems = restoreCanvasOutfitItems(outfit.items || []);
       setSelectedItems(initialItems);
     }
   }, [outfit]);
@@ -225,14 +168,15 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
 
       // 3. Chuẩn bị payload và gửi API tạo Outfit
       // Tính toán position % tương đối để dễ lưu (mặc dù ảnh cover đã có đầy đủ rồi)
-      const payload = {
+      const payload: SaveOutfitReq = {
         name: outfitName,
         description: customOccasion || occasion,
         coverImageUrl: coverImageUrl,
+        status: outfit?.status ?? 0,
         items: selectedItems.map((item) => ({
           fashionItemId: item.fashionItem?.id || (item as any).fashionItemId || item.clothingItemId,
-          positionX: Math.max(1, Math.abs(item.x || 0)),
-          positionY: Math.max(1, Math.abs(item.y || 0)),
+          positionX: Math.round(item.x || 0),
+          positionY: Math.round(item.y || 0),
           scale: (item.scale || 100) / 100,
           layerOrder: item.zIndex || 1,
         })),

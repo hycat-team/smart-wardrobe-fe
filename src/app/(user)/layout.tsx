@@ -13,7 +13,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
       <main className="flex-1 flex flex-col min-w-0 pb-[72px] md:pb-0 relative">
         {/* <Topbar /> */}
         {/* Page Content */}
-        <div className="flex-1 px-4 md:px-8 py-4 md:py-0 max-w-[1600px] w-full mx-auto">
+        <div className="flex-1 w-full flex flex-col">
           {children}
         </div>
       </main>

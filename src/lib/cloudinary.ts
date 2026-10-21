@@ -9,7 +9,13 @@ export interface CloudinaryUploadParams {
     public_id?: string;
     uploadPreset?: string;
     upload_preset?: string;
+    resourceType?: 'image' | 'video';
+    // Giá trị `allowedFormats` từ response upload-signature. Khi backend ký
+    // trường này, Cloudinary tính lại chữ ký từ đúng các field đã nhận nên
+    // FE phải gửi kèm nguyên văn — thiếu là Invalid Signature.
+    allowedFormats?: string;
   };
+  resourceType?: 'image' | 'video';
 }
 
 export interface CloudinaryUploadResponse {
@@ -21,6 +27,7 @@ export interface CloudinaryUploadResponse {
 export async function uploadToCloudinary({
   file,
   signatureParams,
+  resourceType,
 }: CloudinaryUploadParams): Promise<CloudinaryUploadResponse> {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
   const formData = new FormData();
@@ -36,10 +43,21 @@ export async function uploadToCloudinary({
   formData.append("timestamp", signatureParams.timestamp.toString());
   formData.append("signature", signatureParams.signature);
   formData.append("folder", signatureParams.folder);
+
+  // Gửi đúng key Cloudinary đã ký là `allowed_formats` (snake_case), giá trị
+  // nguyên văn từ response. Chỉ gửi khi backend trả về (tức là đã ký).
+  if (signatureParams.allowedFormats) {
+    formData.append("allowed_formats", signatureParams.allowedFormats);
+  }
+
+  // Chỉ gửi `public_id` và `overwrite` khi backend đã ký nó (trả về publicId khác rỗng).
+  // Endpoint avatar-signature ký cả public_id và overwrite=true. Cloudinary tính lại chữ ký
+  // từ đúng các field client gửi lên — thiếu overwrite là lệch chữ ký gây Invalid Signature.
+  // KHÔNG gửi thêm field camelCase `publicId`: Cloudinary không có param này và sẽ làm hỏng chữ ký.
   const pid = signatureParams.publicId || signatureParams.public_id;
   if (pid) {
     formData.append("public_id", pid);
-    formData.append("publicId", pid); // In case backend incorrectly signed publicId
+    formData.append("overwrite", "true");
   }
 
   const preset = signatureParams.uploadPreset || signatureParams.upload_preset;
@@ -47,7 +65,9 @@ export async function uploadToCloudinary({
     formData.append("upload_preset", preset);
   }
 
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+  const finalResourceType = resourceType || signatureParams.resourceType || "image";
+
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${finalResourceType}/upload`, {
     method: "POST",
     body: formData,
   });
@@ -55,7 +75,7 @@ export async function uploadToCloudinary({
   if (!response.ok) {
     const errorText = await response.text();
     console.error("Cloudinary upload error details:", errorText);
-    throw new Error("Không thể upload ảnh lên Cloudinary");
+    throw new Error(`Không thể upload ${finalResourceType === 'video' ? 'video' : 'ảnh'} lên Cloudinary`);
   }
 
   return response.json();

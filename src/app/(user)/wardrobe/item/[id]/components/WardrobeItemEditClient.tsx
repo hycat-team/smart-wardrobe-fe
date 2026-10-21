@@ -52,7 +52,7 @@ export function WardrobeItemEditClient({
   useEffect(() => {
     if (item) {
       reset({
-        categoryId: item.category?.id || "",
+        categoryId: item.category?.id || item.fashionItem?.category?.id || "",
         color: item.fashionItem?.color || (item as any).color || "",
         fit: item.fashionItem?.fit || (item as any).fit || "",
         material: item.fashionItem?.material || (item as any).material || "",
@@ -63,6 +63,7 @@ export function WardrobeItemEditClient({
       });
     }
   }, [item, reset]);
+
 
   if (isLoading && !item) {
     return (

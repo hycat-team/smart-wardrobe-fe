@@ -6,9 +6,17 @@ import { handleApiError } from '@/lib/api-error';
 
 export const useTopupMutation = () => {
   return useMutation({
-    mutationFn: (data: TopUpReq) => billingApi.topupWallet(data),
+    mutationFn: (data: TopUpReq) => {
+      const defaultReturnUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/payment/result?flow=topup&next=${encodeURIComponent('/profile?tab=wallet')}`
+        : undefined;
+      return billingApi.topupWallet({
+        returnUrl: data.returnUrl || defaultReturnUrl,
+        cancelUrl: data.cancelUrl || defaultReturnUrl,
+        ...data,
+      });
+    },
     onSuccess: (data) => {
-      // Redirect to PayOS
       const targetUrl = data?.paymentUrl || data?.checkoutUrl;
       if (targetUrl) {
         window.location.href = targetUrl;
@@ -22,9 +30,17 @@ export const useTopupMutation = () => {
 
 export const usePurchaseDirectMutation = () => {
   return useMutation({
-    mutationFn: (data: DirectPurchaseReq) => billingApi.purchasePlanDirect(data),
+    mutationFn: (data: DirectPurchaseReq) => {
+      const defaultReturnUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/payment/result?flow=purchase&next=${encodeURIComponent('/pricing')}`
+        : undefined;
+      return billingApi.purchasePlanDirect({
+        returnUrl: data.returnUrl || defaultReturnUrl,
+        cancelUrl: data.cancelUrl || defaultReturnUrl,
+        ...data,
+      });
+    },
     onSuccess: (data) => {
-      // Redirect to PayOS
       const targetUrl = data?.paymentUrl || data?.checkoutUrl;
       if (targetUrl) {
         window.location.href = targetUrl;

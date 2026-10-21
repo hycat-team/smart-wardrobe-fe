@@ -1,6 +1,7 @@
 'use client';
 import { useAuthStore } from '@/store/useAuthStore';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Settings,
   Crown,
@@ -19,17 +20,22 @@ import { WalletPageContent } from '@/features/wallet/components/WalletPageConten
 import { UserRes } from '@/features/profile/types';
 import { useProfile, useUpdateAvatar } from '@/features/profile/queries/profile.queries';
 import { getUserAvatar } from '@/lib/utils';
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
-import { useQuery } from '@tanstack/react-query';
-import { subscriptionApi } from '@/features/subscription/api/subscription.api';
+import { useDailyQuota, useMySubscription } from '@/features/subscription/queries/subscription.queries';
+import { useWardrobeStats } from '@/features/wardrobe/queries/wardrobe.queries';
 import { CurrentPlanCard } from '@/features/subscription/components/CurrentPlanCard';
 import { ClaimAccountTab } from './ClaimAccountTab';
 import { profileApi } from '@/features/profile/api/profile.api';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+
   // Pass initialProfile to useProfile so React Query hydrates it immediately
   const { data: profile } = useProfile(initialProfile);
 
@@ -41,19 +47,14 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   const avatar = getUserAvatar(profile);
   const name = profile?.firstName + (profile?.lastName ? ` ${profile.lastName}` : '');
 
-  const { data: mySubscription } = useQuery({
-    queryKey: ['subscription', 'me'],
-    queryFn: () => subscriptionApi.getMySubscription(),
-    retry: 0,
-  });
-
-  const { data: dailyQuota } = useQuery({
-    queryKey: ['subscription', 'quota'],
-    queryFn: () => subscriptionApi.getDailyQuota(),
-    retry: 0,
-  });
+  const { data: mySubscription } = useMySubscription();
+  const { data: dailyQuota } = useDailyQuota();
+  const { data: wardrobeStats } = useWardrobeStats();
 
   const [isUploading, setIsUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'wallet'>(
+    tabParam === 'wallet' ? 'wallet' : 'overview'
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutate: updateAvatar } = useUpdateAvatar();
 
@@ -172,19 +173,75 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-8 bg-cream-dark/15 border border-cream-dark/60 rounded-xl p-1 h-12 mx-auto md:mx-0">
+      <Tabs
+        value={activeTab}
+        onValueChange={(val) => {
+          setActiveTab(val as 'overview' | 'wallet');
+          router.replace('/profile?tab=' + val, { scroll: false });
+        }}
+        className="w-full"
+      >
+        <TabsList className="relative grid w-full grid-cols-2 max-w-[400px] mb-8 p-1.5 h-13 rounded-full mx-auto md:mx-0 bg-stone-100/95 dark:bg-stone-900/95 border border-stone-200/90 dark:border-stone-800 shadow-[0_12px_28px_-4px_rgba(0,0,0,0.22),0_4px_12px_-2px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_32px_-4px_rgba(0,0,0,0.7)] backdrop-blur-md">
           <TabsTrigger
             value="overview"
-            className="rounded-lg data-[state=active]:bg-ink data-[state=active]:text-cream text-ink-muted"
+            className={cn(
+              "relative z-10 h-full rounded-full text-xs sm:text-[13px] font-semibold tracking-wide transition-colors duration-200 outline-none select-none cursor-pointer",
+              "bg-transparent data-[state=active]:bg-transparent data-active:bg-transparent data-[state=active]:shadow-none data-active:shadow-none hover:bg-transparent",
+              activeTab === "overview"
+                ? "text-foreground font-bold"
+                : "text-muted-foreground hover:text-foreground"
+            )}
           >
-            <LayoutDashboard className="size-4 mr-2" /> Tổng quan
+            {activeTab === "overview" && (
+              <motion.div
+                layoutId="profile-tab-active-pill"
+                className="absolute inset-0 bg-white dark:bg-stone-800 rounded-full border border-stone-200/80 dark:border-stone-700/80 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.12),0_1px_3px_0_rgba(0,0,0,0.08)] pointer-events-none -z-10"
+                transition={{
+                  type: "spring",
+                  stiffness: 450,
+                  damping: 32,
+                  mass: 0.8,
+                }}
+              />
+            )}
+            <motion.div
+              whileTap={{ scale: 0.96 }}
+              className="flex items-center justify-center gap-2 w-full h-full"
+            >
+              <LayoutDashboard className={cn("size-4 transition-colors", activeTab === "overview" ? "text-foreground" : "text-muted-foreground")} />
+              <span>Tổng quan</span>
+            </motion.div>
           </TabsTrigger>
+
           <TabsTrigger
             value="wallet"
-            className="rounded-lg data-[state=active]:bg-ink data-[state=active]:text-cream text-ink-muted"
+            className={cn(
+              "relative z-10 h-full rounded-full text-xs sm:text-[13px] font-semibold tracking-wide transition-colors duration-200 outline-none select-none cursor-pointer",
+              "bg-transparent data-[state=active]:bg-transparent data-active:bg-transparent data-[state=active]:shadow-none data-active:shadow-none hover:bg-transparent",
+              activeTab === "wallet"
+                ? "text-foreground font-bold"
+                : "text-muted-foreground hover:text-foreground"
+            )}
           >
-            <Wallet className="size-4 mr-2" /> Ví thanh toán
+            {activeTab === "wallet" && (
+              <motion.div
+                layoutId="profile-tab-active-pill"
+                className="absolute inset-0 bg-white dark:bg-stone-800 rounded-full border border-stone-200/80 dark:border-stone-700/80 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.12),0_1px_3px_0_rgba(0,0,0,0.08)] pointer-events-none -z-10"
+                transition={{
+                  type: "spring",
+                  stiffness: 450,
+                  damping: 32,
+                  mass: 0.8,
+                }}
+              />
+            )}
+            <motion.div
+              whileTap={{ scale: 0.96 }}
+              className="flex items-center justify-center gap-2 w-full h-full"
+            >
+              <Wallet className={cn("size-4 transition-colors", activeTab === "wallet" ? "text-foreground" : "text-muted-foreground")} />
+              <span>Ví thanh toán</span>
+            </motion.div>
           </TabsTrigger>
         </TabsList>
 
@@ -194,7 +251,11 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
               <h2 className="font-bold text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-6 md:text-left ml-2">
                 GÓI HIỆN TẠI CỦA BẠN
               </h2>
-              <CurrentPlanCard subscription={mySubscription} quota={dailyQuota} />
+              <CurrentPlanCard
+                subscription={mySubscription}
+                quota={dailyQuota}
+                stats={wardrobeStats}
+              />
             </section>
           )}
 

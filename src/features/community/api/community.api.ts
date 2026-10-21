@@ -4,15 +4,24 @@ import { APIResponse, PaginationResult } from '@/types/api';
 import {
   PostRes,
   CommentRes,
+  CommunityUserRes,
   AddCommentReq,
   LikePostReq,
   CreatePostReq,
+  UpdatePostReq,
   UploadSignatureResult,
 } from '../types';
 
 export const communityApi = {
   getCommunityPosts: async (
-    params?: { sort?: string; page?: number; limit?: number; username?: string; postType?: string },
+    params?: {
+      type?: 'explore' | 'following';
+      sort?: 'hot' | 'latest';
+      postType?: 'outfit' | 'media';
+      username?: string;
+      page?: number;
+      limit?: number;
+    },
     axiosInstance: AxiosInstance = api
   ): Promise<PaginationResult<PostRes>> => {
     const res = await axiosInstance.get<APIResponse<PaginationResult<PostRes>>>('/posts', { params });
@@ -32,7 +41,7 @@ export const communityApi = {
     axiosInstance: AxiosInstance = api
   ): Promise<CommentRes[]> => {
     const res = await axiosInstance.get<APIResponse<CommentRes[]>>(`/posts/${postPublicID}/comments`);
-    return res.data.data!;
+    return res.data.data || [];
   },
 
   getCommentReplies: async (
@@ -41,6 +50,18 @@ export const communityApi = {
     axiosInstance: AxiosInstance = api
   ): Promise<CommentRes[]> => {
     const res = await axiosInstance.get<APIResponse<CommentRes[]>>(`/posts/${postPublicID}/comments/${commentID}/replies`);
+    return res.data.data || [];
+  },
+
+  getPostLikes: async (
+    postPublicID: string,
+    params?: { page?: number; limit?: number },
+    axiosInstance: AxiosInstance = api
+  ): Promise<PaginationResult<CommunityUserRes>> => {
+    const res = await axiosInstance.get<APIResponse<PaginationResult<CommunityUserRes>>>(
+      `/posts/${postPublicID}/likes`,
+      { params }
+    );
     return res.data.data!;
   },
 
@@ -65,6 +86,11 @@ export const communityApi = {
     return res.data.data!;
   },
 
+  updatePost: async (postPublicID: string, data: UpdatePostReq): Promise<PostRes> => {
+    const res = await api.put<APIResponse<PostRes>>(`/posts/${postPublicID}`, data);
+    return res.data.data!;
+  },
+
   deletePost: async (postPublicID: string): Promise<void> => {
     await api.delete(`/posts/${postPublicID}`);
   },
@@ -73,13 +99,19 @@ export const communityApi = {
     await api.delete(`/posts/${postPublicID}/comments/${commentID}`);
   },
 
-  updateComment: async (postPublicID: string, commentID: string, data: { content: string }): Promise<CommentRes> => {
+  updateComment: async (
+    postPublicID: string,
+    commentID: string,
+    data: { content: string }
+  ): Promise<CommentRes> => {
     const res = await api.put<APIResponse<CommentRes>>(`/posts/${postPublicID}/comments/${commentID}`, data);
     return res.data.data!;
   },
 
-  getPostUploadSignature: async (): Promise<UploadSignatureResult> => {
-    const res = await api.get<APIResponse<UploadSignatureResult>>('/posts/upload-signature');
+  getPostUploadSignature: async (params?: {
+    resourceType?: 'image' | 'video';
+  }): Promise<UploadSignatureResult> => {
+    const res = await api.get<APIResponse<UploadSignatureResult>>('/posts/upload-signature', { params });
     return res.data.data!;
   },
 };

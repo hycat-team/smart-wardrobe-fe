@@ -7,7 +7,7 @@ export async function PostData({ postPublicId }: { postPublicId: string }) {
   let initialData: PostRes | null = null;
   try {
     initialData = await serverFetch<PostRes>(`/posts/${postPublicId}`, {
-      cache: 'no-store'
+      cache: 'no-store',
     });
   } catch (error) {
     notFound();

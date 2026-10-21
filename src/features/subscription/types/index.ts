@@ -36,3 +36,9 @@ export interface DailyQuota {
   aiOutfitDailyQuota?: number; AiOutfitDailyQuota?: number;
   aiChatDailyQuota?: number; AiChatDailyQuota?: number;
 }
+
+export interface WardrobeStats {
+  activeItemsCount?: number;
+  outfitsCount?: number;
+}
+

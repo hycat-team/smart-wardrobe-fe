@@ -1,0 +1,187 @@
+# Hướng dẫn Frontend — Hạn mức Profile & Quản lý phiên (Auth Cookie)
+
+> **Đối tượng:** dev frontend `smart-wardrobe-fe`.
+> **Trạng thái:** Yêu cầu tích hợp. File này nằm trong `docs/temp/` (gitignored) và được gửi trực tiếp cho FE dev.
+> **Phạm vi:** (1) Cách hiển thị đúng hạn mức Tủ đồ/Outfit trên `/profile`; (2) Chuẩn hoá luồng phiên: cookie auth do **backend** quản lý, FE/BFF không tự set cookie auth.
+> **API base production:** `https://api.closy.hycat.online` (FE: `https://closy.hycat.online`).
+
+---
+
+# Section 1 — Hiển thị hạn mức Tủ đồ / Outfit trên `/profile`
+
+## 1.1. Nguyên tắc: tách "tối đa" và "hiện tại" thành 2 nguồn
+
+| Loại dữ liệu | Nguồn chuẩn | Trường |
+|---|---|---|
+| **Tối đa** (theo gói) | `GET /api/v1/subscriptions/me/daily-quota` | `maxWardrobeItems`, `maxOutfits` |
+| **Hiện tại** (đã dùng) | `GET /api/v1/me/wardrobe-items/stats` | `activeItemsCount`, `outfitsCount` |
+| Đã dùng AI phối đồ / AI chat (trong ngày) | `GET /api/v1/subscriptions/me/daily-quota` | `outfitRecommendCount` / `aiOutfitDailyQuota`, `aiUsageCount` / `aiChatDailyQuota` |
+
+> **Vì sao đổi?** Trước đây FE đọc `maxWardrobeItems`/`maxOutfits` từ `GET /subscriptions/me` (hoặc từ `daily-quota` nhưng field chưa tồn tại nên rơi về `∞`). Backend đã bổ sung 2 field này vào `daily-quota` để FE chỉ cần **một nguồn duy nhất** cho hạn mức, còn số lượng hiện tại lấy từ `stats`.
+
+## 1.2. Response mẫu
+
+### `GET /api/v1/subscriptions/me/daily-quota`
+
+```json
+{
+  "success": true,
+  "message": "Lấy hạn ngạch sử dụng thành công",
+  "data": {
+    "planID": "3f2a...",
+    "planName": "Premium",
+    "planSlug": "premium",
+    "expiresAt": "2026-12-31T00:00:00Z",
+    "isAutoRenewEnabled": true,
+    "maxWardrobeItems": 500,
+    "maxOutfits": 50,
+    "aiOutfitDailyQuota": 20,
+    "aiChatDailyQuota": 100,
+    "outfitRecommendCount": 3,
+    "aiUsageCount": 7,
+    "lastResetDate": "2026-09-26T00:00:00Z"
+  }
+}
+```
+
+### `GET /api/v1/me/wardrobe-items/stats`
+
+```json
+{
+  "success": true,
+  "message": "...",
+  "data": {
+    "activeItemsCount": 128,
+    "outfitsCount": 12
+  }
+}
+```
+
+## 1.3. Quy tắc hiển thị
+
+- Hiển thị dạng `hiện tại / tối đa`:
+  - Tủ đồ: `{activeItemsCount} / {maxWardrobeItems} món`
+  - Outfit: `{outfitsCount} / {maxOutfits} bộ`
+- **`max = 0` (hoặc không có) nghĩa là KHÔNG giới hạn** → hiển thị `∞`, không chia cho 0.
+- Progress bar: `min(100, (current / max) * 100)`; nếu `max = 0` thì để 0% hoặc ẩn progress.
+- Dùng `?? 0` cho số đếm, không dùng `||` để tránh `0` bị coi là falsy.
+
+## 1.4. Việc FE cần sửa (kèm vị trí hiện tại trong repo FE)
+
+| File | Vấn đề hiện tại | Việc cần làm |
+|---|---|---|
+| `src/app/(user)/profile/components/ProfileClient.tsx` (dòng ~44-54) | Chỉ query `subscriptionApi.getMySubscription()` + `getDailyQuota()`, không gọi stats | Thêm `useWardrobeStats()` và truyền `stats` xuống `CurrentPlanCard` |
+| `src/features/subscription/components/CurrentPlanCard.tsx` (dòng ~85-96) | Chỉ hiển thị max; dòng 89 bị lặp biểu thức `quota.maxWardrobeItems \|\| quota.maxWardrobeItems` | Render `activeItemsCount/maxWardrobeItems`, `outfitsCount/maxOutfits`; sửa bug lặp dòng 89 |
+| `src/features/wardrobe/queries/wardrobe.queries.ts` (`useWardrobeStats`) | Hook đã có sẵn, `/profile` chưa dùng | Dùng lại hook này |
+| `src/features/subscription/types/index.ts` (`DailyQuota`) | Type đã khai báo `maxWardrobeItems`/`maxOutfits` (cả camelCase & PascalCase) | Giữ nguyên, dùng camelCase từ response |
+| `src/app/(user)/wardrobe/components/WardrobeClient.tsx` (dòng ~354) | Lấy max từ `/subscriptions/me` | (Tuỳ chọn) chuyển sang `daily-quota` cho nhất quán |
+
+**Cảnh báo query key:** `ProfileClient.tsx` dùng `['subscription','quota']` còn hook chuẩn `useDailyQuota` dùng `['subscription','daily-quota']` → không share cache. Nên thống nhất một key.
+
+---
+
+# Section 2 — Cookie AUTH do Backend quản lý (FE/BFF không tự set/clear)
+
+## 2.1. Phạm vi áp dụng (QUAN TRỌNG)
+
+Yêu cầu này **chỉ áp cho cookie auth/phiên** do backend phát hành:
+
+- `accessToken`
+- `refreshToken`
+- `forgotPasswordToken` (token tạm cho luồng quên mật khẩu)
+
+> **FE vẫn được phép tự quản lý cookie riêng** (non-auth) trong tương lai — ví dụ cookie UI/analytics. Chỉ cần đặt **tên khác** để không xung đột với cookie auth. Hiện hệ thống **chỉ có cookie auth**, nên tạm thời yêu cầu này đồng nghĩa "toàn bộ cookie đang có".
+
+**Nguyên tắc:** Backend là **nguồn duy nhất** set/clear cookie auth (kèm thuộc tính `Domain`, `SameSite`, `HttpOnly`). FE/BFF tuyệt đối không tự `Set-Cookie` cho các cookie trên.
+
+## 2.2. Vấn đề hiện tại: 4 token / 2 domain
+
+- Backend set cookie với `Domain=<COOKIE_DOMAIN>` (production: `closy.hycat.online`). Khi browser lưu sẽ thấy domain `.closy.hycat.online`.
+- BFF Next.js của FE **re-set** `accessToken`/`refreshToken` nhưng **không kèm `Domain`** → host-only cookie (`closy.hycat.online`).
+- Trình duyệt lưu host-only và domain cookie thành **2 entry riêng** cho cùng tên → `accessToken` ×2 + `refreshToken` ×2 = **4 token**. Hệ quả:
+  - Refresh/logout chỉ xoá nhánh host-only → nhánh domain còn sót (hoặc ngược lại), jar bị lệch.
+  - `request.cookies.get('refreshToken')` có thể đọc nhầm giá trị cũ.
+  - Logout không sạch phiên.
+
+## 2.3. Backend sở hữu cookie auth — danh sách endpoint
+
+Tất cả trong `services/account/internal/modules/identity/presentation/handler/auth_handler.go`, dùng `Domain = cfg.Server.CookieDomain`:
+
+| Endpoint | Tác động cookie | SameSite |
+|---|---|---|
+| `POST /api/v1/auth/login` | set `accessToken` + `refreshToken` | Strict |
+| `POST /api/v1/auth/refresh-token` | set `accessToken` + `refreshToken` (rotation) | Strict |
+| `POST /api/v1/auth/logout` | clear `accessToken` + `refreshToken` | Strict |
+| `GET /api/v1/auth/google/callback` | set `accessToken` + `refreshToken` | Lax (do OAuth top-level navigation) |
+| `POST /api/v1/auth/forgot-password/confirm-otp` | set `forgotPasswordToken` | Strict |
+| `POST /api/v1/auth/reset-password` | clear `forgotPasswordToken` | Strict |
+
+Các endpoint còn lại (`forgot-password`, `reset-password`, `register/confirm-otp`, ...) đã đi qua rewrite proxy tới backend, **không** có BFF xử lý → cookie do backend quản lý (đúng chuẩn).
+
+## 2.4. Scope FE phải gỡ/neutralize (việc set/clear cookie auth)
+
+| # | File (repo FE) | Hiện tượng | Xử lý |
+|---|---|---|---|
+| 1 | `src/lib/auth-cookies.ts` | `accessCookieOptions`, `refreshCookieOptions`, `clearCookieOptions` (không có `Domain`) | Xoá/không dùng để set cookie auth nữa |
+| 2 | `src/app/api/auth/login/route.ts` | Đọc `Set-Cookie` của BE rồi tự `res.cookies.set('accessToken'/'refreshToken')` | Bỏ BFF hoặc để rewrite forward thẳng |
+| 3 | `src/app/api/auth/refresh-token/route.ts` | Tự set/clear `accessToken`/`refreshToken` sau khi gọi BE | Bỏ BFF |
+| 4 | `src/app/api/auth/logout/route.ts` | Tự clear cookie (không `Domain`) | Để BE logout clear cookie |
+| 5 | `src/app/api/auth/status/route.ts` | Chỉ đọc cookie `accessToken` | Có thể giữ, hoặc thay bằng gọi `GET /me` |
+| 6 | `src/app/api/v1/auth/{login,logout,refresh-token,status}/route.ts` | Wrapper re-export BFF (để Next ưu tiên BFF thay rewrite) | Xoá cùng BFF |
+| 7 | `src/middleware.ts` | Đọc cookie, forward, **set/delete** cookie auth tại dòng ~158-207 | Bỏ đoạn set/delete cookie auth |
+| 8 | `src/lib/axios.ts` | Interceptor gọi `/api/v1/auth/refresh-token` (BFF) | Trỏ thẳng BE (xem 2.5) |
+| 9 | `src/features/auth/api/auth.api.ts` | `login`/`logout`/`refreshToken` gọi BFF | Trỏ thẳng BE |
+| 10 | `src/store/useAuthStore.ts`, `src/components/providers/auth-provider.tsx` | Luồng state/logout | Rà lại để không phụ thuộc cookie do BFF set |
+
+**Read-only (được giữ):** `src/lib/server-fetch.ts` chỉ **đọc** cookie `accessToken` để gắn `Authorization: Bearer` cho SSR — không set, không vi phạm. Tuy nhiên cần lưu ý cookie auth giờ do backend set với `Domain` (vẫn đọc được trong cùng site).
+
+## 2.5. Cách thay thế hợp lệ (chọn 1)
+
+**Cách A — FE gọi thẳng backend (khuyến nghị):**
+- Mọi request auth gửi `credentials: 'include'`.
+- Backend đã cấu hình CORS cho `https://closy.hycat.online` (kèm `Access-Control-Allow-Credentials: true`), nên hoạt động trực tiếp.
+- Ví dụ:
+
+```ts
+const API_BASE = 'https://api.closy.hycat.online';
+
+await fetch(`${API_BASE}/api/v1/auth/login`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include', // BẮT BUỘC
+  body: JSON.stringify({ username, password }),
+});
+```
+
+**Cách B — Giữ same-origin proxy (rewrite) nhưng xoá BFF auth routes:**
+- Xoá các route handler BFF ở mục 2.4 (#2-#6). Khi đó `/api/v1/auth/*` sẽ rơi xuống rewrite `next.config.ts` (`source: '/api/v1/:path*'`) và Next forward **nguyên văn** header `Set-Cookie` của backend (giữ `Domain`, `SameSite`).
+- **Không** đọc rồi re-emit `Set-Cookie` bằng `NextResponse.cookies.set` (đó chính là hành vi gây trùng cookie).
+
+**Refresh token khi access token hết hạn:**
+- Gọi `POST /auth/refresh-token` (qua BE hoặc rewrite) với `credentials:'include'`; backend đọc `refreshToken` từ cookie, trả `Set-Cookie` cặp token mới. FE **không** tự set lại cookie.
+
+**Logout:**
+- Gọi `POST /auth/logout` với `credentials:'include'`; backend clear đúng cookie có `Domain`. FE không tự clear.
+
+## 2.6. Dọn cookie legacy (một lần)
+
+Sau khi triển khai, trên client có thể còn cookie host-only cũ. Cần dọn:
+
+- Xoá `accessToken`/`refreshToken` ở dạng host-only (không `Domain`) một lần, sau đó để backend set cookie domain mới.
+- Bảo đảm sau login chỉ còn **một cặp** cookie (nhánh `.closy.hycat.online`).
+
+## 2.7. QA Checklist
+
+- [ ] Sau login: chỉ còn **1** `accessToken` và **1** `refreshToken` (không có cặp host-only trùng).
+- [ ] Refresh khi hết hạn: token được xoay vòng, không sinh thêm cookie; không có 4 token.
+- [ ] Logout: xoá sạch cả `accessToken` và `refreshToken`; reload vẫn ở trạng thái đã đăng xuất.
+- [ ] Cookie auth không truy cập được từ JS (`HttpOnly`).
+- [ ] Google login (redirect) vẫn hoạt động; không sinh cookie trùng ở FE host.
+- [ ] Mobile không bị ảnh hưởng (đã dùng body/header, không cookie).
+
+---
+
+## Ghi chú thay đổi phía Backend (tham chiếu)
+
+- Bổ sung `maxWardrobeItems`, `maxOutfits` vào DTO `UserSubscriptionDTO` (response `GET /api/v1/subscriptions/me/daily-quota`).
+- Thay đổi này đảo ngược quyết định trim ở spec `013-briefres-audit` (T057/T081), với lý do: FE cần một nguồn hạn mức tối đa duy nhất trên màn hình profile/subscription.

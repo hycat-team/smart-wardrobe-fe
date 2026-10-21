@@ -8,6 +8,7 @@ import { useBatchUploadSystemWardrobeItems } from "@/features/admin/queries/admi
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { uploadToCloudinary, applyCloudinaryBackgroundRemoval } from "@/lib/cloudinary";
+import { compressImageToWebP } from "@/lib/image-compression";
 
 interface BatchUploadModalProps {
   isOpen: boolean;
@@ -54,8 +55,16 @@ export function BatchUploadModal({ isOpen, onClose }: BatchUploadModalProps) {
       const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
 
       const uploadPromises = files.map(async (file) => {
+        let fileToUpload = file;
+        try {
+          fileToUpload = await compressImageToWebP(file);
+        } catch (compressionErr) {
+          console.warn('[BatchUploadModal] Không thể nén ảnh, tiếp tục với ảnh gốc:', compressionErr);
+          fileToUpload = file;
+        }
+
         const uploadResData = await uploadToCloudinary({
-          file,
+          file: fileToUpload,
           signatureParams: {
             apiKey: signatureResult.apiKey,
             timestamp: signatureResult.timestamp,

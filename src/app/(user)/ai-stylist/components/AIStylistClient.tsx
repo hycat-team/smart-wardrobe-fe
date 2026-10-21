@@ -1,13 +1,20 @@
 'use client';
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Sparkles, Save, RefreshCw, Layers, SlidersHorizontal } from 'lucide-react';
+import { Sparkles, Save, RefreshCw, Layers, SlidersHorizontal, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { aiApi } from '@/features/ai-stylist/api/ai.api';
 import type { AIOutfitRecommendationRes } from '@/features/ai-stylist/types';
 import { useOutfitCanvas } from '@/features/outfits/hooks/useOutfitCanvas';
 import type { CanvasItem } from '@/features/outfits/hooks/useOutfitCanvas';
-import { getBrandItemCanvasMetadata } from '@/features/ai-stylist/utils/brand-item-canvas';
+import {
+  resolveCanvasOutfitItems,
+  swapCanvasItemByRole,
+  normalizeFashionRole,
+  detectCompositionType,
+  ROLE_COORDINATES_SEPARATE,
+  ROLE_COORDINATES_FULLBODY,
+} from '@/features/ai-stylist/utils/outfit-canvas-layout';
 import { OutfitCanvasBoard } from '@/features/outfits/components/OutfitCanvasBoard';
 import { wardrobeApi } from '@/features/wardrobe/api/wardrobe.api';
 import { useCreateOutfit } from '@/features/outfits/queries/outfits.queries';
@@ -35,11 +42,12 @@ function AIStylistContent() {
 
   const [selectedOccasion, setSelectedOccasion] = useState<string>('');
   const [selectedStyle, setSelectedStyle] = useState<string>('');
-  const [detailsInput, setDetailsInput] = useState('');
+  const [detailsInput, setDetailsInput] = useState(() => searchParams.get('details') || '');
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
+  const [outfitName, setOutfitName] = useState<string>('');
 
   const {
     ghostClosetEnabled,
@@ -55,9 +63,29 @@ function AIStylistContent() {
   const [isBrandFeedbackOpen, setIsBrandFeedbackOpen] = useState(false);
 
   const [alternativeIndices, setAlternativeIndices] = useState<Record<string, number>>({});
+  const [itemScaleModifier, setItemScaleModifier] = useState<number>(100);
 
   const { selectedItems, setSelectedItems, bringToFront, updateScale, handleDragEnd } =
     useOutfitCanvas();
+
+  const handleScaleModifierChange = (newModifier: number) => {
+    setItemScaleModifier(newModifier);
+    if (selectedItems.length > 0) {
+      const isFullbody = outfitData ? detectCompositionType(outfitData.items) === 'FULLBODY' : false;
+      const coordinateMap = isFullbody ? ROLE_COORDINATES_FULLBODY : ROLE_COORDINATES_SEPARATE;
+
+      setSelectedItems((prev) =>
+        prev.map((item) => {
+          const role = normalizeFashionRole(item._role, item.category?.slug);
+          const basePlacement = coordinateMap[role] || coordinateMap.other;
+          return {
+            ...item,
+            scale: Math.round(basePlacement.scale * (newModifier / 100)),
+          };
+        })
+      );
+    }
+  };
 
   const createOutfitMutation = useCreateOutfit();
   const createSampleFeedback = useCreateSampleFeedback();
@@ -65,6 +93,7 @@ function AIStylistContent() {
   useEffect(() => {
     const detailsParam = searchParams.get('details');
     if (detailsParam) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDetailsInput(detailsParam);
     }
   }, [searchParams]);
@@ -78,112 +107,17 @@ function AIStylistContent() {
         details: safeDetails,
         occasion: occasionMap[selectedOccasion] || selectedOccasion.trim(),
         styleTarget: selectedStyle ? selectedStyle.toLowerCase() : '',
-        includeBrandItems: ghostClosetEnabled ? true : undefined,
+        includeBrandItems: ghostClosetEnabled ? false : undefined,
       });
 
       setOutfitData(res);
 
-      let brandYOffset = -150;
-      let accessoryYOffset = -150;
-
-      const initialItems = res.items.map((item) => {
-        const primary = item.primary;
-        const brandItemMetadata = getBrandItemCanvasMetadata(item.itemContext, primary);
-        const isBrand =
-          brandItemMetadata.itemContext === 'brand_item' ||
-          isGhostItem(primary) ||
-          !!(primary as GhostItem).brandName;
-        let x = 0;
-        let y = 0;
-        let zIndex = 1;
-
-        if (isBrand) {
-          x = 280;
-          y = brandYOffset;
-          brandYOffset += 240;
-          zIndex = 10;
-        } else {
-          const slug = (primary.category?.slug || '').toLowerCase();
-          const role = (item.role || '').toLowerCase();
-
-          if (
-            slug.includes('phu-kien') ||
-            slug.includes('accessory') ||
-            role.includes('phụ kiện')
-          ) {
-            x = -280;
-            y = accessoryYOffset;
-            accessoryYOffset += 240;
-            zIndex = 5;
-          } else if (
-            slug === 'mu' ||
-            slug === 'non' ||
-            slug.includes('hat') ||
-            role.includes('mũ') ||
-            role.includes('nón')
-          ) {
-            y = -350;
-            zIndex = 4;
-          } else if (
-            slug === 'ao' ||
-            slug.startsWith('ao-') ||
-            slug.includes('top') ||
-            slug.includes('jacket') ||
-            role.includes('áo')
-          ) {
-            y = -180;
-            zIndex = 3;
-          } else if (
-            slug === 'quan' ||
-            slug === 'vay' ||
-            slug.startsWith('quan-') ||
-            slug.startsWith('vay-') ||
-            slug.includes('bottom') ||
-            slug.includes('skirt') ||
-            role.includes('quần') ||
-            role.includes('váy')
-          ) {
-            y = 120;
-            zIndex = 2;
-          } else if (
-            slug === 'giay' ||
-            slug.startsWith('giay-') ||
-            slug.includes('shoes') ||
-            slug.includes('footwear') ||
-            role.includes('giày')
-          ) {
-            y = 270;
-            zIndex = 3;
-          } else {
-            y = Math.random() * 80 - 40;
-            x = Math.random() * 80 - 40;
-          }
-        }
-
-        const ghostData = isGhostItem(primary) ? primary : undefined;
-
-        return {
-          id: crypto.randomUUID(),
-          clothingItemId: primary.fashionItem?.id || primary.id,
-          imageUrl: primary.fashionItem?.imageUrl || '',
-          category: primary.category || primary.fashionItem?.category,
-          _role: item.role,
-          isGhost: ghostData?.isGhost,
-          brandName:
-            ghostData?.brandName ||
-            brandItemMetadata.brandItemSnapshot?.brandName ||
-            primary.brandName,
-          wardrobeImpact: ghostData?.wardrobeImpact,
-          price: brandItemMetadata.brandItemSnapshot?.price ?? primary.price,
-          ...brandItemMetadata,
-          x,
-          y,
-          scale: isBrand ? 80 : 100,
-          zIndex,
-        };
+      const initialItems = resolveCanvasOutfitItems(res.items, {
+        scaleMultiplier: itemScaleModifier / 100,
       });
       setSelectedItems(initialItems);
       setAlternativeIndices({});
+      setOutfitName(res.title || `Outfit ${new Date().toLocaleDateString('vi-VN')}`);
       toast.success('Đã tạo bộ phối đồ thành công!');
     } catch (error) {
       console.error(error);
@@ -196,51 +130,38 @@ function AIStylistContent() {
   const handleSwap = (role: string) => {
     if (!outfitData) return;
 
-    const outfitItem = outfitData.items.find((i) => i.role === role);
+    const outfitItem = outfitData.items.find(
+      (i) => normalizeFashionRole(i.role) === normalizeFashionRole(role)
+    );
     if (!outfitItem || !outfitItem.alternatives || outfitItem.alternatives.length === 0) {
       toast.error('Không có lựa chọn thay thế cho món đồ này');
       return;
     }
 
-    const currentIndex = alternativeIndices[outfitItem.role] || 0;
+    const itemRoleKey = outfitItem.role || role;
+    const currentIndex = alternativeIndices[itemRoleKey] || 0;
     const allOptions = [outfitItem.primary, ...outfitItem.alternatives];
     const nextIndex = (currentIndex + 1) % allOptions.length;
 
     setAlternativeIndices((prev) => ({
       ...prev,
-      [outfitItem.role]: nextIndex,
+      [itemRoleKey]: nextIndex,
     }));
 
     const nextItem = allOptions[nextIndex];
-    const nextGhostData = isGhostItem(nextItem) ? nextItem : undefined;
-    const brandItemMetadata = getBrandItemCanvasMetadata(outfitItem.itemContext, nextItem);
-
-    setSelectedItems((prev) => {
-      const existingItemIndex = prev.findIndex((item) => item._role === role);
-      if (existingItemIndex === -1) return prev;
-
-      const newItems = [...prev];
-      newItems[existingItemIndex] = {
-        ...newItems[existingItemIndex],
-        clothingItemId: nextItem.fashionItem?.id || nextItem.id,
-        imageUrl: nextItem.fashionItem?.imageUrl || '',
-        category: nextItem.category || nextItem.fashionItem?.category,
-        isGhost: nextGhostData?.isGhost,
-        brandName:
-          nextGhostData?.brandName ||
-          brandItemMetadata.brandItemSnapshot?.brandName ||
-          nextItem.brandName,
-        wardrobeImpact: nextGhostData?.wardrobeImpact,
-        price: brandItemMetadata.brandItemSnapshot?.price ?? nextItem.price,
-        ...brandItemMetadata,
-      };
-
-      return newItems;
-    });
+    setSelectedItems((prev) =>
+      swapCanvasItemByRole(prev, role, nextItem, outfitItem.itemContext)
+    );
   };
 
   const handleSaveOutfit = async () => {
     if (!outfitData || selectedItems.length === 0 || !canvasRef.current) return;
+
+    const trimmedName = outfitName.trim();
+    if (!trimmedName) {
+      toast.error('Vui lòng nhập tên cho bộ trang phục trước khi lưu!');
+      return;
+    }
 
     try {
       const invalidItems = selectedItems.filter((item) => !item.clothingItemId);
@@ -254,44 +175,71 @@ function AIStylistContent() {
       setIsSaving(true);
       toast.loading('Đang tạo ảnh preview...', { id: 'save_outfit' });
 
-      const elementsToHide = canvasRef.current.querySelectorAll('.action-button');
-      elementsToHide.forEach((el) => ((el as HTMLElement).style.display = 'none'));
+      // 1. Tạm ẩn các nút điều khiển trên canvas
+      const controls = document.querySelectorAll('.canvas-item-controls');
+      controls.forEach((el) => ((el as HTMLElement).style.opacity = '0'));
+      await new Promise((resolve) => setTimeout(resolve, 80));
 
-      const blob = await htmlToImage.toBlob(canvasRef.current, {
-        quality: 1,
-        pixelRatio: 3,
-        backgroundColor: 'transparent',
-        cacheBust: true,
-      });
+      let uploadedUrl = '';
 
-      elementsToHide.forEach((el) => ((el as HTMLElement).style.display = ''));
+      try {
+        // Cố gắng chụp Canvas bằng htmlToImage với timeout 4 giây
+        const capturePromise = htmlToImage.toBlob(canvasRef.current, {
+          quality: 0.92,
+          pixelRatio: 1.5,
+          backgroundColor: 'transparent',
+          skipFonts: true, // Không tải web fonts để tránh bị treo vĩnh viễn
+          cacheBust: false, // Không thêm query param làm hỏng cache CORS của Cloudinary
+          filter: (node: HTMLElement) => {
+            return !node.classList?.contains('canvas-item-controls') && !node.classList?.contains('action-button');
+          },
+        });
 
-      if (!blob) throw new Error('Không thể tạo ảnh từ Canvas');
+        const timeoutPromise = new Promise<null>((_, reject) =>
+          setTimeout(() => reject(new Error('Canvas preview capture timeout')), 4000)
+        );
 
-      toast.loading('Đang lưu hình ảnh...', { id: 'save_outfit' });
+        const blob = await Promise.race([capturePromise, timeoutPromise]);
 
-      const signatureResult = await wardrobeApi.getUploadSignature();
-      const uploadResData = await uploadToCloudinary({
-        file: blob,
-        signatureParams: {
-          apiKey: signatureResult.apiKey,
-          timestamp: signatureResult.timestamp,
-          signature: signatureResult.signature,
-          folder: signatureResult.folder,
-        },
-      });
+        if (blob) {
+          toast.loading('Đang lưu hình ảnh...', { id: 'save_outfit' });
+          const signatureResult = await wardrobeApi.getUploadSignature();
+          const uploadResData = await uploadToCloudinary({
+            file: blob,
+            signatureParams: {
+              apiKey: signatureResult.apiKey,
+              timestamp: signatureResult.timestamp,
+              signature: signatureResult.signature,
+              folder: signatureResult.folder,
+            },
+          });
+          uploadedUrl = uploadResData.secure_url;
+        }
+      } catch (captureErr) {
+        console.warn('Canvas preview capture không thành công, dùng ảnh gốc của món đồ chính:', captureErr);
+      } finally {
+        controls.forEach((el) => ((el as HTMLElement).style.opacity = '1'));
+      }
 
-      const uploadedUrl = uploadResData.secure_url;
+      // Fallback nếu không chụp được canvas: dùng ảnh của món đồ đầu tiên trong outfit
+      if (!uploadedUrl) {
+        uploadedUrl =
+          selectedItems[0]?.fashionItem?.imageUrl ||
+          (selectedItems[0] as any)?.imageUrl ||
+          '';
+      }
+
       toast.loading('Đang lưu tủ đồ...', { id: 'save_outfit' });
 
       await createOutfitMutation.mutateAsync({
-        name: `Outfit ${new Date().toLocaleDateString('vi-VN')}`,
-        description: outfitData.title || 'Gợi ý từ AI',
+        name: trimmedName,
+        description: outfitData.explanation || outfitData.title || 'Gợi ý từ AI',
         coverImageUrl: uploadedUrl,
+        status: 1, // 1: Do AI phối (AI Curated)
         items: selectedItems.map((item) => ({
           fashionItemId: item.clothingItemId,
-          positionX: Math.max(1, Math.abs(item.x || 0)),
-          positionY: Math.max(1, Math.abs(item.y || 0)),
+          positionX: Math.round(item.x || 0),
+          positionY: Math.round(item.y || 0),
           scale: (item.scale || 100) / 100,
           layerOrder: item.zIndex || 1,
         })),
@@ -315,7 +263,7 @@ function AIStylistContent() {
     <div className="min-h-full flex flex-col pt-4 md:pt-8 bg-background max-w-[1600px] w-full mx-auto pb-10">
       <div className="flex flex-col h-full gap-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-1 items-start">
-          <div className="lg:col-span-8 flex flex-col gap-0 relative min-h-[600px] h-[600px] lg:h-[800px] border border-border bg-card shadow-sm rounded-2xl overflow-hidden">
+          <div className="lg:col-span-8 flex flex-col gap-0 relative min-h-[600px] h-[600px] lg:h-[800px] border border-border bg-card shadow-sm rounded-2xl overflow-hidden pb-24 sm:pb-20">
             {outfitData ? (
               <>
                 <div className="absolute top-4 left-4 z-20">
@@ -333,7 +281,9 @@ function AIStylistContent() {
                   handleDragEnd={handleDragEnd}
                   onSwap={handleSwap}
                   hasAlternativesCheck={(role) => {
-                    const outfitItem = outfitData.items.find((i) => i.role === role);
+                    const outfitItem = outfitData.items.find(
+                      (i) => normalizeFashionRole(i.role) === normalizeFashionRole(role)
+                    );
                     return !!(
                       outfitItem &&
                       outfitItem.alternatives &&
@@ -346,7 +296,9 @@ function AIStylistContent() {
                   }}
                   onGhostItemClick={(item) => {
                     if (outfitData) {
-                      const outfitItem = outfitData.items.find((i) => i.role === item._role);
+                      const outfitItem = outfitData.items.find(
+                        (i) => normalizeFashionRole(i.role) === normalizeFashionRole(item._role)
+                      );
                       if (outfitItem) {
                         const allOptions = [outfitItem.primary, ...(outfitItem.alternatives || [])];
                         const realGhostItem = allOptions.find(
@@ -369,23 +321,55 @@ function AIStylistContent() {
                   }
                 />
 
-                <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center border-t border-border bg-card z-20">
-                  <button
-                    onClick={() => {
-                      setOutfitData(null);
-                      setSelectedItems([]);
-                    }}
-                    className="w-1/2 px-6 py-4 border-r border-border text-foreground font-bold text-[11px] uppercase tracking-widest hover:bg-muted transition-colors flex items-center justify-center gap-2"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" /> LÀM MỚI
-                  </button>
-                  <button
-                    onClick={handleSaveOutfit}
-                    disabled={isSaving}
-                    className="w-1/2 px-8 py-4 bg-primary text-primary-foreground font-bold text-[11px] uppercase tracking-widest hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    <Save className="w-3.5 h-3.5" /> {isSaving ? 'ĐANG LƯU...' : 'LƯU VÀO TỦ ĐỒ'}
-                  </button>
+                <div className="absolute bottom-0 left-0 right-0 border-t border-border bg-card/95 backdrop-blur-md z-20 p-3 sm:p-3.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+                  {/* Outfit Name Input */}
+                  <div className="relative flex-1 flex items-center">
+                    <div className="absolute left-3 text-muted-foreground pointer-events-none flex items-center gap-1.5">
+                      <Sparkles className="size-3.5 text-amber-500 shrink-0" />
+                      <span className="text-[10px] font-mono uppercase tracking-wider font-semibold text-muted-foreground">Tên:</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={outfitName}
+                      onChange={(e) => setOutfitName(e.target.value)}
+                      placeholder="Nhập tên bộ trang phục..."
+                      maxLength={70}
+                      className="w-full pl-16 pr-8 py-2 bg-muted/70 hover:bg-muted focus:bg-background border border-border focus:border-foreground rounded-xl text-xs sm:text-sm font-medium text-foreground placeholder:text-muted-foreground/60 outline-none transition-all shadow-xs"
+                    />
+                    {outfitName && (
+                      <button
+                        type="button"
+                        onClick={() => setOutfitName('')}
+                        className="absolute right-2.5 text-muted-foreground hover:text-foreground p-1 transition-colors"
+                        title="Xóa tên"
+                      >
+                        <X className="size-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOutfitData(null);
+                        setSelectedItems([]);
+                        setOutfitName('');
+                      }}
+                      className="flex-1 sm:flex-none px-4 py-2 border border-border text-foreground font-bold text-[11px] uppercase tracking-wider hover:bg-muted rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <RefreshCw className="size-3.5" /> Làm mới
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveOutfit}
+                      disabled={isSaving}
+                      className="flex-1 sm:flex-none px-5 py-2 bg-primary text-primary-foreground font-bold text-[11px] uppercase tracking-wider hover:bg-primary/90 rounded-xl transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-xs"
+                    >
+                      <Save className="size-3.5" /> {isSaving ? 'ĐANG LƯU...' : 'LƯU VÀO TỦ ĐỒ'}
+                    </button>
+                  </div>
                 </div>
               </>
             ) : (
@@ -414,6 +398,30 @@ function AIStylistContent() {
           </div>
 
           <div className="lg:col-span-4 h-auto lg:h-[800px] border border-border bg-card flex flex-col relative shadow-sm overflow-hidden rounded-2xl">
+            {outfitData && (
+              <div className="p-4 sm:p-5 border-b border-border bg-gradient-to-br from-stone-100/60 via-stone-50/40 to-stone-100/60 dark:from-stone-900/60 dark:via-stone-950/40 dark:to-stone-900/60 flex flex-col gap-2 shrink-0">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider font-semibold bg-background/90 dark:bg-stone-900/90 backdrop-blur-md border border-border/70 text-foreground shadow-xs">
+                    <Sparkles className="size-3 text-amber-500 fill-amber-500/20" />
+                    GỢI Ý TỪ AI
+                  </span>
+                  {outfitData.remainingQuota !== undefined && (
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      Còn {outfitData.remainingQuota} lượt
+                    </span>
+                  )}
+                </div>
+                <h4 className="font-semibold text-sm sm:text-base text-foreground tracking-tight">
+                  {outfitData.title}
+                </h4>
+                {outfitData.explanation && (
+                  <p className="text-xs text-muted-foreground leading-relaxed italic border-l-2 border-primary/40 pl-3">
+                    &ldquo;{outfitData.explanation}&rdquo;
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="p-5 border-b border-border bg-muted flex items-center gap-3">
               <SlidersHorizontal className="w-4 h-4 text-foreground" />
               <h3 className="font-bold text-[13px] text-foreground uppercase tracking-widest">
@@ -504,7 +512,59 @@ function AIStylistContent() {
                 />
               </div>
 
-              <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
+              <div className="group flex flex-col gap-2.5 pt-2 border-t border-border/60">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
+                    KÍCH THƯỚC TRANG PHỤC (FIT)
+                  </label>
+                  <span className="text-[10px] font-bold text-foreground font-mono bg-muted px-2 py-0.5 rounded-full border border-border">
+                    {itemScaleModifier}%
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { label: 'Gọn gàng', value: 85 },
+                    { label: 'Cân đối', value: 100 },
+                    { label: 'Phóng to', value: 115 },
+                  ].map((preset) => (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      onClick={() => handleScaleModifierChange(preset.value)}
+                      disabled={isGenerating}
+                      className={cn(
+                        'px-2 py-1.5 text-[9px] font-bold uppercase tracking-wider transition-colors border rounded-full text-center',
+                        itemScaleModifier === preset.value
+                          ? 'bg-foreground text-background border-foreground shadow-xs'
+                          : 'bg-transparent text-foreground border-border hover:border-foreground'
+                      )}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 pt-0.5">
+                  <span className="text-[9px] font-bold text-muted-foreground">70%</span>
+                  <input
+                    type="range"
+                    min={70}
+                    max={130}
+                    step={5}
+                    value={itemScaleModifier}
+                    onChange={(e) => handleScaleModifierChange(Number(e.target.value))}
+                    disabled={isGenerating}
+                    className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-foreground"
+                  />
+                  <span className="text-[9px] font-bold text-muted-foreground">130%</span>
+                </div>
+                <p className="text-[9px] text-muted-foreground/80 tracking-tight">
+                  Chuẩn hoá khung hình & điều chỉnh tỉ lệ trang phục trước khi hiển thị trên Canvas
+                </p>
+              </div>
+
+              {/* <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-widest text-foreground">
                     Phối đồ với các thương hiệu địa phương
@@ -514,7 +574,7 @@ function AIStylistContent() {
                   </p>
                 </div>
                 <Switch checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} />
-              </div>
+              </div> */}
             </div>
 
             <div className="p-4 border-t border-border bg-card">
@@ -554,7 +614,7 @@ function AIStylistContent() {
           if (activeGhostItem) {
             const activeFashionId = activeGhostItem.fashionItem?.id || activeGhostItem.id;
             const canvasItem = selectedItems.find((x) => x.clothingItemId === activeFashionId);
-            if (canvasItem) handleSwap(canvasItem._role);
+            if (canvasItem && canvasItem._role) handleSwap(canvasItem._role);
             logGhostAction(activeGhostItem.id, 'swap');
             setIsImpactPanelOpen(false);
           }

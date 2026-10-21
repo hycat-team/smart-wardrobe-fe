@@ -69,7 +69,7 @@ describe('Axios Interceptor - Auto Refresh Token Flow', () => {
     const res = await api.get('/me/wardrobe-items');
 
     // Kiểm tra kết quả
-    expect(axios.post).toHaveBeenCalledWith('/api/v1/auth/refresh-token', {}, { baseURL: '' });
+    expect(axios.post).toHaveBeenCalledWith('/api/v1/auth/refresh-token', {}, { baseURL: '', withCredentials: true });
     expect(res.status).toBe(200);
     expect(res.data).toEqual({ data: 'Success after refresh' });
   });

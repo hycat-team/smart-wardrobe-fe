@@ -74,8 +74,8 @@ export function ItemEditDrawer({ item, isOpen, onClose }: ItemEditDrawerProps) {
             <form id="edit-form" onSubmit={handleSubmit} className="space-y-6">
               
               <div className="flex gap-4 mb-8">
-                <div className="size-24 bg-muted rounded-2xl overflow-hidden">
-                  {(item.fashionItem?.imageUrl || item.imageUrl) && <Image fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" src={item.fashionItem?.imageUrl || item.imageUrl} alt="" className="w-full h-full object-cover mix-blend-multiply opacity-80" />}
+                <div className="relative size-24 bg-muted rounded-2xl overflow-hidden shrink-0">
+                  {(item.fashionItem?.imageUrl || item.imageUrl) && <Image fill sizes="96px" src={item.fashionItem?.imageUrl || item.imageUrl} alt="" className="w-full h-full object-cover mix-blend-multiply opacity-80" />}
                 </div>
                 <div className="flex flex-col justify-center gap-1">
                   <span className="font-semibold text-[10px] text-muted-foreground uppercase tracking-widest">ID: {item.id}</span>

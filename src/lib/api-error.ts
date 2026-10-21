@@ -3,6 +3,22 @@ import { ErrorResponse } from '@/types/api';
 import { toast } from 'sonner';
 
 /**
+ * Maps standard HTTP status codes to user-friendly Vietnamese messages.
+ */
+export const HTTP_STATUS_MESSAGES: Record<number, string> = {
+  400: 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.',
+  401: 'Vui lòng đăng nhập để thực hiện thao tác này.',
+  403: 'Bạn không có quyền thực hiện thao tác này.',
+  404: 'Nội dung yêu cầu không tồn tại hoặc đã bị xóa.',
+  409: 'Dữ liệu bị trùng lặp hoặc xung đột.',
+  422: 'Dữ liệu gửi lên không đúng định dạng quy định.',
+  429: 'Thao tác quá nhanh. Vui lòng thử lại sau giây lát.',
+  500: 'Lỗi hệ thống máy chủ. Vui lòng thử lại sau.',
+  502: 'Máy chủ phản hồi không đúng. Vui lòng thử lại sau.',
+  503: 'Dịch vụ tạm thời quá tải hoặc đang bảo trì.',
+};
+
+/**
  * Extracts a user-friendly error message from an API error response.
  * @param error The error object caught in a try/catch or onError block
  * @param fallbackMessage Optional fallback message if no specific message is found
@@ -12,8 +28,17 @@ export const getApiErrorMessage = (error: unknown, fallbackMessage: string = 'Th
   if (isAxiosError(error)) {
     const errorData = error.response?.data as ErrorResponse | undefined;
     if (errorData) {
-      return errorData.message || errorData.detail || errorData.title || fallbackMessage;
+      const serverMessage = errorData.message || errorData.detail || errorData.title;
+      if (serverMessage && typeof serverMessage === 'string' && serverMessage.trim()) {
+        return serverMessage;
+      }
     }
+
+    const status = error.response?.status;
+    if (status && HTTP_STATUS_MESSAGES[status]) {
+      return HTTP_STATUS_MESSAGES[status];
+    }
+
     if (isNetworkError(error)) {
       return 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra đường truyền.';
     }
@@ -44,8 +69,8 @@ export const handleApiError = (error: unknown, fallbackMessage?: string) => {
   const status = getApiErrorStatus(error);
   const isNetwork = isNetworkError(error);
   
-  // Axios interceptor handles these globally, so we skip to prevent duplicate toasts
-  if (isNetwork || (status && (status >= 500 || status === 403 || status === 429 || status === 401))) {
+  // Axios interceptor handles global session expired / 500, skip only those to prevent duplicate toasts
+  if (isNetwork || (status && status >= 500)) {
     return;
   }
 

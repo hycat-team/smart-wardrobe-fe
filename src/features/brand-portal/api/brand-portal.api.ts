@@ -217,6 +217,22 @@ export const brandPortalApi = {
     return res.data.data;
   },
 
+  retryBrandItemAnalysis: async (
+    brandId: string,
+    itemId: string,
+    data?: { categoryId?: string }
+  ): Promise<BrandItemRes & { message?: string }> => {
+    const res = await api.post<{ data: BrandItemRes; message?: string }>(
+      `/brand-portal/brands/${brandId}/items/${itemId}/retry-analysis`,
+      data
+    );
+    const result = (res.data?.data || {}) as BrandItemRes & { message?: string };
+    if (res.data?.message) {
+      result.message = res.data.message;
+    }
+    return result;
+  },
+
   getBrandItemUploadSignature: async (brandId: string) => {
     const res = await api.get<{data: { signature: string, timestamp: number, folder: string, apiKey: string }}>(`/brand-portal/brands/${brandId}/items/upload-signature`);
     return res.data.data;
@@ -259,6 +275,9 @@ export const brandPortalApi = {
 
         const decoder = new TextDecoder();
         let buffer = '';
+        let totalItems = 0;
+        let processedTerminalCount = 0;
+        const processedTerminalItemIds = new Set<string>();
 
         while (true) {
           const { value, done } = await reader.read();
@@ -301,14 +320,36 @@ export const brandPortalApi = {
             // Ignore heartbeat / ping
             if (eventType === 'ping') continue;
 
+            if (parsedData && typeof parsedData === 'object' && typeof parsedData.total === 'number') {
+              totalItems = parsedData.total;
+            }
+
             onMessage(parsedData);
 
             const statusLower = String(parsedData?.status || '').toLowerCase();
-            if (
+            const isTerminalStatus =
               eventType === 'done' ||
               statusLower === 'completed' ||
               statusLower === 'failed' ||
-              statusLower === 'needs_review'
+              statusLower === 'needs_review';
+
+            if (isTerminalStatus) {
+              if (parsedData?.itemId) {
+                processedTerminalItemIds.add(parsedData.itemId);
+              } else {
+                processedTerminalCount++;
+              }
+            }
+
+            const terminalCount = Math.max(
+              processedTerminalItemIds.size,
+              processedTerminalCount
+            );
+
+            if (
+              eventType === 'done' ||
+              (totalItems > 0 && terminalCount >= totalItems) ||
+              (isTerminalStatus && (!totalItems || totalItems <= 1))
             ) {
               onDone();
               return;

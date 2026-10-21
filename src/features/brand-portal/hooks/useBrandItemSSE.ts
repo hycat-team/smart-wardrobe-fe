@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { brandPortalApi } from "../api/brand-portal.api";
 import { BRAND_PORTAL_KEYS } from "../queries/brand-portal.queries";
 import { BrandItemRes } from "../types";
+import { getAnalysisErrorMessage, getAnalysisReviewMessage } from "@/features/wardrobe/utils/analysis-status";
 
 /**
  * Custom hook to listen to realtime SSE updates for Brand Portal items
@@ -12,6 +13,7 @@ import { BrandItemRes } from "../types";
 export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItemsUpdated?: () => void) {
   const queryClient = useQueryClient();
   const activeControllers = useRef<Map<string, AbortController>>(new Map());
+  const fallbackTimers = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   useEffect(() => {
     if (!brandId || !items) return;
@@ -34,6 +36,11 @@ export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItems
       if (!currentTaskIds.has(taskId)) {
         controller.abort();
         activeControllers.current.delete(taskId);
+        const timer = fallbackTimers.current.get(taskId);
+        if (timer) {
+          clearTimeout(timer);
+          fallbackTimers.current.delete(taskId);
+        }
       }
     });
 
@@ -45,14 +52,36 @@ export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItems
       const controller = new AbortController();
       activeControllers.current.set(taskId, controller);
 
+      const clearTimer = () => {
+        const timer = fallbackTimers.current.get(taskId);
+        if (timer) {
+          clearTimeout(timer);
+          fallbackTimers.current.delete(taskId);
+        }
+      };
+
+      // Fallback timer: if SSE stalls or connection drops without terminal event
+      if (!fallbackTimers.current.has(taskId)) {
+        const timer = setTimeout(() => {
+          console.warn(`[Brand SSE Task ${taskId}] Fallback refetch triggered after 15s.`);
+          queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId) });
+          queryClient.refetchQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId), type: "active" });
+        }, 15000);
+        fallbackTimers.current.set(taskId, timer);
+      }
+
       const handleTaskEvent = (payload: any) => {
         console.log(`[Brand SSE Task ${taskId}] Event:`, payload);
         const targetItemId = payload.itemId || payload.data?.id;
-        const itemStatus = payload.status;
+        const itemStatus = String(payload.status || "").toLowerCase();
         const sseData = payload.data;
 
         if (itemStatus === "failed") {
-          toast.error(payload.error || "AI phân tích sản phẩm không thành công.");
+          const reasonText = getAnalysisErrorMessage(payload.error);
+          toast.error(reasonText || "AI phân tích sản phẩm không thành công.");
+        } else if (itemStatus === "needs_review") {
+          const reviewText = getAnalysisReviewMessage(payload.error || sseData?.fashionItem?.reviewReason);
+          toast.info(reviewText || "Sản phẩm cần chọn danh mục để hoàn tất phân tích.");
         } else if (itemStatus === "completed") {
           toast.success("Sản phẩm đã được AI phân tích hoàn tất!");
         }
@@ -67,10 +96,38 @@ export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItems
                 (Boolean(targetItemId) && String(it.id).toLowerCase() === String(targetItemId).toLowerCase()) ||
                 (String(it.taskId || it.task_id || "").toLowerCase() === String(taskId).toLowerCase());
               if (!isMatch) return it;
+
+              const nextStatus =
+                itemStatus === "completed"
+                  ? "active"
+                  : itemStatus === "failed"
+                  ? "failed"
+                  : itemStatus === "needs_review"
+                  ? "needs_review"
+                  : it.status;
+
+              const processingErrorReason =
+                itemStatus === "failed"
+                  ? payload.error || sseData?.fashionItem?.processingErrorReason || it.processingErrorReason
+                  : undefined;
+
+              const reviewReason =
+                itemStatus === "needs_review"
+                  ? (payload.error as any) || sseData?.fashionItem?.reviewReason || "uncertain_category"
+                  : undefined;
+
               return {
                 ...it,
                 ...(sseData && typeof sseData === "object" ? sseData : {}),
-                status: itemStatus === "completed" ? "active" : itemStatus === "failed" ? "failed" : it.status,
+                fashionItem: {
+                  ...(it.fashionItem || {}),
+                  ...(sseData?.fashionItem || {}),
+                  ...(processingErrorReason !== undefined ? { processingErrorReason } : {}),
+                  ...(reviewReason !== undefined ? { reviewReason } : {}),
+                },
+                processingErrorReason: processingErrorReason ?? it.processingErrorReason,
+                reviewReason: reviewReason ?? it.reviewReason,
+                status: nextStatus,
               };
             });
           },
@@ -96,6 +153,7 @@ export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItems
       };
 
       const handleTaskDone = () => {
+        clearTimer();
         queryClient.invalidateQueries({
           queryKey: BRAND_PORTAL_KEYS.items(brandId),
         });
@@ -116,6 +174,7 @@ export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItems
         handleTaskDone,
         (error) => {
           console.warn(`[Brand SSE Task ${taskId}] Error:`, error);
+          clearTimer();
           queryClient.refetchQueries({
             queryKey: BRAND_PORTAL_KEYS.items(brandId),
             type: "active",
@@ -133,6 +192,12 @@ export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItems
         controller.abort();
       });
       activeControllers.current.clear();
+
+      fallbackTimers.current.forEach((timer) => {
+        clearTimeout(timer);
+      });
+      fallbackTimers.current.clear();
     };
   }, []);
 }
+

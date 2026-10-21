@@ -21,6 +21,9 @@ import {
   ShieldAlert,
   Shirt,
   Building,
+  Gift,
+  Activity,
+  ReceiptText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -28,12 +31,15 @@ import { useLogout } from '@/features/auth/queries/auth.queries';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboardIcon },
+  { href: '/admin/transactions', label: 'Giao dịch payOS', icon: ReceiptText },
+  { href: '/admin/activity-events', label: 'Hoạt động người dùng', icon: Activity },
+  { href: '/admin/campaigns', label: 'Chiến dịch tặng gói', icon: Gift },
   { href: '/admin/users', label: 'Người dùng', icon: UsersIcon },
-  // { href: '/admin/moderation', label: 'Kiểm duyệt', icon: MessageSquareIcon },
+  { href: '/admin/community', label: 'Cộng đồng', icon: MessageSquareIcon },
   { href: '/admin/wardrobe', label: 'Trang phục', icon: Shirt },
   { href: '/admin/category', label: 'Danh mục', icon: GridIcon },
   // { href: '/admin/trends', label: 'Xu hướng', icon: TrendingUp },
-  { href: '/admin/brands', label: 'Duyệt thương hiệu', icon: Building },
+  // { href: '/admin/brands', label: 'Duyệt thương hiệu', icon: Building },
 ];
 
 export function AdminSidebar() {
@@ -73,7 +79,7 @@ export function AdminSidebar() {
       </div>
 
       {/* Elegant User Profile with Dropdown */}
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <div className="flex items-center gap-4 mb-8 p-3 bg-muted/50 border border-border hover:border-primary transition-all cursor-pointer group outline-none shadow-sm rounded-2xl">
             <div className="flex flex-col flex-1 min-w-0 pl-1">

@@ -7,8 +7,20 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useMyOutfits, useDeleteOutfit } from "@/features/outfits/queries/outfits.queries";
 import { OutfitRes as Outfit } from "@/features/outfits/types";
-import { OutfitCard } from "./OutfitCard";
+import { OutfitCardV2 } from "./OutfitCardV2";
+import { OutfitFilterBarV2, OutfitSortOption } from "./OutfitFilterBarV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+import { PaginationResult } from "@/types/api";
+
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import {
@@ -22,31 +34,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationLink,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
-import { PaginationResult } from "@/types/api";
 
 gsap.registerPlugin(useGSAP);
 
 interface OutfitsClientProps {
   initialData?: PaginationResult<Outfit> | null;
 }
-
-type SortOption = "Mới Nhất" | "Cũ Nhất";
 
 export function OutfitsClient({ initialData }: OutfitsClientProps) {
   const router = useRouter();
@@ -69,7 +62,7 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
   const lastPushedQ = useRef(searchParam);
 
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
-  const [sortParam, setSortParam] = useState<SortOption>("Mới Nhất");
+  const [sortParam, setSortParam] = useState<OutfitSortOption>("Mới Nhất");
   const [outfitToDelete, setOutfitToDelete] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
@@ -228,7 +221,7 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
         </div>
       </div>
 
-      <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 w-full pb-24 text-foreground">
+      <div ref={containerRef} className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 w-full pb-24 text-foreground">
         <div className="flex flex-col gap-8 pt-8 md:pt-12 border-b border-border pb-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-4 max-w-2xl">
@@ -237,54 +230,22 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
               </h1>
               <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-border pl-4">
                 Kho lưu trữ phong cách cá nhân của bạn. <br />
-                {outfits.length > 0 ? ` Đang lưu trữ ${metadata?.totalItems || outfits.length} bộ phối.` : " Hãy bắt đầu tạo bộ phối của bạn."}
+                {(metadata?.totalItems ?? outfits.length) > 0
+                  ? ` Đang lưu trữ ${metadata?.totalItems ?? outfits.length} bộ phối.`
+                  : " Hãy bắt đầu tạo bộ phối của bạn."}
               </p>
             </div>
             {renderActions()}
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mt-4">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
-              {[
-                { label: "Tất cả", value: "all" },
-                { label: "Tạo bởi AI", value: "ai" },
-                { label: "Thủ công", value: "manual" },
-              ].map(tab => {
-                const isActive = filterParam === tab.value;
-                return (
-                  <button
-                    key={tab.value}
-                    onClick={() => handleFilterChange(tab.value)}
-                    className={cn(
-                      "relative pb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors duration-200 group",
-                      isActive ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground font-medium"
-                    )}
-                  >
-                    {tab.label}
-                    <span className={cn(
-                      "absolute bottom-0 left-0 h-[2px] bg-foreground transition-all duration-300",
-                      isActive ? "w-full" : "w-0 group-hover:w-full"
-                    )} />
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">Sort:</span>
-                <Select value={sortParam} onValueChange={(value) => setSortParam(value as SortOption)}>
-                  <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-[11px] font-semibold uppercase tracking-widest text-foreground w-auto gap-1">
-                    <SelectValue placeholder="Mới nhất" />
-                  </SelectTrigger>
-                  <SelectContent align="end" alignItemWithTrigger={false} className="rounded-2xl border-border bg-card mt-1">
-                    <SelectItem value="Mới Nhất" className="font-semibold text-[11px] uppercase tracking-widest hover:bg-muted">Mới nhất</SelectItem>
-                    <SelectItem value="Cũ Nhất" className="font-semibold text-[11px] uppercase tracking-widest hover:bg-muted">Cũ nhất</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
+          <OutfitFilterBarV2
+            filterParam={filterParam}
+            onFilterChange={handleFilterChange}
+            sortParam={sortParam}
+            onSortChange={setSortParam}
+            outfits={outfits}
+            totalItems={metadata?.totalItems ?? outfits.length}
+          />
         </div>
 
         {isLoading && !outfits.length ? (
@@ -312,33 +273,57 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
           >
             {filteredAndSortedOutfits.map((outfit: Outfit, index: number) => (
               <div key={outfit.id} className="outfit-card h-full">
-                <OutfitCard
+                <OutfitCardV2
                   outfit={outfit}
                   index={index}
-                  isFavorite={favorites[outfit.id] || false}
-                  onToggleFavorite={toggleFavorite}
                   onDelete={handleDeleteOutfit}
                 />
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center min-h-[40vh] space-y-8 text-center max-w-md mx-auto">
+          <div className="flex flex-col items-center justify-center min-h-[460px] py-12 space-y-8 text-center max-w-md mx-auto">
             <div className="size-20 bg-muted border border-border rounded-2xl flex items-center justify-center text-muted-foreground">
               <Shirt className="size-8 stroke-1" />
             </div>
             <div className="space-y-4">
-              <h3 className="font-semibold text-3xl text-foreground uppercase tracking-tight">Trống</h3>
+              <h3 className="font-semibold text-3xl text-foreground uppercase tracking-tight">
+                {searchParam
+                  ? "Không tìm thấy"
+                  : filterParam !== "all"
+                    ? "Không có bộ phối"
+                    : "Chưa có bộ phối"}
+              </h3>
               <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground leading-relaxed">
-                Không có bộ phối nào phù hợp với bộ lọc hiện tại. Hãy chọn tất cả hoặc tạo bộ phối mới.
+                {searchParam
+                  ? `Không tìm thấy bộ phối nào phù hợp với từ khóa "${searchParam}".`
+                  : filterParam !== "all"
+                    ? "Không có bộ phối nào phù hợp với bộ lọc hiện tại. Hãy chọn tất cả hoặc tạo bộ phối mới."
+                    : "Kho trang phục của bạn đang trống. Hãy tạo bộ phối mới với AI Stylist hoặc tự phối thủ công."}
               </p>
             </div>
-            <button
-              onClick={() => handleFilterChange("all")}
-              className="h-11 px-8 border border-foreground text-foreground font-semibold text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background rounded-full transition-colors duration-200 mt-4"
-            >
-              Xóa Bộ Lọc
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {(filterParam !== "all" || searchParam) && (
+                <button
+                  onClick={() => updateParams({ filter: null, q: null, page: "1" })}
+                  className="h-11 px-8 border border-border text-foreground font-semibold text-[11px] uppercase tracking-widest hover:border-foreground rounded-full transition-colors duration-200"
+                >
+                  Xóa Bộ Lọc
+                </button>
+              )}
+              <button
+                onClick={() => router.push("/ai-stylist")}
+                className="h-11 px-6 border border-border text-foreground font-semibold text-[11px] uppercase tracking-widest hover:border-foreground rounded-full transition-colors duration-200 flex items-center justify-center gap-2"
+              >
+                <Sparkles className="size-3.5" /> Tạo bằng AI
+              </button>
+              <button
+                onClick={() => router.push("/outfits/create")}
+                className="h-11 px-8 bg-primary text-primary-foreground font-semibold text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-primary/90 rounded-full transition-colors duration-200"
+              >
+                <Plus className="size-4" /> Tạo Bộ Phối
+              </button>
+            </div>
           </div>
         )}
 

@@ -18,7 +18,9 @@ export const PricingCard = ({ plan, isPopular, currentPlanSlug }: PricingCardPro
   const purchaseWallet = usePurchaseWithWalletMutation();
 
   const handlePurchaseDirect = () => {
-    purchaseDirect.mutate({ planSlug: plan.slug || (plan as any).planSlug });
+    const slug = plan.slug || plan.planSlug || plan.PlanSlug || '';
+    const resultUrl = `${window.location.origin}/payment/result?flow=purchase&next=${encodeURIComponent('/pricing')}`;
+    purchaseDirect.mutate({ planSlug: slug, returnUrl: resultUrl, cancelUrl: resultUrl });
   };
 
   const handlePurchaseWallet = () => {

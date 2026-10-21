@@ -258,6 +258,9 @@ export interface BrandItemRes {
   price: number,
   itemType?: string, 
   status: string,
+  taskId?: string,
+  reviewReason?: string,
+  processingErrorReason?: string,
   fashionItem?: {
     id: string,
     category: Category,
@@ -274,6 +277,8 @@ export interface BrandItemRes {
     fit?: string,
     seasonality?: string,
     description?: string,
+    reviewReason?: string,
+    processingErrorReason?: string,
     createdAt?: string,
     updatedAt?: string
   },

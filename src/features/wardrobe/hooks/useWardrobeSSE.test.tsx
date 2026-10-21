@@ -17,6 +17,7 @@ jest.mock('sonner', () => ({
   toast: {
     success: jest.fn(),
     error: jest.fn(),
+    info: jest.fn(),
   },
 }));
 
@@ -211,5 +212,107 @@ describe('useWardrobeSSE hook', () => {
       queryKey: WARDROBE_QUERY_KEYS.lists(),
       type: 'active',
     });
+  });
+
+  it('hiển thị toast tiếng Việt chuẩn khi nhận event failed với mã no_fashion_item_detected', async () => {
+    let capturedOnMessage: (payload: any) => void = () => {};
+
+    jest.mocked(wardrobeApi.subscribeTaskSSE).mockImplementation(
+      async (taskId, onMessage, onDone, onError, signal) => {
+        capturedOnMessage = onMessage;
+      }
+    );
+
+    const { queryClient, wrapper } = createHarness();
+    queryClient.setQueryData(WARDROBE_QUERY_KEYS.lists(), {
+      items: [
+        {
+          id: 'item-2',
+          status: WardrobeItemStatus.Processing,
+          taskId: 'task-456',
+          createdAt: '2026-08-25T00:00:00Z',
+        },
+      ],
+    });
+
+    const items: WardrobeItemRes[] = [
+      {
+        id: 'item-2',
+        status: WardrobeItemStatus.Processing,
+        taskId: 'task-456',
+        createdAt: '2026-08-25T00:00:00Z',
+      },
+    ];
+
+    renderHook(() => useWardrobeSSE(items), { wrapper });
+
+    await act(async () => {
+      capturedOnMessage({
+        itemId: 'item-2',
+        status: 'failed',
+        total: 1,
+        index: 0,
+        error: 'no_fashion_item_detected',
+      });
+    });
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'Ảnh không phải trang phục — hãy tải ảnh đúng món đồ',
+    );
+
+    const cachedList: any = queryClient.getQueryData(WARDROBE_QUERY_KEYS.lists());
+    expect(cachedList.items[0].status).toBe(WardrobeItemStatus.Failed);
+    expect(cachedList.items[0].fashionItem.processingErrorReason).toBe('no_fashion_item_detected');
+  });
+
+  it('hiển thị toast tiếng Việt chuẩn khi nhận event needs_review với mã uncertain_category', async () => {
+    let capturedOnMessage: (payload: any) => void = () => {};
+
+    jest.mocked(wardrobeApi.subscribeTaskSSE).mockImplementation(
+      async (taskId, onMessage, onDone, onError, signal) => {
+        capturedOnMessage = onMessage;
+      }
+    );
+
+    const { queryClient, wrapper } = createHarness();
+    queryClient.setQueryData(WARDROBE_QUERY_KEYS.lists(), {
+      items: [
+        {
+          id: 'item-3',
+          status: WardrobeItemStatus.Processing,
+          taskId: 'task-789',
+          createdAt: '2026-08-25T00:00:00Z',
+        },
+      ],
+    });
+
+    const items: WardrobeItemRes[] = [
+      {
+        id: 'item-3',
+        status: WardrobeItemStatus.Processing,
+        taskId: 'task-789',
+        createdAt: '2026-08-25T00:00:00Z',
+      },
+    ];
+
+    renderHook(() => useWardrobeSSE(items), { wrapper });
+
+    await act(async () => {
+      capturedOnMessage({
+        itemId: 'item-3',
+        status: 'needs_review',
+        total: 1,
+        index: 0,
+        error: 'uncertain_category',
+      });
+    });
+
+    expect(toast.info).toHaveBeenCalledWith(
+      'AI chưa chắc danh mục — chọn danh mục rồi gửi phân tích lại',
+    );
+
+    const cachedList: any = queryClient.getQueryData(WARDROBE_QUERY_KEYS.lists());
+    expect(cachedList.items[0].status).toBe(WardrobeItemStatus.NeedsReview);
+    expect(cachedList.items[0].fashionItem.reviewReason).toBe('uncertain_category');
   });
 });

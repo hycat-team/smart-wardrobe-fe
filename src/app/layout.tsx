@@ -20,11 +20,12 @@ export const metadata: Metadata = {
   description: "Closy - Trợ lý thời trang AI và quản lý tủ đồ thông minh của bạn.",
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/brand/logo-only.png", type: "image/png" },
+      { url: "/icon.png?v=2", type: "image/png", sizes: "64x64" },
+      { url: "/brand/logo-only.png?v=2", type: "image/png" },
+      { url: "/favicon.ico?v=2", sizes: "any" },
     ],
     apple: [
-      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "/apple-icon.png?v=2", sizes: "180x180", type: "image/png" },
     ],
   },
 };

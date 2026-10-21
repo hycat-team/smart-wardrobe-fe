@@ -421,3 +421,20 @@ export const useGetBrandItemFeedbacks = (brandId: string, itemId: string) => {
     enabled: !!brandId && !!itemId,
   });
 };
+
+export const useRetryBrandItemAnalysis = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, data }: { itemId: string; data?: { categoryId?: string } }) =>
+      brandPortalApi.retryBrandItemAnalysis(brandId, itemId, data),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.itemDetail(brandId, variables.itemId) });
+      toast.info(data.message || 'Đã gửi yêu cầu phân tích lại sản phẩm');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể phân tích lại sản phẩm');
+    },
+  });
+};
+

@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useMyWardrobe } from "@/features/wardrobe/queries/wardrobe.queries";
 import { useCreateOutfit } from "@/features/outfits/queries/outfits.queries";
+import { SaveOutfitReq } from "@/features/outfits/types";
 import { WardrobeItemStatus } from "@/features/wardrobe/types";
 import { getWardrobeItemName } from "@/features/wardrobe/utils";
 import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
@@ -125,14 +126,15 @@ function CreateOutfitContent() {
       const coverImageUrl = uploadResData.secure_url;
 
       // 3. Chuẩn bị payload và gửi API tạo Outfit
-      const payload = {
+      const payload: SaveOutfitReq = {
         name: outfitName,
         description: customOccasion || occasion,
         coverImageUrl: coverImageUrl,
+        status: 0, // 0: Tạo thủ công
         items: selectedItems.map((item) => ({
           fashionItemId: item.fashionItem?.id || (item as any).fashionItemId || item.clothingItemId,
-          positionX: Math.max(1, Math.abs(item.x || 0)),
-          positionY: Math.max(1, Math.abs(item.y || 0)),
+          positionX: Math.round(item.x || 0),
+          positionY: Math.round(item.y || 0),
           scale: (item.scale || 100) / 100,
           layerOrder: item.zIndex || 1,
         })),

@@ -81,14 +81,23 @@ api.interceptors.response.use(
         isRefreshing = true;
 
         try {
-          // Gọi API refresh token của BFF (chuẩn /api/v1)
-          await axios.post('/api/v1/auth/refresh-token', {}, { baseURL: '' });
+          // Gọi API refresh token (qua rewrite proxy /api/v1/auth/refresh-token tới Backend)
+          await axios.post('/api/v1/auth/refresh-token', {}, { baseURL: '', withCredentials: true });
           processQueue(null);
           hasShownSessionExpiredToast = false; // Reset if successful
           return api(originalRequest);
         } catch (err) {
           processQueue(err, null);
-          if (!hasShownSessionExpiredToast && !silent) {
+          const isPublicPath =
+            typeof window !== 'undefined' &&
+            (window.location.pathname === '/' ||
+              window.location.pathname === '/privacy' ||
+              window.location.pathname.startsWith('/privacy') ||
+              window.location.pathname === '/delete-account' ||
+              window.location.pathname.startsWith('/delete-account') ||
+              window.location.pathname.startsWith('/auth'));
+
+          if (!hasShownSessionExpiredToast && !silent && !isPublicPath) {
             toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
             hasShownSessionExpiredToast = true;
           }

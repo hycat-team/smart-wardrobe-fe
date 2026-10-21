@@ -11,6 +11,7 @@ import type { AIMarginAnalytics } from '@/features/admin/types';
 import {
   formatNumber,
   formatVND,
+  formatVNDateString,
   isNotFoundError,
   safePercentage,
 } from '@/features/admin/utils/dashboard';
@@ -30,13 +31,13 @@ export function AIMarginPanel({
   onRetry: () => void;
 }) {
   if (isLoading && !data) {
-    return <Skeleton className="h-[410px] rounded-3xl xl:col-span-2" />;
+    return <Skeleton className="h-[430px] rounded-3xl xl:col-span-2" />;
   }
 
   if (error && !data && !isNotFoundError(error)) {
     return (
       <section className="rounded-3xl border border-destructive/30 bg-card p-8 xl:col-span-2">
-        <h2 className="text-xl font-semibold">Không thể tải AI margin</h2>
+        <h2 className="text-xl font-semibold text-destructive">Không thể tải AI margin</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Hãy thử tải lại riêng báo cáo của khoảng thời gian này.
         </p>
@@ -53,7 +54,7 @@ export function AIMarginPanel({
         <Bot className="mx-auto size-8 text-muted-foreground" />
         <h2 className="mt-4 text-lg font-semibold">Chưa có dữ liệu AI margin</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Hãy chọn một khoảng ngày khác hoặc chờ snapshot tiếp theo.
+          Hãy chọn một khoảng ngày khác hoặc chờ dữ liệu phát sinh.
         </p>
       </section>
     );
@@ -62,17 +63,17 @@ export function AIMarginPanel({
   const errorRate = safePercentage(data.aiErrorCount, data.aiRequestsCount);
   const financials = [
     {
-      label: 'Doanh thu',
+      label: 'Doanh thu gói trong kỳ',
       value: formatVND(data.totalSubscriptionRevVnd),
       icon: CircleDollarSign,
     },
     {
-      label: 'Chi phí AI',
+      label: 'Chi phí AI thực tế',
       value: formatVND(data.totalAiActualCostVnd),
       icon: Coins,
     },
     {
-      label: 'Lợi nhuận ròng',
+      label: 'Lợi nhuận ròng AI',
       value: formatVND(data.netAiMarginVnd),
       icon: Gauge,
       warning: data.netAiMarginVnd < 0,
@@ -97,15 +98,14 @@ export function AIMarginPanel({
       <div className="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
-            Kinh tế AI
+            Kinh tế AI theo kỳ
           </p>
-          <h2 id="ai-margin-heading" className="mt-2 text-2xl font-semibold">
+          <h2 id="ai-margin-heading" className="mt-1 text-2xl font-semibold">
             Hiệu quả chi phí AI
           </h2>
         </div>
         <p className="text-xs text-muted-foreground">
-          {new Date(data.fromDate).toLocaleDateString('vi-VN')} –{' '}
-          {new Date(data.toDate).toLocaleDateString('vi-VN')}
+          Kỳ: {formatVNDateString(data.fromDate)} – {formatVNDateString(data.toDate)}
         </p>
       </div>
 
@@ -134,8 +134,8 @@ export function AIMarginPanel({
       </div>
 
       <div className="mt-6 grid gap-3 border-t border-border pt-6 sm:grid-cols-4">
-        <Metric label="Paid tokens" value={formatNumber(data.totalAiPaidTokens)} />
-        <Metric label="AI requests" value={formatNumber(data.aiRequestsCount)} />
+        <Metric label="Tokens trả phí" value={formatNumber(data.totalAiPaidTokens)} />
+        <Metric label="Lượt gọi AI" value={formatNumber(data.aiRequestsCount)} />
         <Metric
           label="Lỗi AI"
           value={formatNumber(data.aiErrorCount)}

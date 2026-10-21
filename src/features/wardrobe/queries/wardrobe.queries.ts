@@ -195,13 +195,29 @@ export const useSearchWardrobeItems = (query: string, categorySlug?: string) => 
 export const useRetryWardrobeItemAnalysis = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => wardrobeApi.retryWardrobeItemAnalysis(id),
-    onSuccess: (res, id) => {
+    mutationFn: (param: string | { id: string; categoryId?: string }) => {
+      const id = typeof param === 'string' ? param : param.id;
+      const data =
+        typeof param === 'object' && param.categoryId
+          ? { categoryId: param.categoryId }
+          : undefined;
+      return wardrobeApi.retryWardrobeItemAnalysis(id, data);
+    },
+    onSuccess: (res, param) => {
+      const id = typeof param === 'string' ? param : param.id;
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.lists() });
       queryClient.invalidateQueries({
         queryKey: WARDROBE_QUERY_KEYS.categoryDistribution(),
       });
       queryClient.invalidateQueries({ queryKey: WARDROBE_QUERY_KEYS.detail(id) });
+      queryClient.refetchQueries({
+        queryKey: WARDROBE_QUERY_KEYS.lists(),
+        type: 'active',
+      });
+      queryClient.refetchQueries({
+        queryKey: WARDROBE_QUERY_KEYS.detail(id),
+        type: 'active',
+      });
       toast.success(res?.message || 'Đã gửi lại yêu cầu phân tích trang phục!');
     },
     onError: (error) => {

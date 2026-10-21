@@ -45,6 +45,16 @@ export interface BrandItemBriefRes {
   price?: number;
 }
 
+export type AnalyzeReviewReason = 'uncertain_category';
+
+export type AnalyzeErrorReason =
+  | 'no_fashion_item_detected'
+  | 'multiple_items_detected'
+  | 'full_body_outfit_detected'
+  | 'analysis_temporary_error'
+  | 'auto_retry_exceeded'
+  | string;
+
 export interface FashionItemBriefRes {
   id: string;
   imageUrl?: string;
@@ -52,6 +62,8 @@ export interface FashionItemBriefRes {
   colorHex?: string;
   style?: string;
   category?: CategoryBriefRes;
+  reviewReason?: AnalyzeReviewReason | null;
+  processingErrorReason?: AnalyzeErrorReason | null;
 }
 
 export interface FashionItemRes {
@@ -69,8 +81,14 @@ export interface FashionItemRes {
   fit: string;
   seasonality: string;
   description: string;
+  reviewReason?: AnalyzeReviewReason | null;
+  processingErrorReason?: AnalyzeErrorReason | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface RetryWardrobeItemReq {
+  categoryId?: string;
 }
 
 export interface WardrobeItemBriefRes {
