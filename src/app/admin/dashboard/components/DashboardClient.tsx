@@ -28,11 +28,9 @@ import { DashboardInsights } from './DashboardInsights';
 export function DashboardClient({
   filters,
   initialData,
-  hasCustomDateRange,
 }: {
   filters: DashboardFilters;
   initialData: DashboardInitialData;
-  hasCustomDateRange: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -43,8 +41,7 @@ export function DashboardClient({
     initialData: initialData.payosReconciliation ?? initialData.overview?.payosReconcile,
   });
   const aiMarginQuery = useDashboardAIMargin(filters, {
-    enabled: hasCustomDateRange,
-    initialData: hasCustomDateRange ? initialData.aiMargin : undefined,
+    initialData: initialData.aiMargin,
   });
   const analyticsQuery = useDashboardAnalytics(
     filters,
@@ -77,9 +74,7 @@ export function DashboardClient({
     initialData: initialData.aiErrorBreakdown,
   });
   const overview = overviewQuery.data;
-  const aiMargin = hasCustomDateRange
-    ? aiMarginQuery.data
-    : overview?.aiMargin ?? initialData.aiMargin;
+  const aiMargin = aiMarginQuery.data ?? initialData.aiMargin;
 
   const updateParams = (updates: Record<string, string | null>) => {
     const next = new URLSearchParams(searchParams.toString());
@@ -100,10 +95,8 @@ export function DashboardClient({
       payosQuery.refetch(),
       analyticsQuery.refetch(),
       aiEventsQuery.refetch(),
+      aiMarginQuery.refetch(),
     ];
-    if (hasCustomDateRange) {
-      requests.push(aiMarginQuery.refetch());
-    }
     if (isSubscriptionTab) {
       requests.push(
         subscriptionDistributionQuery.refetch(),
@@ -124,25 +117,17 @@ export function DashboardClient({
     payosQuery.isFetching ||
     analyticsQuery.isFetching ||
     aiEventsQuery.isFetching ||
-    (hasCustomDateRange && aiMarginQuery.isFetching) ||
+    aiMarginQuery.isFetching ||
     (isSubscriptionTab
       ? subscriptionDistributionQuery.isFetching ||
         revenueBreakdownQuery.isFetching ||
         renewalStatsQuery.isFetching
       : aiUsageByOperationQuery.isFetching || aiErrorBreakdownQuery.isFetching);
 
-  const aiMarginIsLoading = hasCustomDateRange
-    ? aiMarginQuery.isLoading
-    : overviewQuery.isLoading;
-  const aiMarginIsFetching = hasCustomDateRange
-    ? aiMarginQuery.isFetching
-    : overviewQuery.isFetching;
-  const aiMarginError = hasCustomDateRange
-    ? aiMarginQuery.error
-    : overviewQuery.error;
-  const retryAIMargin = hasCustomDateRange
-    ? aiMarginQuery.refetch
-    : overviewQuery.refetch;
+  const aiMarginIsLoading = aiMarginQuery.isLoading;
+  const aiMarginIsFetching = aiMarginQuery.isFetching;
+  const aiMarginError = aiMarginQuery.error;
+  const retryAIMargin = aiMarginQuery.refetch;
 
   return (
     <div className="mx-auto flex w-full max-w-[1400px] animate-in flex-col gap-8 fade-in pb-24 text-foreground duration-500">

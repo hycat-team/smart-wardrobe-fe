@@ -151,11 +151,14 @@ describe('DashboardClient', () => {
       <DashboardClient
         filters={filters}
         initialData={initialData}
-        hasCustomDateRange={false}
       />,
     );
 
     expect(screen.getByText('Tổng user: 1500')).toBeTruthy();
+    expect(queries.useDashboardAIMargin).toHaveBeenCalledWith(filters, {
+      initialData: initialData.aiMargin,
+    });
+
     fireEvent.click(screen.getByText('Làm mới test'));
 
     await waitFor(() => {
@@ -163,11 +166,11 @@ describe('DashboardClient', () => {
       expect(mockPayosRefetch).toHaveBeenCalled();
       expect(mockAnalyticsRefetch).toHaveBeenCalled();
       expect(mockEventsRefetch).toHaveBeenCalled();
+      expect(mockMarginRefetch).toHaveBeenCalled();
       expect(mockDistributionRefetch).toHaveBeenCalled();
       expect(mockRevenueRefetch).toHaveBeenCalled();
       expect(mockRenewalRefetch).toHaveBeenCalled();
     });
-    expect(mockMarginRefetch).not.toHaveBeenCalled();
   });
 
   it('ghi date filter, status và pagination vào URL', () => {
@@ -175,7 +178,6 @@ describe('DashboardClient', () => {
       <DashboardClient
         filters={filters}
         initialData={initialData}
-        hasCustomDateRange={false}
       />,
     );
 

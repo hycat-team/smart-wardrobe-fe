@@ -16,7 +16,6 @@ import type {
 import {
   buildAdminAnalyticsRequest,
   DASHBOARD_AI_EVENTS_LIMIT,
-  hasCustomDashboardDateRange,
   normalizeDashboardFilters,
 } from '@/features/admin/utils/dashboard';
 import { DashboardClient } from './DashboardClient';
@@ -38,13 +37,12 @@ export default async function DashboardData({
     eventParams.set('status', filters.aiStatus);
   }
 
-  const shouldFetchCustomMargin = hasCustomDashboardDateRange(filters);
   const marginParams = new URLSearchParams({
     fromDate: filters.fromDate,
     toDate: filters.toDate,
   });
 
-  const [overview, analytics, aiEvents, customMargin, payosReconciliation] =
+  const [overview, analytics, aiEvents, aiMargin, payosReconciliation] =
     await Promise.all([
       serverFetch<AdminOverview>('/admin/dashboard/overview', {
         cache: 'no-store',
@@ -58,12 +56,10 @@ export default async function DashboardData({
         `/admin/dashboard/drilldown/ai-events?${eventParams.toString()}`,
         { cache: 'no-store' },
       ),
-      shouldFetchCustomMargin
-        ? serverFetch<AIMarginAnalytics>(
-            `/admin/dashboard/ai-margin?${marginParams.toString()}`,
-            { cache: 'no-store' },
-          )
-        : Promise.resolve(null),
+      serverFetch<AIMarginAnalytics>(
+        `/admin/dashboard/ai-margin?${marginParams.toString()}`,
+        { cache: 'no-store' },
+      ),
       serverFetch<PayOSReconciliation>(
         `/admin/dashboard/payos-reconciliation?${marginParams.toString()}`,
         { cache: 'no-store' },
@@ -106,9 +102,7 @@ export default async function DashboardData({
   }
   const initialData: DashboardInitialData = {
     overview,
-    aiMargin: shouldFetchCustomMargin
-      ? customMargin
-      : overview?.aiMargin ?? null,
+    aiMargin,
     analytics,
     aiEvents,
     payosReconciliation,
@@ -123,7 +117,6 @@ export default async function DashboardData({
     <DashboardClient
       filters={filters}
       initialData={initialData}
-      hasCustomDateRange={shouldFetchCustomMargin}
     />
   );
 }
