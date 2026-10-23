@@ -26,7 +26,7 @@ description: "Task list for fixing avatar upload invalid signature bug (032-fix-
 
 **Purpose**: Xác nhận cấu hình Cloudinary và môi trường kiểm thử sẵn có trong dự án.
 
-- [X] T001 Xác nhận cấu hình biến môi trường `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2` và fallback mặc định `"dzvwkngxu"` trong `src/lib/cloudinary.ts`
+- [X] T001 Xác nhận cấu hình bắt buộc `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2` trong `src/lib/cloudinary.ts`, không sử dụng cloud name hardcode.
 
 **Checkpoint**: Môi trường và các tham số cơ sở sẵn sàng; có thể bắt đầu pha nền tảng.
 

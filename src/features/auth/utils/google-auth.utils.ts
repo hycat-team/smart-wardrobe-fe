@@ -4,7 +4,10 @@ import { AUTH_RETURN_URL_KEY, GoogleAuthErrorCode } from '../types/google-auth.t
  * Normalizes backend base URL to ensure it has /api/v1 suffix without trailing slash
  */
 export function getBackendApiBase(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL_V2 || 'http://localhost:8080/api/v1';
+  const raw = process.env.NEXT_PUBLIC_API_URL_V2;
+  if (!raw?.trim()) {
+    throw new Error('Thiếu cấu hình NEXT_PUBLIC_API_URL_V2.');
+  }
   const cleaned = raw.replace(/^['"]|['"]$/g, '').trim().replace(/\/+$/, '');
   if (cleaned.endsWith('/api/v1')) return cleaned;
   if (cleaned.endsWith('/api')) return `${cleaned}/v1`;

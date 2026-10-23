@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { brandPortalApi } from "@/features/brand-portal/api/brand-portal.api";
 import { useUpdateBrandLogo, useGetBrandProfile } from "@/features/brand-portal/queries/brand-portal.queries";
 import { toast } from "sonner";
+import { getCloudinaryCloudName } from "@/lib/cloudinary";
 
 export function BrandProfileSettingsClient() {
   const params = useParams();
@@ -62,8 +63,7 @@ export function BrandProfileSettingsClient() {
       formDataUpload.append("signature", signature);
       formDataUpload.append("folder", folder);
 
-      // Cần biết cloud_name, giả định là 'ddrzzofze' hoặc lấy từ môi trường
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2 || "ddrzzofze"; // Fallback to a common one if needed
+      const cloudName = getCloudinaryCloudName();
       
       const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
         method: "POST",
