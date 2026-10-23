@@ -23,8 +23,8 @@ const getNavItems = (brandId: string, isStaff: boolean) => {
     { href: `/brand/${brandId}/benefits`, label: 'Phúc lợi', icon: Gift, hideForStaff: true },
     { href: `/brand/${brandId}/products`, label: 'Sản phẩm', icon: Package },
     { href: `/brand/${brandId}/digital-sample-lab/report`, label: 'Báo cáo thử mẫu', icon: NotebookTabsIcon },
-    // { href: `/brand/${brandId}/orders`, label: 'Đơn hàng', icon: ShoppingCart },
-    // { href: `/brand/${brandId}/posts`, label: 'Bài viết', icon: MessageSquareText },
+    { href: `/brand/${brandId}/orders`, label: 'Đơn hàng', icon: ShoppingCart },
+    { href: `/brand/${brandId}/posts`, label: 'Bài viết', icon: MessageSquareText },
   ];
   return items.filter(item => !(isStaff && item.hideForStaff));
 };
@@ -61,7 +61,7 @@ function ProfileMenu({ brandId, brandName, onNavigate }: { brandId: string, bran
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="flex flex-col">
+        <button type="button" aria-label={`Tài khoản thương hiệu ${brandName}`} className="flex flex-col text-left">
           <div className="flex items-center gap-3 p-3 bg-muted/30 border border-border hover:border-primary transition-all cursor-pointer group outline-none shadow-sm rounded-xl">
             <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">
               {brandName.charAt(0).toUpperCase()}
@@ -77,7 +77,7 @@ function ProfileMenu({ brandId, brandName, onNavigate }: { brandId: string, bran
             {isStaff ? <ShieldAlert className="size-3.5 text-orange-500" /> : <ShieldCheck className="size-3.5 text-green-500" />}
             <span className="text-xs font-semibold capitalize tracking-wider text-muted-foreground">Vai trò: {memberRole || 'Đang tải...'}</span>
           </div>
-        </div>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side="top" className="w-[240px] rounded-2xl border border-border bg-card p-2 shadow-xl mb-2">
         {!isStaff && (
@@ -88,12 +88,12 @@ function ProfileMenu({ brandId, brandName, onNavigate }: { brandId: string, bran
             </Link>
           </DropdownMenuItem>
         )}
-        {/* <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted focus:bg-muted">
-          <Link href={`/brand/brands`} className="flex items-center gap-3 w-full text-foreground" onClick={onNavigate}>
+        <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer hover:bg-muted focus:bg-muted">
+          <Link href="/brand-portal/select" className="flex items-center gap-3 w-full text-foreground" onClick={onNavigate}>
             <LayoutDashboard className="size-4 text-muted-foreground" />
             <span className="font-semibold text-[11px] uppercase tracking-widest">Đổi thương hiệu</span>
           </Link>
-        </DropdownMenuItem> */}
+        </DropdownMenuItem>
         <DropdownMenuSeparator className="my-1 bg-border" />
         <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 transition-colors">
           <Link href="/auth/login" className="flex items-center gap-3 w-full" onClick={onNavigate}>
@@ -117,7 +117,7 @@ function BrandLayoutInner({ children }: { children: React.ReactNode }) {
   const brandName = brandProfile?.name || 'Loading...';
 
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden relative">
+    <div className="flex h-dvh bg-background text-foreground overflow-hidden relative">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-64 border-r border-border bg-card flex-col shrink-0">
         <div className="h-16 flex items-center px-6 border-b border-border">
@@ -143,7 +143,7 @@ function BrandLayoutInner({ children }: { children: React.ReactNode }) {
       <aside className={`fixed inset-y-0 left-0 w-64 bg-card z-50 flex flex-col transform transition-transform duration-300 lg:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-16 flex items-center justify-between px-6 border-b border-border">
           <span className="font-bold text-lg tracking-tight uppercase">Không gian <br /> thương hiệu</span>
-          <button onClick={closeMobileMenu} className="p-1 -mr-2">
+          <button aria-label="Đóng menu thương hiệu" onClick={closeMobileMenu} className="p-1 -mr-2">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -161,7 +161,7 @@ function BrandLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <div className="h-16 border-b border-border bg-card flex items-center px-4 lg:px-8 shrink-0">
-          <button className="lg:hidden p-2 -ml-2 text-foreground mr-4" onClick={() => setIsMobileMenuOpen(true)}>
+          <button aria-label="Mở menu thương hiệu" className="lg:hidden p-2 -ml-2 text-foreground mr-4" onClick={() => setIsMobileMenuOpen(true)}>
             <Menu className="w-6 h-6" />
           </button>
           <div className="font-bold text-sm text-muted-foreground uppercase tracking-widest">{brandName}</div>

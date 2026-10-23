@@ -52,7 +52,7 @@ export function BatchUploadModal({ isOpen, onClose }: BatchUploadModalProps) {
     try {
       // 1. Get secure upload signature
       const signatureResult = await adminApi.getUploadSignature();
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dzvwkngxu";
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2 || "dzvwkngxu";
 
       const uploadPromises = files.map(async (file) => {
         let fileToUpload = file;

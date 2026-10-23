@@ -223,12 +223,12 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
             >
               Cửa hàng
             </TabsTrigger>
-            {/* <TabsTrigger
+            <TabsTrigger
               value="my_benefits"
               className="px-0 pb-4 pt-2 font-semibold text-sm font-bold uppercase tracking-widest text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent"
             >
               Quà của tôi {brandRedemptions.length > 0 && <span className="ml-1.5 text-[10px] bg-muted px-1.5 py-0.5 rounded-full">{brandRedemptions.length}</span>}
-            </TabsTrigger> */}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="shop" className="focus-visible:outline-none focus-visible:ring-0 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-700">

@@ -95,7 +95,7 @@ export function GuestHeader() {
           <nav className="hidden md:flex items-center gap-8">
             {isLoggedIn ? (
               <>
-                {/* <Link
+                <Link
                   href="/brand-portal/select"
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
@@ -104,7 +104,7 @@ export function GuestHeader() {
                   `}
                 >
                   Kênh Thương Hiệu
-                </Link> */}
+                </Link>
                 {user?.roleSlug === 'admin' && (
                   <Link
                     href="/admin/dashboard"

@@ -51,11 +51,11 @@ export type NavItem = {
 export const NAV_ITEMS: NavItem[] = [
   // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
   { icon: Globe, label: 'Cộng Đồng', path: '/community' },
-  // { icon: Compass, label: "Khám Phá", path: "/brands" },
+  { icon: Compass, label: 'Khám Phá', path: '/brands' },
   { icon: Shirt, label: 'Tủ Quần Áo', path: '/wardrobe' },
   { icon: Sparkles, label: 'AI Phối Đồ', path: '/ai-stylist' },
   { icon: Images, label: 'Trang Phục', path: '/outfits' },
-  // { icon: Store, label: "Kênh Thương Hiệu", path: "/brand-portal/select" },
+  { icon: Store, label: 'Kênh Thương Hiệu', path: '/brand-portal/select' },
 ];
 
 export function Sidebar() {
@@ -460,11 +460,12 @@ export function Sidebar() {
       </nav>
 
       {/* Cart Button */}
-      {/* <div className="mb-4 mt-2">
+      <div className="mb-4 mt-2">
         {isCollapsed ? (
           <Tooltip>
             <TooltipTrigger
               onClick={() => setCartOpen(true)}
+              aria-label="Mở giỏ hàng"
               className="group flex items-center justify-center w-full p-3 rounded-xl transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-muted/30"
             >
               <div className="relative">
@@ -498,7 +499,7 @@ export function Sidebar() {
             </div>
           </button>
         )}
-      </div> */}
+      </div>
 
       {/* Premium Upgrade (Minimal Style) */}
       {!user?.isPremium && (

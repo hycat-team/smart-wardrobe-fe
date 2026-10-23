@@ -1,4 +1,4 @@
-const WEATHER_API_KEY = process.env.NEXT_PUBLIC_API_WEATHER;
+const WEATHER_API_KEY = process.env.NEXT_PUBLIC_API_WEATHER_V2;
 
 export interface WeatherData {
   temp: number;

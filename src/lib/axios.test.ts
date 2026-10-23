@@ -20,14 +20,12 @@ jest.mock('sonner', () => ({
   },
 }));
 
-delete (window as any).location;
-(window as any).location = {
-  href: '',
-  pathname: '/wardrobe',
-};
-
 describe('Axios Interceptor - Auto Refresh Token Flow', () => {
   let mock: MockAdapter;
+
+  beforeEach(() => {
+    window.history.replaceState({}, '', '/wardrobe');
+  });
 
   beforeAll(() => {
     // Khởi tạo mock cho instance api
@@ -40,11 +38,12 @@ describe('Axios Interceptor - Auto Refresh Token Flow', () => {
   afterEach(() => {
     mock.reset();
     jest.clearAllMocks();
-    window.location.href = '';
+    window.history.replaceState({}, '', '/');
   });
 
   afterAll(() => {
     mock.restore();
+    jest.restoreAllMocks();
   });
 
   it('1. Nên gọi API bình thường khi token hợp lệ (Trả về 200 OK)', async () => {
@@ -95,7 +94,7 @@ describe('Axios Interceptor - Auto Refresh Token Flow', () => {
     expect(res2.status).toBe(200);
   });
 
-  it('4. Nên đá văng người dùng về trang đăng nhập nếu refresh-token cũng thất bại', async () => {
+  it('4. Nên báo hết phiên và từ chối request nếu refresh-token cũng thất bại', async () => {
     mock.onGet('/me/wardrobe-items').reply(401, { message: 'Unauthorized' });
 
     // Giả lập API refresh-token cũng lỗi 401 (Refresh token hết hạn)
@@ -103,18 +102,11 @@ describe('Axios Interceptor - Auto Refresh Token Flow', () => {
       response: { status: 401, data: { message: 'Refresh token expired' } }
     });
 
-    try {
-      await api.get('/me/wardrobe-items');
-    } catch (error: any) {
-      expect(error.response.status).toBe(401);
-    }
+    await expect(api.get('/me/wardrobe-items')).rejects.toMatchObject({
+      response: { status: 401 },
+    });
 
     // Kiểm tra đã gọi toast thông báo lỗi
     expect(toast.error).toHaveBeenCalledWith('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-    
-    // Kiểm tra đã set timeout để chuyển hướng (dùng fakeTimers nếu muốn test chi tiết hơn)
-    jest.useFakeTimers();
-    jest.advanceTimersByTime(1000);
-    // Lưu ý: trong test môi trường Node thì window.location.href sẽ được update
   });
 });

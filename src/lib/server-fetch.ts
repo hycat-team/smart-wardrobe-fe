@@ -1,6 +1,6 @@
 // import { cookies } from 'next/headers';
 
-// const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
+// const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL_V2;
 
 // /**
 //  * Hàm fetch tùy chỉnh dành riêng cho Server Components.
@@ -59,12 +59,12 @@ import { cookies, headers } from 'next/headers';
 let warnedMissingBackendUrl = false;
 
 function getBackendUrl(): string {
-  const raw = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL;
+  const raw = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL_V2;
   if (!raw) {
     if (process.env.NODE_ENV === 'production' && !warnedMissingBackendUrl) {
       warnedMissingBackendUrl = true;
       console.error(
-        '[backend-url] Missing BACKEND_API_URL (or NEXT_PUBLIC_API_URL) in production. ' +
+        '[backend-url] Missing BACKEND_API_URL (or NEXT_PUBLIC_API_URL_V2) in production. ' +
           'Set it to the backend base, e.g. https://<backend-host>/api/v1, and redeploy.'
       );
     }

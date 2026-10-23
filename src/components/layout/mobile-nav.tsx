@@ -3,22 +3,32 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { UserCircle, ShoppingBag } from "lucide-react";
+import { Ellipsis, UserCircle, ShoppingBag } from "lucide-react";
 import { cn, getUserAvatar } from "@/lib/utils";
 import Image from "next/image";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useB2BDemoStore } from "@/lib/mock-data/b2b/store";
 import { NAV_ITEMS } from "./sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const PRIMARY_PATHS = ['/community', '/wardrobe', '/ai-stylist', '/outfits'];
+const PRIMARY_ITEMS = NAV_ITEMS.filter((item) => PRIMARY_PATHS.includes(item.path));
+const MORE_ITEMS = NAV_ITEMS.filter((item) => !PRIMARY_PATHS.includes(item.path));
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
-  const isPremium = user?.isPremium;
   const { cart, setCartOpen } = useB2BDemoStore();
 
   return (
-    <nav className="md:hidden fixed bottom-0 w-full h-[72px] pb-4 pt-2 bg-[#FAFAFA] dark:bg-[#111111] border-t border-border/60 flex items-center justify-around px-2 z-50">
-      {[...NAV_ITEMS.slice(0, 4), { icon: UserCircle, label: "", path: "/profile" }].map((item) => {
+    <nav aria-label="Điều hướng chính" className="md:hidden fixed bottom-0 w-full min-h-[72px] pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 bg-[#FAFAFA] dark:bg-[#111111] border-t border-border/60 flex items-center justify-around px-2 z-50">
+      {[...PRIMARY_ITEMS, { icon: UserCircle, label: "Hồ sơ", path: "/profile" }].map((item) => {
         const isActive = item.path === '/wardrobe'
           ? pathname === '/wardrobe' || (pathname.startsWith('/wardrobe/') && !pathname.startsWith('/wardrobe/explore'))
           : pathname.startsWith(item.path);
@@ -29,6 +39,8 @@ export function MobileBottomNav() {
           <Link 
             key={item.path} 
             href={item.path}
+            aria-label={item.label}
+            aria-current={isActive ? 'page' : undefined}
             className={cn(
               "flex flex-col items-center justify-center gap-1 w-full h-full relative outline-none",
               isActive ? "text-[#D9C5B2]" : "text-muted-foreground hover:text-foreground"
@@ -86,9 +98,40 @@ export function MobileBottomNav() {
           </Link>
         );
       })}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            aria-label="Thêm chức năng thương hiệu"
+            className={cn(
+              "flex w-full items-center justify-center rounded-xl p-2",
+              MORE_ITEMS.some((item) => pathname.startsWith(item.path))
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Ellipsis className="size-5" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="top" align="end" sideOffset={12}>
+          <DropdownMenuGroup>
+            {MORE_ITEMS.map((item) => (
+              <DropdownMenuItem key={item.path} asChild>
+                <Link href={item.path}>
+                  <item.icon />
+                  {item.label}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
       
       {/* Mobile Cart Button */}
       <button 
+        type="button"
+        aria-label="Mở giỏ hàng"
         onClick={() => setCartOpen(true)}
         className="flex flex-col items-center justify-center gap-1 w-full h-full transition-colors active:scale-95 relative text-muted-foreground hover:text-foreground"
       >

@@ -19,7 +19,7 @@ Tài liệu này hướng dẫn cách kiểm thử và kiểm chứng nhanh (Qui
    - Backend chạy tại `http://localhost:8080` (hoặc cấu hình trỏ tới `https://api.closy.hycat.online`).
    - Biến môi trường `.env.local` của Frontend:
      ```env
-     NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+     NEXT_PUBLIC_API_URL_V2=http://localhost:8080/api/v1
      ```
    - Backend đã đăng ký `http://localhost:3000/auth/callback` trong danh sách các origin / redirect URL hợp lệ.
 

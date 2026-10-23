@@ -39,7 +39,7 @@ const navItems = [
   { href: '/admin/wardrobe', label: 'Trang phục', icon: Shirt },
   { href: '/admin/category', label: 'Danh mục', icon: GridIcon },
   // { href: '/admin/trends', label: 'Xu hướng', icon: TrendingUp },
-  // { href: '/admin/brands', label: 'Duyệt thương hiệu', icon: Building },
+  { href: '/admin/brands', label: 'Duyệt thương hiệu', icon: Building },
 ];
 
 export function AdminSidebar() {

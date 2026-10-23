@@ -277,7 +277,7 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
 
               {/* HISTORY TAB */}
               <TabsContent value="history" className="focus-visible:outline-none">
-                {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8"> */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Left Column: Transactions */}
                   <div className="lg:col-span-2 space-y-6">
                     <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Biến Động Điểm</h2>
@@ -316,7 +316,7 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                   </div>
 
                   {/* Right Column: Expiry Lots */}
-                  {/* <div className="space-y-6">
+                  <div className="space-y-6">
                     <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Điểm Sắp Hết Hạn</h2>
                     <div className="bg-white rounded-[2.5rem] border border-slate-200/50 p-6">
                       {!lots || lots.length === 0 ? (
@@ -326,7 +326,7 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                         </div>
                       ) : (
                         <div className="space-y-4">
-                          {lots.map((lot: any) => (
+                          {lots.map((lot: { id: string; expiresAt: string; remainingPoints: number }) => (
                             <div key={lot.id} className="p-4 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-between">
                               <div>
                                 <p className="text-sm font-bold text-amber-900">Hết hạn vào</p>
@@ -342,8 +342,8 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                         </div>
                       )}
                     </div>
-                  </div> */}
-                {/* </div> */}
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           </div>

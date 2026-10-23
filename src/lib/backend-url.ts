@@ -6,12 +6,12 @@
 //   trong serverless function -> `ECONNREFUSED` -> login 500.
 //   Ở production thiếu env sẽ throw lỗi rõ ràng để log chỉ đúng cách fix.
 export function getBackendBaseUrl(): string {
-  const raw = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL;
+  const raw = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL_V2;
 
   if (!raw) {
     if (process.env.NODE_ENV === 'production') {
       throw new Error(
-        '[backend-url] Missing BACKEND_API_URL (or NEXT_PUBLIC_API_URL) in production. ' +
+        '[backend-url] Missing BACKEND_API_URL (or NEXT_PUBLIC_API_URL_V2) in production. ' +
           'Set it to the backend base, e.g. https://<backend-host>/api/v1, and redeploy.'
       );
     }
@@ -36,6 +36,6 @@ export function backendHostForLog(): string {
   try {
     return new URL(getBackendBaseUrl()).host;
   } catch {
-    return 'unconfigured (missing BACKEND_API_URL/NEXT_PUBLIC_API_URL)';
+    return 'unconfigured (missing BACKEND_API_URL/NEXT_PUBLIC_API_URL_V2)';
   }
 }
