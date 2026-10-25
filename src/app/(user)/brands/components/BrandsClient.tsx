@@ -31,7 +31,7 @@ export default function BrandsClient() {
             Thương Hiệu Nổi Bật
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base max-w-xl leading-relaxed">
-            Khám phá các nhãn hàng nội địa chất lượng cao, trở thành thành viên và tận hưởng các đặc quyền độc quyền dành riêng cho bạn.
+            Khám phá các nhãn hàng nội địa chất lượng cao, trở thành thành viên và tận hưởng quyền lợi cùng voucher dành riêng cho bạn.
           </p>
         </div>
       </div>

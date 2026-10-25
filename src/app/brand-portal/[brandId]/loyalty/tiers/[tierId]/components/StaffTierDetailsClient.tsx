@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useGetLoyaltyTierDetails } from '@/features/brand-portal/queries/brand-portal.queries';
+import { benefitTypeLabel } from '@/features/brand-portal/utils/benefit-labels';
 import { Loader2, ArrowLeft, Award, Gift, Wallet, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,10 +62,10 @@ export default function StaffTierDetailsClient({ brandId, tierId }: { brandId: s
               <Gift className="w-12 h-12 text-muted-foreground opacity-30 mb-4" />
               <p className="text-foreground font-bold mb-1">Chưa có quyền lợi</p>
               <p className="text-muted-foreground text-sm max-w-sm mb-6">
-                Hạng này chưa được cấu hình bất kỳ quyền lợi nào. Hãy sang mục "Phúc Lợi" để thêm quyền lợi và gắn vào hạng này.
+                Hạng này chưa được cấu hình bất kỳ quyền lợi nào. Hãy sang mục "Quyền lợi" để thêm quyền lợi và gắn vào hạng này.
               </p>
               <Button variant="outline" className="rounded-xl" onClick={() => router.push(`/brand-portal/${brandId}/benefits`)}>
-                Đến mục Phúc lợi
+                Đến mục Quyền lợi
               </Button>
             </div>
           ) : (
@@ -73,7 +74,7 @@ export default function StaffTierDetailsClient({ brandId, tierId }: { brandId: s
                 <div key={benefit.id} className="p-4 rounded-2xl border border-border bg-background hover:border-primary/30 transition-colors flex flex-col">
                   <div className="flex justify-between items-start mb-2">
                     <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-1 bg-primary/10 text-primary rounded-md">
-                      {benefit.benefitType}
+                      {benefitTypeLabel(benefit.benefitType)}
                     </span>
                     {benefit.status === 'ACTIVE' ? (
                       <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">ACTIVE</span>

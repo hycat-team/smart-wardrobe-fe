@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useGetBenefits, useUpdateBenefitStatus } from '@/features/brand-portal/queries/brand-portal.queries';
-import { Gift, Loader2, Plus, ArrowRight, ShieldCheck, Tag, Ticket, Percent, Truck, Star } from 'lucide-react';
+import { Gift, Loader2, Plus, ShieldCheck, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import CreateBenefitDialog from './CreateBenefitDialog';
+import { benefitTypeLabel, isVoucherBenefitType, unlockTypeLabel } from '@/features/brand-portal/utils/benefit-labels';
 
 export default function BenefitsClient() {
   const params = useParams();
@@ -30,37 +31,16 @@ export default function BenefitsClient() {
   };
 
   const getBenefitIcon = (type: string) => {
-    switch (type?.toLowerCase()) {
-      case 'voucher': return <Ticket className="w-5 h-5 text-amber-500" />;
-      // case 'discount': return <Percent className="w-5 h-5 text-emerald-500" />;
-      // case 'free_shipping': return <Truck className="w-5 h-5 text-blue-500" />;
-      // case 'early_access': return <Star className="w-5 h-5 text-purple-500" />;
-      case 'feature_access': return <ShieldCheck className="w-5 h-5 text-rose-500" />;
-      case 'gift':
-      default: return <Gift className="w-5 h-5 text-indigo-500" />;
-    }
+    return isVoucherBenefitType(type) ? (
+      <Ticket className="w-5 h-5 text-amber-500" />
+    ) : (
+      <ShieldCheck className="w-5 h-5 text-rose-500" />
+    );
   };
 
-  const getBenefitTypeName = (type: string) => {
-    switch (type?.toLowerCase()) {
-      case 'voucher': return 'Voucher giảm giá';
-      // case 'discount': return 'Giảm giá trực tiếp';
-      // case 'gift': return 'Quà tặng hiện vật';
-      // case 'free_shipping': return 'Miễn phí vận chuyển';
-      // case 'early_access': return 'Mua sớm BST mới';
-      case 'feature_access': return 'Quyền truy cập đặc biệt';
-      default: return type;
-    }
-  };
-  
-  const getUnlockTypeName = (type: string) => {
-    switch (type?.toLowerCase()) {
-      case 'point_redemption': return 'Đổi điểm';
-      case 'tier_privilege': return 'Đặc quyền hạng';
-      case 'manual_grant': return 'Trao tặng thủ công';
-      default: return type;
-    }
-  };
+  const getBenefitTypeName = (type: string) => benefitTypeLabel(type);
+
+  const getUnlockTypeName = (type: string) => unlockTypeLabel(type);
 
   const getFeatureCodeName = (code?: string) => {
     if (!code) return null;
@@ -76,11 +56,11 @@ export default function BenefitsClient() {
     <div className="w-full flex flex-col gap-6 p-6 lg:p-8">
       <div className="flex justify-between items-center bg-card p-4 rounded-3xl border border-border shadow-sm">
         <div className="flex flex-col">
-          <span className="font-bold">Danh sách phúc lợi</span>
-          <span className="text-xs text-muted-foreground">{benefits?.length || 0} phúc lợi đã được tạo</span>
+          <span className="font-bold">Danh sách quyền lợi & voucher</span>
+          <span className="text-xs text-muted-foreground">{benefits?.length || 0} mục đã được tạo</span>
         </div>
         <Button className="rounded-full" onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" /> Tạo phúc lợi mới
+          <Plus className="w-4 h-4 mr-2" /> Tạo quyền lợi / voucher
         </Button>
       </div>
 
@@ -91,9 +71,9 @@ export default function BenefitsClient() {
       ) : !benefits || benefits.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <Gift className="w-16 h-16 text-muted-foreground opacity-20 mb-4" />
-          <h2 className="text-lg font-bold mb-2">Chưa có phúc lợi nào</h2>
+          <h2 className="text-lg font-bold mb-2">Chưa có quyền lợi/voucher nào</h2>
           <p className="text-muted-foreground text-sm max-w-sm mb-6">
-            Hãy tạo các phúc lợi như đổi điểm lấy voucher hoặc đặc quyền cho hạng VIP.
+            Hãy tạo voucher đổi bằng điểm hoặc quyền lợi tự động theo hạng thành viên.
           </p>
           <Button variant="outline" className="rounded-full" onClick={() => setIsCreateDialogOpen(true)}>
             Tạo ngay
@@ -143,7 +123,7 @@ export default function BenefitsClient() {
                       ) : null}
                       {benefit.unlockType?.toLowerCase() === 'tier_privilege' && benefit.requiredTierId ? (
                         <Badge variant="outline" className="rounded-md font-medium text-xs border-primary/30 text-primary">
-                          Hạng: {benefit.requiredTierName}
+                          Hạng: {benefit.requiredTierName}{benefit.requiredTierRank ? ` (rank ${benefit.requiredTierRank})` : ''}
                         </Badge>
                       ) : null}
                       {benefit.benefitType?.toLowerCase() === 'feature_access' && benefit.featureCode ? (

@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import { BrandInfo, Benefit, Conversation, ConversationMessage, BrandItemRes, PaginationResult, SampleFeedbackPayload, DigitalSampleResponseRes, MyBenefitsResult } from '@/features/brand-portal/types';
+import { BrandInfo, Benefit, Conversation, ConversationMessage, BrandItemRes, PaginationResult, SampleFeedbackPayload, DigitalSampleResponseRes, MyBenefitsResult, LoyaltyTierRes } from '@/features/brand-portal/types';
 
 export const userBrandsApi = {
   // Lấy danh sách brand đang hoạt động
@@ -20,13 +20,13 @@ export const userBrandsApi = {
     return res.data.data;
   },
 
-  // Lấy danh sách phúc lợi (active) của brand
+  // Lấy danh sách quyền lợi/voucher (active) của brand
   getBrandBenefits: async (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
     const res = await api.get<{data: PaginationResult<Benefit>}>(`/brands/${brandId}/benefits`, { params });
     return res.data.data;
   },
 
-  // Lấy chi tiết phúc lợi
+  // Lấy chi tiết quyền lợi/voucher
   getBenefitDetail: async (benefitId: string) => {
     const res = await api.get<{data: Benefit}>(`/brand-benefits/${benefitId}`);
     return res.data.data;
@@ -86,6 +86,12 @@ export const userBrandsApi = {
   getLoyaltyTierDetails: async (brandId: string, tierId: string) => {
     const res = await api.get<{data: any}>(`/brands/${brandId}/loyalty/tiers/${tierId}`);
     return res.data.data;
+  },
+
+  // Lấy toàn bộ hạng thành viên + quyền lợi cộng dồn (public)
+  getPublicLoyaltyTiers: async (brandId: string) => {
+    const res = await api.get<{data: LoyaltyTierRes[]}>(`/brands/${brandId}/loyalty/tiers`);
+    return res.data.data || [];
   },
 
   // Lấy danh sách sản phẩm của brand (cho khách hàng xem)

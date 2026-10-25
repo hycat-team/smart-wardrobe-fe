@@ -37,6 +37,7 @@ import {
 } from '@/features/brands/queries/user-brands.queries';
 import { useGetMyBrands } from '@/features/brand-portal/queries/brand-portal.queries';
 import { brandPortalPath } from '@/features/brand-portal/utils/routes';
+import { benefitTypeLabel, isVoucherBenefitType } from '@/features/brand-portal/utils/benefit-labels';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
 import BrandChatWindow from './BrandChatWindow';
@@ -81,6 +82,10 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
     r.brand?.id === brandId ||
     r.benefit?.brand?.id === brandId ||
     r.brandId === brandId
+  );
+
+  const voucherRedemptions = brandRedemptions.filter(
+    (redemption: any) => redemption.benefit?.benefitType !== 'feature_access',
   );
 
   const membership = (Array.isArray(myBrands) ? myBrands : []).find(
@@ -220,7 +225,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                 value="my_benefits"
                 className="px-0 pb-4 pt-2 font-semibold text-sm font-bold uppercase tracking-widest text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent"
               >
-                Quà của tôi {brandRedemptions.length > 0 && <span className="ml-1.5 text-[10px] bg-muted px-1.5 py-0.5 rounded-full">{brandRedemptions.length}</span>}
+                Voucher của tôi {voucherRedemptions.length > 0 && <span className="ml-1.5 text-[10px] bg-muted px-1.5 py-0.5 rounded-full">{voucherRedemptions.length}</span>}
               </TabsTrigger>
             )}
           </TabsList>
@@ -276,19 +281,19 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
 
           {!isBrandMember && (
           <TabsContent value="my_benefits" className="focus-visible:outline-none focus-visible:ring-0 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {brandRedemptions.length === 0 ? (
+            {voucherRedemptions.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground font-semibold text-sm uppercase tracking-widest">
-                Bạn chưa đổi quà tặng nào từ brand này.
+                Bạn chưa đổi voucher nào từ brand này.
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {brandRedemptions.map((redemption: any) => {
+                {voucherRedemptions.map((redemption: any) => {
                   const benefit = redemption.benefit || redemption.brandBenefit || redemption;
                   return (
                     <div key={redemption.id} className="relative p-5 rounded-2xl bg-zinc-50 border border-border hover:border-border/80 transition-all duration-300 group overflow-hidden">
                       <div className="flex items-start gap-3">
                         <div className="shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#D4AF37]/10 to-[#B5952F]/10 border border-[#D4AF37]/20 flex items-center justify-center">
-                          {benefit?.benefitType === 'voucher' || benefit?.benefitType === 'VOUCHER' ? (
+                          {isVoucherBenefitType(benefit?.benefitType) ? (
                             <Ticket className="w-5 h-5 text-[#C49B28]" />
                           ) : (
                             <Gift className="w-5 h-5 text-[#C49B28]" />
@@ -325,7 +330,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                         <div className="mt-5 pt-4 border-t border-border/50">
                           <div className="flex items-center gap-2">
                             <Sparkles className="w-4 h-4 text-emerald-600" />
-                            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-widest">Đặc quyền được kích hoạt</span>
+                            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-widest">Quyền lợi được áp dụng</span>
                           </div>
                         </div>
                       )}
@@ -356,7 +361,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                   <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37]/20 to-[#B5952F]/20 flex items-center justify-center">
                     <Gift className="w-4 h-4 text-[#C49B28]" />
                   </span>
-                  Đặc quyền & Quà tặng
+                  Quyền lợi & Voucher
                 </DialogTitle>
                 <p className="text-sm text-muted-foreground ml-10">
                   {loyaltyData
@@ -381,8 +386,8 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                   <Sparkles className="w-7 h-7 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">Chưa có quà tặng nào</p>
-                  <p className="text-sm text-muted-foreground mt-1">Thương hiệu chưa thiết lập chương trình ưu đãi.</p>
+                  <p className="font-semibold text-foreground">Chưa có quyền lợi/voucher</p>
+                  <p className="text-sm text-muted-foreground mt-1">Thương hiệu chưa thiết lập quyền lợi hoặc voucher.</p>
                 </div>
               </div>
             ) : (
@@ -399,7 +404,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                   >
                     {/* Icon */}
                     <div className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${isPointBenefit ? 'bg-gradient-to-br from-[#D4AF37]/15 to-[#B5952F]/15 border border-[#D4AF37]/25' : 'bg-muted border border-border'}`}>
-                      {benefit.benefitType === 'VOUCHER' || benefit.benefitType === 'voucher'
+                      {isVoucherBenefitType(benefit.benefitType)
                         ? <Ticket className={`w-5 h-5 ${isPointBenefit ? 'text-[#C49B28]' : 'text-zinc-500'}`} />
                         : <Gift className={`w-5 h-5 ${isPointBenefit ? 'text-[#C49B28]' : 'text-zinc-500'}`} />
                       }
@@ -439,7 +444,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                         ) : (
                           <span className="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold border border-blue-100">
                             <BadgeCheck className="w-3 h-3" />
-                            Đặc quyền
+                            {benefitTypeLabel(benefit.benefitType)}
                           </span>
                         )}
                       </div>

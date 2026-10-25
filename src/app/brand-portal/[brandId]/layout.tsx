@@ -26,7 +26,7 @@ const getNavItems = (brandId: string, isStaff: boolean) => {
     { href: brandPortalPath(brandId, 'chat'), label: 'Chat Inbox', icon: MessageCircle },
     { href: brandPortalPath(brandId, 'members'), label: 'Thành viên', icon: Users, hideForStaff: true },
     { href: brandPortalPath(brandId, 'loyalty'), label: 'Chương trình điểm', icon: Award, hideForStaff: true },
-    { href: brandPortalPath(brandId, 'benefits'), label: 'Phúc lợi', icon: Gift, hideForStaff: true },
+    { href: brandPortalPath(brandId, 'benefits'), label: 'Quyền lợi', icon: Gift, hideForStaff: true },
     { href: brandPortalPath(brandId, 'products'), label: 'Sản phẩm', icon: Package },
     { href: brandPortalPath(brandId, 'digital-sample-lab/report'), label: 'Báo cáo thử mẫu', icon: NotebookTabsIcon },
   ];

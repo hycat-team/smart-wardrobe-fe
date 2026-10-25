@@ -54,6 +54,7 @@ export interface Benefit {
   requiredPoints?: number;
   requiredTierId?: string;
   requiredTierName?: string;
+  requiredTierRank?: number;
   requiredTier?: {
     id: string;
     name: string;

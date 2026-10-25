@@ -13,6 +13,7 @@ import {
   useRedeemBenefit,
   useGetMyLoyaltyAtBrand
 } from '@/features/brands/queries/user-brands.queries';
+import { benefitTypeLabel } from '@/features/brand-portal/utils/benefit-labels';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function BenefitDetailClient({ brandId, benefitId }: { brandId: string, benefitId: string }) {
@@ -53,6 +54,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
 
   const currentPoints = myBenefits?.currentPoints ?? loyaltyData?.currentPoints ?? 0;
   const unlockType = benefit?.unlockType?.toLowerCase();
+  const isFeatureAccess = (benefit?.benefitType || '').toLowerCase() === 'feature_access';
 
   // Server is the source of truth for unlock state (tier rank / points / manual grant).
   const myBenefit = myBenefits?.items.find((item) => item.id === benefitId);
@@ -70,12 +72,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
     }
   }
 
-  const getLabelTag = () => {
-    if (unlockType === 'point_redemption') return 'Đổi bằng điểm';
-    if (unlockType === 'tier_privilege') return 'Đặc quyền hạng';
-    if (unlockType === 'manual_grant') return 'Quà tặng';
-    return 'Ưu đãi';
-  };
+  const getLabelTag = () => benefitTypeLabel(benefit?.benefitType);
 
   const getButtonText = () => {
     if (isRedeeming) return 'Đang xử lý...';
@@ -84,8 +81,8 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
       if (unlockType === 'tier_privilege') return 'Chưa đủ hạng';
       return 'Không đủ điểm';
     }
-    if (unlockType === 'tier_privilege') return 'Kích hoạt đặc quyền';
-    return 'Đổi ưu đãi này';
+    if (unlockType === 'tier_privilege') return 'Nhận voucher';
+    return 'Đổi voucher này';
   };
 
   return (
@@ -195,17 +192,25 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
                 </div>
 
                 {/* Action */}
-                <Button
-                  size="lg"
-                  onClick={handleRedeem}
-                  disabled={!canAccess || isRedeeming}
-                  className={`w-full h-14 rounded-2xl text-base font-semibold shadow-sm transition-all active:scale-[0.98] ${canAccess
-                    ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
-                    : 'bg-zinc-100 text-zinc-400 cursor-not-allowed shadow-none'
-                    }`}
-                >
-                  {getButtonText()}
-                </Button>
+                {isFeatureAccess ? (
+                  <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-4 text-sm font-medium text-emerald-700">
+                    {canAccess
+                      ? 'Quyền lợi này được áp dụng tự động theo hạng thành viên của bạn.'
+                      : reasonBlocked || 'Bạn chưa đủ điều kiện để sử dụng quyền lợi này.'}
+                  </div>
+                ) : (
+                  <Button
+                    size="lg"
+                    onClick={handleRedeem}
+                    disabled={!canAccess || isRedeeming}
+                    className={`w-full h-14 rounded-2xl text-base font-semibold shadow-sm transition-all active:scale-[0.98] ${canAccess
+                      ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
+                      : 'bg-zinc-100 text-zinc-400 cursor-not-allowed shadow-none'
+                      }`}
+                  >
+                    {getButtonText()}
+                  </Button>
+                )}
               </motion.div>
             </div>
           </div>
@@ -235,13 +240,13 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
                 </div>
 
                 <h2 className="text-2xl font-bold text-zinc-900 tracking-tight mb-3">
-                  Đổi Ưu Đãi Thành Công
+                  Đổi voucher thành công
                 </h2>
 
                 <p className="text-base text-zinc-500 mb-8">
                   {unlockType === 'point_redemption'
                     ? `Bạn đã sử dụng ${(benefit?.requiredPoints || 0).toLocaleString()} pts để đổi ưu đãi này.`
-                    : `Đặc quyền hạng thành viên đã được kích hoạt.`
+                    : `Quyền lợi hạng thành viên đã được kích hoạt.`
                   }
                 </p>
 

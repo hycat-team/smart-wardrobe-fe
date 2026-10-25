@@ -248,3 +248,11 @@ export const useGetLoyaltyTierDetails = (brandId: string, tierId: string) => {
   });
 };
 
+export const useGetPublicLoyaltyTiers = (brandId: string) => {
+  return useQuery({
+    queryKey: ['brand-loyalty-tiers', brandId],
+    queryFn: () => userBrandsApi.getPublicLoyaltyTiers(brandId),
+    enabled: !!brandId,
+  });
+};
+

@@ -6,6 +6,7 @@ import { ArrowLeft, ShieldCheck, Gift, Ticket, Star, Sparkles } from 'lucide-rea
 import Link from 'next/link';
 import { useGetLoyaltyTierDetails } from '@/features/brands/queries/user-brands.queries';
 import { useGetActiveBrandDetail } from '@/features/brands/queries/user-brands.queries';
+import { benefitTypeLabel, isVoucherBenefitType } from '@/features/brand-portal/utils/benefit-labels';
 
 export default function TierDetailsClient({ brandId, tierId }: { brandId: string, tierId: string }) {
   const { data: brand, isLoading: isLoadingBrand } = useGetActiveBrandDetail(brandId);
@@ -37,24 +38,14 @@ export default function TierDetailsClient({ brandId, tierId }: { brandId: string
   const benefits = (tierData.benefits || []).filter((b: any) => b.unlockType !== 'manual_grant');
 
   const getBenefitIcon = (type: string) => {
-    switch (type?.toLowerCase()) {
-      case 'voucher': return <Ticket className="w-6 h-6 text-amber-500" />;
-      case 'feature_access': return <ShieldCheck className="w-6 h-6 text-rose-500" />;
-      default: return <Gift className="w-6 h-6 text-indigo-500" />;
-    }
+    return isVoucherBenefitType(type) ? (
+      <Ticket className="w-6 h-6 text-amber-500" />
+    ) : (
+      <ShieldCheck className="w-6 h-6 text-rose-500" />
+    );
   };
 
-  const getBenefitTypeName = (type: string) => {
-    switch (type?.toLowerCase()) {
-      case 'voucher': return 'Voucher giảm giá';
-      case 'discount': return 'Giảm giá trực tiếp';
-      case 'free_shipping': return 'Miễn phí vận chuyển';
-      case 'early_access': return 'Đặc quyền mua sớm';
-      case 'feature_access': return 'Quyền truy cập đặc biệt';
-      case 'gift': return 'Quà tặng';
-      default: return type;
-    }
-  };
+  const getBenefitTypeName = (type: string) => benefitTypeLabel(type);
 
   return (
     <div className="min-h-[100dvh] bg-zinc-50 pb-20">
@@ -95,7 +86,7 @@ export default function TierDetailsClient({ brandId, tierId }: { brandId: string
             <div className="bg-white rounded-[2rem] p-10 text-center border border-slate-200/50">
               <Gift className="w-12 h-12 text-zinc-300 mx-auto mb-4" />
               <h3 className="text-lg font-bold text-zinc-900">Chưa có quyền lợi</h3>
-              <p className="text-zinc-500 mt-2">Hạng thành viên này hiện chưa được thiết lập đặc quyền nào.</p>
+              <p className="text-zinc-500 mt-2">Hạng thành viên này hiện chưa được thiết lập quyền lợi nào.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

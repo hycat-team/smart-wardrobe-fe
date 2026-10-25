@@ -252,7 +252,7 @@ export const useCreateBenefit = (brandId: string) => {
     mutationFn: (payload: any) => brandPortalApi.createBenefit(brandId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.benefits(brandId) });
-      toast.success('Tạo phúc lợi thành công');
+      toast.success('Tạo quyền lợi/voucher thành công');
     },
   });
 };

@@ -187,7 +187,7 @@ export default function LoyaltyClient() {
                       
                       {tier.description && (
                         <div>
-                          <span className="text-[10px] uppercase tracking-widest font-bold opacity-70">Đặc quyền</span>
+                          <span className="text-[10px] uppercase tracking-widest font-bold opacity-70">Mô tả</span>
                           <p className="text-sm mt-1 opacity-90 line-clamp-3 leading-relaxed">
                             {tier.description}
                           </p>

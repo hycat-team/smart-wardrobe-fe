@@ -32,6 +32,7 @@ import {
   formatBrandVND,
   isBrandDashboardNotFoundError,
 } from '@/features/brand-portal/utils/dashboard';
+import { benefitTypeLabel } from '@/features/brand-portal/utils/benefit-labels';
 
 const COLORS = ['#0f766e', '#d97706', '#2563eb', '#dc2626', '#7c3aed', '#64748b'];
 const SEGMENT_ORDER = ['low', 'medium', 'high', 'premium'];
@@ -255,9 +256,9 @@ function BenefitPanel({ query }: { query: QueryState<BenefitRedemptionAnalytics>
     return <ErrorState onRetry={() => void query.refetch()} />;
   const data = query.data;
   return (
-    <Panel eyebrow="Benefits" title="Hiệu quả đổi quyền lợi" isFetching={query.isFetching}>
+    <Panel eyebrow="Benefits" title="Hiệu quả đổi voucher" isFetching={query.isFetching}>
       {!data || (!data.trend.length && !data.topBenefits.length) ? (
-        <Empty label="Chưa có lượt đổi benefit." />
+        <Empty label="Chưa có lượt đổi voucher." />
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
           <div>
@@ -290,7 +291,7 @@ function BenefitPanel({ query }: { query: QueryState<BenefitRedemptionAnalytics>
                   <div>
                     <p className="font-medium">{item.benefitName}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {humanize(item.benefitType)}
+                      {benefitTypeLabel(item.benefitType)}
                     </p>
                   </div>
                   <p className="font-mono text-sm">

@@ -176,7 +176,7 @@ export default function UpsertLoyaltyTierDialog({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs uppercase tracking-widest font-bold">Mô tả đặc quyền</FormLabel>
+                    <FormLabel className="text-xs uppercase tracking-widest font-bold">Mô tả hạng</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Mô tả ngắn gọn về những ưu đãi khách hàng nhận được khi đạt hạng này..." 
