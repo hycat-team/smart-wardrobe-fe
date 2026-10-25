@@ -53,7 +53,7 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: Shirt, label: 'Tủ Quần Áo', path: '/wardrobe' },
   { icon: Sparkles, label: 'AI Phối Đồ', path: '/ai-stylist' },
   { icon: Images, label: 'Trang Phục', path: '/outfits' },
-  { icon: Store, label: 'Kênh Thương Hiệu', path: '/brand-portal/select' },
+  { icon: Store, label: 'Kênh Thương Hiệu', path: '/brand-portal' },
 ];
 
 export function Sidebar() {

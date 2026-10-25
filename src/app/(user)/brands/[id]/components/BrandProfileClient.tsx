@@ -11,21 +11,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  BadgeCheck,
-  MapPin,
-  Link as LinkIcon,
-  Camera,
-  Loader2,
-  ArrowLeft,
-  Check,
   ArrowUpRight,
+  BadgeCheck,
+  Check,
+  Copy,
   Gift,
-  Ticket,
+  Loader2,
+  MessageCircle,
+  ShieldAlert,
+  ShieldCheck,
   Star,
   Sparkles,
-  ChevronRight,
+  Ticket,
   X,
-  Copy
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -37,9 +35,11 @@ import {
   useGetBrandBenefits,
   useGetMyBenefitRedemptions,
 } from '@/features/brands/queries/user-brands.queries';
+import { useGetMyBrands } from '@/features/brand-portal/queries/brand-portal.queries';
+import { brandPortalPath } from '@/features/brand-portal/utils/routes';
+import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'sonner';
 import BrandChatWindow from './BrandChatWindow';
-import Image from 'next/image';
 
 interface BrandProfileClientProps {
   brandId: string;
@@ -47,11 +47,13 @@ interface BrandProfileClientProps {
 
 export default function BrandProfileClient({ brandId }: BrandProfileClientProps) {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
   const { data: brand, isLoading } = useGetActiveBrandDetail(brandId);
   const { data: brandItems } = useGetBrandItems(brandId);
   const { data: loyaltyData } = useGetMyLoyaltyAtBrand(brandId);
   const { data: brandBenefits } = useGetBrandBenefits(brandId);
   const { data: myRedemptions } = useGetMyBenefitRedemptions(brandId);
+  const { data: myBrands, isLoading: isLoadingMyBrands } = useGetMyBrands(!!user);
   const { mutateAsync: joinLoyalty, isPending: isJoining } = useJoinLoyalty();
 
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -75,12 +77,18 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
   const benefits = brandBenefits?.items || [];
   const activeBenefits = benefits.filter((b: any) => !b.status || b.status === 'active' || b.status === 'ACTIVE');
 
-  const brandRedemptions = myRedemptions?.filter((r: any) => 
+  const brandRedemptions = (myRedemptions || []).filter((r: any) =>
     r.brand?.id === brandId ||
-    r.benefit?.brand?.id === brandId || 
-    r.brandBenefit?.brand?.id === brandId ||
-    r.id // If it's returning the brand benefits directly, just show them
-  ) || [];
+    r.benefit?.brand?.id === brandId ||
+    r.brandId === brandId
+  );
+
+  const membership = (Array.isArray(myBrands) ? myBrands : []).find(
+    (item) => item.id === brandId && item.memberStatus === 'active',
+  );
+  const isBrandMember = membership?.memberRole === 'owner' || membership?.memberRole === 'staff';
+  const memberRoleLabel = membership?.memberRole === 'owner' ? 'Chủ thương hiệu' : 'Nhân viên';
+  const totalMembers = Number((brand as any).totalCustomer || (brand as any).memberCount || 0);
 
   const handleRedeem = (benefit: any) => {
     if (!loyaltyData) {
@@ -100,14 +108,6 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
     <div className="flex-1 bg-background pb-20">
       {/* Cover */}
       <div className="w-[calc(100%+2rem)] -mx-4 md:w-[calc(100%+4rem)] md:-mx-8 h-[300px] md:h-[450px] relative bg-muted group overflow-hidden">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-4 left-4 z-20 bg-background/50 hover:bg-background/80 backdrop-blur-sm rounded-full"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
         <img src={brand.backgroundUrl || 'https://placehold.co/1200x400?text=Brand+Cover'} alt="Cover" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2s] ease-out" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-background" />
         <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-background to-transparent" />
@@ -116,101 +116,93 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
 
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Brand Header */}
-        <div className="relative -mt-24 sm:-mt-32 mb-12 flex flex-col lg:flex-row items-center lg:items-end gap-6 lg:gap-8">
+        <div className="relative -mt-24 sm:-mt-32 mb-12 flex flex-col xl:flex-row items-center xl:items-end gap-6 xl:gap-8">
           <Avatar className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 shadow-xl rounded-full overflow-hidden border-4 border-background z-10 shrink-0">
             <AvatarImage src={brand.logoUrl} className="object-cover" />
             <AvatarFallback className="bg-muted text-foreground text-4xl font-semibold">{brand.name[0]}</AvatarFallback>
           </Avatar>
 
-          <div className="flex-1 flex flex-col items-center lg:items-start gap-4 pb-2 text-center lg:text-left w-full mt-2 lg:mt-0">
-            <div className="flex flex-col gap-2 w-full">
-              <div className="flex items-center justify-center lg:justify-start gap-3">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-medium text-foreground tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">{brand.name}</h1>
-                {(brand as any).isVerified && <BadgeCheck className="w-6 h-6 lg:w-8 lg:h-8 text-blue-500 bg-background rounded-full p-0.5" />}
-              </div>
-              {brand.description && (
-                <p className="text-muted-foreground font-semibold text-sm sm:text-base max-w-[800px] leading-relaxed mx-auto lg:mx-0">
-                  {brand.description}
-                </p>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 lg:gap-6 mt-2 text-xs sm:text-sm font-semibold w-full">
-              {brand.location && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span>{brand.location}</span>
-                </div>
-              )}
-              {brand.website && (
-                <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                  <LinkIcon className="w-4 h-4" />
-                  <span>{brand.website.replace(/^https?:\/\//, '')}</span>
-                </div>
-              )}
-              {brand.instagram && (
-                <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                  <Camera className="w-4 h-4" />
-                  <span>@{brand.instagram.replace(/^@/, '')}</span>
-                </div>
-              )}
-            </div>
+          <div className="flex-1 min-w-0 flex flex-col items-center xl:items-start gap-3 pb-2 text-center xl:text-left w-full mt-2 xl:mt-0">
+            <h1 className="w-full text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight truncate">{brand.name}</h1>
+            {brand.description && (
+              <p className="text-muted-foreground font-semibold text-sm sm:text-base max-w-[800px] leading-relaxed mx-auto xl:mx-0">
+                {brand.description}
+              </p>
+            )}
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              {totalMembers.toLocaleString()} thành viên
+            </p>
           </div>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 pb-2 w-full lg:w-auto shrink-0 mt-4 lg:mt-0">
-            {/* Members count pill */}
-            <div className="flex items-center justify-center gap-8 px-6 lg:px-8 py-3 bg-muted rounded-3xl border border-border shadow-sm w-full sm:w-auto">
-              <div className="flex flex-col items-center">
-                <span className="font-bold text-foreground text-lg font-semibold">{((brand as any).totalCustomer || (brand as any).memberCount || 0).toLocaleString()}</span>
-                <span className="text-muted-foreground text-[10px] uppercase tracking-widest">Members</span>
-              </div>
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex gap-3 w-full sm:w-auto flex-wrap justify-center">
-              {/* Benefits button — shown only when benefits exist */}
-              {activeBenefits.length > 0 && (
-                <button
-                  onClick={() => setIsBenefitsOpen(true)}
-                  className="relative inline-flex items-center gap-2 rounded-full border border-dashed border-[#D4AF37]/60 bg-gradient-to-r from-[#D4AF37]/8 to-[#B5952F]/8 text-[#9A7820] hover:from-[#D4AF37]/15 hover:to-[#B5952F]/15 hover:border-[#D4AF37] transition-all duration-200 font-semibold text-xs uppercase tracking-widest px-5 h-12 group"
-                >
-                  <Gift className="w-4 h-4 text-[#C49B28] group-hover:rotate-12 transition-transform duration-300" />
-                  <span>Quà tặng</span>
-                  {/* badge */}
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-[#D4AF37] text-white text-[9px] font-black leading-none">
-                    {activeBenefits.length}
-                  </span>
-                </button>
-              )}
-
-              <Button
-                variant="outline"
-                onClick={() => setIsChatOpen(true)}
-                className="flex-1 sm:flex-none rounded-full font-semibold text-xs font-medium uppercase tracking-widest px-6 lg:px-8 h-12 shadow-sm transition-colors"
-              >
-                Nhắn tin
-              </Button>
-
-              {loyaltyData ? (
-                <Link
-                  href={`/brands/${brandId}/loyalty`}
-                  className="flex items-center justify-center flex-1 sm:flex-none rounded-full bg-gradient-to-r from-[#D4AF37]/10 to-[#B5952F]/10 hover:from-[#D4AF37]/20 hover:to-[#B5952F]/20 text-[#B5952F] font-semibold text-xs font-bold uppercase tracking-widest px-6 lg:px-8 h-12 border border-[#D4AF37]/30 transition-all cursor-pointer"
-                >
-                  <Check className="w-4 h-4 mr-2" />
-                  Thẻ Thành Viên
-                </Link>
-              ) : (
+          <div className="flex flex-wrap items-center justify-center xl:justify-end gap-2 pb-2 w-full xl:w-auto max-w-full mt-4 xl:mt-0">
+            {isLoadingMyBrands ? (
+              <div className="h-11 w-40 animate-pulse rounded-full bg-muted" />
+            ) : isBrandMember ? (
+              <>
+                <span className="inline-flex h-11 items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 text-xs font-bold uppercase tracking-widest text-emerald-700">
+                  {membership?.memberRole === 'owner' ? (
+                    <ShieldCheck className="w-4 h-4" />
+                  ) : (
+                    <ShieldAlert className="w-4 h-4" />
+                  )}
+                  {memberRoleLabel}
+                </span>
                 <Button
-                  variant="default"
-                  onClick={() => joinLoyalty(brandId)}
-                  disabled={isJoining}
-                  className="flex-1 sm:flex-none rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B5952F] hover:opacity-90 text-white font-semibold text-xs font-medium uppercase tracking-widest px-6 lg:px-8 h-12 shadow-md border-0 disabled:opacity-50"
+                  className="h-11 rounded-full bg-zinc-950 px-5 text-xs font-semibold uppercase tracking-widest text-white hover:bg-zinc-800"
+                  render={<Link href={brandPortalPath(brandId)} />}
                 >
-                  {isJoining ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Đăng ký Membership'}
+                  Quản lý thương hiệu
                 </Button>
-              )}
-            </div>
+              </>
+            ) : (
+              <>
+                {activeBenefits.length > 0 && (
+                  <button
+                    type="button"
+                    aria-label={`Quà tặng (${activeBenefits.length})`}
+                    title="Quà tặng"
+                    onClick={() => setIsBenefitsOpen(true)}
+                    className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-dashed border-[#D4AF37]/60 bg-gradient-to-r from-[#D4AF37]/8 to-[#B5952F]/8 text-[#9A7820] transition-all hover:border-[#D4AF37] hover:from-[#D4AF37]/15 hover:to-[#B5952F]/15"
+                  >
+                    <Gift className="w-4 h-4" />
+                    <span className="absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#D4AF37] px-1 text-[9px] font-black leading-none text-white">
+                      {activeBenefits.length}
+                    </span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  aria-label="Nhắn tin"
+                  title="Nhắn tin"
+                  onClick={() => setIsChatOpen(true)}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-border bg-background px-3 text-xs font-semibold uppercase tracking-widest shadow-sm transition-colors hover:bg-muted sm:px-5"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">Nhắn tin</span>
+                </button>
+
+                {loyaltyData ? (
+                  <Link
+                    href={`/brands/${brandId}/loyalty`}
+                    className="flex h-11 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-gradient-to-r from-[#D4AF37]/10 to-[#B5952F]/10 px-5 text-xs font-bold uppercase tracking-widest text-[#B5952F] transition-all hover:from-[#D4AF37]/20 hover:to-[#B5952F]/20"
+                  >
+                    <Check className="w-4 h-4 mr-2" />
+                    Thẻ Thành Viên
+                  </Link>
+                ) : (
+                  <Button
+                    variant="default"
+                    onClick={() => joinLoyalty(brandId)}
+                    disabled={isJoining}
+                    className="h-11 rounded-full border-0 bg-gradient-to-r from-[#D4AF37] to-[#B5952F] px-5 text-xs font-semibold uppercase tracking-widest text-white shadow-md hover:opacity-90 disabled:opacity-50"
+                  >
+                    {isJoining ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Đăng ký Membership'}
+                  </Button>
+                )}
+              </>
+            )}
           </div>
         </div>
 
@@ -223,12 +215,14 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
             >
               Cửa hàng
             </TabsTrigger>
-            <TabsTrigger
-              value="my_benefits"
-              className="px-0 pb-4 pt-2 font-semibold text-sm font-bold uppercase tracking-widest text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent"
-            >
-              Quà của tôi {brandRedemptions.length > 0 && <span className="ml-1.5 text-[10px] bg-muted px-1.5 py-0.5 rounded-full">{brandRedemptions.length}</span>}
-            </TabsTrigger>
+            {!isBrandMember && (
+              <TabsTrigger
+                value="my_benefits"
+                className="px-0 pb-4 pt-2 font-semibold text-sm font-bold uppercase tracking-widest text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent"
+              >
+                Quà của tôi {brandRedemptions.length > 0 && <span className="ml-1.5 text-[10px] bg-muted px-1.5 py-0.5 rounded-full">{brandRedemptions.length}</span>}
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="shop" className="focus-visible:outline-none focus-visible:ring-0 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -280,6 +274,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
             )}
           </TabsContent>
 
+          {!isBrandMember && (
           <TabsContent value="my_benefits" className="focus-visible:outline-none focus-visible:ring-0 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {brandRedemptions.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground font-semibold text-sm uppercase tracking-widest">
@@ -346,6 +341,7 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
               </div>
             )}
           </TabsContent>
+          )}
         </Tabs>
       </div>
 

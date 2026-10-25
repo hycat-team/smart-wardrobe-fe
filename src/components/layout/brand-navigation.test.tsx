@@ -4,7 +4,7 @@ import { Sidebar } from './sidebar';
 import { MobileBottomNav } from './mobile-nav';
 import { GuestHeader } from './guest-header';
 import { AdminSidebar } from '@/features/admin/components/AdminSidebar';
-import BrandLayout from '@/app/brand/[brandId]/layout';
+import BrandLayout from '@/app/brand-portal/[brandId]/layout';
 import { BrandRedirector } from '@/app/(user)/components/BrandRedirector';
 
 let mockPathname = '/wardrobe';
@@ -58,6 +58,13 @@ jest.mock('@/features/brand-portal/queries/brand-portal.queries', () => ({
     data: { id: 'brand-1', name: 'Closy Brand', memberRole: mockMemberRole },
     isLoading: false,
   }),
+  useGetMyBrands: () => ({
+    data: [
+      { id: 'brand-1', name: 'Closy Brand', status: 'ACTIVE', memberRole: mockMemberRole, memberStatus: 'active' },
+      { id: 'brand-2', name: 'Second Brand', status: 'ACTIVE', memberRole: 'owner', memberStatus: 'active' },
+    ],
+    isLoading: false,
+  }),
 }));
 
 describe('brand navigation', () => {
@@ -73,7 +80,7 @@ describe('brand navigation', () => {
     render(<Sidebar />);
 
     expect(screen.getByRole('link', { name: 'Khám Phá' }).getAttribute('href')).toBe('/brands');
-    expect(screen.getByRole('link', { name: 'Kênh Thương Hiệu' }).getAttribute('href')).toBe('/brand-portal/select');
+    expect(screen.getByRole('link', { name: 'Kênh Thương Hiệu' }).getAttribute('href')).toBe('/brand-portal');
     expect(screen.queryByRole('button', { name: 'Giỏ Hàng' })).toBeNull();
   });
 
@@ -92,7 +99,7 @@ describe('brand navigation', () => {
 
     fireEvent.keyDown(screen.getByRole('button', { name: 'Thêm chức năng thương hiệu' }), { key: 'Enter' });
     expect((await screen.findByRole('menuitem', { name: 'Khám Phá' })).getAttribute('href')).toBe('/brands');
-    expect(screen.getByRole('menuitem', { name: 'Kênh Thương Hiệu' }).getAttribute('href')).toBe('/brand-portal/select');
+    expect(screen.getByRole('menuitem', { name: 'Kênh Thương Hiệu' }).getAttribute('href')).toBe('/brand-portal');
   });
 
   it('exposes the brand portal on the landing page for signed-in users', () => {
@@ -107,14 +114,15 @@ describe('brand navigation', () => {
   });
 
   it('keeps the brand workspace navigation free of removed mock routes', async () => {
-    mockPathname = '/brand/brand-1/dashboard';
+    mockPathname = '/brand-portal/brand-1/dashboard';
     render(<BrandLayout><p>Dashboard</p></BrandLayout>);
 
-    expect(screen.getAllByRole('link', { name: 'Sản phẩm' })[0].getAttribute('href')).toBe('/brand/brand-1/products');
+    expect(screen.getAllByRole('link', { name: 'Sản phẩm' })[0].getAttribute('href')).toBe('/brand-portal/brand-1/products');
     expect(screen.queryByRole('link', { name: 'Đơn hàng' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Bài viết' })).toBeNull();
+    expect(screen.getAllByRole('button', { name: /Chọn thương hiệu đang quản lý/ }).length).toBeGreaterThan(0);
     fireEvent.keyDown(screen.getAllByRole('button', { name: 'Tài khoản thương hiệu Closy Brand' })[0], { key: 'Enter' });
-    expect((await screen.findByRole('menuitem', { name: 'Đổi thương hiệu' })).getAttribute('href')).toBe('/brand-portal/select');
+    expect((await screen.findByRole('menuitem', { name: 'Hồ sơ thương hiệu' })).getAttribute('href')).toBe('/brand-portal/brand-1/profile');
   });
 
   it('preserves staff restrictions when brand navigation is restored', () => {
@@ -130,6 +138,6 @@ describe('brand navigation', () => {
   it('routes legacy brand accounts through the brand entry page', () => {
     mockAuthState.user.lastName = 'brand';
     render(<BrandRedirector />);
-    expect(mockRouterPush).toHaveBeenCalledWith('/brand');
+    expect(mockRouterPush).toHaveBeenCalledWith('/brand-portal');
   });
 });

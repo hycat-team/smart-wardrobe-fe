@@ -10,7 +10,7 @@ export function BrandRedirector() {
 
   useEffect(() => {
     if (user && user.roleSlug === 'user' && user.lastName?.toLowerCase() === 'brand') {
-      router.push('/brand');
+      router.push('/brand-portal');
     }
   }, [user, router]);
 

@@ -96,7 +96,7 @@ export function GuestHeader() {
             {isLoggedIn ? (
               <>
                 <Link
-                  href="/brand-portal/select"
+                  href="/brand-portal"
                   className={`
                     font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
                     hover:opacity-100
@@ -307,7 +307,7 @@ export function GuestHeader() {
             <MobileNavLink href="/ai-stylist" onClick={() => setMobileMenuOpen(false)}>
               AI Stylist
             </MobileNavLink>
-            <MobileNavLink href="/brand-portal/select" onClick={() => setMobileMenuOpen(false)}>
+            <MobileNavLink href="/brand-portal" onClick={() => setMobileMenuOpen(false)}>
               Kênh Thương Hiệu
             </MobileNavLink>
             {user?.roleSlug === 'admin' && (

@@ -26,10 +26,11 @@ export const BRAND_PORTAL_KEYS = {
 };
 
 // Brand
-export const useGetMyBrands = () => {
+export const useGetMyBrands = (enabled = true) => {
   return useQuery({
     queryKey: BRAND_PORTAL_KEYS.myBrands(),
     queryFn: brandPortalApi.getMyBrands,
+    enabled,
   });
 };
 
