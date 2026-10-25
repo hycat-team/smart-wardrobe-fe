@@ -290,10 +290,13 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                     description="Brand hiện tại chưa phát hành voucher nào."
                   />
                 ) : (
+                  <>
+                  <p className="mb-5 text-sm text-zinc-500">
+                    Voucher có thể đổi nhiều lần khi bạn còn đủ điểm/hạng. Lịch sử đổi xem ở tab "Voucher của tôi".
+                  </p>
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {voucherBenefits.map((benefit: MyBenefit, idx: number) => {
-                      const isRedeemed = !!benefit.redemption;
-                      const canRedeem = benefit.unlocked && !isRedeemed;
+                      const canRedeem = benefit.unlocked;
                       return (
                         <motion.div
                           key={benefit.id}
@@ -304,12 +307,12 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                         >
                           <div>
                             <div className="mb-5 flex items-start justify-between gap-3">
-                              <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isRedeemed ? 'bg-emerald-50 text-emerald-600' : canRedeem ? 'bg-amber-50 text-amber-600' : 'bg-zinc-100 text-zinc-400'}`}>
+                              <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${canRedeem ? 'bg-amber-50 text-amber-600' : 'bg-zinc-100 text-zinc-400'}`}>
                                 <Ticket className="h-6 w-6" />
                               </div>
                               <StatusBadge
-                                active={isRedeemed || canRedeem}
-                                label={isRedeemed ? 'Đã nhận' : canRedeem ? 'Đủ điều kiện' : 'Chưa đủ điều kiện'}
+                                active={canRedeem}
+                                label={canRedeem ? 'Đủ điều kiện' : 'Chưa đủ điều kiện'}
                               />
                             </div>
                             <h3 className="mb-2 text-xl font-bold tracking-tight text-zinc-900">{benefit.name}</h3>
@@ -332,12 +335,7 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                             </div>
                           </div>
                           <div className="mt-6 border-t border-slate-100 pt-4">
-                            {isRedeemed ? (
-                              <p className="text-xs text-zinc-500">
-                                Đã nhận {benefit.redemption?.redeemedAt ? format(new Date(benefit.redemption.redeemedAt), 'dd/MM/yyyy HH:mm') : ''}
-                                {benefit.redemption?.expiresAt ? ` • Hết hạn ${format(new Date(benefit.redemption.expiresAt), 'dd/MM/yyyy')}` : ''}
-                              </p>
-                            ) : canRedeem ? (
+                            {canRedeem ? (
                               <Button
                                 size="sm"
                                 disabled={isRedeeming}
@@ -359,6 +357,7 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                       );
                     })}
                   </div>
+                  </>
                 )}
               </TabsContent>
 
