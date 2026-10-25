@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import {
   useGetActiveBrandDetail,
   useGetBenefitDetail,
+  useGetMyBenefits,
   useRedeemBenefit,
   useGetMyLoyaltyAtBrand
 } from '@/features/brands/queries/user-brands.queries';
@@ -21,6 +22,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
   const { data: brandData, isLoading: isLoadingBrand } = useGetActiveBrandDetail(brandId);
   const { data: benefit, isLoading: isLoadingBenefit } = useGetBenefitDetail(benefitId);
   const { data: loyaltyData } = useGetMyLoyaltyAtBrand(brandId);
+  const { data: myBenefits } = useGetMyBenefits(brandId, undefined, !!loyaltyData);
 
   const { mutateAsync: redeemBenefit, isPending: isRedeeming } = useRedeemBenefit();
 
@@ -29,7 +31,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
 
   const handleRedeem = async () => {
     try {
-      const result = await redeemBenefit(benefitId);
+      const result = await redeemBenefit({ benefitId, brandId });
       setVoucherCode(result?.voucherCode || result?.id || `VOUCHER-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
       setShowSuccessDialog(true);
     } catch (e) {
@@ -49,29 +51,23 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
     );
   }
 
-  const currentPoints = loyaltyData?.currentPoints || 0;
-  const currentTierRank = loyaltyData?.currentTier?.rank || 0;
-
+  const currentPoints = myBenefits?.currentPoints ?? loyaltyData?.currentPoints ?? 0;
   const unlockType = benefit?.unlockType?.toLowerCase();
 
-  let canAccess = false;
+  // Server is the source of truth for unlock state (tier rank / points / manual grant).
+  const myBenefit = myBenefits?.items.find((item) => item.id === benefitId);
+  const canAccess = myBenefit?.unlocked ?? false;
   let reasonBlocked = '';
 
-  if (unlockType === 'point_redemption') {
-    const requiredPoints = benefit?.requiredPoints || 0;
-    canAccess = currentPoints >= requiredPoints;
-    if (!canAccess) {
-      reasonBlocked = `Thiếu ${(requiredPoints - currentPoints).toLocaleString()} pts`;
+  if (!canAccess) {
+    if (unlockType === 'tier_privilege') {
+      reasonBlocked = `Yêu cầu hạng ${benefit?.requiredTierName || 'cao hơn'}`;
+    } else if (unlockType === 'point_redemption') {
+      const requiredPoints = benefit?.requiredPoints || 0;
+      reasonBlocked = `Thiếu ${Math.max(requiredPoints - currentPoints, 0).toLocaleString()} pts`;
+    } else if (unlockType === 'manual_grant') {
+      reasonBlocked = 'Không thể tự đổi';
     }
-  } else if (unlockType === 'tier_privilege') {
-    const requiredRank = benefit?.requiredTier?.rank || 0;
-    canAccess = currentTierRank >= requiredRank;
-    if (!canAccess) {
-      reasonBlocked = `Yêu cầu hạng ${benefit?.requiredTier?.name || 'cao hơn'}`;
-    }
-  } else if (unlockType === 'manual_grant') {
-    canAccess = false;
-    reasonBlocked = 'Không thể tự đổi';
   }
 
   const getLabelTag = () => {

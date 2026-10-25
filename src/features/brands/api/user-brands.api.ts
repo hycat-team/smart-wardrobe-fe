@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import { BrandInfo, Benefit, Conversation, ConversationMessage, BrandItemRes, PaginationResult, SampleFeedbackPayload, DigitalSampleResponseRes } from '@/features/brand-portal/types';
+import { BrandInfo, Benefit, Conversation, ConversationMessage, BrandItemRes, PaginationResult, SampleFeedbackPayload, DigitalSampleResponseRes, MyBenefitsResult } from '@/features/brand-portal/types';
 import { mockBrands } from '@/lib/mock-data/b2b';
 
 export const userBrandsApi = {
@@ -36,6 +36,12 @@ export const userBrandsApi = {
   // Lấy chi tiết phúc lợi
   getBenefitDetail: async (benefitId: string) => {
     const res = await api.get<{data: Benefit}>(`/brand-benefits/${benefitId}`);
+    return res.data.data;
+  },
+
+  // Quyền lợi của tôi: toàn bộ quyền lợi active + trạng thái mở khoá + lượt đổi gần nhất
+  getMyBenefits: async (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
+    const res = await api.get<{data: MyBenefitsResult}>(`/me/brand-loyalties/${brandId}/benefits`, { params });
     return res.data.data;
   },
 

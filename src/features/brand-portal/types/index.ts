@@ -66,6 +66,27 @@ export interface Benefit {
   };
 }
 
+export interface MyBenefitRedemption {
+  id: string;
+  status: 'pending' | 'redeemed' | 'used' | 'cancelled' | 'expired';
+  pointsSpent: number;
+  redeemedAt: string;
+  usedAt?: string | null;
+  expiresAt?: string | null;
+}
+
+export interface MyBenefit extends Benefit {
+  /** Backend đã tính sẵn theo hạng/điểm hiện có; FE không tự tính lại. */
+  unlocked: boolean;
+  /** Lượt đổi gần nhất của user cho quyền lợi này. */
+  redemption?: MyBenefitRedemption | null;
+}
+
+export interface MyBenefitsResult extends PaginationResult<MyBenefit> {
+  currentTier: LoyaltyTierRes | null;
+  currentPoints: number;
+}
+
 export interface LoyaltyTierRes {
   id: string;
   brandId: string;

@@ -16,6 +16,7 @@ export const USER_BRANDS_KEYS = {
   myLoyaltyTransactions: (brandId: string) => [...USER_BRANDS_KEYS.all, 'myLoyaltyTransactions', brandId] as const,
   benefitDetail: (benefitId: string) => [...USER_BRANDS_KEYS.all, 'benefitDetail', benefitId] as const,
   myBenefitRedemptions: () => [...USER_BRANDS_KEYS.all, 'myBenefitRedemptions'] as const,
+  myBenefits: (brandId: string) => [...USER_BRANDS_KEYS.all, 'myBenefits', brandId] as const,
   samples: (brandId: string) => [...USER_BRANDS_KEYS.all, 'samples', brandId] as const,
 };
 
@@ -51,6 +52,8 @@ export const useJoinLoyalty = () => {
     onSuccess: (_, brandId) => {
       toast.success('Đăng ký Loyalty thành công!');
       queryClient.invalidateQueries({ queryKey: USER_BRANDS_KEYS.detail(brandId) });
+      queryClient.invalidateQueries({ queryKey: USER_BRANDS_KEYS.myLoyaltyAtBrand(brandId) });
+      queryClient.invalidateQueries({ queryKey: USER_BRANDS_KEYS.myBenefits(brandId) });
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Không thể đăng ký Loyalty. Vui lòng thử lại sau.');
@@ -66,6 +69,19 @@ export const useGetBrandBenefits = (brandId: string, params?: { page?: number; l
   });
 };
 
+export const useGetMyBenefits = (
+  brandId: string,
+  params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string },
+  enabled = true,
+) => {
+  return useQuery({
+    queryKey: [...USER_BRANDS_KEYS.myBenefits(brandId), params],
+    queryFn: () => userBrandsApi.getMyBenefits(brandId, params),
+    enabled: !!brandId && enabled,
+    retry: false,
+  });
+};
+
 export const useGetBenefitDetail = (benefitId: string) => {
   return useQuery({
     queryKey: USER_BRANDS_KEYS.benefitDetail(benefitId),
@@ -78,11 +94,13 @@ export const useRedeemBenefit = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (benefitId: string) => userBrandsApi.redeemBenefit(benefitId),
-    onSuccess: (_, benefitId) => {
+    mutationFn: ({ benefitId }: { benefitId: string; brandId: string }) => userBrandsApi.redeemBenefit(benefitId),
+    onSuccess: (_, { brandId }) => {
       toast.success('Đổi ưu đãi thành công!');
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: USER_BRANDS_KEYS.myBenefitRedemptions() });
+      queryClient.invalidateQueries({ queryKey: USER_BRANDS_KEYS.myBenefits(brandId) });
+      queryClient.invalidateQueries({ queryKey: USER_BRANDS_KEYS.myLoyaltyAtBrand(brandId) });
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Không thể đổi ưu đãi. Vui lòng thử lại sau.');

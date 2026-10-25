@@ -5,10 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, 
   Award, 
+  CheckCircle2,
   Clock, 
   CreditCard, 
+  Crown,
   Gift, 
   History, 
+  Lock,
   ShieldCheck, 
   Sparkles, 
   Ticket, 
@@ -24,9 +27,12 @@ import {
   useGetMyLoyaltyTransactions, 
   useGetMyLoyaltyLots,
   useGetBrandBenefits,
+  useGetMyBenefits,
   useGetMyBenefitRedemptions,
+  useRedeemBenefit,
   useJoinLoyalty
 } from '@/features/brands/queries/user-brands.queries';
+import type { MyBenefit } from '@/features/brand-portal/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -43,15 +49,26 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
   const { data: lots } = useGetMyLoyaltyLots(brandId);
   const { data: benefitsData } = useGetBrandBenefits(brandId, { unlockType: 'point_redemption' });
   const benefits = benefitsData?.items || [];
+  const { data: myBenefits, isLoading: isLoadingMyBenefits } = useGetMyBenefits(brandId, undefined, !!loyaltyData);
+  const myBenefitItems = myBenefits?.items || [];
   const { data: redemptions } = useGetMyBenefitRedemptions(brandId);
   
   const { mutateAsync: joinLoyalty, isPending: isJoining } = useJoinLoyalty();
+  const { mutateAsync: redeemBenefit, isPending: isRedeeming } = useRedeemBenefit();
 
   // Handle joining loyalty
   const handleJoin = async () => {
     try {
       await joinLoyalty(brandId);
       // Data will be refetched automatically due to onSuccess invalidation
+    } catch (e) {
+      // Error handled by query hook
+    }
+  };
+
+  const handleRedeemBenefit = async (benefitId: string) => {
+    try {
+      await redeemBenefit({ benefitId, brandId });
     } catch (e) {
       // Error handled by query hook
     }
@@ -177,8 +194,11 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                   <TabsTrigger value="benefits" className="rounded-xl px-6 py-3 text-sm font-semibold data-[state=active]:bg-zinc-950 data-[state=active]:text-white transition-all">
                     Đặc Quyền
                   </TabsTrigger>
-                  <TabsTrigger value="redemptions" className="rounded-xl px-6 py-3 text-sm font-semibold data-[state=active]:bg-zinc-950 data-[state=active]:text-white transition-all">
+                  <TabsTrigger value="my-benefits" className="rounded-xl px-6 py-3 text-sm font-semibold data-[state=active]:bg-zinc-950 data-[state=active]:text-white transition-all">
                     Quyền lợi Của Tôi
+                  </TabsTrigger>
+                  <TabsTrigger value="redemptions" className="rounded-xl px-6 py-3 text-sm font-semibold data-[state=active]:bg-zinc-950 data-[state=active]:text-white transition-all">
+                    Quyền lợi Đã Đổi
                   </TabsTrigger>
                   <TabsTrigger value="history" className="rounded-xl px-6 py-3 text-sm font-semibold data-[state=active]:bg-zinc-950 data-[state=active]:text-white transition-all">
                     Lịch Sử Điểm
@@ -241,36 +261,155 @@ export default function BrandLoyaltyClient({ brandId }: { brandId: string }) {
                 )}
               </TabsContent>
 
+              {/* MY BENEFITS TAB */}
+              <TabsContent value="my-benefits" className="focus-visible:outline-none">
+                {isLoadingMyBenefits ? (
+                  <div className="flex justify-center py-20">
+                    <div className="w-10 h-10 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+                  </div>
+                ) : myBenefitItems.length === 0 ? (
+                  <div className="text-center py-20 bg-white rounded-[2.5rem] border border-slate-200/50">
+                    <Award className="w-10 h-10 text-zinc-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-zinc-900">Chưa có quyền lợi</h3>
+                    <p className="text-zinc-500 mt-1">Brand hiện tại chưa phát hành quyền lợi nào.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {myBenefitItems.map((benefit: MyBenefit, idx: number) => {
+                      const redemption = benefit.redemption;
+                      const isRedeemed = !!redemption;
+                      const locked = !benefit.unlocked && !isRedeemed;
+                      return (
+                        <motion.div
+                          key={benefit.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.05, type: "spring", stiffness: 100 }}
+                          className="group relative bg-white p-6 rounded-[2rem] border border-slate-200/50 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] transition-all flex flex-col justify-between"
+                        >
+                          <div>
+                            <div className="flex items-start justify-between gap-3 mb-5">
+                              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${locked ? 'bg-zinc-100 text-zinc-400' : 'bg-emerald-50 text-emerald-600'}`}>
+                                <Gift className="w-6 h-6" />
+                              </div>
+                              {isRedeemed ? (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  Đã nhận
+                                </span>
+                              ) : benefit.unlocked ? (
+                                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">
+                                  Đủ điều kiện
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-100 px-2 py-1 rounded-full">
+                                  {benefit.unlockType === 'manual_grant' ? 'Quà tặng từ brand' : 'Chưa đủ điều kiện'}
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="text-xl font-bold tracking-tight text-zinc-900 mb-2">{benefit.name}</h3>
+                            <p className="text-zinc-500 text-sm leading-relaxed line-clamp-3">
+                              {benefit.description}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-2 mt-4 text-xs font-semibold text-zinc-500">
+                              {benefit.unlockType === 'tier_privilege' && (
+                                <span className="inline-flex items-center gap-1">
+                                  <Crown className="w-3.5 h-3.5 text-amber-500" />
+                                  Hạng {benefit.requiredTierName || '—'}
+                                </span>
+                              )}
+                              {benefit.unlockType === 'point_redemption' && (
+                                <span className="inline-flex items-center gap-1">
+                                  <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                                  {(benefit.requiredPoints || 0).toLocaleString()} pts
+                                </span>
+                              )}
+                              {benefit.unlockType === 'manual_grant' && (
+                                <span className="inline-flex items-center gap-1">
+                                  <Gift className="w-3.5 h-3.5 text-zinc-400" />
+                                  Brand trao tặng
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="pt-4 mt-6 border-t border-slate-100">
+                            {isRedeemed ? (
+                              <p className="text-xs text-zinc-500">
+                                Đã nhận {redemption?.redeemedAt ? format(new Date(redemption.redeemedAt), 'dd/MM/yyyy HH:mm') : ''}
+                                {redemption?.expiresAt ? ` • Hết hạn ${format(new Date(redemption.expiresAt), 'dd/MM/yyyy')}` : ''}
+                              </p>
+                            ) : benefit.unlocked ? (
+                              <Button
+                                size="sm"
+                                disabled={isRedeeming}
+                                onClick={() => handleRedeemBenefit(benefit.id)}
+                                className="w-full h-11 rounded-xl text-sm font-semibold bg-zinc-950 hover:bg-zinc-800 text-white transition-transform active:scale-[0.98]"
+                              >
+                                {isRedeeming ? 'Đang xử lý...' : 'Nhận ngay'}
+                              </Button>
+                            ) : (
+                              <p className="text-xs font-semibold text-zinc-400 inline-flex items-center gap-1.5">
+                                <Lock className="w-3.5 h-3.5" />
+                                {benefit.unlockType === 'tier_privilege'
+                                  ? `Cần hạng ${benefit.requiredTierName || 'cao hơn'}`
+                                  : benefit.unlockType === 'point_redemption'
+                                    ? `Cần thêm ${Math.max((benefit.requiredPoints || 0) - (myBenefits?.currentPoints || 0), 0).toLocaleString()} pts`
+                                    : 'Chỉ nhận khi brand trao tặng'}
+                              </p>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </TabsContent>
+
               {/* REDEMPTIONS TAB */}
               <TabsContent value="redemptions" className="focus-visible:outline-none">
                 {(!redemptions || redemptions.length === 0) ? (
                   <div className="text-center py-20 bg-white rounded-[2.5rem] border border-slate-200/50">
                     <Ticket className="w-10 h-10 text-zinc-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold text-zinc-900">Chưa có Voucher</h3>
-                    <p className="text-zinc-500 mt-1">Bạn chưa đổi điểm lấy voucher nào.</p>
+                    <h3 className="text-lg font-bold text-zinc-900">Chưa có quyền lợi đã đổi</h3>
+                    <p className="text-zinc-500 mt-1">Bạn chưa nhận hoặc đổi quyền lợi nào của brand này.</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* Render filtered redemptions for this brand (if data contains brandId) or all */}
-                    {redemptions.map((redemption: any, idx: number) => (
-                      <motion.div
-                        key={redemption.id || idx}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white p-6 rounded-[2rem] border border-emerald-100 shadow-sm relative overflow-hidden"
-                      >
-                        <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full blur-2xl" />
-                        <h3 className="text-lg font-bold text-zinc-900 mb-1 relative z-10">{redemption.name || "Voucher Ưu đãi"}</h3>
-                        <p className="text-sm text-zinc-500 mb-6 relative z-10">
-                          Đã đổi vào {(redemption.redeemedAt || redemption.createdAt) ? format(new Date(redemption.redeemedAt || redemption.createdAt), 'dd/MM/yyyy HH:mm') : 'Gần đây'}
-                        </p>
-                        
-                        <div className="bg-zinc-50 p-4 rounded-2xl border border-dashed border-zinc-300 text-center relative z-10">
-                          <p className="text-xs text-zinc-500 uppercase font-semibold mb-1">Mã Code / ID</p>
-                          <p className="text-xl font-mono font-bold text-zinc-900 tracking-widest">{redemption.voucherCode || redemption.id?.substring(0, 8).toUpperCase() || "N/A"}</p>
-                        </div>
-                      </motion.div>
-                    ))}
+                    {redemptions.map((redemption: any, idx: number) => {
+                      const redeemedBenefit = redemption.benefit;
+                      return (
+                        <motion.div
+                          key={redemption.id || idx}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="bg-white p-6 rounded-[2rem] border border-emerald-100 shadow-sm relative overflow-hidden"
+                        >
+                          <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full blur-2xl" />
+                          <h3 className="text-lg font-bold text-zinc-900 mb-1 relative z-10">
+                            {redeemedBenefit?.name || "Quyền lợi ưu đãi"}
+                          </h3>
+                          <p className="text-sm text-zinc-500 mb-2 relative z-10">
+                            Đã đổi vào {(redemption.redeemedAt || redemption.createdAt) ? format(new Date(redemption.redeemedAt || redemption.createdAt), 'dd/MM/yyyy HH:mm') : 'Gần đây'}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-500 mb-6 relative z-10">
+                            <span className="uppercase tracking-wide">{redemption.status}</span>
+                            <span>•</span>
+                            <span>{redemption.pointsSpent || 0} pts</span>
+                            {redemption.expiresAt && (
+                              <>
+                                <span>•</span>
+                                <span>Hết hạn {format(new Date(redemption.expiresAt), 'dd/MM/yyyy')}</span>
+                              </>
+                            )}
+                          </div>
+                          
+                          <div className="bg-zinc-50 p-4 rounded-2xl border border-dashed border-zinc-300 text-center relative z-10">
+                            <p className="text-xs text-zinc-500 uppercase font-semibold mb-1">Mã tham chiếu</p>
+                            <p className="text-xl font-mono font-bold text-zinc-900 tracking-widest">{redemption.id?.substring(0, 8).toUpperCase() || "N/A"}</p>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 )}
               </TabsContent>
