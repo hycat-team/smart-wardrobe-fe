@@ -20,7 +20,6 @@ import { wardrobeApi } from '@/features/wardrobe/api/wardrobe.api';
 import { useCreateOutfit } from '@/features/outfits/queries/outfits.queries';
 import { useCreateSampleFeedback } from '@/features/brands/queries/user-brands.queries';
 import { toast } from 'sonner';
-import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import * as htmlToImage from 'html-to-image';
 import { Switch } from '@/components/ui/switch';
@@ -630,19 +629,7 @@ function AIStylistContent() {
           if (activeGhostItem) {
             joinWaitlist(activeGhostItem.id);
             logGhostAction(activeGhostItem.id, 'waitlist');
-            const { addToCart } = useB2BDemoStore.getState();
-            addToCart({
-              productId: activeGhostItem.id,
-              name: `${activeGhostItem.category?.name || 'Sản phẩm'} ${activeGhostItem.fashionItem?.color || 'Basic'}`,
-              price: activeGhostItem.price || 500000,
-              quantity: 1,
-              size: 'M',
-              color: activeGhostItem.fashionItem?.color || 'Basic',
-              imageUrl: activeGhostItem.fashionItem?.imageUrl || '',
-              brandId: activeGhostItem.brandId,
-              brandName: activeGhostItem.brandName,
-              selected: true,
-            });
+            toast.success('Đã thêm vào danh sách chờ!');
           }
         }}
         onHideBrand={() => {

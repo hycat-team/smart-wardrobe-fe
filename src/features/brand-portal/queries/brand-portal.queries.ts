@@ -64,6 +64,21 @@ export const useUpdateBrandLogo = (brandId: string) => {
   });
 };
 
+export const useUpdateBrandProfile = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { name?: string, description?: string }) => brandPortalApi.updateBrandProfile(brandId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.profile(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
+      toast.success('Cập nhật thông tin thương hiệu thành công!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể cập nhật thông tin thương hiệu.');
+    },
+  });
+};
+
 // CRM
 export const useGetCustomers = (brandId: string, search?: string) => {
   return useQuery({

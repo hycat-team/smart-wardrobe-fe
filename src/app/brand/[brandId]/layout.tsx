@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Package, LayoutDashboard, MessageSquareText, Settings, NotebookTabsIcon, Menu, X, Store, LogOut, ChevronRight, Users, ShoppingCart, MessageCircle, Award, Gift, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Package, LayoutDashboard, Settings, NotebookTabsIcon, Menu, X, Store, LogOut, ChevronRight, Users, MessageCircle, Award, Gift, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useParams, usePathname } from 'next/navigation';
 import {
   DropdownMenu,
@@ -23,8 +23,6 @@ const getNavItems = (brandId: string, isStaff: boolean) => {
     { href: `/brand/${brandId}/benefits`, label: 'Phúc lợi', icon: Gift, hideForStaff: true },
     { href: `/brand/${brandId}/products`, label: 'Sản phẩm', icon: Package },
     { href: `/brand/${brandId}/digital-sample-lab/report`, label: 'Báo cáo thử mẫu', icon: NotebookTabsIcon },
-    { href: `/brand/${brandId}/orders`, label: 'Đơn hàng', icon: ShoppingCart },
-    { href: `/brand/${brandId}/posts`, label: 'Bài viết', icon: MessageSquareText },
   ];
   return items.filter(item => !(isStaff && item.hideForStaff));
 };

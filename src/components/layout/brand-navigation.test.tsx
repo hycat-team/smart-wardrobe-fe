@@ -9,7 +9,6 @@ import { BrandRedirector } from '@/app/(user)/components/BrandRedirector';
 
 let mockPathname = '/wardrobe';
 let mockMemberRole = 'owner';
-const mockSetCartOpen = jest.fn();
 const mockRouterPush = jest.fn();
 const mockAuthState = {
   user: {
@@ -51,9 +50,6 @@ jest.mock('@/store/useSidebarStore', () => ({
     toggleCollapse: jest.fn(),
   }),
 }));
-jest.mock('@/lib/mock-data/b2b/store', () => ({
-  useB2BDemoStore: () => ({ cart: [], setCartOpen: mockSetCartOpen }),
-}));
 jest.mock('@/features/auth/queries/auth.queries', () => ({
   useLogout: () => ({ mutate: jest.fn() }),
 }));
@@ -73,13 +69,12 @@ describe('brand navigation', () => {
     mockAuthState.user.lastName = 'Dùng';
   });
 
-  it('exposes discovery, the brand portal and the cart on desktop', () => {
+  it('exposes discovery and the brand portal on desktop', () => {
     render(<Sidebar />);
 
     expect(screen.getByRole('link', { name: 'Khám Phá' }).getAttribute('href')).toBe('/brands');
     expect(screen.getByRole('link', { name: 'Kênh Thương Hiệu' }).getAttribute('href')).toBe('/brand-portal/select');
-    fireEvent.click(screen.getByRole('button', { name: 'Giỏ Hàng' }));
-    expect(mockSetCartOpen).toHaveBeenCalledWith(true);
+    expect(screen.queryByRole('button', { name: 'Giỏ Hàng' })).toBeNull();
   });
 
   it('keeps all four primary destinations on mobile and opens brand destinations from More', async () => {
@@ -111,12 +106,13 @@ describe('brand navigation', () => {
     expect(screen.getByRole('link', { name: 'Duyệt thương hiệu' }).getAttribute('href')).toBe('/admin/brands');
   });
 
-  it('restores brand orders, posts and switching to a valid selector route', async () => {
+  it('keeps the brand workspace navigation free of removed mock routes', async () => {
     mockPathname = '/brand/brand-1/dashboard';
     render(<BrandLayout><p>Dashboard</p></BrandLayout>);
 
-    expect(screen.getAllByRole('link', { name: 'Đơn hàng' })[0].getAttribute('href')).toBe('/brand/brand-1/orders');
-    expect(screen.getAllByRole('link', { name: 'Bài viết' })[0].getAttribute('href')).toBe('/brand/brand-1/posts');
+    expect(screen.getAllByRole('link', { name: 'Sản phẩm' })[0].getAttribute('href')).toBe('/brand/brand-1/products');
+    expect(screen.queryByRole('link', { name: 'Đơn hàng' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Bài viết' })).toBeNull();
     fireEvent.keyDown(screen.getAllByRole('button', { name: 'Tài khoản thương hiệu Closy Brand' })[0], { key: 'Enter' });
     expect((await screen.findByRole('menuitem', { name: 'Đổi thương hiệu' })).getAttribute('href')).toBe('/brand-portal/select');
   });
@@ -128,7 +124,7 @@ describe('brand navigation', () => {
     for (const label of ['Thành viên', 'Chương trình điểm', 'Phúc lợi']) {
       expect(screen.queryByRole('link', { name: label })).toBeNull();
     }
-    expect(screen.getAllByRole('link', { name: 'Đơn hàng' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Sản phẩm' }).length).toBeGreaterThan(0);
   });
 
   it('routes legacy brand accounts through the brand entry page', () => {

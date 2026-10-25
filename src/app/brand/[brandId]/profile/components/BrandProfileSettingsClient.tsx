@@ -1,32 +1,27 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { UploadCloud, CheckCircle, MapPin, Globe, Link as LinkIcon, Pencil, Camera } from "lucide-react";
+import { UploadCloud, CheckCircle, Pencil, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useParams } from "next/navigation";
 import { brandPortalApi } from "@/features/brand-portal/api/brand-portal.api";
-import { useUpdateBrandLogo, useGetBrandProfile } from "@/features/brand-portal/queries/brand-portal.queries";
+import { useUpdateBrandLogo, useGetBrandProfile, useUpdateBrandProfile } from "@/features/brand-portal/queries/brand-portal.queries";
 import { toast } from "sonner";
 import { getCloudinaryCloudName } from "@/lib/cloudinary";
 
 export function BrandProfileSettingsClient() {
   const params = useParams();
   const brandId = params.brandId as string;
-  const [isSaving, setIsSaving] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const { mutateAsync: updateLogo } = useUpdateBrandLogo(brandId);
+  const { mutateAsync: updateProfile, isPending: isSaving } = useUpdateBrandProfile(brandId);
   const { data: brandProfile } = useGetBrandProfile(brandId);
 
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    story: "",
     logoUrl: "",
     coverUrl: "",
-    location: "TP. Hồ Chí Minh",
-    website: "",
-    instagram: "",
   });
 
   useEffect(() => {
@@ -34,12 +29,8 @@ export function BrandProfileSettingsClient() {
       setFormData({
         name: brandProfile.name || "",
         description: brandProfile.description || "",
-        story: brandProfile.story || "",
         logoUrl: brandProfile.logoUrl || "",
         coverUrl: brandProfile.backgroundUrl || "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&q=80",
-        location: brandProfile.location || "TP. Hồ Chí Minh",
-        website: brandProfile.website || `${brandProfile.name?.toLowerCase().replace(/\s/g, '')}.vn`,
-        instagram: brandProfile.instagram || `@${brandProfile.name?.toLowerCase().replace(/\s/g, '')}`,
       });
     }
   }, [brandProfile]);
@@ -99,18 +90,16 @@ export function BrandProfileSettingsClient() {
     }
   };
 
-  const handleSave = () => {
-    setIsSaving(true);
+  const handleSave = async () => {
+    const name = formData.name.trim();
+    if (!name) {
+      toast.error('Tên thương hiệu không được để trống.');
+      return;
+    }
     try {
-      localStorage.setItem("custom_brand_profile", JSON.stringify(formData));
-      setTimeout(() => {
-        setIsSaving(false);
-        toast.success("Đã lưu thông tin hồ sơ");
-      }, 600);
-    } catch (e) {
-      console.error("Error saving profile", e);
-      setIsSaving(false);
-      toast.error("Không thể lưu thông tin");
+      await updateProfile({ name, description: formData.description.trim() });
+    } catch {
+      // Error toast handled by the mutation hook.
     }
   };
 
@@ -200,16 +189,6 @@ export function BrandProfileSettingsClient() {
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="Định vị thương hiệu của bạn..."
                     className="w-full min-h-[60px] p-4 text-base rounded-2xl border border-transparent bg-muted/30 focus-visible:bg-muted/50 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none focus-visible:border-border resize-none transition-all placeholder:text-muted-foreground/50"
-                  />
-                </div>
-                
-                <div className="space-y-3">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Câu chuyện thương hiệu (Về chúng tôi)</label>
-                  <textarea
-                    value={formData.story}
-                    onChange={(e) => setFormData(prev => ({ ...prev, story: e.target.value }))}
-                    placeholder="Chia sẻ hành trình hoặc giá trị cốt lõi..."
-                    className="w-full min-h-[160px] p-4 text-base rounded-2xl border border-transparent bg-muted/30 focus-visible:bg-muted/50 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none focus-visible:border-border resize-none transition-all placeholder:text-muted-foreground/50 leading-relaxed"
                   />
                 </div>
               </div>

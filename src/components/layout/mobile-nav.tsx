@@ -3,11 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Ellipsis, UserCircle, ShoppingBag } from "lucide-react";
+import { Ellipsis, UserCircle } from "lucide-react";
 import { cn, getUserAvatar } from "@/lib/utils";
 import Image from "next/image";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useB2BDemoStore } from "@/lib/mock-data/b2b/store";
 import { NAV_ITEMS } from "./sidebar";
 import {
   DropdownMenu,
@@ -24,7 +23,6 @@ const MORE_ITEMS = NAV_ITEMS.filter((item) => !PRIMARY_PATHS.includes(item.path)
 export function MobileBottomNav() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
-  const { cart, setCartOpen } = useB2BDemoStore();
 
   return (
     <nav aria-label="Điều hướng chính" className="md:hidden fixed bottom-0 w-full min-h-[72px] pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 bg-[#FAFAFA] dark:bg-[#111111] border-t border-border/60 flex items-center justify-around px-2 z-50">
@@ -127,23 +125,6 @@ export function MobileBottomNav() {
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-      
-      {/* Mobile Cart Button */}
-      <button 
-        type="button"
-        aria-label="Mở giỏ hàng"
-        onClick={() => setCartOpen(true)}
-        className="flex flex-col items-center justify-center gap-1 w-full h-full transition-colors active:scale-95 relative text-muted-foreground hover:text-foreground"
-      >
-        <div className="relative">
-          <ShoppingBag className="size-5 transition-transform duration-300" strokeWidth={1.5} />
-          {cart.length > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-foreground text-background text-[9px] font-bold w-4 h-4 rounded-full z-10 shadow-sm border border-background">
-              {cart.length}
-            </span>
-          )}
-        </div>
-      </button>
     </nav>
   );
 }

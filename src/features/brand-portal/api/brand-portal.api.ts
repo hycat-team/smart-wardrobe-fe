@@ -47,6 +47,11 @@ export const brandPortalApi = {
     return res.data.data;
   },
 
+  updateBrandProfile: async (brandId: string, payload: { name?: string, description?: string }) => {
+    const res = await api.patch<{data: BrandInfo}>(`/brand-portal/brands/${brandId}/profile`, payload);
+    return res.data.data;
+  },
+
   createBrand: async (payload: CreateBrandPayload) => {
     const res = await api.post<{data: BrandInfo}>('/brand-portal/brands', payload);
     return res.data.data;
