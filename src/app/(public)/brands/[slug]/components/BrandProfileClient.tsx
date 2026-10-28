@@ -130,16 +130,18 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
   return (
     <div className="flex-1 bg-background pb-20">
       {/* Cover */}
-      <div className="w-[calc(100%+2rem)] -mx-4 md:w-[calc(100%+4rem)] md:-mx-8 h-[300px] md:h-[450px] relative bg-muted group overflow-hidden">
-        <img src={brand.backgroundUrl || 'https://placehold.co/1200x400?text=Brand+Cover'} alt="Cover" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2s] ease-out" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-background" />
-        <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-background to-transparent" />
-        <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-background to-transparent" />
-      </div>
+      {brand.backgroundUrl && (
+        <div className="w-[calc(100%+2rem)] -mx-4 md:w-[calc(100%+4rem)] md:-mx-8 h-[300px] md:h-[450px] relative bg-muted group overflow-hidden">
+          <img src={brand.backgroundUrl} alt="Cover" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2s] ease-out" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-background" />
+          <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-background to-transparent" />
+          <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-background to-transparent" />
+        </div>
+      )}
 
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Brand Header */}
-        <div className="relative -mt-24 sm:-mt-32 mb-12 flex flex-col xl:flex-row items-center xl:items-end gap-6 xl:gap-8">
+        <div className={`relative mb-12 flex flex-col xl:flex-row items-center xl:items-end gap-6 xl:gap-8 ${brand.backgroundUrl ? '-mt-24 sm:-mt-32' : 'mt-6'}`}>
           <Avatar className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 shadow-xl rounded-full overflow-hidden border-4 border-background z-10 shrink-0">
             <AvatarImage src={brand.logoUrl} className="object-cover" />
             <AvatarFallback className="bg-muted text-foreground text-4xl font-semibold">{brand.name[0]}</AvatarFallback>

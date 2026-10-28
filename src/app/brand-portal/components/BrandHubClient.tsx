@@ -1,9 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useGetMyBrands } from '@/features/brand-portal/queries/brand-portal.queries';
+import { useCancelBrandRequest, useGetMyBrands } from '@/features/brand-portal/queries/brand-portal.queries';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { BRAND_PORTAL_REGISTER, brandPortalPath } from '@/features/brand-portal/utils/routes';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,6 +29,8 @@ export default function BrandHubClient() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const { data: brands, isLoading, error, refetch } = useGetMyBrands(!!user);
+  const { mutateAsync: cancelBrandRequest, isPending: isCancelling } = useCancelBrandRequest();
+  const [brandToCancel, setBrandToCancel] = useState<{ id: string; name: string; status: string } | null>(null);
 
   if (!user) {
     return (
@@ -94,6 +106,8 @@ export default function BrandHubClient() {
         const status = brand.status?.toUpperCase() || '';
         const isActive = status === 'ACTIVE';
         const isPending = status === 'PENDING' || status === 'PENDING_REVIEW';
+        const isRejected = status === 'REJECTED';
+        const isOwner = brand.memberRole === 'owner';
         const roleLabel = brand.memberRole ? ROLE_LABEL[brand.memberRole] : null;
 
         const card = (
@@ -122,24 +136,52 @@ export default function BrandHubClient() {
                 )}
               </div>
             </div>
-            <div className="mt-auto pt-4 border-t border-border flex items-center justify-between text-sm text-muted-foreground">
+            <div className="mt-auto pt-4 border-t border-border flex items-center justify-between gap-3 text-sm text-muted-foreground">
               <span
                 className={`inline-flex px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded-full ${
                   isActive
                     ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                     : isPending
                       ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                      : 'bg-muted text-muted-foreground'
+                      : isRejected
+                        ? 'bg-red-500/10 text-red-600 dark:text-red-400'
+                        : 'bg-muted text-muted-foreground'
                 }`}
               >
-                {isActive ? 'Hoạt động' : isPending ? 'Chờ duyệt' : status}
+                {isActive ? 'Hoạt động' : isPending ? 'Chờ duyệt' : isRejected ? 'Đã từ chối' : status}
               </span>
               {isActive ? (
                 <span className="flex items-center gap-1 font-semibold group-hover:text-primary transition-colors">
                   Quản lý <ArrowRight className="w-4 h-4" />
                 </span>
               ) : isPending ? (
-                <span className="text-amber-600/70 text-xs font-medium">Đang chờ admin</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-600/70 text-xs font-medium">Đang chờ admin</span>
+                  {isOwner && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 rounded-full border-border text-xs"
+                      onClick={() => setBrandToCancel(brand)}
+                    >
+                      Hủy yêu cầu
+                    </Button>
+                  )}
+                </div>
+              ) : isRejected ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Admin đã từ chối</span>
+                  {isOwner && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 rounded-full border-border text-xs text-destructive hover:text-destructive"
+                      onClick={() => setBrandToCancel(brand)}
+                    >
+                      Xóa yêu cầu
+                    </Button>
+                  )}
+                </div>
               ) : null}
             </div>
           </CardContent>
@@ -167,6 +209,45 @@ export default function BrandHubClient() {
           <span className="text-xs text-muted-foreground mt-1">Tạo thương hiệu mới</span>
         </Card>
       </Link>
+
+      <AlertDialog
+        open={Boolean(brandToCancel)}
+        onOpenChange={(open) => {
+          if (!open) setBrandToCancel(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa yêu cầu đăng ký?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {brandToCancel
+                ? `Yêu cầu đăng ký "${brandToCancel.name}" sẽ bị xóa vĩnh viễn. Bạn có thể đăng ký lại với cùng slug sau.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isCancelling}>Giữ lại</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isCancelling}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(event) => {
+                event.preventDefault();
+                if (!brandToCancel) return;
+                void (async () => {
+                  try {
+                    await cancelBrandRequest(brandToCancel.id);
+                    setBrandToCancel(null);
+                  } catch {
+                    // toast handled by mutation
+                  }
+                })();
+              }}
+            >
+              {isCancelling ? "Đang xóa..." : "Xóa yêu cầu"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

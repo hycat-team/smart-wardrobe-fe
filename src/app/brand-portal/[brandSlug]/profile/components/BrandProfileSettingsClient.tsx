@@ -32,7 +32,7 @@ export function BrandProfileSettingsClient() {
         name: brandProfile.name || "",
         description: brandProfile.description || "",
         logoUrl: brandProfile.logoUrl || "",
-        coverUrl: brandProfile.backgroundUrl || "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&q=80",
+        coverUrl: brandProfile.backgroundUrl || "",
       });
     }
   }, [brandProfile]);
@@ -123,8 +123,9 @@ export function BrandProfileSettingsClient() {
             ) : formData.coverUrl ? (
               <img src={formData.coverUrl} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                <UploadCloud className="size-8 opacity-50" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                <UploadCloud className="size-7 opacity-50" />
+                <span className="text-[11px] font-semibold uppercase tracking-widest">Chưa có ảnh bìa · Nhấn để tải lên</span>
               </div>
             )}
             {!isUploadingCover && (
@@ -148,8 +149,8 @@ export function BrandProfileSettingsClient() {
                 ) : formData.logoUrl ? (
                   <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    <UploadCloud className="size-6 opacity-50" />
+                  <div className="w-full h-full flex items-center justify-center rounded-full border border-dashed border-border bg-muted/40 text-muted-foreground">
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Thêm logo</span>
                   </div>
                 )}
                 {!isUploadingLogo && (

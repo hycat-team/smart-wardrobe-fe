@@ -37,6 +37,10 @@ export const brandPortalApi = {
     return res.data.data;
   },
 
+  cancelBrandRequest: async (brandId: string) => {
+    const res = await api.delete<{data: unknown}>(`/brand-portal/brands/${brandId}/request`);
+    return res.data.data;
+  },
   getLogoUploadSignature: async () => {
     const res = await api.get<{data: { signature: string, timestamp: number, folder: string, apiKey: string }}>('/brand-portal/brands/profile-images/upload-signature');
     return res.data.data;

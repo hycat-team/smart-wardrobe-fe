@@ -42,6 +42,19 @@ export const useGetBrandProfile = (brandId: string) => {
   });
 };
 
+export const useCancelBrandRequest = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (brandId: string) => brandPortalApi.cancelBrandRequest(brandId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
+      toast.success('Đã hủy yêu cầu đăng ký thương hiệu');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể hủy yêu cầu đăng ký');
+    },
+  });
+};
 export const useCreateBrand = () => {
   const queryClient = useQueryClient();
   return useMutation({
