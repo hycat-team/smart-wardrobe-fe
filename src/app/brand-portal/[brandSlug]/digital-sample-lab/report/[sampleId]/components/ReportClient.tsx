@@ -5,6 +5,16 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useGetBrandItemFeedbacks, useGetBrandItemDetail, useConvertSampleToProduct } from "@/features/brand-portal/queries/brand-portal.queries";
 import { BrandItemMetaPanel } from "@/features/brand-portal/components/BrandItemMeta";
+import { getItemDisplayStatus, type BrandItemDisplayStatus } from "@/features/brand-portal/utils/item-status";
+
+const STATUS_LABELS: Record<BrandItemDisplayStatus, string> = {
+  analyzing: "Đang phân tích",
+  failed: "Phân tích thất bại",
+  needs_review: "Cần chọn danh mục",
+  active: "Đang hoạt động",
+  archived: "Lưu trữ",
+  draft: "Bản nháp",
+};
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -49,6 +59,8 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
   const displayProductName = product?.name || product?.fashionItem?.style || "Chi tiết sản phẩm";
   const displayImage = product?.fashionItem?.imageUrl || null;
   const displayDesc = product?.description || product?.fashionItem?.description || "Chưa có mô tả chi tiết cho sản phẩm này.";
+  const displayStatus = product ? getItemDisplayStatus(product) : 'draft';
+  const statusLabel = STATUS_LABELS[displayStatus];
   const displayPrice = product?.price != null ? `${product.price.toLocaleString('vi-VN')} ₫` : "Liên hệ để biết giá";
 
   return (
@@ -89,18 +101,11 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
         </div>
       )}
 
-      {product && <BrandItemMetaPanel item={product} />}
-
-
-      {/* Main Product Hero */}
-      <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-ink/10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#F4F1EE] rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10 items-center">
-          {/* Image */}
-          <div className="bg-[#F4F1EE]/50 rounded-[2rem] p-8 aspect-square flex items-center justify-center border border-ink/5 relative overflow-hidden">
+      <div className="grid gap-6 lg:grid-cols-[1.05fr_1fr]">
+        <div className="bg-white rounded-[2.5rem] p-6 md:p-8 border border-ink/10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] relative overflow-hidden">
+          <div className="bg-[#F4F1EE]/50 rounded-[2rem] p-6 aspect-square flex items-center justify-center border border-ink/5 relative overflow-hidden">
             {displayImage ? (
-              <img src={displayImage} alt={displayProductName} className="w-full h-full object-contain mix-blend-multiply drop-shadow-xl transition-transform duration-700 group-hover:scale-105" />
+              <img src={displayImage} alt={displayProductName} className="w-full h-full object-contain mix-blend-multiply drop-shadow-xl" />
             ) : (
               <div className="flex flex-col items-center justify-center text-ink-muted">
                 <Tag className="size-16 mb-4 opacity-20" />
@@ -108,25 +113,35 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
               </div>
             )}
           </div>
-          
-          {/* Info */}
-          <div className="space-y-8 py-4">
+
+          <div className="mt-6 space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A0522D]/10 text-[#A0522D] text-xs font-mono uppercase tracking-widest font-semibold">
               Thông tin mẫu
             </div>
-            
-            <div className="space-y-4">
-              <h1 className="text-5xl font-medium tracking-tight text-ink leading-[1.1]">{displayProductName}</h1>
-              <p className="text-2xl font-light text-ink/70">{displayPrice}</p>
+            <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-ink leading-[1.15]">{displayProductName}</h1>
+            <p className="text-2xl font-light text-ink/70">{displayPrice}</p>
+            <p className="text-base text-ink-muted leading-relaxed font-light">{displayDesc}</p>
+            <div className="pt-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-[#F4F1EE]/60 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-ink/70">
+                {statusLabel}
+              </span>
             </div>
+          </div>
+        </div>
 
-            <p className="text-lg text-ink-muted leading-relaxed font-light max-w-lg">
-              {displayDesc}
-            </p>
+        <div className="flex flex-col gap-6">
+          {product && <BrandItemMetaPanel item={product} />}
+
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm text-sm text-muted-foreground space-y-2">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-foreground">Thông tin mẫu thử</p>
+            <p>Trạng thái: <span className="font-semibold text-foreground">{statusLabel}</span></p>
+            <p>Ngày tạo: {product?.createdAt ? new Date(product.createdAt).toLocaleString('vi-VN') : '—'}</p>
+            <p>Số phản hồi: {feedbacks?.length ?? 0}</p>
+            {product?.productCode && <p>Mã sản phẩm: {product.productCode}</p>}
+            {product?.price != null && <p>Giá: {product.price.toLocaleString('vi-VN')}đ</p>}
           </div>
         </div>
       </div>
-
       {/* Feedback Table Section */}
       <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-ink/10 shadow-sm relative overflow-hidden">
         <div className="flex items-center justify-between mb-8">

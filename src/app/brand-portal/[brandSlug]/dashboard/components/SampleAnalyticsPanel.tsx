@@ -128,7 +128,7 @@ export function SampleAnalyticsPanel({
             className="w-full md:w-80"
             aria-label="Chọn mẫu thử để phân tích"
           >
-            <SelectValue placeholder="Chọn mẫu thử" />
+            <SelectValue placeholder="Chọn mẫu thử">{selectedSample?.name}</SelectValue>
           </SelectTrigger>
           <SelectContent alignItemWithTrigger={false}>
             {samples.map((sample) => (

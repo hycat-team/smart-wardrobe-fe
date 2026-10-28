@@ -67,7 +67,7 @@ export function DigitalSampleLabClient() {
         imageUrl: uploadRes.secure_url,
         imagePublicId: uploadRes.public_id,
         itemType: 'sample',
-        status: 'active'
+        status: 'draft'
       });
       
       toast.success("Tạo mẫu thử thành công!", { id: 'create_sample' });

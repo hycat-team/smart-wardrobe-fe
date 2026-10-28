@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { brandPortalApi } from "../api/brand-portal.api";
 import { BRAND_PORTAL_KEYS } from "../queries/brand-portal.queries";
 import { BrandItemRes } from "../types";
+import { getItemDisplayStatus } from "../utils/item-status";
 import { getAnalysisErrorMessage, getAnalysisReviewMessage } from "@/features/wardrobe/utils/analysis-status";
 
 /**
@@ -18,14 +19,10 @@ export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItems
   useEffect(() => {
     if (!brandId || !items) return;
 
-    const processingItems = items.filter((item) =>
-      Boolean((item as any).taskId || (item as any).task_id || (item as any).TaskID),
-    );
+    const processingItems = items.filter((item) => getItemDisplayStatus(item) === "analyzing");
 
     const currentTaskIds = new Set(
-      processingItems
-        .map((item) => (item as any).taskId || (item as any).task_id || (item as any).TaskID)
-        .filter(Boolean) as string[],
+      processingItems.map((item) => item.taskId).filter(Boolean) as string[],
     );
 
     // Abort subscriptions for finished tasks
@@ -43,7 +40,7 @@ export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItems
 
     // Start SSE subscription for each pending task
     processingItems.forEach((item) => {
-      const taskId = (item as any).taskId || (item as any).task_id || (item as any).TaskID;
+      const taskId = item.taskId;
       if (!taskId || activeControllers.current.has(taskId)) return;
 
       const controller = new AbortController();

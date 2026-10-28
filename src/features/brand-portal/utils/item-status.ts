@@ -8,17 +8,18 @@ export type BrandItemDisplayStatus =
   | 'archived'
   | 'draft';
 
-export function isItemAnalyzing(item: Pick<BrandItemRes, 'taskId'>): boolean {
-  return Boolean(item?.taskId);
+export function isItemAnalyzing(item: Pick<BrandItemRes, 'taskId' | 'status'>): boolean {
+  return Boolean(item?.taskId) && String(item?.status || '').toLowerCase() === 'draft';
 }
 
 export function getItemDisplayStatus(item: BrandItemRes): BrandItemDisplayStatus {
-  if (isItemAnalyzing(item)) return 'analyzing';
   const status = String(item.status || '').toLowerCase();
+
   if (status === 'failed') return 'failed';
-  if (status === 'archived') return 'archived';
   if (status === 'active') return 'active';
+  if (status === 'archived') return 'archived';
   if (item.fashionItem?.reviewReason) return 'needs_review';
+  if (isItemAnalyzing(item)) return 'analyzing';
   return 'draft';
 }
 

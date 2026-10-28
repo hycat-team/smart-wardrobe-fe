@@ -169,7 +169,7 @@ export default function BrandProductEditClient({ brandId, itemId }: { brandId: s
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <Select value={retryCategoryId} onValueChange={(value) => setRetryCategoryId(value ?? '')}>
               <SelectTrigger className="w-full rounded-xl sm:max-w-xs">
-                <SelectValue placeholder="Chọn danh mục" />
+                <SelectValue placeholder="Chọn danh mục">{categories.find((category) => category.id === retryCategoryId)?.name}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
@@ -253,7 +253,7 @@ export default function BrandProductEditClient({ brandId, itemId }: { brandId: s
                 disabled={saveDisabled}
               >
                 <SelectTrigger className="w-full rounded-xl sm:max-w-xs">
-                  <SelectValue />
+                  <SelectValue>{STATUS_OPTIONS.find((option) => option.value === form.status)?.label}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {STATUS_OPTIONS.map((option) => (
