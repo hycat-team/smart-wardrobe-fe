@@ -361,6 +361,39 @@ export const useAddBrandMembers = (brandId: string) => {
   });
 };
 
+export const useUpdateBrandMember = (brandId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ memberId, status }: { memberId: string; status: 'active' | 'disabled' }) =>
+      brandPortalApi.updateBrandMember(brandId, memberId, { status }),
+    onSuccess: () => {
+      toast.success('Đã cập nhật thành viên');
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.members(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể cập nhật thành viên');
+    },
+  });
+};
+
+export const useRemoveBrandMember = (brandId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (memberId: string) => brandPortalApi.removeBrandMember(brandId, memberId),
+    onSuccess: () => {
+      toast.success('Đã xóa thành viên');
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.members(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể xóa thành viên');
+    },
+  });
+};
+
 // Admin
 export const useGetAdminBrands = (params?: { page?: number; limit?: number; status?: string; q?: string }) => {
 

@@ -196,6 +196,16 @@ export const brandPortalApi = {
     return res.data.data;
   },
 
+  updateBrandMember: async (brandId: string, memberId: string, payload: { status: 'active' | 'disabled' }) => {
+    const res = await api.patch<{data: BrandMember}>(`/brand-portal/brands/${brandId}/members/${memberId}`, payload);
+    return res.data.data;
+  },
+
+  removeBrandMember: async (brandId: string, memberId: string) => {
+    const res = await api.delete<{data: unknown}>(`/brand-portal/brands/${brandId}/members/${memberId}`);
+    return res.data.data;
+  },
+
   // Brand Items
   getBrandItems: async (brandId: string, params?: { itemType?: 'product' | 'sample'; status?: string }) => {
     const res = await api.get<{data: BrandItemRes[]}>(`/brand-portal/brands/${brandId}/items`, { params });

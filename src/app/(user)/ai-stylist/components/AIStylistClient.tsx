@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Sparkles, Save, RefreshCw, Layers, SlidersHorizontal, X } from 'lucide-react';
+import { Sparkles, Save, RefreshCw, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { aiApi } from '@/features/ai-stylist/api/ai.api';
 import type { AIOutfitRecommendationRes } from '@/features/ai-stylist/types';
@@ -259,10 +259,10 @@ function AIStylistContent() {
   const hasSelectedOptions = !!(selectedOccasion || selectedStyle || detailsInput.trim());
 
   return (
-    <div className="min-h-full flex flex-col pt-4 md:pt-8 bg-background max-w-[1600px] w-full mx-auto pb-10">
-      <div className="flex flex-col h-full gap-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-1 items-start">
-          <div className="lg:col-span-8 flex flex-col gap-0 relative min-h-[600px] h-[600px] lg:h-[800px] border border-border bg-card shadow-sm rounded-2xl overflow-hidden pb-24 sm:pb-20">
+    <div className="flex w-full max-w-[1600px] mx-auto flex-col bg-background px-4 pb-6 pt-4 sm:px-6 md:pt-6 lg:h-[calc(100dvh-1rem)] lg:overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col gap-6">
+        <div className="grid min-h-0 flex-1 grid-cols-1 items-stretch gap-6 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-8 flex min-h-[560px] h-[600px] flex-col gap-0 relative min-w-0 border border-border bg-card shadow-sm rounded-2xl overflow-hidden pb-24 sm:pb-20 lg:h-full lg:min-h-0">
             {outfitData ? (
               <>
                 <div className="absolute top-4 left-4 z-20">
@@ -396,7 +396,7 @@ function AIStylistContent() {
             )}
           </div>
 
-          <div className="lg:col-span-4 h-auto lg:h-[800px] border border-border bg-card flex flex-col relative shadow-sm overflow-hidden rounded-2xl">
+          <div className="lg:col-span-4 flex h-auto min-h-[480px] min-w-0 flex-col border border-border bg-card relative shadow-sm overflow-hidden rounded-2xl lg:h-full lg:min-h-0">
             {outfitData && (
               <div className="p-4 sm:p-5 border-b border-border bg-gradient-to-br from-stone-100/60 via-stone-50/40 to-stone-100/60 dark:from-stone-900/60 dark:via-stone-950/40 dark:to-stone-900/60 flex flex-col gap-2 shrink-0">
                 <div className="flex items-center justify-between">
@@ -421,14 +421,8 @@ function AIStylistContent() {
               </div>
             )}
 
-            <div className="p-5 border-b border-border bg-muted flex items-center gap-3">
-              <SlidersHorizontal className="w-4 h-4 text-foreground" />
-              <h3 className="font-bold text-[13px] text-foreground uppercase tracking-widest">
-                THÔNG SỐ THIẾT KẾ
-              </h3>
-            </div>
 
-            <div className="flex-1 overflow-y-auto p-5 md:p-6 space-y-6">
+            <div className="flex-1 min-h-0 overflow-y-auto p-5 md:p-6 space-y-6">
               <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
                 <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
                   DỊP (OCCASION)

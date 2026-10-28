@@ -157,14 +157,22 @@ export interface Conversation {
 
 export type BrandStatus = 'pending_review' | 'active' | 'suspended' | 'archived' | 'rejected';
 
+export interface BrandMemberUser {
+  username?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 export interface BrandMember {
   id: string;
   brandId: string;
   userId: string;
   role: 'owner' | 'staff';
-  status: 'active' | 'inactive';
+  status: 'active' | 'invited' | 'disabled';
   userEmail?: string;
   userFullName?: string;
+  user?: BrandMemberUser;
   createdAt: string;
 }
 
