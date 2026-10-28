@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Package, LayoutDashboard, Settings, NotebookTabsIcon, Menu, X, Store, LogOut, ChevronRight, ChevronsUpDown, Users, MessageCircle, Award, Gift, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Package, LayoutDashboard, Settings, NotebookTabsIcon, Menu, X, Store, LogOut, ChevronRight, ChevronsUpDown, Users, MessageCircle, Award, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import {
   DropdownMenu,
@@ -27,8 +27,7 @@ const getNavItems = (brandId: string) => {
     { href: brandPortalPath(brandId, 'customers'), label: 'CRM Khách hàng', icon: Users },
     { href: brandPortalPath(brandId, 'chat'), label: 'Chat Inbox', icon: MessageCircle },
     { href: brandPortalPath(brandId, 'members'), label: 'Thành viên', icon: Users },
-    { href: brandPortalPath(brandId, 'loyalty'), label: 'Chương trình điểm', icon: Award },
-    { href: brandPortalPath(brandId, 'benefits'), label: 'Quyền lợi', icon: Gift },
+    { href: brandPortalPath(brandId, 'loyalty'), label: 'Loyalty & Quyền lợi', icon: Award },
     { href: brandPortalPath(brandId, 'products'), label: 'Sản phẩm', icon: Package },
     { href: brandPortalPath(brandId, 'digital-sample-lab/report'), label: 'Báo cáo thử mẫu', icon: NotebookTabsIcon },
   ];

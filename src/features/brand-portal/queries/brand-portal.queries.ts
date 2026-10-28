@@ -238,7 +238,7 @@ export const useGetLoyaltyTierDetails = (brandId: string, tierId: string) => {
 };
 
 // Benefits
-export const useGetBenefits = (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
+export const useGetBenefits = (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string; requiredTierId?: string; status?: string }) => {
   return useQuery({
     queryKey: ['benefits', brandId, params],
     queryFn: () => brandPortalApi.getBenefits(brandId, params),
@@ -458,7 +458,7 @@ export const useRetryBrandItemAnalysis = (brandId: string) => {
 export const useConvertSampleToProduct = (brandId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (itemId: string) => brandPortalApi.convertSampleToProduct(brandId, itemId),
+    mutationFn: ({ itemId, productCode }: { itemId: string; productCode: string }) => brandPortalApi.convertSampleToProduct(brandId, itemId, { productCode }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId) });
       queryClient.invalidateQueries({ queryKey: ['brand-portal-items', brandId] });

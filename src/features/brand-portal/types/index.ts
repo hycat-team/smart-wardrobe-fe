@@ -95,6 +95,7 @@ export interface LoyaltyTierRes {
   rank: number;
   minTotalSpend: number;
   description?: string;
+  benefitsCount?: number;
   benefits?: Benefit[];
   createdAt: string;
 }

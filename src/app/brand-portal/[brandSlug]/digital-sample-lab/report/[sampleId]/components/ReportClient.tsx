@@ -16,17 +16,15 @@ const STATUS_LABELS: Record<BrandItemDisplayStatus, string> = {
   draft: "Bản nháp",
 };
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type SampleFeedbackRow = {
   id?: string;
@@ -45,14 +43,37 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
   const { mutateAsync: convertToProduct, isPending: isConverting } = useConvertSampleToProduct(brandId);
   const [convertError, setConvertError] = useState<string | null>(null);
 
+  const [isConvertOpen, setIsConvertOpen] = useState(false);
+  const [productCode, setProductCode] = useState("");
+  const [productCodeError, setProductCodeError] = useState<string | null>(null);
+
+  const openConvertDialog = () => {
+    setProductCode(product?.productCode || "");
+    setProductCodeError(null);
+    setConvertError(null);
+    setIsConvertOpen(true);
+  };
+
   const handleConvert = async () => {
+    const code = productCode.trim();
+    if (!code) {
+      setProductCodeError("Vui lòng nhập mã sản phẩm");
+      return;
+    }
+    setProductCodeError(null);
     setConvertError(null);
     try {
-      await convertToProduct(sampleId);
+      await convertToProduct({ itemId: sampleId, productCode: code });
+      setIsConvertOpen(false);
       router.push(`/brand-portal/${brandId}/products/${sampleId}`);
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      setConvertError(err?.response?.data?.message || "Không thể chuyển mẫu thử thành sản phẩm.");
+      const err = error as { response?: { status?: number; data?: { message?: string } } };
+      const message = err?.response?.data?.message || "Không thể chuyển mẫu thử thành sản phẩm.";
+      if (err?.response?.status === 409) {
+        setProductCodeError(message);
+        return;
+      }
+      setConvertError(message);
     }
   };
 
@@ -71,29 +92,55 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
           <ChevronLeft className="size-4" /> Quay lại danh sách
         </Link>
         {product?.itemType?.toLowerCase() === 'sample' && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button disabled={isConverting} className="rounded-full">
-                {isConverting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <PackageCheck className="mr-2 size-4" />}
-                Chuyển thành sản phẩm
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Chuyển mẫu thử thành sản phẩm?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Mẫu thử sẽ trở thành sản phẩm trong catalog của thương hiệu và giữ nguyên toàn bộ phản hồi đã thu thập.
-                  Sản phẩm sẽ hiển thị theo trạng thái hiện tại ({product?.status || 'draft'}).
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Hủy</AlertDialogCancel>
-                <AlertDialogAction onClick={handleConvert}>Xác nhận</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <Button disabled={isConverting} className="rounded-full" onClick={openConvertDialog}>
+            {isConverting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <PackageCheck className="mr-2 size-4" />}
+            Chuyển thành sản phẩm
+          </Button>
         )}
       </div>
+
+      <Dialog open={isConvertOpen} onOpenChange={setIsConvertOpen}>
+        <DialogContent className="sm:max-w-md rounded-3xl">
+          <DialogHeader>
+            <DialogTitle>Chuyển mẫu thử thành sản phẩm?</DialogTitle>
+            <DialogDescription>
+              Mẫu thử sẽ trở thành sản phẩm trong catalog của thương hiệu và giữ nguyên toàn bộ phản hồi đã thu thập.
+              Sản phẩm sẽ hiển thị theo trạng thái hiện tại ({product?.status || 'draft'}).
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-foreground">
+              Product Code <span className="text-destructive">*</span>
+            </label>
+            <Input
+              value={productCode}
+              onChange={(event) => {
+                setProductCode(event.target.value);
+                setProductCodeError(null);
+              }}
+              placeholder="VD: SP-2026-001"
+              aria-invalid={Boolean(productCodeError)}
+              className="rounded-xl"
+            />
+            {productCodeError ? (
+              <p className="text-xs text-destructive">{productCodeError}</p>
+            ) : (
+              <p className="text-xs text-muted-foreground">Mã này dùng để quản lý sản phẩm và không được trùng trong thương hiệu.</p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" className="rounded-full" onClick={() => setIsConvertOpen(false)}>
+              Hủy
+            </Button>
+            <Button className="rounded-full" onClick={handleConvert} disabled={isConverting}>
+              {isConverting && <Loader2 className="mr-2 size-4 animate-spin" />}
+              Xác nhận
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {convertError && (
         <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">

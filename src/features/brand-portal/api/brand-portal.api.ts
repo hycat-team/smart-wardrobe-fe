@@ -139,7 +139,7 @@ export const brandPortalApi = {
   },
 
   // Benefits
-  getBenefits: async (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
+  getBenefits: async (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string; requiredTierId?: string; status?: string }) => {
     const res = await api.get<{data: PaginationResult<Benefit>}>(`/brand-portal/brands/${brandId}/benefits`, { params });
     return res.data.data;
   },
@@ -202,8 +202,8 @@ export const brandPortalApi = {
     return res.data.data || [];
   },
 
-  convertSampleToProduct: async (brandId: string, itemId: string) => {
-    const res = await api.post<{data: BrandItemRes}>(`/brand-portal/brands/${brandId}/items/${itemId}/convert-to-product`);
+  convertSampleToProduct: async (brandId: string, itemId: string, payload: { productCode: string }) => {
+    const res = await api.post<{data: BrandItemRes}>(`/brand-portal/brands/${brandId}/items/${itemId}/convert-to-product`, payload);
     return res.data.data;
   },
 

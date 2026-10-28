@@ -129,7 +129,7 @@ describe('brand navigation', () => {
     mockMemberRole = 'staff';
     render(<BrandLayout><p>Dashboard</p></BrandLayout>);
 
-    for (const label of ['Thành viên', 'Chương trình điểm', 'Quyền lợi']) {
+    for (const label of ['Thành viên', 'Loyalty & Quyền lợi']) {
       expect(screen.getAllByRole('link', { name: label }).length).toBeGreaterThan(0);
     }
     expect(screen.getAllByRole('link', { name: 'Sản phẩm' }).length).toBeGreaterThan(0);

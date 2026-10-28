@@ -68,6 +68,8 @@ interface Props {
   brandId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultTierId?: string;
+  defaultUnlockType?: string;
 }
 
 const BENEFIT_TYPE_LABELS = {
@@ -85,7 +87,7 @@ const FEATURE_CODE_LABELS = {
   sample_mix_access: 'Thử đồ mẫu (Digital Sample Lab)',
 };
 
-export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Props) {
+export default function CreateBenefitDialog({ brandId, open, onOpenChange, defaultTierId, defaultUnlockType }: Props) {
   const { mutateAsync: createBenefit, isPending } = useCreateBenefit(brandId);
   const { data: tiers, isLoading: isLoadingTiers } = useGetLoyaltyTiers(brandId);
 
@@ -103,6 +105,20 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
     },
   });
 
+  React.useEffect(() => {
+    if (!open) return;
+    form.reset({
+      name: '',
+      description: '',
+      benefitType: 'voucher',
+      unlockType: (defaultUnlockType as 'point_redemption' | 'tier_privilege' | 'manual_grant')
+        || (defaultTierId ? 'tier_privilege' : 'point_redemption'),
+      requiredPoints: 0,
+      requiredTierId: defaultTierId || '',
+      featureCode: '',
+      validDurationDays: 0,
+    });
+  }, [open, defaultTierId, defaultUnlockType, form]);
   const unlockType = form.watch('unlockType');
   const benefitType = form.watch('benefitType');
 
