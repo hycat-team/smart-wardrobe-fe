@@ -8,10 +8,12 @@ import { Button } from '@/components/ui/button';
 import UpsertLoyaltyProgramDialog from './UpsertLoyaltyProgramDialog';
 import UpsertLoyaltyTierDialog from './UpsertLoyaltyTierDialog';
 import { LoyaltyTierRes } from '@/features/brand-portal/types';
+import { useBrandRole } from '@/features/brand-portal/context/BrandRoleContext';
 
 export default function LoyaltyClient() {
   const params = useParams();
   const brandId = params.brandSlug as string;
+  const { isStaff } = useBrandRole();
 
   const { data: program, isLoading: isLoadingProgram } = useGetLoyaltyProgram(brandId);
   const { data: tiers, isLoading: isLoadingTiers } = useGetLoyaltyTiers(brandId);
@@ -42,10 +44,12 @@ export default function LoyaltyClient() {
         <p className="text-muted-foreground text-sm max-w-md mb-6">
           Thương hiệu của bạn chưa thiết lập chương trình khách hàng thân thiết. Vui lòng thiết lập để bắt đầu tích điểm cho khách hàng.
         </p>
-        <Button onClick={() => setIsUpsertProgramOpen(true)} className="rounded-xl">
-          <Settings className="w-4 h-4 mr-2" />
-          Thiết lập chương trình
-        </Button>
+        {!isStaff && (
+          <Button onClick={() => setIsUpsertProgramOpen(true)} className="rounded-xl">
+            <Settings className="w-4 h-4 mr-2" />
+            Thiết lập chương trình
+          </Button>
+        )}
         <UpsertLoyaltyProgramDialog
           brandId={brandId}
           open={isUpsertProgramOpen}
@@ -87,10 +91,12 @@ export default function LoyaltyClient() {
               {program.pointExpiryDays ? ` Điểm hết hạn sau ${program.pointExpiryDays} ngày.` : ' Điểm không có thời hạn.'}
             </p>
           </div>
-          <Button variant="outline" onClick={() => setIsUpsertProgramOpen(true)} className="rounded-xl font-bold text-xs uppercase tracking-widest shrink-0">
-            <Settings className="w-4 h-4 mr-2" />
-            Cấu hình
-          </Button>
+          {!isStaff && (
+            <Button variant="outline" onClick={() => setIsUpsertProgramOpen(true)} className="rounded-xl font-bold text-xs uppercase tracking-widest shrink-0">
+              <Settings className="w-4 h-4 mr-2" />
+              Cấu hình
+            </Button>
+          )}
         </CardContent>
       </Card>
       
@@ -115,10 +121,10 @@ export default function LoyaltyClient() {
             <TrendingUp className="w-5 h-5" />
             Các hạng thành viên
           </h3>
-          <Button onClick={handleCreateTier} className="rounded-xl font-bold text-xs uppercase tracking-widest bg-primary text-primary-foreground">
+          {!isStaff && (<Button onClick={handleCreateTier} className="rounded-xl font-bold text-xs uppercase tracking-widest bg-primary text-primary-foreground">
             <Plus className="w-4 h-4 mr-2" />
             Thêm hạng mới
-          </Button>
+          </Button>)}
         </div>
 
         {sortedTiers.length === 0 ? (
@@ -128,10 +134,10 @@ export default function LoyaltyClient() {
             </div>
             <p className="text-foreground font-bold mb-1">Chưa có hạng thành viên nào</p>
             <p className="text-muted-foreground text-sm max-w-sm mb-6">Bạn chưa thiết lập bất kỳ hạng thành viên nào cho chương trình. Hãy bắt đầu bằng cách thêm hạng đầu tiên.</p>
-            <Button variant="outline" onClick={handleCreateTier} className="rounded-xl">
+            {!isStaff && (<Button variant="outline" onClick={handleCreateTier} className="rounded-xl">
               <Plus className="w-4 h-4 mr-2" />
               Thêm hạng mới
-            </Button>
+            </Button>)}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">

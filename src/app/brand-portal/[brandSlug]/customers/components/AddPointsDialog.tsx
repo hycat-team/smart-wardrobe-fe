@@ -72,6 +72,18 @@ export default function AddPointsDialog({ brandId, open, onOpenChange, defaultUs
 
   const userType = form.watch('userType');
 
+  React.useEffect(() => {
+    if (!open) return;
+    form.reset({
+      userType: defaultUserId ? 'APP_USER' : defaultPhone ? 'OFFLINE_PHONE' : 'APP_USER',
+      userId: defaultUserId || '',
+      phone: defaultPhone || '',
+      customerName: '',
+      purchaseAmount: 0,
+      reason: 'Mua hàng tại cửa hàng',
+    });
+  }, [open, defaultUserId, defaultPhone, form]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await addPoints({

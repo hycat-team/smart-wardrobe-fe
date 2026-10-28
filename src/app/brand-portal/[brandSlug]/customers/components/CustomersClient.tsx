@@ -67,7 +67,7 @@ export default function CustomersClient() {
                 <TableHead className="font-bold text-[10px] uppercase tracking-widest">Khách hàng</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-widest">Liên hệ</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Tổng chi tiêu</TableHead>
-                <TableHead className="font-bold text-[10px] uppercase tracking-widest">Lần cuối mua</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-widest">Ngày tham gia</TableHead>
                 <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>

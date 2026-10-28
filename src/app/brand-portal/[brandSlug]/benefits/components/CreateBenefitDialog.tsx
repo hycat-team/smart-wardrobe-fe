@@ -83,8 +83,6 @@ const UNLOCK_TYPE_LABELS = {
 
 const FEATURE_CODE_LABELS = {
   sample_mix_access: 'Thử đồ mẫu (Digital Sample Lab)',
-  brand_item_recommendation: 'Gợi ý phối đồ AI ưu tiên',
-  priority_brand_chat: 'Kênh chat hỗ trợ ưu tiên'
 };
 
 export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Props) {
@@ -235,8 +233,6 @@ export default function CreateBenefitDialog({ brandId, open, onOpenChange }: Pro
                         </FormControl>
                         <SelectContent className="rounded-xl">
                           <SelectItem value="sample_mix_access" className="rounded-lg cursor-pointer py-2.5">Thử đồ mẫu (Digital Sample Lab)</SelectItem>
-                          <SelectItem value="brand_item_recommendation" className="rounded-lg cursor-pointer py-2.5">Gợi ý phối đồ AI ưu tiên</SelectItem>
-                          <SelectItem value="priority_brand_chat" className="rounded-lg cursor-pointer py-2.5">Kênh chat hỗ trợ ưu tiên</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

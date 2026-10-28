@@ -159,10 +159,10 @@ export const useGetBrandItems = (brandId: string) => {
   });
 };
 
-export const useGetBrandPortalItems = (brandId: string) => {
+export const useGetBrandPortalItems = (brandId: string, itemType?: 'product' | 'sample') => {
   return useQuery({
-    queryKey: USER_BRANDS_KEYS.items(brandId),
-    queryFn: () => userBrandsApi.getBrandPortalItem(brandId),
+    queryKey: ['brand-portal-items', brandId, itemType ?? 'all'],
+    queryFn: () => userBrandsApi.getBrandPortalItem(brandId, itemType),
     enabled: !!brandId,
   });
 };

@@ -454,3 +454,36 @@ export const useRetryBrandItemAnalysis = (brandId: string) => {
   });
 };
 
+
+export const useConvertSampleToProduct = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (itemId: string) => brandPortalApi.convertSampleToProduct(brandId, itemId),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId) });
+      queryClient.invalidateQueries({ queryKey: ['brand-portal-items', brandId] });
+      if (data?.id) {
+        queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.itemDetail(brandId, data.id) });
+      }
+      toast.success('Đã chuyển mẫu thử thành sản phẩm');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể chuyển mẫu thử thành sản phẩm');
+    },
+  });
+};
+
+export const useUpdateBrandItem = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, payload }: { itemId: string; payload: import('../types').UpdateBrandItemReq }) =>
+      brandPortalApi.updateBrandItem(brandId, itemId, payload),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.itemDetail(brandId, variables.itemId) });
+      if (data?.id) {
+        queryClient.invalidateQueries({ queryKey: ['brand-portal-items', brandId] });
+      }
+    },
+  });
+};

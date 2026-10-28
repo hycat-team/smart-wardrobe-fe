@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { UploadCloud, Plus, X, Sparkles, SlidersHorizontal, Image as ImageIcon } from "lucide-react";
+import { UploadCloud, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -14,8 +14,7 @@ export function DigitalSampleLabClient() {
   const brandId = params.brandSlug as string;
   const [productName, setProductName] = useState("");
   const [concept, setConcept] = useState("");
-  const [variants, setVariants] = useState([{ name: "Black", color: "#1A1A1A" }]);
-  const [price, setPrice] = useState("950000");
+  const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,22 +32,6 @@ export function DigitalSampleLabClient() {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const addVariant = () => {
-    if (variants.length < 3) {
-      setVariants([...variants, { name: "", color: "#FFFFFF" }]);
-    }
-  };
-
-  const removeVariant = (index: number) => {
-    setVariants(variants.filter((_, i) => i !== index));
-  };
-
-  const updateVariant = (index: number, field: string, value: string) => {
-    const newVariants = [...variants];
-    newVariants[index] = { ...newVariants[index], [field]: value };
-    setVariants(newVariants);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,7 +63,7 @@ export function DigitalSampleLabClient() {
       const newItem = await createBrandItem.mutateAsync({
         name: productName,
         description: concept,
-        price: Number(price.replace(/,/g, '')), // Assuming it could have commas
+        price: price.trim() ? Number(price.replace(/[^0-9.]/g, '')) : undefined,
         imageUrl: uploadRes.secure_url,
         imagePublicId: uploadRes.public_id,
         itemType: 'sample',
@@ -89,9 +72,10 @@ export function DigitalSampleLabClient() {
       
       toast.success("Tạo mẫu thử thành công!", { id: 'create_sample' });
       router.push(`/brand-portal/${brandId}/digital-sample-lab/report/${newItem.id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       console.error(error);
-      toast.error(error.response?.data?.message || "Không thể tạo mẫu thử", { id: 'create_sample' });
+      toast.error(err?.response?.data?.message || "Không thể tạo mẫu thử", { id: 'create_sample' });
     } finally {
       setIsSubmitting(false);
     }
@@ -151,54 +135,16 @@ export function DigitalSampleLabClient() {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Màu sắc</label>
-                  {variants.length < 3 && (
-                    <button type="button" onClick={addVariant} className="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline flex items-center gap-1">
-                      <Plus className="size-3" /> Thêm Màu sắc
-                    </button>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  {variants.map((v, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-muted/50 border border-border p-2 pr-3 rounded-xl">
-                      <div className="size-8 border border-border overflow-hidden relative shrink-0 rounded-full">
-                        <input
-                          type="color"
-                          value={v.color}
-                          onChange={(e) => updateVariant(i, "color", e.target.value)}
-                          className="absolute -top-2 -left-2 w-12 h-12 cursor-pointer"
-                        />
-                      </div>
-                      <input
-                        required
-                        type="text"
-                        value={v.name}
-                        onChange={(e) => updateVariant(i, "name", e.target.value)}
-                        placeholder="Tên variant (VD: Đen)"
-                        className="flex-1 bg-transparent border-none p-2 text-sm focus:outline-none"
-                      />
-                      {variants.length > 1 && (
-                        <button type="button" onClick={() => removeVariant(i)} className="text-muted-foreground hover:text-destructive transition-colors">
-                          <X className="size-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-bold text-foreground">Mức giá dự kiến (VNĐ)</label>
                 <input
-                  required
                   type="number"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   className="w-full bg-muted/50 border border-border p-3 text-sm focus:outline-none focus:border-border focus:ring-1 focus:ring-ring transition-colors rounded-xl font-mono"
                 />
               </div>
+            </div>
             </div>
 
             <div className="pt-6 border-t border-border">

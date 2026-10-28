@@ -1,14 +1,50 @@
 "use client";
-import { Users, Layers, ArrowRight, ArrowUpRight, TrendingUp, ChevronLeft, MessageSquare, Star, Info, Tag } from "lucide-react";
+import { useState } from "react";
+import { Users, Layers, ArrowRight, ArrowUpRight, TrendingUp, ChevronLeft, MessageSquare, Star, Info, Tag, Loader2, PackageCheck } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useGetBrandItemFeedbacks, useGetBrandItemDetail } from "@/features/brand-portal/queries/brand-portal.queries";
+import { useParams, useRouter } from "next/navigation";
+import { useGetBrandItemFeedbacks, useGetBrandItemDetail, useConvertSampleToProduct } from "@/features/brand-portal/queries/brand-portal.queries";
+import { BrandItemMetaPanel } from "@/features/brand-portal/components/BrandItemMeta";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+type SampleFeedbackRow = {
+  id?: string;
+  voteType?: string;
+  rating?: number | null;
+  feedbackText?: string;
+  createdAt?: string;
+};
 
 export function ReportClient({ sampleId }: { sampleId: string }) {
   const params = useParams();
+  const router = useRouter();
   const brandId = params.brandSlug as string;
   const { data: feedbacks, isLoading: isLoadingFeedbacks } = useGetBrandItemFeedbacks(brandId, sampleId);
   const { data: product, isLoading: isLoadingProduct } = useGetBrandItemDetail(brandId, sampleId);
+  const { mutateAsync: convertToProduct, isPending: isConverting } = useConvertSampleToProduct(brandId);
+  const [convertError, setConvertError] = useState<string | null>(null);
+
+  const handleConvert = async () => {
+    setConvertError(null);
+    try {
+      await convertToProduct(sampleId);
+      router.push(`/brand-portal/${brandId}/products/${sampleId}`);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setConvertError(err?.response?.data?.message || "Không thể chuyển mẫu thử thành sản phẩm.");
+    }
+  };
 
   const displayProductName = product?.name || product?.fashionItem?.style || "Chi tiết sản phẩm";
   const displayImage = product?.fashionItem?.imageUrl || null;
@@ -18,11 +54,43 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
   return (
     <div className="max-w-6xl mx-auto py-12 px-6 space-y-12">
       {/* Header */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Link href={`/brand-portal/${brandId}/digital-sample-lab/report`} className="text-sm font-medium tracking-wide text-ink-muted hover:text-ink flex items-center gap-2 w-fit transition-colors bg-white/50 px-4 py-2 rounded-full border border-ink/5 backdrop-blur-md">
           <ChevronLeft className="size-4" /> Quay lại danh sách
         </Link>
+        {product?.itemType?.toLowerCase() === 'sample' && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button disabled={isConverting} className="rounded-full">
+                {isConverting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <PackageCheck className="mr-2 size-4" />}
+                Chuyển thành sản phẩm
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Chuyển mẫu thử thành sản phẩm?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Mẫu thử sẽ trở thành sản phẩm trong catalog của thương hiệu và giữ nguyên toàn bộ phản hồi đã thu thập.
+                  Sản phẩm sẽ hiển thị theo trạng thái hiện tại ({product?.status || 'draft'}).
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConvert}>Xác nhận</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
+
+      {convertError && (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+          {convertError}
+        </div>
+      )}
+
+      {product && <BrandItemMetaPanel item={product} />}
+
 
       {/* Main Product Hero */}
       <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-ink/10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] relative overflow-hidden group">
@@ -98,10 +166,10 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink/5">
-                {feedbacks.map((fb: any, i: number) => (
+                {feedbacks.map((fb: SampleFeedbackRow, i: number) => (
                   <tr key={fb.id || i} className="hover:bg-[#F4F1EE]/30 transition-colors">
                     <td className="py-5 px-6 font-mono text-[11px] uppercase text-ink/60 whitespace-nowrap">
-                      {new Date(fb.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      {fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
                     </td>
                     <td className="py-5 px-6 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-[11px] font-bold uppercase tracking-wider ${
@@ -133,7 +201,7 @@ export function ReportClient({ sampleId }: { sampleId: string }) {
                     <td className="py-5 px-6">
                       {fb.feedbackText ? (
                         <p className="text-sm text-ink/80 leading-relaxed italic max-w-xl">
-                          "{fb.feedbackText}"
+                          &ldquo;{fb.feedbackText}&rdquo;
                         </p>
                       ) : (
                         <p className="text-sm text-ink/30 italic">Không để lại bình luận chi tiết.</p>

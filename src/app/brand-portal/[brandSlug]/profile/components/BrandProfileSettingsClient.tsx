@@ -7,6 +7,7 @@ import { brandPortalApi } from "@/features/brand-portal/api/brand-portal.api";
 import { useUpdateBrandLogo, useGetBrandProfile, useUpdateBrandProfile } from "@/features/brand-portal/queries/brand-portal.queries";
 import { toast } from "sonner";
 import { getCloudinaryCloudName } from "@/lib/cloudinary";
+import { useBrandRole } from "@/features/brand-portal/context/BrandRoleContext";
 
 export function BrandProfileSettingsClient() {
   const params = useParams();
@@ -16,6 +17,7 @@ export function BrandProfileSettingsClient() {
   const { mutateAsync: updateLogo } = useUpdateBrandLogo(brandId);
   const { mutateAsync: updateProfile, isPending: isSaving } = useUpdateBrandProfile(brandId);
   const { data: brandProfile } = useGetBrandProfile(brandId);
+  const { isStaff } = useBrandRole();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -247,7 +249,8 @@ export function BrandProfileSettingsClient() {
       </div>
 
       {/* Sticky Save Bar */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 lg:left-[calc(50%+8rem)] z-40">
+      {!isStaff && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 lg:left-[calc(50%+8rem)] z-40">
         <div className="bg-background/80 backdrop-blur-md p-2 rounded-full border border-border shadow-lg flex items-center justify-between gap-4">
           <Button 
             onClick={handleSave}
@@ -267,7 +270,8 @@ export function BrandProfileSettingsClient() {
             )}
           </Button>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

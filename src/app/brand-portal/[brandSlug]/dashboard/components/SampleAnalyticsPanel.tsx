@@ -119,7 +119,7 @@ export function SampleAnalyticsPanel({
           <h2 className="mt-2 text-2xl font-semibold">Hiệu quả mẫu thử</h2>
         </div>
         <Select
-          value={selectedSample?.name}
+          value={selectedSample?.id}
           onValueChange={(value) => {
             if (value) onSampleChange(value);
           }}

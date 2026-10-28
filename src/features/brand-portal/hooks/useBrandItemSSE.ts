@@ -18,11 +18,8 @@ export function useBrandItemSSE(brandId: string, items?: BrandItemRes[], onItems
   useEffect(() => {
     if (!brandId || !items) return;
 
-    const processingItems = items.filter(
-      (item) =>
-        item.status === "processing" ||
-        (item as any).status === 3 ||
-        (item as any).status === "Processing",
+    const processingItems = items.filter((item) =>
+      Boolean((item as any).taskId || (item as any).task_id || (item as any).TaskID),
     );
 
     const currentTaskIds = new Set(

@@ -117,14 +117,14 @@ export default function ChatInboxClient() {
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <h2 className="font-bold text-sm">{activeConvDetails?.customerName || activeConvDetails?.userDisplayName || 'Khách hàng'}</h2>
-                    {(customerInfo as any)?.tier && (
+                    {(customerInfo as any)?.loyaltyAccount?.currentTier && (
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-                        {(customerInfo as any).tier.name}
+                        {(customerInfo as any).loyaltyAccount.currentTier.name}
                       </Badge>
                     )}
                     {(customerInfo as any)?.loyaltyAccount && (
                       <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-primary text-primary">
-                        {(customerInfo as any).loyaltyAccount.pointsBalance} điểm
+                        {(customerInfo as any).loyaltyAccount.currentPoints} điểm
                       </Badge>
                     )}
                   </div>
@@ -141,7 +141,7 @@ export default function ChatInboxClient() {
                     </Button>
                   </Link>
                 )}
-                {/* {activeConvDetails?.status === 'open' && (
+                {activeConvDetails?.status === 'open' && (
                   <Button 
                     variant="destructive" 
                     size="sm" 
@@ -151,7 +151,7 @@ export default function ChatInboxClient() {
                   >
                     Đóng hội thoại
                   </Button>
-                )} */}
+                )}
                 {activeConvDetails?.status === 'closed' && (
                   <Button 
                     variant="default" 

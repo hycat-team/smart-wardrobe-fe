@@ -197,9 +197,14 @@ export const brandPortalApi = {
   },
 
   // Brand Items
-  getBrandItems: async (brandId: string) => {
-    const res = await api.get<{data: BrandItemRes[]}>(`/brand-portal/brands/${brandId}/items`);
+  getBrandItems: async (brandId: string, params?: { itemType?: 'product' | 'sample'; status?: string }) => {
+    const res = await api.get<{data: BrandItemRes[]}>(`/brand-portal/brands/${brandId}/items`, { params });
     return res.data.data || [];
+  },
+
+  convertSampleToProduct: async (brandId: string, itemId: string) => {
+    const res = await api.post<{data: BrandItemRes}>(`/brand-portal/brands/${brandId}/items/${itemId}/convert-to-product`);
+    return res.data.data;
   },
 
   createBrandItem: async (brandId: string, payload: CreateBrandItemReq) => {

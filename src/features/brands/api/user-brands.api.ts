@@ -149,8 +149,8 @@ export const userBrandsApi = {
     return res.data.data;
   },
 
-  getBrandPortalItem: async (brandId: string) => {
-    const res = await api.get<{data: any}>(`/brand-portal/brands/${brandId}/items`);
+  getBrandPortalItem: async (brandId: string, itemType?: 'product' | 'sample') => {
+    const res = await api.get<{data: any}>(`/brand-portal/brands/${brandId}/items`, { params: itemType ? { itemType } : undefined });
     if (res.data.data && Array.isArray(res.data.data.items)) {
       return res.data.data.items as BrandItemRes[];
     }

@@ -14,7 +14,6 @@ import {
   ArrowUpRight,
   BadgeCheck,
   Check,
-  Copy,
   Gift,
   Loader2,
   MessageCircle,
@@ -260,15 +259,12 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                   <Link key={product.id} href={`/products/${product.id}`} className="group flex flex-col gap-3 lg:gap-4">
                     <div className="relative aspect-[3/4] bg-zinc-50 overflow-hidden rounded-2xl isolate">
                       <img
-                        src={product.fashionItem?.imageUrl || product.imageUrls?.[0]}
+                        src={product.fashionItem?.imageUrl || ''}
                         alt={product.name}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 z-10" />
                       <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
-                        {product.discountPrice && (
-                          <span className="bg-foreground text-background text-[10px] font-bold px-2.5 py-1 uppercase tracking-widest rounded-sm">Sale</span>
-                        )}
                         {product.status && product.status !== 'active' && product.status !== 'ACTIVE' && (
                           <span className="bg-zinc-100/90 backdrop-blur-sm text-zinc-600 text-[10px] font-bold px-2.5 py-1 uppercase tracking-widest rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             {product.status}
@@ -284,14 +280,9 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                         <h4 className="font-medium text-sm text-foreground line-clamp-1">{product.name}</h4>
                       </div>
                       <div className="flex items-center gap-2">
-                        {product.discountPrice ? (
-                          <>
-                            <span className="text-sm font-semibold text-destructive">{product.discountPrice.toLocaleString()}đ</span>
-                            <span className="text-xs text-muted-foreground line-through">{product.price.toLocaleString()}đ</span>
-                          </>
-                        ) : (
-                          <span className="text-sm text-zinc-500">{product.price.toLocaleString()}đ</span>
-                        )}
+                        <span className="text-sm text-zinc-500">
+                          {product.price != null ? `${product.price.toLocaleString()}đ` : 'Liên hệ'}
+                        </span>
                       </div>
                     </div>
                   </Link>
@@ -328,25 +319,6 @@ export default function BrandProfileClient({ brandId }: BrandProfileClientProps)
                         </div>
                       </div>
                       
-                      {redemption.voucherCode && benefit?.benefitType !== 'feature_access' && (
-                        <div className="mt-5 pt-4 border-t border-border/50">
-                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-2">Mã Voucher</p>
-                          <div className="flex items-center justify-between bg-white border border-border rounded-lg p-2 pl-3">
-                            <code className="text-sm font-bold tracking-wider font-mono text-zinc-800 line-clamp-1">{redemption.voucherCode}</code>
-                            <button 
-                              onClick={() => {
-                                navigator.clipboard.writeText(redemption.voucherCode);
-                                toast.success('Đã sao chép mã voucher!');
-                              }}
-                              className="w-8 h-8 flex shrink-0 items-center justify-center rounded-md hover:bg-zinc-100 text-zinc-500 transition-colors ml-2"
-                              title="Sao chép"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
                       {benefit?.benefitType === 'feature_access' && (
                         <div className="mt-5 pt-4 border-t border-border/50">
                           <div className="flex items-center gap-2">

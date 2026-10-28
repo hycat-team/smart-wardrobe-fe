@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useGetBrandProfile, useGetMyBrands } from '@/features/brand-portal/queries/brand-portal.queries';
+import { useLogout } from '@/features/auth/queries/auth.queries';
 import { BrandRoleProvider, useBrandRole } from '@/features/brand-portal/context/BrandRoleContext';
 import { BRAND_PORTAL_HUB, BRAND_PORTAL_REGISTER, brandPortalPath } from '@/features/brand-portal/utils/routes';
 import { isUuidLike } from '@/features/brand-portal/utils/brand-slug';
@@ -20,26 +21,23 @@ const ROLE_LABEL: Record<string, string> = {
   staff: 'Nhân viên',
 };
 
-const getNavItems = (brandId: string, isStaff: boolean) => {
+const getNavItems = (brandId: string) => {
   const items = [
     { href: brandPortalPath(brandId), label: 'Bảng điều khiển', icon: LayoutDashboard },
     { href: brandPortalPath(brandId, 'customers'), label: 'CRM Khách hàng', icon: Users },
     { href: brandPortalPath(brandId, 'chat'), label: 'Chat Inbox', icon: MessageCircle },
-    { href: brandPortalPath(brandId, 'members'), label: 'Thành viên', icon: Users, hideForStaff: true },
-    { href: brandPortalPath(brandId, 'loyalty'), label: 'Chương trình điểm', icon: Award, hideForStaff: true },
-    { href: brandPortalPath(brandId, 'benefits'), label: 'Quyền lợi', icon: Gift, hideForStaff: true },
+    { href: brandPortalPath(brandId, 'members'), label: 'Thành viên', icon: Users },
+    { href: brandPortalPath(brandId, 'loyalty'), label: 'Chương trình điểm', icon: Award },
+    { href: brandPortalPath(brandId, 'benefits'), label: 'Quyền lợi', icon: Gift },
     { href: brandPortalPath(brandId, 'products'), label: 'Sản phẩm', icon: Package },
     { href: brandPortalPath(brandId, 'digital-sample-lab/report'), label: 'Báo cáo thử mẫu', icon: NotebookTabsIcon },
   ];
-  return items.filter(item => !(isStaff && item.hideForStaff));
+  return items;
 };
-
-
 
 function SidebarNav({ brandId, onNavigate }: { brandId: string, onNavigate?: () => void }) {
   const pathname = usePathname();
-  const { isStaff } = useBrandRole();
-  const navItems = getNavItems(brandId, isStaff);
+  const navItems = getNavItems(brandId);
 
   return (
     <>
@@ -147,6 +145,7 @@ function BrandSwitcher({
 
 function ProfileMenu({ brandId, brandName, onNavigate }: { brandId: string, brandName: string, onNavigate?: () => void }) {
   const { isStaff, memberRole } = useBrandRole();
+  const { mutate: logout } = useLogout();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -178,11 +177,17 @@ function ProfileMenu({ brandId, brandName, onNavigate }: { brandId: string, bran
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator className="my-1 bg-border" />
-        <DropdownMenuItem asChild className="rounded-xl px-3 py-2.5 cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 transition-colors">
-          <Link href="/auth/login" className="flex items-center gap-3 w-full" onClick={onNavigate}>
+        <DropdownMenuItem
+          className="rounded-xl px-3 py-2.5 cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 transition-colors"
+          onClick={() => {
+            onNavigate?.();
+            logout();
+          }}
+        >
+          <div className="flex items-center gap-3 w-full">
             <LogOut className="size-4" />
             <span className="font-semibold text-[11px] uppercase tracking-widest">Đăng xuất</span>
-          </Link>
+          </div>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

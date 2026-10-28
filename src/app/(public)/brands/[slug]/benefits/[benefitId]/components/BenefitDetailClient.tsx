@@ -39,7 +39,7 @@ export default function BenefitDetailClient({ brandId, benefitId }: { brandId: s
     }
     try {
       const result = await redeemBenefit({ benefitId, brandId });
-      setVoucherCode(result?.voucherCode || result?.id || `VOUCHER-${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
+      setVoucherCode(result?.voucherCode || null);
       setShowSuccessDialog(true);
     } catch (e) {
       // Error is handled in the mutation hook (toast)

@@ -216,7 +216,7 @@ export default function CustomerDetailClient() {
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Trạng thái</TableHead>
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Ngày tạo</TableHead>
                     <TableHead className="font-bold text-[10px] uppercase tracking-widest">Ngày hết hạn</TableHead>
-                    {/* <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Thao tác</TableHead> */}
+                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-right">Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

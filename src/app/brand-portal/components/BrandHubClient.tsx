@@ -48,22 +48,24 @@ export default function BrandHubClient() {
 
   if (error) {
     const status = (error as { response?: { status?: number } }).response?.status;
-    const isAuthError = status === 401 || status === 403;
+    const isUnauthorized = status === 401;
+    const isForbidden = status === 403;
+    const message = isUnauthorized
+      ? 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'
+      : isForbidden
+        ? 'Tài khoản của bạn chưa phải thành viên đang hoạt động của thương hiệu nào.'
+        : 'Không thể tải danh sách thương hiệu. Vui lòng thử lại sau.';
 
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
         <ShieldAlert className="w-10 h-10 text-destructive" />
-        <p className="text-destructive font-semibold">
-          {isAuthError
-            ? 'Phiên đăng nhập đã hết hạn hoặc bạn không có quyền truy cập.'
-            : 'Không thể tải danh sách thương hiệu. Vui lòng thử lại sau.'}
-        </p>
+        <p className="text-destructive font-semibold">{message}</p>
         <Button
           variant="outline"
           className="rounded-full"
-          onClick={() => (isAuthError ? router.push('/auth/login') : refetch())}
+          onClick={() => (isUnauthorized ? router.push('/auth/login') : refetch())}
         >
-          {isAuthError ? 'Đăng nhập lại' : 'Thử lại'}
+          {isUnauthorized ? 'Đăng nhập lại' : 'Thử lại'}
         </Button>
       </div>
     );
