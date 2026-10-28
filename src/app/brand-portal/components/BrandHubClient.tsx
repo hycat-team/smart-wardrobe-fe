@@ -144,7 +144,7 @@ export default function BrandHubClient() {
         );
 
         return isActive ? (
-          <Link key={brand.id} href={brandPortalPath(brand.id)} className="group block">
+          <Link key={brand.id} href={brandPortalPath(brand.slug || brand.id)} className="group block">
             <Card className="rounded-3xl border-border bg-card shadow-sm transition-all overflow-hidden hover:shadow-md hover:border-primary cursor-pointer">
               {card}
             </Card>

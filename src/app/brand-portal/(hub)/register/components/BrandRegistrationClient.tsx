@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,28 +11,43 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+import {
+  isReservedBrandSlug,
+  isValidBrandSlug,
+  normalizeBrandSlug,
+} from '@/features/brand-portal/utils/brand-slug';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Tên thương hiệu phải có ít nhất 2 ký tự').max(100, 'Tên thương hiệu không vượt quá 100 ký tự'),
-  slug: z.string().min(2, 'Slug phải có ít nhất 2 ký tự').regex(/^[a-z0-9-]+$/, 'Slug chỉ được chứa chữ thường, số và dấu gạch ngang'),
+  slug: z
+    .string()
+    .min(2, 'Slug phải có ít nhất 2 ký tự')
+    .max(100, 'Slug không vượt quá 100 ký tự')
+    .refine(isValidBrandSlug, 'Slug chỉ được chứa chữ thường, số và dấu gạch ngang')
+    .refine((value) => !isReservedBrandSlug(value), 'Slug này là đường dẫn hệ thống, vui lòng chọn slug khác'),
   description: z.string().max(500, 'Mô tả không vượt quá 500 ký tự').optional(),
 });
 
-function generateSlug(text: string) {
-  return text
-    .toString()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // remove diacritics
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '')
-    .replace(/--+/g, '-');
+function resolveAppUrl() {
+  const fromEnv = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (fromEnv) {
+    return fromEnv.replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  return '';
 }
 
 export default function BrandRegistrationClient() {
   const router = useRouter();
   const { mutateAsync: createBrand, isPending } = useCreateBrand();
+  const [appUrl, setAppUrl] = useState('');
+
+  useEffect(() => {
+    setAppUrl(resolveAppUrl());
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,11 +59,15 @@ export default function BrandRegistrationClient() {
   });
 
   const nameValue = form.watch('name');
+  const slugValue = form.watch('slug');
+  const slugPreview = useMemo(
+    () => `${appUrl || '…'}/brands/${slugValue || 'slug-cua-ban'}`,
+    [appUrl, slugValue],
+  );
 
-  // Auto-generate slug when name changes, but only if user hasn't touched slug field directly
   useEffect(() => {
     if (nameValue && !form.getFieldState('slug').isDirty) {
-      form.setValue('slug', generateSlug(nameValue), { shouldValidate: true });
+      form.setValue('slug', normalizeBrandSlug(nameValue), { shouldValidate: true });
     }
   }, [nameValue, form]);
 
@@ -58,13 +77,20 @@ export default function BrandRegistrationClient() {
         name: values.name,
         slug: values.slug,
         description: values.description,
-        // logoUrl: undefined, // Optional for now
-        // logoPublicId: undefined, // Optional for now
       });
-      // Return to brand list where it will show as PENDING
       router.push('/brand-portal');
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number; data?: { message?: string } } };
+      const status = err?.response?.status;
+      const message = err?.response?.data?.message;
+      if (status === 409) {
+        form.setError('slug', {
+          type: 'manual',
+          message: message || 'Slug này đã được sử dụng, vui lòng chọn slug khác.',
+        });
+        return;
+      }
+      toast.error(message || 'Không thể gửi yêu cầu đăng ký. Vui lòng thử lại sau.');
     }
   };
 
@@ -117,15 +143,18 @@ export default function BrandRegistrationClient() {
                   <FormLabel className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Đường dẫn (Slug) <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <div className="flex items-center rounded-xl border border-input bg-transparent pr-3 focus-within:ring-1 focus-within:ring-ring overflow-hidden">
-                      <span className="pl-4 text-muted-foreground text-sm bg-muted/50 h-12 flex items-center shrink-0">smartwardrobe.com/</span>
+                      <span className="pl-4 text-muted-foreground text-sm bg-muted/50 h-12 flex items-center shrink-0">{appUrl || '…'}/brands/</span>
                       <Input 
                         placeholder="mori-studio" 
                         className="border-0 focus-visible:ring-0 shadow-none h-12 rounded-none px-2" 
                         {...field} 
+                        onChange={(event) => field.onChange(normalizeBrandSlug(event.target.value))}
                       />
                     </div>
                   </FormControl>
-                  <CardDescription className="text-xs">Đường dẫn này không thể thay đổi sau khi được tạo.</CardDescription>
+                  <CardDescription className="text-xs">
+                    Đường dẫn công khai của thương hiệu: <span className="font-semibold text-foreground">{slugPreview}</span>. Slug không thể thay đổi sau khi được tạo.
+                  </CardDescription>
                   <FormMessage />
                 </FormItem>
               )}

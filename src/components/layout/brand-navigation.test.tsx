@@ -4,7 +4,7 @@ import { Sidebar } from './sidebar';
 import { MobileBottomNav } from './mobile-nav';
 import { GuestHeader } from './guest-header';
 import { AdminSidebar } from '@/features/admin/components/AdminSidebar';
-import BrandLayout from '@/app/brand-portal/[brandId]/layout';
+import BrandLayout from '@/app/brand-portal/[brandSlug]/layout';
 import { BrandRedirector } from '@/app/(user)/components/BrandRedirector';
 
 let mockPathname = '/wardrobe';
@@ -23,8 +23,8 @@ const mockAuthState = {
 
 jest.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
-  useRouter: () => ({ push: mockRouterPush }),
-  useParams: () => ({ brandId: 'brand-1' }),
+  useRouter: () => ({ push: mockRouterPush, replace: jest.fn() }),
+  useParams: () => ({ brandSlug: 'brand-1' }),
 }));
 jest.mock('next/image', () => ({
   __esModule: true,

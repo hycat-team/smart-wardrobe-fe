@@ -91,7 +91,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
 
           {/* Right Column: Info */}
           <div className="flex flex-col sticky top-10 h-fit">
-            <Link href={`/brands/${brand.id}`} className="text-muted-foreground font-bold uppercase tracking-widest text-sm mb-3 hover:text-foreground transition-colors">
+            <Link href={`/brands/${brand.slug || brand.id}`} className="text-muted-foreground font-bold uppercase tracking-widest text-sm mb-3 hover:text-foreground transition-colors">
               {brand.name}
             </Link>
             <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-4">{product.name}</h1>

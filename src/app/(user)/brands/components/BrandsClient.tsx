@@ -42,7 +42,7 @@ export default function BrandsClient() {
           {brands.map((brand) => (
             <Link 
               key={brand.id} 
-              href={`/brands/${brand.id}`}
+              href={`/brands/${brand.slug || brand.id}`}
               className="group flex flex-col bg-background border border-border/50 rounded-2xl overflow-hidden hover:border-border transition-colors hover:shadow-lg"
             >
               {/* Brand Cover / Logo Area */}

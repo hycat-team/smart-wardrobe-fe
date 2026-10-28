@@ -108,42 +108,46 @@ export const useRedeemBenefit = () => {
   });
 };
 
-export const useGetMyBenefitRedemptions = (brandId?: string) => {
+export const useGetMyBenefitRedemptions = (brandId?: string, enabled = true) => {
   return useQuery({
     queryKey: brandId ? [...USER_BRANDS_KEYS.myBenefitRedemptions(), brandId] : USER_BRANDS_KEYS.myBenefitRedemptions(),
     queryFn: () => userBrandsApi.getMyBenefitRedemptions(brandId),
-  });
-};
-
-export const useGetMyLoyalties = () => {
-  return useQuery({
-    queryKey: USER_BRANDS_KEYS.myLoyalties(),
-    queryFn: () => userBrandsApi.getMyLoyalties(),
-  });
-};
-
-export const useGetMyLoyaltyAtBrand = (brandId: string) => {
-  return useQuery({
-    queryKey: USER_BRANDS_KEYS.myLoyaltyAtBrand(brandId),
-    queryFn: () => userBrandsApi.getMyLoyaltyAtBrand(brandId),
-    enabled: !!brandId,
+    enabled: !!brandId && enabled,
     retry: false,
   });
 };
 
-export const useGetMyLoyaltyLots = (brandId: string) => {
+export const useGetMyLoyalties = (enabled = true) => {
   return useQuery({
-    queryKey: USER_BRANDS_KEYS.myLoyaltyLots(brandId),
-    queryFn: () => userBrandsApi.getMyLoyaltyLots(brandId),
-    enabled: !!brandId,
+    queryKey: USER_BRANDS_KEYS.myLoyalties(),
+    queryFn: () => userBrandsApi.getMyLoyalties(),
+    enabled,
+    retry: false,
   });
 };
 
-export const useGetMyLoyaltyTransactions = (brandId: string) => {
+export const useGetMyLoyaltyAtBrand = (brandId: string, enabled = true) => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.myLoyaltyAtBrand(brandId),
+    queryFn: () => userBrandsApi.getMyLoyaltyAtBrand(brandId),
+    enabled: !!brandId && enabled,
+    retry: false,
+  });
+};
+
+export const useGetMyLoyaltyLots = (brandId: string, enabled = true) => {
+  return useQuery({
+    queryKey: USER_BRANDS_KEYS.myLoyaltyLots(brandId),
+    queryFn: () => userBrandsApi.getMyLoyaltyLots(brandId),
+    enabled: !!brandId && enabled,
+  });
+};
+
+export const useGetMyLoyaltyTransactions = (brandId: string, enabled = true) => {
   return useQuery({
     queryKey: USER_BRANDS_KEYS.myLoyaltyTransactions(brandId),
     queryFn: () => userBrandsApi.getMyLoyaltyTransactions(brandId),
-    enabled: !!brandId,
+    enabled: !!brandId && enabled,
   });
 };
 

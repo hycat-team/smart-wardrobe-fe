@@ -51,7 +51,7 @@ export default function CartClient() {
                         <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex flex-col justify-center gap-1">
-                        <Link href={`/brands/${item.brandId}`} className="text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wider">
+                        <Link href={`/brands/${brand?.slug || item.brandId}`} className="text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wider">
                           {brand?.name}
                         </Link>
                         <Link href={`/products/${item.productId}`} className="font-bold text-sm hover:underline text-foreground">
