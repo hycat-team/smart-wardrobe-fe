@@ -16,6 +16,7 @@ import {
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLogout } from '@/features/auth/queries/auth.queries';
 import { getUserAvatar } from '@/lib/utils';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 export function PublicHeader() {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ export function PublicHeader() {
   const { mutate: logout } = useLogout();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isLoggedIn = !!user;
+  const brandEnabled = isBrandFeatureEnabled();
   const loginHref = `/auth/login?returnUrl=${encodeURIComponent(pathname || '/')}`;
 
   return (
@@ -34,9 +36,11 @@ export function PublicHeader() {
         </Link>
 
         <nav className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" className="rounded-full text-sm" render={<Link href="/brands" />}>
-            Thương hiệu
-          </Button>
+          {brandEnabled && (
+            <Button variant="ghost" className="rounded-full text-sm" render={<Link href="/brands" />}>
+              Thương hiệu
+            </Button>
+          )}
           {isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -93,9 +97,11 @@ export function PublicHeader() {
       {mobileMenuOpen && (
         <div className="border-t border-border bg-background px-4 py-4 md:hidden">
           <div className="flex flex-col gap-3">
-            <Link href="/brands" onClick={() => setMobileMenuOpen(false)} className="text-sm font-semibold">
-              Thương hiệu
-            </Link>
+            {brandEnabled && (
+              <Link href="/brands" onClick={() => setMobileMenuOpen(false)} className="text-sm font-semibold">
+                Thương hiệu
+              </Link>
+            )}
             {isLoggedIn ? (
               <>
                 <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="text-sm font-semibold">

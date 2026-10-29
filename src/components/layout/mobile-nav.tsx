@@ -8,6 +8,7 @@ import { cn, getUserAvatar } from "@/lib/utils";
 import Image from "next/image";
 import { useAuthStore } from "@/store/useAuthStore";
 import { NAV_ITEMS } from "./sidebar";
+import { isBrandFeatureEnabled } from "@/lib/brand-feature";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,16 +18,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const PRIMARY_PATHS = ['/community', '/wardrobe', '/ai-stylist', '/outfits'];
-const PRIMARY_ITEMS = NAV_ITEMS.filter((item) => PRIMARY_PATHS.includes(item.path));
-const MORE_ITEMS = NAV_ITEMS.filter((item) => !PRIMARY_PATHS.includes(item.path));
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
+  const brandEnabled = isBrandFeatureEnabled();
+  const visibleNavItems = NAV_ITEMS.filter((item) => brandEnabled || !item.brand);
+  const primaryItems = visibleNavItems.filter((item) => PRIMARY_PATHS.includes(item.path));
+  const moreItems = visibleNavItems.filter((item) => !PRIMARY_PATHS.includes(item.path));
 
   return (
     <nav aria-label="Điều hướng chính" className="md:hidden fixed bottom-0 w-full min-h-[72px] pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 bg-[#FAFAFA] dark:bg-[#111111] border-t border-border/60 flex items-center justify-around px-2 z-50">
-      {[...PRIMARY_ITEMS, { icon: UserCircle, label: "Hồ sơ", path: "/profile" }].map((item) => {
+      {[...primaryItems, { icon: UserCircle, label: "Hồ sơ", path: "/profile" }].map((item) => {
         const isActive = item.path === '/wardrobe'
           ? pathname === '/wardrobe' || (pathname.startsWith('/wardrobe/') && !pathname.startsWith('/wardrobe/explore'))
           : pathname.startsWith(item.path);
@@ -97,34 +100,36 @@ export function MobileBottomNav() {
         );
       })}
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            aria-label="Thêm chức năng thương hiệu"
-            className={cn(
-              "flex w-full items-center justify-center rounded-xl p-2",
-              MORE_ITEMS.some((item) => pathname.startsWith(item.path))
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Ellipsis className="size-5" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="top" align="end" sideOffset={12}>
-          <DropdownMenuGroup>
-            {MORE_ITEMS.map((item) => (
-              <DropdownMenuItem key={item.path} asChild>
-                <Link href={item.path}>
-                  <item.icon />
-                  {item.label}
-                </Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {moreItems.length > 0 && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              aria-label="Thêm chức năng thương hiệu"
+              className={cn(
+                "flex w-full items-center justify-center rounded-xl p-2",
+                moreItems.some((item) => pathname.startsWith(item.path))
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Ellipsis className="size-5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="end" sideOffset={12}>
+            <DropdownMenuGroup>
+              {moreItems.map((item) => (
+                <DropdownMenuItem key={item.path} asChild>
+                  <Link href={item.path}>
+                    <item.icon />
+                    {item.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </nav>
   );
 }

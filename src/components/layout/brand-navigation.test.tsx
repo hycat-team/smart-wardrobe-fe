@@ -68,12 +68,20 @@ jest.mock('@/features/brand-portal/queries/brand-portal.queries', () => ({
 }));
 
 describe('brand navigation', () => {
+  const originalBrandFlag = process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES;
+
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
+    process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES = 'true';
     mockPathname = '/wardrobe';
     mockMemberRole = 'owner';
     mockAuthState.user.lastName = 'Dùng';
+  });
+
+  afterAll(() => {
+    if (originalBrandFlag === undefined) delete process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES;
+    else process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES = originalBrandFlag;
   });
 
   it('exposes discovery and the brand portal on desktop', () => {
@@ -139,5 +147,42 @@ describe('brand navigation', () => {
     mockAuthState.user.lastName = 'brand';
     render(<BrandRedirector />);
     expect(mockRouterPush).toHaveBeenCalledWith('/brand-portal');
+  });
+
+  describe('when brand features are disabled', () => {
+    beforeEach(() => {
+      process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES = 'false';
+      mockAuthState.user.lastName = 'Dùng';
+    });
+
+    it('hides brand destinations from desktop navigation', () => {
+      render(<Sidebar />);
+      expect(screen.queryByRole('link', { name: 'Khám Phá' })).toBeNull();
+      expect(screen.queryByRole('link', { name: 'Kênh Thương Hiệu' })).toBeNull();
+    });
+
+    it('hides the More menu when no secondary destinations remain', () => {
+      render(<MobileBottomNav />);
+      expect(screen.queryByRole('button', { name: 'Thêm chức năng thương hiệu' })).toBeNull();
+      expect(screen.queryByRole('link', { name: 'Khám Phá' })).toBeNull();
+      expect(screen.queryByRole('link', { name: 'Kênh Thương Hiệu' })).toBeNull();
+    });
+
+    it('hides the brand portal from the guest header', () => {
+      mockPathname = '/';
+      render(<GuestHeader />);
+      expect(screen.queryByRole('link', { name: 'Kênh Thương Hiệu' })).toBeNull();
+    });
+
+    it('hides brand approval from admin navigation', () => {
+      render(<AdminSidebar />);
+      expect(screen.queryByRole('link', { name: 'Duyệt thương hiệu' })).toBeNull();
+    });
+
+    it('does not redirect brand accounts into the hidden portal', () => {
+      mockAuthState.user.lastName = 'brand';
+      render(<BrandRedirector />);
+      expect(mockRouterPush).not.toHaveBeenCalledWith('/brand-portal');
+    });
   });
 });

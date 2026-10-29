@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useGetBrandItemDetail, useGetActiveBrandDetail } from '@/features/brands/queries/user-brands.queries';
 import { BrandItemMetaPanel } from '@/features/brand-portal/components/BrandItemMeta';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 interface ProductDetailClientProps {
   productId: string;
@@ -18,6 +19,7 @@ function formatPrice(price?: number | null) {
 
 export default function ProductDetailClient({ productId }: ProductDetailClientProps) {
   const router = useRouter();
+  const brandEnabled = isBrandFeatureEnabled();
   const { data: product, isLoading: isProductLoading } = useGetBrandItemDetail(productId);
   const { data: brand, isLoading: isBrandLoading } = useGetActiveBrandDetail(product?.brandId || '');
 
@@ -34,9 +36,11 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
       <div className="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
         <Tag className="size-10 text-muted-foreground" />
         <p className="text-lg font-semibold">Không tìm thấy sản phẩm</p>
-        <Link href="/brands" className="text-sm font-semibold underline">
-          Khám phá thương hiệu khác
-        </Link>
+        {brandEnabled && (
+          <Link href="/brands" className="text-sm font-semibold underline">
+            Khám phá thương hiệu khác
+          </Link>
+        )}
       </div>
     );
   }
@@ -72,7 +76,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
           </div>
 
           <div className="flex flex-col gap-6">
-            {brand && (
+            {brandEnabled && brand && (
               <Link
                 href={`/brands/${brand.slug || brand.id}`}
                 className="text-muted-foreground font-bold uppercase tracking-widest text-sm hover:text-foreground transition-colors w-fit"
@@ -90,7 +94,7 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
             {product.description && (
               <p className="text-foreground/80 leading-relaxed">{product.description}</p>
             )}
-            <BrandItemMetaPanel item={product} />
+            {brandEnabled && <BrandItemMetaPanel item={product} />}
           </div>
         </div>
       </div>

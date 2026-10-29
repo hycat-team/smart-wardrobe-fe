@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Trash2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { mockBrands } from '@/lib/mock-data/b2b';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 export default function CartClient() {
   const { cart, removeFromCart, updateQuantity } = useB2BDemoStore();
+  const brandEnabled = isBrandFeatureEnabled();
 
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -19,7 +21,7 @@ export default function CartClient() {
         <p className="text-muted-foreground mb-8">Bạn chưa có sản phẩm nào trong giỏ hàng.</p>
         <Link href="/community">
           <Button className="rounded-full font-bold uppercase tracking-widest px-8 h-12">
-            Khám phá Brands
+            {brandEnabled ? 'Khám phá Brands' : 'Khám phá sản phẩm'}
           </Button>
         </Link>
       </div>
@@ -51,9 +53,11 @@ export default function CartClient() {
                         <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex flex-col justify-center gap-1">
-                        <Link href={`/brands/${brand?.slug || item.brandId}`} className="text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wider">
-                          {brand?.name}
-                        </Link>
+                        {brandEnabled && (
+                          <Link href={`/brands/${brand?.slug || item.brandId}`} className="text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wider">
+                            {brand?.name}
+                          </Link>
+                        )}
                         <Link href={`/products/${item.productId}`} className="font-bold text-sm hover:underline text-foreground">
                           {item.name}
                         </Link>

@@ -8,11 +8,13 @@ import { CheckCircle2, ChevronLeft, CreditCard, Banknote, ShieldCheck, Package, 
 import Link from 'next/link';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 gsap.registerPlugin(useGSAP);
 
 export default function CheckoutClient() {
   const { cart, checkout } = useB2BDemoStore();
+  const brandEnabled = isBrandFeatureEnabled();
   const [isSuccess, setIsSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderId, setOrderId] = useState<string>('');
@@ -319,7 +321,7 @@ export default function CheckoutClient() {
                 {groupedCart.map(([brandId, group]) => (
                   <div key={brandId} className="space-y-4">
                     <h3 className="font-bold text-xs uppercase tracking-widest text-foreground border-b border-border pb-2">
-                      {group.brandName}
+                      {brandEnabled ? group.brandName : 'Sản phẩm'}
                     </h3>
                     <div className="space-y-6">
                       {group.items.map((item, idx) => (

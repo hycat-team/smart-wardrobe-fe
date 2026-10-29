@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
+
+function matchesPath(pathname: string, prefix: string) {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
 
 /**
  * Middleware trong Next.js App Router:
@@ -10,6 +15,23 @@ import type { NextRequest } from 'next/server';
  *   trên Client kết hợp cùng Next.js rewrite proxy tới Backend.
  */
 export async function middleware(request: NextRequest) {
+  if (!isBrandFeatureEnabled()) {
+    const pathname = request.nextUrl.pathname;
+
+    if (matchesPath(pathname, '/admin/brands')) {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+
+    if (
+      matchesPath(pathname, '/brands') ||
+      matchesPath(pathname, '/brand') ||
+      matchesPath(pathname, '/brand-portal') ||
+      matchesPath(pathname, '/loyalties')
+    ) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
   const headersToForward = new Headers(request.headers);
 
   // Chuyển tiếp request với headers đầy đủ cho downstream handlers / Server Components

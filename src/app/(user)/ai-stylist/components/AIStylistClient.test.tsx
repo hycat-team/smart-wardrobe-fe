@@ -29,6 +29,7 @@ jest.mock('html-to-image', () => ({ toBlob: jest.fn() }));
 jest.mock('sonner', () => ({ toast: { success: jest.fn(), error: jest.fn() } }));
 
 describe('AI stylist brand recommendations', () => {
+  const originalBrandFlag = process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES;
   const pointerEventDescriptor = Object.getOwnPropertyDescriptor(window, 'PointerEvent');
 
   beforeAll(() => {
@@ -38,11 +39,14 @@ describe('AI stylist brand recommendations', () => {
   afterAll(() => {
     if (pointerEventDescriptor) Object.defineProperty(window, 'PointerEvent', pointerEventDescriptor);
     else Reflect.deleteProperty(window, 'PointerEvent');
+    if (originalBrandFlag === undefined) delete process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES;
+    else process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES = originalBrandFlag;
   });
 
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
+    process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES = 'true';
     (aiApi.getOutfitRecommendation as jest.Mock).mockResolvedValue({
       title: 'Trang phục đi làm',
       items: [],
@@ -100,5 +104,21 @@ describe('AI stylist brand recommendations', () => {
 
     resolveSecond?.({ title: 'Bộ mới', items: [] });
     expect(await screen.findByTestId('outfit-canvas-board')).toBeTruthy();
+  });
+
+  it('hides the brand switch and forces includeBrandItems=false when brand features are disabled', async () => {
+    process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES = 'false';
+    render(<AIStylistClient />);
+
+    expect(screen.queryByRole('switch', { name: 'Phối đồ với các thương hiệu địa phương' })).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Đi làm' }));
+    fireEvent.click(screen.getByRole('button', { name: 'TẠO TRANG PHỤC' }));
+
+    await waitFor(() => {
+      expect(aiApi.getOutfitRecommendation).toHaveBeenCalledWith(
+        expect.objectContaining({ includeBrandItems: false }),
+      );
+    });
   });
 });

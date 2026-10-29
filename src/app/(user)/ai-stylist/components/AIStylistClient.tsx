@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Sparkles, Save, RefreshCw, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 import { aiApi } from '@/features/ai-stylist/api/ai.api';
 import type { AIOutfitRecommendationRes } from '@/features/ai-stylist/types';
 import { useOutfitCanvas } from '@/features/outfits/hooks/useOutfitCanvas';
@@ -47,6 +48,7 @@ function AIStylistContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
   const [outfitName, setOutfitName] = useState<string>('');
+  const brandEnabled = isBrandFeatureEnabled();
 
   const {
     ghostClosetEnabled,
@@ -110,7 +112,7 @@ function AIStylistContent() {
         details: safeDetails,
         occasion: occasionMap[selectedOccasion] || selectedOccasion.trim(),
         styleTarget: selectedStyle ? selectedStyle.toLowerCase() : '',
-        includeBrandItems: ghostClosetEnabled,
+        includeBrandItems: brandEnabled && ghostClosetEnabled,
       });
 
       setOutfitData(res);
@@ -562,17 +564,19 @@ function AIStylistContent() {
                 </p>
               </div>
 
-              <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
-                <div>
-                  <label htmlFor="include-brand-items" className="text-[11px] font-bold uppercase tracking-widest text-foreground">
-                    Phối đồ với các thương hiệu địa phương
-                  </label>
-                  <p className="text-[9px] text-muted-foreground mt-1 tracking-widest uppercase">
-                    Thử nghiệm các mẫu thiết kế ảo
-                  </p>
+              {brandEnabled && (
+                <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
+                  <div>
+                    <label htmlFor="include-brand-items" className="text-[11px] font-bold uppercase tracking-widest text-foreground">
+                      Phối đồ với các thương hiệu địa phương
+                    </label>
+                    <p className="text-[9px] text-muted-foreground mt-1 tracking-widest uppercase">
+                      Thử nghiệm các mẫu thiết kế ảo
+                    </p>
+                  </div>
+                  <Switch id="include-brand-items" checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} disabled={isGenerating} />
                 </div>
-                <Switch id="include-brand-items" checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} disabled={isGenerating} />
-              </div>
+              )}
             </div>
 
             <div className="p-4 border-t border-border bg-card">

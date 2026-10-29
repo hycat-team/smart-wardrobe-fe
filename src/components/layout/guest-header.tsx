@@ -25,8 +25,10 @@ import { useLogout } from '@/features/auth/queries/auth.queries';
 import { getUserAvatar } from '@/lib/utils';
 
 import { useEffect, useState, useCallback } from 'react';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 export function GuestHeader() {
+  const brandEnabled = isBrandFeatureEnabled();
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const { mutate: logout } = useLogout();
@@ -95,16 +97,18 @@ export function GuestHeader() {
           <nav className="hidden md:flex items-center gap-8">
             {isLoggedIn ? (
               <>
-                <Link
-                  href="/brand-portal"
-                  className={`
-                    font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
-                    hover:opacity-100
-                    ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
-                  `}
-                >
-                  Kênh Thương Hiệu
-                </Link>
+                {brandEnabled && (
+                  <Link
+                    href="/brand-portal"
+                    className={`
+                      font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
+                      hover:opacity-100
+                      ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
+                    `}
+                  >
+                    Kênh Thương Hiệu
+                  </Link>
+                )}
                 {user?.roleSlug === 'admin' && (
                   <Link
                     href="/admin/dashboard"
@@ -307,11 +311,13 @@ export function GuestHeader() {
             <MobileNavLink href="/ai-stylist" onClick={() => setMobileMenuOpen(false)}>
               AI Stylist
             </MobileNavLink>
-            <MobileNavLink href="/brand-portal" onClick={() => setMobileMenuOpen(false)}>
-              Kênh Thương Hiệu
-            </MobileNavLink>
+            {brandEnabled && (
+              <MobileNavLink href="/brand-portal" onClick={() => setMobileMenuOpen(false)}>
+                Kênh Thương Hiệu
+              </MobileNavLink>
+            )}
             {user?.roleSlug === 'admin' && (
-              <MobileNavLink href="/admin/brands" onClick={() => setMobileMenuOpen(false)}>
+              <MobileNavLink href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)}>
                 Quản trị hệ thống
               </MobileNavLink>
             )}

@@ -38,22 +38,24 @@ import { useLogout } from '@/features/auth/queries/auth.queries';
 import { getUserAvatar } from '@/lib/utils';
 import Image from 'next/image';
 import { useSidebarStore } from '@/store/useSidebarStore';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 export type NavItem = {
   icon: LucideIcon;
   label: string;
   path: string;
   comingSoon?: boolean;
+  brand?: boolean;
 };
 
 export const NAV_ITEMS: NavItem[] = [
   // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
   { icon: Globe, label: 'Cộng Đồng', path: '/community' },
-  { icon: Compass, label: 'Khám Phá', path: '/brands' },
+  { icon: Compass, label: 'Khám Phá', path: '/brands', brand: true },
   { icon: Shirt, label: 'Tủ Quần Áo', path: '/wardrobe' },
   { icon: Sparkles, label: 'AI Phối Đồ', path: '/ai-stylist' },
   { icon: Images, label: 'Trang Phục', path: '/outfits' },
-  { icon: Store, label: 'Kênh Thương Hiệu', path: '/brand-portal' },
+  { icon: Store, label: 'Kênh Thương Hiệu', path: '/brand-portal', brand: true },
 ];
 
 export function Sidebar() {
@@ -69,6 +71,8 @@ export function Sidebar() {
   const logoutMutation = useLogout();
   const { isCollapsed, setIsCollapsed, toggleCollapse } = useSidebarStore();
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
+  const brandEnabled = isBrandFeatureEnabled();
+  const visibleNavItems = NAV_ITEMS.filter((item) => brandEnabled || !item.brand);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -332,7 +336,7 @@ export function Sidebar() {
 
       {/* Main Navigation (Minimalist List with Motion) */}
       <nav className="flex-1 flex flex-col gap-1.5" onMouseLeave={() => setHoveredPath(null)}>
-        {NAV_ITEMS.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive =
             item.path === '/wardrobe'
               ? pathname === '/wardrobe' ||
