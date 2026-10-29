@@ -10,7 +10,7 @@ Tài liệu này đặc tả chi tiết giao ước dữ liệu (Interface Contr
 
 - **Method**: `POST`
 - **URL**: `https://api.cloudinary.com/v1_1/:cloud_name/:resource_type/upload`
-  - `:cloud_name`: Bắt buộc lấy từ `process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2`; thiếu cấu hình sẽ báo lỗi trước khi upload.
+  - `:cloud_name`: Bắt buộc lấy từ `process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`; thiếu cấu hình sẽ báo lỗi trước khi upload.
   - `:resource_type`: `image` (cho avatar)
 - **Headers**:
   - `Content-Type`: `multipart/form-data` (trình duyệt tự động đính kèm kèm `boundary`)

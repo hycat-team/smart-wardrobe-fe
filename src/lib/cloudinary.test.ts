@@ -16,7 +16,7 @@ describe('uploadToCloudinary form contract (Cloudinary signature)', () => {
   beforeEach(() => {
     jest.replaceProperty(process, 'env', {
       ...process.env,
-      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2: 'test-cloud',
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: 'test-cloud',
     });
     global.fetch = jest.fn(async () => ({
       ok: true,
@@ -108,16 +108,18 @@ describe('uploadToCloudinary form contract (Cloudinary signature)', () => {
   });
 
   it('từ chối upload trước khi gọi mạng khi thiếu cloud name', async () => {
+    delete process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     delete process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2;
 
     await expect(uploadToCloudinary({
       file: new File(['a'], 'a.jpg', { type: 'image/jpeg' }),
       signatureParams: { apiKey: 'key', timestamp: 1, signature: 'sig', folder: 'test' },
-    })).rejects.toThrow('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2');
+    })).rejects.toThrow('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME');
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it('giữ URL ảnh gốc khi thiếu cấu hình cho transformation bên ngoài', () => {
+    delete process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     delete process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2;
     const url = 'https://images.example.test/item.jpg';
     expect(applyCloudinaryTrim(url)).toBe(url);

@@ -34,9 +34,14 @@ const nextConfig: NextConfig = {
     // - env `.../api` (thiếu v1) -> thêm `/v1`
     // - env `.../api/v1` -> giữ nguyên (tránh double /api/v1/api/v1)
     // Rewrites dùng cấu hình lúc build, bắt buộc khai báo env trước khi build/redeploy.
-    const raw = process.env.NEXT_PUBLIC_API_URL_V2;
+    const raw =
+      process.env.BACKEND_API_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      process.env.NEXT_PUBLIC_API_URL_V2;
     if (!raw?.trim()) {
-      throw new Error('Missing NEXT_PUBLIC_API_URL_V2. Configure it before building or starting the app.');
+      throw new Error(
+        'Missing BACKEND_API_URL (or legacy NEXT_PUBLIC_API_URL). Configure it before building or starting the app.'
+      );
     }
     const cleaned = raw
       .replace(/^['"]|['"]$/g, '')

@@ -11,10 +11,6 @@ import { AUTH_RETURN_URL_KEY } from '../../types/google-auth.types';
 describe('google-auth.utils', () => {
   beforeEach(() => {
     sessionStorage.clear();
-    jest.replaceProperty(process, 'env', {
-      ...process.env,
-      NEXT_PUBLIC_API_URL_V2: 'https://auth.example.test/api/v1',
-    });
   });
 
   afterEach(() => jest.restoreAllMocks());
@@ -119,14 +115,13 @@ describe('google-auth.utils', () => {
   });
 
   describe('buildGoogleAuthUrl', () => {
-    it('rejects missing backend configuration without a hardcoded fallback', () => {
-      delete process.env.NEXT_PUBLIC_API_URL_V2;
-      expect(() => getBackendApiBase()).toThrow('NEXT_PUBLIC_API_URL_V2');
+    it('always initiates Google auth through the relative backend proxy', () => {
+      expect(getBackendApiBase()).toBe('/api/v1');
     });
 
     it('constructs correct backend initiation URL', () => {
       const url = buildGoogleAuthUrl();
-      expect(url).toContain('/auth/google?redirectUrl=');
+      expect(url).toContain('/api/v1/auth/google?redirectUrl=');
       expect(url).toContain(encodeURIComponent('http://localhost/auth/callback'));
     });
   });

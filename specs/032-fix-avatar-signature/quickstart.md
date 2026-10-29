@@ -10,7 +10,7 @@ Tài liệu này hướng dẫn cách kiểm thử và xác thực giải pháp 
 
 - Môi trường Node.js $\ge 18$ và npm đã được cài đặt.
 - Các phụ thuộc đã cài đặt đầy đủ (`npm install`).
-- File biến môi trường `.env` hoặc `.env.local` bắt buộc cấu hình `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2` trước khi upload.
+- File biến môi trường `.env` hoặc `.env.local` bắt buộc cấu hình `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` trước khi upload.
 
 ---
 

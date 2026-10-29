@@ -25,9 +25,12 @@ export interface CloudinaryUploadResponse {
 }
 
 export function getCloudinaryCloudName(): string {
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2?.trim();
+  const cloudName = (
+    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
+    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2
+  )?.trim();
   if (!cloudName) {
-    throw new Error('Thiếu cấu hình NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2.');
+    throw new Error('Thiếu cấu hình NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME.');
   }
   return cloudName;
 }
@@ -149,7 +152,7 @@ export function applyCloudinaryBackgroundRemoval(url: string): string {
 
 //   // Nếu là URL bên ngoài (http/https), sử dụng Cloudinary Fetch API để tự động trim
 //   if (url.startsWith("http")) {
-//     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2;
+//     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 //     // Thêm f_png và e_trim:20 để xử lý triệt để các URL không có đuôi mở rộng và bóng mờ
 //     return `https://res.cloudinary.com/${cloudName}/image/fetch/f_png,e_trim:20/${encodeURIComponent(url)}`;
 //   }
@@ -181,7 +184,10 @@ export function applyCloudinaryTrim(url: string | undefined): string {
 
   // Đối với URL bên ngoài (http/https) qua Cloudinary Fetch API
   if (url.startsWith("http")) {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2?.trim();
+    const cloudName = (
+      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
+      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2
+    )?.trim();
     if (!cloudName) return url;
     // Đã thay thế f_png,e_trim:20 thành t_fetch_trim
     return `https://res.cloudinary.com/${cloudName}/image/fetch/t_fetch_trim/${encodeURIComponent(url)}`;

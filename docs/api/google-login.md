@@ -10,7 +10,7 @@ Tài liệu hướng dẫn kỹ thuật cho các kỹ sư phát triển tính n�
 - **Nguyên tắc bảo mật**: Không nhúng Google Client Secret hay SDK của bên thứ ba vào client; Token truy cập và làm mới được quản lý độc quyền qua Cookie `HttpOnly` (`SameSite=Strict`, `Path=/`).
 - **Endpoint Khởi tạo**:
   ```text
-  GET {NEXT_PUBLIC_API_URL_V2}/auth/google?redirectUrl={encodeURIComponent(CALLBACK_URL)}
+  GET {BACKEND_API_URL}/auth/google?redirectUrl={encodeURIComponent(CALLBACK_URL)}
   ```
 - **Callback URL**: `https://<DOMAIN>/auth/callback` (hoặc `http://localhost:3000/auth/callback` ở local).
 
