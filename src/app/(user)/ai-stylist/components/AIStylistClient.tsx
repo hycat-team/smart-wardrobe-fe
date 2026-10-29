@@ -101,6 +101,10 @@ function AIStylistContent() {
     try {
       const safeDetails = detailsInput.trim().normalize('NFC').substring(0, 1000);
       setIsGenerating(true);
+      setOutfitData(null);
+      setSelectedItems([]);
+      setAlternativeIndices({});
+      setOutfitName('');
 
       const res = await aiApi.getOutfitRecommendation({
         details: safeDetails,
@@ -273,6 +277,7 @@ function AIStylistContent() {
 
                 <OutfitCanvasBoard
                   canvasRef={canvasRef}
+                  showTips={false}
                   selectedItems={selectedItems}
                   updateScale={updateScale}
                   bringToFront={bringToFront}

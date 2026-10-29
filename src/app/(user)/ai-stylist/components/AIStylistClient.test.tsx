@@ -16,7 +16,7 @@ jest.mock('@/features/brands/queries/user-brands.queries', () => ({
   useCreateSampleFeedback: () => ({ mutate: jest.fn() }),
 }));
 jest.mock('@/features/outfits/components/OutfitCanvasBoard', () => ({
-  OutfitCanvasBoard: () => null,
+  OutfitCanvasBoard: () => <div data-testid="outfit-canvas-board" />,
 }));
 jest.mock('@/features/brands/components/BrandItemFeedbackSheet', () => ({
   BrandItemFeedbackSheet: () => null,
@@ -75,5 +75,30 @@ describe('AI stylist brand recommendations', () => {
     render(<AIStylistClient />);
 
     expect(screen.getByRole('switch', { name: 'Phối đồ với các thương hiệu địa phương' }).getAttribute('aria-checked')).toBe('true');
+  });
+
+  it('clears the previous canvas immediately when generating a new outfit', async () => {
+    render(<AIStylistClient />);
+    fireEvent.click(screen.getByRole('button', { name: 'Đi làm' }));
+    fireEvent.click(screen.getByRole('button', { name: 'TẠO TRANG PHỤC' }));
+
+    expect(await screen.findByTestId('outfit-canvas-board')).toBeTruthy();
+    await waitFor(() => {
+      expect((screen.getByRole('button', { name: 'TẠO TRANG PHỤC' }) as HTMLButtonElement).disabled).toBe(false);
+    });
+
+    let resolveSecond: ((value: unknown) => void) | undefined;
+    (aiApi.getOutfitRecommendation as jest.Mock).mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveSecond = resolve;
+      }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'TẠO TRANG PHỤC' }));
+
+    await waitFor(() => expect(screen.queryByTestId('outfit-canvas-board')).toBeNull());
+    expect(screen.getByText(/ĐANG TẠO PHONG CÁCH/)).toBeTruthy();
+
+    resolveSecond?.({ title: 'Bộ mới', items: [] });
+    expect(await screen.findByTestId('outfit-canvas-board')).toBeTruthy();
   });
 });
