@@ -1,8 +1,9 @@
 'use client';
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Sparkles, Save, RefreshCw, Layers, SlidersHorizontal, X } from 'lucide-react';
+import { Sparkles, Save, RefreshCw, Layers, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 import { aiApi } from '@/features/ai-stylist/api/ai.api';
 import type { AIOutfitRecommendationRes } from '@/features/ai-stylist/types';
 import { useOutfitCanvas } from '@/features/outfits/hooks/useOutfitCanvas';
@@ -20,7 +21,6 @@ import { wardrobeApi } from '@/features/wardrobe/api/wardrobe.api';
 import { useCreateOutfit } from '@/features/outfits/queries/outfits.queries';
 import { useCreateSampleFeedback } from '@/features/brands/queries/user-brands.queries';
 import { toast } from 'sonner';
-import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import * as htmlToImage from 'html-to-image';
 import { Switch } from '@/components/ui/switch';
@@ -48,6 +48,7 @@ function AIStylistContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
   const [outfitName, setOutfitName] = useState<string>('');
+  const brandEnabled = isBrandFeatureEnabled();
 
   const {
     ghostClosetEnabled,
@@ -102,12 +103,16 @@ function AIStylistContent() {
     try {
       const safeDetails = detailsInput.trim().normalize('NFC').substring(0, 1000);
       setIsGenerating(true);
+      setOutfitData(null);
+      setSelectedItems([]);
+      setAlternativeIndices({});
+      setOutfitName('');
 
       const res = await aiApi.getOutfitRecommendation({
         details: safeDetails,
         occasion: occasionMap[selectedOccasion] || selectedOccasion.trim(),
         styleTarget: selectedStyle ? selectedStyle.toLowerCase() : '',
-        includeBrandItems: ghostClosetEnabled ? false : undefined,
+        includeBrandItems: brandEnabled && ghostClosetEnabled,
       });
 
       setOutfitData(res);
@@ -260,10 +265,10 @@ function AIStylistContent() {
   const hasSelectedOptions = !!(selectedOccasion || selectedStyle || detailsInput.trim());
 
   return (
-    <div className="min-h-full flex flex-col pt-4 md:pt-8 bg-background max-w-[1600px] w-full mx-auto pb-10">
-      <div className="flex flex-col h-full gap-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 flex-1 items-start">
-          <div className="lg:col-span-8 flex flex-col gap-0 relative min-h-[600px] h-[600px] lg:h-[800px] border border-border bg-card shadow-sm rounded-2xl overflow-hidden pb-24 sm:pb-20">
+    <div className="flex w-full max-w-[1600px] mx-auto flex-col bg-background px-4 pb-6 pt-4 sm:px-6 md:pt-6 lg:h-[calc(100dvh-1rem)] lg:overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col gap-6">
+        <div className="grid min-h-0 flex-1 grid-cols-1 items-stretch gap-6 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-8 flex min-h-[560px] h-[600px] flex-col gap-0 relative min-w-0 border border-border bg-card shadow-sm rounded-2xl overflow-hidden pb-24 sm:pb-20 lg:h-full lg:min-h-0">
             {outfitData ? (
               <>
                 <div className="absolute top-4 left-4 z-20">
@@ -274,6 +279,7 @@ function AIStylistContent() {
 
                 <OutfitCanvasBoard
                   canvasRef={canvasRef}
+                  showTips={false}
                   selectedItems={selectedItems}
                   updateScale={updateScale}
                   bringToFront={bringToFront}
@@ -397,7 +403,7 @@ function AIStylistContent() {
             )}
           </div>
 
-          <div className="lg:col-span-4 h-auto lg:h-[800px] border border-border bg-card flex flex-col relative shadow-sm overflow-hidden rounded-2xl">
+          <div className="lg:col-span-4 flex h-auto min-h-[480px] min-w-0 flex-col border border-border bg-card relative shadow-sm overflow-hidden rounded-2xl lg:h-full lg:min-h-0">
             {outfitData && (
               <div className="p-4 sm:p-5 border-b border-border bg-gradient-to-br from-stone-100/60 via-stone-50/40 to-stone-100/60 dark:from-stone-900/60 dark:via-stone-950/40 dark:to-stone-900/60 flex flex-col gap-2 shrink-0">
                 <div className="flex items-center justify-between">
@@ -422,14 +428,8 @@ function AIStylistContent() {
               </div>
             )}
 
-            <div className="p-5 border-b border-border bg-muted flex items-center gap-3">
-              <SlidersHorizontal className="w-4 h-4 text-foreground" />
-              <h3 className="font-bold text-[13px] text-foreground uppercase tracking-widest">
-                THÔNG SỐ THIẾT KẾ
-              </h3>
-            </div>
 
-            <div className="flex-1 overflow-y-auto p-5 md:p-6 space-y-6">
+            <div className="flex-1 min-h-0 overflow-y-auto p-5 md:p-6 space-y-6">
               <div className="group flex flex-col gap-2 border-b border-border pb-4 focus-within:border-foreground transition-colors">
                 <label className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest group-focus-within:text-foreground transition-colors">
                   DỊP (OCCASION)
@@ -564,17 +564,19 @@ function AIStylistContent() {
                 </p>
               </div>
 
-              {/* <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-foreground">
-                    Phối đồ với các thương hiệu địa phương
-                  </p>
-                  <p className="text-[9px] text-muted-foreground mt-1 tracking-widest uppercase">
-                    Thử nghiệm các mẫu thiết kế ảo
-                  </p>
+              {brandEnabled && (
+                <div className="flex items-center justify-between border border-border bg-muted p-4 mt-2 rounded-2xl">
+                  <div>
+                    <label htmlFor="include-brand-items" className="text-[11px] font-bold uppercase tracking-widest text-foreground">
+                      Phối đồ với các thương hiệu địa phương
+                    </label>
+                    <p className="text-[9px] text-muted-foreground mt-1 tracking-widest uppercase">
+                      Thử nghiệm các mẫu thiết kế ảo
+                    </p>
+                  </div>
+                  <Switch id="include-brand-items" checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} disabled={isGenerating} />
                 </div>
-                <Switch checked={ghostClosetEnabled} onCheckedChange={toggleGhostCloset} />
-              </div> */}
+              )}
             </div>
 
             <div className="p-4 border-t border-border bg-card">
@@ -630,19 +632,7 @@ function AIStylistContent() {
           if (activeGhostItem) {
             joinWaitlist(activeGhostItem.id);
             logGhostAction(activeGhostItem.id, 'waitlist');
-            const { addToCart } = useB2BDemoStore.getState();
-            addToCart({
-              productId: activeGhostItem.id,
-              name: `${activeGhostItem.category?.name || 'Sản phẩm'} ${activeGhostItem.fashionItem?.color || 'Basic'}`,
-              price: activeGhostItem.price || 500000,
-              quantity: 1,
-              size: 'M',
-              color: activeGhostItem.fashionItem?.color || 'Basic',
-              imageUrl: activeGhostItem.fashionItem?.imageUrl || '',
-              brandId: activeGhostItem.brandId,
-              brandName: activeGhostItem.brandName,
-              selected: true,
-            });
+            toast.success('Đã thêm vào danh sách chờ!');
           }
         }}
         onHideBrand={() => {

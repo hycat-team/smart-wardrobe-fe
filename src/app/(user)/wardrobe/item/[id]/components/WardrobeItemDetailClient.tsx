@@ -34,6 +34,7 @@ import {
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
 import { getWardrobeItemTitle } from "@/features/wardrobe/utils";
 import Image from "next/image";
+import { isBrandFeatureEnabled } from "@/lib/brand-feature";
 
 interface WardrobeItemDetailClientProps {
   itemId: string;
@@ -47,6 +48,7 @@ export function WardrobeItemDetailClient({
   const router = useRouter();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const { data: categories = [] } = useCategories();
+  const brandEnabled = isBrandFeatureEnabled();
 
   const {
     data: item,
@@ -365,7 +367,7 @@ export function WardrobeItemDetailClient({
               </h1>
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                <span>{brandName || categoryName || "Tủ đồ cá nhân"}</span>
+                <span>{(brandEnabled && brandName) || categoryName || "Tủ đồ cá nhân"}</span>
                 <span className="w-1 h-1 rounded-full bg-border" />
                 <div className="flex items-center gap-2">
                   {colorHex && (
@@ -406,7 +408,7 @@ export function WardrobeItemDetailClient({
                 <div className="h-px w-full bg-border" />
 
                 {/* Brand (if exists) */}
-                {brandName && (
+                {brandEnabled && brandName && (
                   <>
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
                       <span className="text-muted-foreground uppercase">Thương hiệu</span>

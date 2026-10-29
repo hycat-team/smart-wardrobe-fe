@@ -24,7 +24,6 @@ import {
   ScanQrCode,
   PlusCircle,
   User,
-  ShoppingBag,
   PanelLeftClose,
   PanelLeftOpen,
   Globe,
@@ -35,27 +34,28 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
 import { useLogout } from '@/features/auth/queries/auth.queries';
 import { getUserAvatar } from '@/lib/utils';
 import Image from 'next/image';
 import { useSidebarStore } from '@/store/useSidebarStore';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 export type NavItem = {
   icon: LucideIcon;
   label: string;
   path: string;
   comingSoon?: boolean;
+  brand?: boolean;
 };
 
 export const NAV_ITEMS: NavItem[] = [
   // { icon: PlusCircle, label: "Thêm Đồ Nhanh", path: "/wardrobe/explore" },
   { icon: Globe, label: 'Cộng Đồng', path: '/community' },
-  // { icon: Compass, label: "Khám Phá", path: "/brands" },
+  { icon: Compass, label: 'Khám Phá', path: '/brands', brand: true },
   { icon: Shirt, label: 'Tủ Quần Áo', path: '/wardrobe' },
   { icon: Sparkles, label: 'AI Phối Đồ', path: '/ai-stylist' },
   { icon: Images, label: 'Trang Phục', path: '/outfits' },
-  // { icon: Store, label: "Kênh Thương Hiệu", path: "/brand-portal/select" },
+  { icon: Store, label: 'Kênh Thương Hiệu', path: '/brand-portal', brand: true },
 ];
 
 export function Sidebar() {
@@ -69,9 +69,10 @@ export function Sidebar() {
     'Ethos Atelier';
   const clearAuthStore = useAuthStore((state) => state.logout);
   const logoutMutation = useLogout();
-  const { cart, setCartOpen } = useB2BDemoStore();
   const { isCollapsed, setIsCollapsed, toggleCollapse } = useSidebarStore();
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
+  const brandEnabled = isBrandFeatureEnabled();
+  const visibleNavItems = NAV_ITEMS.filter((item) => brandEnabled || !item.brand);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -335,7 +336,7 @@ export function Sidebar() {
 
       {/* Main Navigation (Minimalist List with Motion) */}
       <nav className="flex-1 flex flex-col gap-1.5" onMouseLeave={() => setHoveredPath(null)}>
-        {NAV_ITEMS.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive =
             item.path === '/wardrobe'
               ? pathname === '/wardrobe' ||
@@ -458,47 +459,6 @@ export function Sidebar() {
           return <div key={item.path}>{content}</div>;
         })}
       </nav>
-
-      {/* Cart Button */}
-      {/* <div className="mb-4 mt-2">
-        {isCollapsed ? (
-          <Tooltip>
-            <TooltipTrigger
-              onClick={() => setCartOpen(true)}
-              className="group flex items-center justify-center w-full p-3 rounded-xl transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-muted/30"
-            >
-              <div className="relative">
-                <ShoppingBag className="size-5 transition-transform duration-300 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" strokeWidth={1.5} />
-                {cart.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-foreground text-background text-[9px] font-bold w-4 h-4 rounded-full z-10 shadow-sm border border-background">
-                    {cart.length}
-                  </span>
-                )}
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="right" sideOffset={12} className="font-semibold text-xs font-medium uppercase tracking-widest">
-              Giỏ Hàng
-            </TooltipContent>
-          </Tooltip>
-        ) : (
-          <button
-            onClick={() => setCartOpen(true)}
-            className="group flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-muted/30"
-          >
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <ShoppingBag className="size-5 transition-transform duration-300 group-hover:scale-110 text-muted-foreground group-hover:text-foreground" strokeWidth={1.5} />
-                {cart.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-foreground text-background text-[9px] font-bold w-4 h-4 rounded-full z-10 shadow-sm border border-background">
-                    {cart.length}
-                  </span>
-                )}
-              </div>
-              <span className="font-body-sm text-[14px] tracking-wide font-medium">Giỏ Hàng</span>
-            </div>
-          </button>
-        )}
-      </div> */}
 
       {/* Premium Upgrade (Minimal Style) */}
       {!user?.isPremium && (

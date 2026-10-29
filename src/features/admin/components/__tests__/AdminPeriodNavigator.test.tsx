@@ -10,6 +10,15 @@ describe('AdminPeriodNavigator Component', () => {
     onChange: jest.fn(),
   };
 
+  beforeAll(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-10-20T10:00:00+07:00'));
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
   });

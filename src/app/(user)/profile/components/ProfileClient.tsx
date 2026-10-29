@@ -369,7 +369,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
               </div>
             </div>
           )} */}
-          {/* <ClaimAccountTab /> */}
+          <ClaimAccountTab />
         </TabsContent>
 
         <TabsContent value="wallet" className="animate-in fade-in duration-500 mt-2">

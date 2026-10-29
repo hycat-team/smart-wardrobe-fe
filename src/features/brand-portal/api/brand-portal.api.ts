@@ -37,6 +37,10 @@ export const brandPortalApi = {
     return res.data.data;
   },
 
+  cancelBrandRequest: async (brandId: string) => {
+    const res = await api.delete<{data: unknown}>(`/brand-portal/brands/${brandId}/request`);
+    return res.data.data;
+  },
   getLogoUploadSignature: async () => {
     const res = await api.get<{data: { signature: string, timestamp: number, folder: string, apiKey: string }}>('/brand-portal/brands/profile-images/upload-signature');
     return res.data.data;
@@ -44,6 +48,11 @@ export const brandPortalApi = {
 
   updateBrandLogo: async (brandId: string, payload: { logoUrl?: string, logoPublicId?: string, backgroundUrl?: string, backgroundPublicId?: string }) => {
     const res = await api.patch<{data: BrandInfo}>(`/brand-portal/brands/${brandId}/profile-images`, payload);
+    return res.data.data;
+  },
+
+  updateBrandProfile: async (brandId: string, payload: { name?: string, description?: string }) => {
+    const res = await api.patch<{data: BrandInfo}>(`/brand-portal/brands/${brandId}/profile`, payload);
     return res.data.data;
   },
 
@@ -134,7 +143,7 @@ export const brandPortalApi = {
   },
 
   // Benefits
-  getBenefits: async (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
+  getBenefits: async (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string; requiredTierId?: string; status?: string }) => {
     const res = await api.get<{data: PaginationResult<Benefit>}>(`/brand-portal/brands/${brandId}/benefits`, { params });
     return res.data.data;
   },
@@ -191,10 +200,25 @@ export const brandPortalApi = {
     return res.data.data;
   },
 
+  updateBrandMember: async (brandId: string, memberId: string, payload: { status: 'active' | 'disabled' }) => {
+    const res = await api.patch<{data: BrandMember}>(`/brand-portal/brands/${brandId}/members/${memberId}`, payload);
+    return res.data.data;
+  },
+
+  removeBrandMember: async (brandId: string, memberId: string) => {
+    const res = await api.delete<{data: unknown}>(`/brand-portal/brands/${brandId}/members/${memberId}`);
+    return res.data.data;
+  },
+
   // Brand Items
-  getBrandItems: async (brandId: string) => {
-    const res = await api.get<{data: BrandItemRes[]}>(`/brand-portal/brands/${brandId}/items`);
+  getBrandItems: async (brandId: string, params?: { itemType?: 'product' | 'sample'; status?: string }) => {
+    const res = await api.get<{data: BrandItemRes[]}>(`/brand-portal/brands/${brandId}/items`, { params });
     return res.data.data || [];
+  },
+
+  convertSampleToProduct: async (brandId: string, itemId: string, payload: { productCode: string }) => {
+    const res = await api.post<{data: BrandItemRes}>(`/brand-portal/brands/${brandId}/items/${itemId}/convert-to-product`, payload);
+    return res.data.data;
   },
 
   createBrandItem: async (brandId: string, payload: CreateBrandItemReq) => {

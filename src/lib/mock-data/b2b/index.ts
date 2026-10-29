@@ -1,6 +1,7 @@
 export const mockBrands = [
   {
     id: "brand_001",
+    slug: "mori-studio",
     name: "Mori Studio",
     logoUrl: "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&h=400&fit=crop",
@@ -14,6 +15,7 @@ export const mockBrands = [
   },
   {
     id: "brand_002",
+    slug: "dark-atelier",
     name: "Dark Atelier",
     logoUrl: "https://images.unsplash.com/photo-1549421255-06a928ba4825?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1509319117193-57bab727e09d?w=1200&h=400&fit=crop",
@@ -27,6 +29,7 @@ export const mockBrands = [
   },
   {
     id: "brand_003",
+    slug: "lumina-label",
     name: "Lumina Label",
     logoUrl: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=400&fit=crop",
@@ -40,6 +43,7 @@ export const mockBrands = [
   },
   {
     id: "brand_004",
+    slug: "urban-core",
     name: "Urban Core",
     logoUrl: "https://images.unsplash.com/photo-1618077360395-f3068be8e001?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1555529733-0e670560f7e1?w=1200&h=400&fit=crop",
@@ -53,6 +57,7 @@ export const mockBrands = [
   },
   {
     id: "brand_005",
+    slug: "silk-thread",
     name: "Silk & Thread",
     logoUrl: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200&h=400&fit=crop",
@@ -66,6 +71,7 @@ export const mockBrands = [
   },
   {
     id: "brand_006",
+    slug: "neo-vintage",
     name: "Neo Vintage",
     logoUrl: "https://images.unsplash.com/photo-1511556820780-d912e42b4980?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1485230405346-71acb9518d9c?w=1200&h=400&fit=crop",
@@ -79,6 +85,7 @@ export const mockBrands = [
   },
   {
     id: "brand_007",
+    slug: "earth-child",
     name: "Earth Child",
     logoUrl: "https://images.unsplash.com/photo-1505022610485-0249ba5b3675?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&h=400&fit=crop",
@@ -92,6 +99,7 @@ export const mockBrands = [
   },
   {
     id: "brand_008",
+    slug: "noir-collection",
     name: "Noir Collection",
     logoUrl: "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=400&fit=crop",
@@ -105,6 +113,7 @@ export const mockBrands = [
   },
   {
     id: "brand_009",
+    slug: "aura-studio",
     name: "Aura Studio",
     logoUrl: "https://images.unsplash.com/photo-1524041255072-7da0525d6b34?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1550614000-4b95d466f29a?w=1200&h=400&fit=crop",
@@ -118,6 +127,7 @@ export const mockBrands = [
   },
   {
     id: "brand_010",
+    slug: "bold-move",
     name: "Bold Move",
     logoUrl: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=1200&h=400&fit=crop",
@@ -131,6 +141,7 @@ export const mockBrands = [
   },
   {
     id: "brand_011",
+    slug: "velvet-nights",
     name: "Velvet Nights",
     logoUrl: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1515347619152-47530467540f?w=1200&h=400&fit=crop",
@@ -144,6 +155,7 @@ export const mockBrands = [
   },
   {
     id: "brand_012",
+    slug: "raw-denim-co",
     name: "Raw Denim Co.",
     logoUrl: "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1475178626620-a4d074967452?w=1200&h=400&fit=crop",
@@ -157,6 +169,7 @@ export const mockBrands = [
   },
   {
     id: "brand_013",
+    slug: "arctic-core",
     name: "Arctic Core",
     logoUrl: "https://images.unsplash.com/photo-1506152983158-b4a74a01c721?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1484807352052-23338990c6c6?w=1200&h=400&fit=crop",
@@ -170,6 +183,7 @@ export const mockBrands = [
   },
   {
     id: "brand_014",
+    slug: "summer-haze",
     name: "Summer Haze",
     logoUrl: "https://images.unsplash.com/photo-1507643179773-3e975d7ac515?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=400&fit=crop",
@@ -183,6 +197,7 @@ export const mockBrands = [
   },
   {
     id: "brand_015",
+    slug: "leather-iron",
     name: "Leather & Iron",
     logoUrl: "https://images.unsplash.com/photo-1555529771-835f59bfc50c?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1515347619152-47530467540f?w=1200&h=400&fit=crop",
@@ -196,6 +211,7 @@ export const mockBrands = [
   },
   {
     id: "brand_016",
+    slug: "future-retro",
     name: "Future Retro",
     logoUrl: "https://images.unsplash.com/photo-1618077360395-f3068be8e001?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=1200&h=400&fit=crop",
@@ -209,6 +225,7 @@ export const mockBrands = [
   },
   {
     id: "brand_017",
+    slug: "blossom-boutique",
     name: "Blossom Boutique",
     logoUrl: "https://images.unsplash.com/photo-1524041255072-7da0525d6b34?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=400&fit=crop",
@@ -222,6 +239,7 @@ export const mockBrands = [
   },
   {
     id: "brand_018",
+    slug: "concrete-jungle",
     name: "Concrete Jungle",
     logoUrl: "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&h=400&fit=crop",
@@ -235,6 +253,7 @@ export const mockBrands = [
   },
   {
     id: "brand_019",
+    slug: "knitted-cozy",
     name: "Knitted Cozy",
     logoUrl: "https://images.unsplash.com/photo-1505022610485-0249ba5b3675?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200&h=400&fit=crop",
@@ -248,6 +267,7 @@ export const mockBrands = [
   },
   {
     id: "brand_020",
+    slug: "neon-lights",
     name: "Neon Lights",
     logoUrl: "https://images.unsplash.com/photo-1511556820780-d912e42b4980?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1485230405346-71acb9518d9c?w=1200&h=400&fit=crop",
@@ -261,6 +281,7 @@ export const mockBrands = [
   },
   {
     id: "brand_021",
+    slug: "office-chic",
     name: "Office Chic",
     logoUrl: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1555529733-0e670560f7e1?w=1200&h=400&fit=crop",
@@ -274,6 +295,7 @@ export const mockBrands = [
   },
   {
     id: "brand_022",
+    slug: "nomad-traveler",
     name: "Nomad Traveler",
     logoUrl: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200&h=200&fit=crop",
     coverUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=400&fit=crop",

@@ -73,17 +73,6 @@ export const normalizeDashboardFilters = (
   };
 };
 
-export const hasCustomDashboardDateRange = (
-  filters: DashboardFilters,
-  now = new Date()
-) => {
-  const fallback = getDefaultDashboardDateRange(now);
-  return (
-    filters.fromDate !== fallback.fromDate ||
-    filters.toDate !== fallback.toDate
-  );
-};
-
 export const buildAdminAnalyticsRequest = (
   filters: DashboardFilters
 ): DynamicQueryRequest => ({

@@ -67,3 +67,29 @@ describe("OutfitCanvasBoard brand feedback action", () => {
     expect(screen.getByRole("button", { name: /Đánh giá sản phẩm/i })).toBeTruthy();
   });
 });
+
+describe("OutfitCanvasBoard tips", () => {
+  function renderWithTips(showTips?: boolean) {
+    return render(
+      <OutfitCanvasBoard
+        canvasRef={React.createRef<HTMLDivElement>()}
+        selectedItems={[baseItem]}
+        updateScale={jest.fn()}
+        bringToFront={jest.fn()}
+        removeItem={jest.fn()}
+        handleDragEnd={jest.fn()}
+        showTips={showTips}
+      />,
+    );
+  }
+
+  it("shows the interaction tips by default", () => {
+    renderWithTips();
+    expect(screen.getByText(/KÉO ĐỂ DI CHUYỂN/i)).toBeTruthy();
+  });
+
+  it("hides the interaction tips when showTips is false", () => {
+    renderWithTips(false);
+    expect(screen.queryByText(/KÉO ĐỂ DI CHUYỂN/i)).toBeNull();
+  });
+});

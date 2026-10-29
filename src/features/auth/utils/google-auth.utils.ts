@@ -1,14 +1,11 @@
 import { AUTH_RETURN_URL_KEY, GoogleAuthErrorCode } from '../types/google-auth.types';
 
 /**
- * Normalizes backend base URL to ensure it has /api/v1 suffix without trailing slash
+ * Frontend always talks to the backend through the Next.js `/api/v1` proxy.
+ * Keeping this relative avoids exposing a backend URL/public env to the browser.
  */
 export function getBackendApiBase(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
-  const cleaned = raw.replace(/^['"]|['"]$/g, '').trim().replace(/\/+$/, '');
-  if (cleaned.endsWith('/api/v1')) return cleaned;
-  if (cleaned.endsWith('/api')) return `${cleaned}/v1`;
-  return `${cleaned}/api/v1`;
+  return '/api/v1';
 }
 
 /**

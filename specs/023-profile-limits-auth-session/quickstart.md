@@ -11,7 +11,7 @@
 - Node.js >= 20.x, npm / yarn / pnpm.
 - Biến môi trường kết nối Backend:
   ```env
-  NEXT_PUBLIC_API_URL=https://api.closy.hycat.online/api/v1
+  BACKEND_API_URL=https://api.closy.hycat.online/api/v1
   ```
 - Tài khoản kiểm thử:
   - Tài khoản A (Gói Premium hoặc gói có giới hạn: ví dụ 500 đồ, 50 outfit).

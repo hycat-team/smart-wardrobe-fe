@@ -1,34 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ShoppingBag, ChevronLeft, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import React from 'react';
+import { ChevronLeft, Loader2, Tag } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useGetBrandItemDetail, useGetActiveBrandDetail } from '@/features/brands/queries/user-brands.queries';
-import { useBatchUploadWardrobeItems } from '@/features/wardrobe/queries/wardrobe.queries';
+import { BrandItemMetaPanel } from '@/features/brand-portal/components/BrandItemMeta';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 interface ProductDetailClientProps {
   productId: string;
 }
 
+function formatPrice(price?: number | null) {
+  if (price == null) return 'Liên hệ để biết giá';
+  return `${price.toLocaleString('vi-VN')}đ`;
+}
+
 export default function ProductDetailClient({ productId }: ProductDetailClientProps) {
   const router = useRouter();
-  // eslint-disable-next-line react-hooks/purity
-  const imagePublicId = Math.random().toString(36)
+  const brandEnabled = isBrandFeatureEnabled();
   const { data: product, isLoading: isProductLoading } = useGetBrandItemDetail(productId);
-  const { data: brand, isLoading: isBrandLoading } = useGetActiveBrandDetail(product?.brandId || "");
-
-  const { mutate: addToWardrobe, isPending: isAddingToWardrobe } = useBatchUploadWardrobeItems();
-
-  const [selectedSize, setSelectedSize] = useState<string>('');
-  const [selectedColor, setSelectedColor] = useState<string>('');
-  const [quantity, setQuantity] = useState(1);
-
-  
-
-  const prod = product as any;
+  const { data: brand, isLoading: isBrandLoading } = useGetActiveBrandDetail(product?.brandId || '');
 
   if (isProductLoading || isBrandLoading) {
     return (
@@ -38,22 +31,21 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
     );
   }
 
-  if (!product || !brand) return null;
+  if (!product) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
+        <Tag className="size-10 text-muted-foreground" />
+        <p className="text-lg font-semibold">Không tìm thấy sản phẩm</p>
+        {brandEnabled && (
+          <Link href="/brands" className="text-sm font-semibold underline">
+            Khám phá thương hiệu khác
+          </Link>
+        )}
+      </div>
+    );
+  }
 
-  const handleAddToWardrobe = () => {
-    if (!product.fashionItem?.category.id  ) {
-      toast.error('Sản phẩm thiếu thông tin (Danh mục, Ảnh) để thêm vào tủ đồ');
-      return; 
-    }
-    
-    addToWardrobe({
-      items: [{
-        categoryId: product.fashionItem.category.id,
-        imagePublicId: imagePublicId,
-        imageUrl: product.fashionItem.imageUrl || '',
-      }]
-    });
-  };
+  const imageUrl = product.fashionItem?.imageUrl;
 
   return (
     <div className="flex-1 bg-background text-foreground min-h-screen pb-24">
@@ -67,112 +59,42 @@ export default function ProductDetailClient({ productId }: ProductDetailClientPr
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-
-          {/* Left Column: Images */}
           <div className="flex flex-col gap-4">
             <div className="aspect-[3/4] bg-secondary/20 overflow-hidden rounded-3xl relative">
-              <img src={product.fashionItem?.imageUrl || ''} alt={`${product.name || 'Sản phẩm'} - Thumbnail`} className="w-full h-full object-cover" />
-              {prod.discountPrice && (
-                <div className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 uppercase tracking-wider rounded-full">
-                  Sale
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={product.name || 'Sản phẩm'}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                  <Tag className="size-12 opacity-30" />
                 </div>
               )}
             </div>
-            {(prod.imageUrls?.length || 0) > 1 && (
-              <div className="grid grid-cols-2 gap-4">
-                {prod.imageUrls?.slice(1).map((imgUrl: string, idx: number) => (
-                  <div key={idx} className="aspect-[3/4] bg-secondary/20 overflow-hidden rounded-2xl">
-                    <img src={imgUrl} alt={`${product.name || 'Sản phẩm'} - Thumbnail ${idx + 2}`} className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* Right Column: Info */}
-          <div className="flex flex-col sticky top-10 h-fit">
-            <Link href={`/brands/${brand.id}`} className="text-muted-foreground font-bold uppercase tracking-widest text-sm mb-3 hover:text-foreground transition-colors">
-              {brand.name}
-            </Link>
-            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-4">{product.name}</h1>
-
-            <div className="flex items-center gap-4 mb-8">
-              {prod.discountPrice ? (
-                <>
-                  <span className="text-2xl font-bold text-red-600">{prod.discountPrice.toLocaleString('vi-VN')}đ</span>
-                  <span className="text-lg text-muted-foreground line-through">{product.price.toLocaleString('vi-VN')}đ</span>
-                </>
-              ) : (
-                <span className="text-2xl font-bold">{product.price.toLocaleString('vi-VN')}đ</span>
-              )}
-            </div>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              {product.description}
-            </p>
-
-            <div className="h-px w-full bg-border mb-8"></div>
-
-            {/* Colors */}
-            <div className="flex flex-col gap-4 mb-8">
-              <span className="font-bold text-sm uppercase tracking-widest">Màu sắc</span>
-              <div className="flex flex-wrap gap-3">
-                {(prod.colors || ['Xanh', 'Đỏ', 'Vàng', 'Đen', 'Trắng']).map((color: string) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`h-12 px-6 border font-bold text-sm rounded-full uppercase tracking-widest transition-colors
-                      ${selectedColor === color
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-border text-foreground hover:border-primary'}
-                    `}
-                  >
-                    {color}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Sizes */}
-            <div className="space-y-4 mb-10">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-sm uppercase tracking-widest">Kích cỡ</span>
-                <button className="text-xs font-bold underline decoration-1 underline-offset-2 text-muted-foreground hover:text-foreground">Hướng dẫn chọn size</button>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {(prod.sizes || ['S', 'M', 'L', 'XL']).map((size: string) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`w-16 h-16 flex items-center justify-center rounded-full border text-sm font-bold transition-all ${selectedSize === size
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border text-foreground hover:border-primary/50'
-                      }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex flex-col gap-4 mb-10">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center rounded-full border border-border h-14 px-2">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 text-muted-foreground hover:text-foreground transition-colors">-</button>
-                  <span className="font-bold w-6 text-center">{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} className="px-4 text-muted-foreground hover:text-foreground transition-colors">+</button>
-                </div>
-                <Button
-                  onClick={handleAddToWardrobe}
-                  disabled={isAddingToWardrobe}
-                  className="flex-1 h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-widest flex items-center justify-center gap-2 shadow-sm"
-                >
-                  {isAddingToWardrobe ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShoppingBag className="w-5 h-5" />}
-                  {isAddingToWardrobe ? 'Đang thêm...' : 'Thêm vào tủ đồ'}
-                </Button> 
-              </div>
-            </div>
+          <div className="flex flex-col gap-6">
+            {brandEnabled && brand && (
+              <Link
+                href={`/brands/${brand.slug || brand.id}`}
+                className="text-muted-foreground font-bold uppercase tracking-widest text-sm hover:text-foreground transition-colors w-fit"
+              >
+                {brand.name}
+              </Link>
+            )}
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight">{product.name}</h1>
+            <p className="text-2xl font-bold">{formatPrice(product.price)}</p>
+            {product.productCode && (
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Mã sản phẩm: {product.productCode}
+              </p>
+            )}
+            {product.description && (
+              <p className="text-foreground/80 leading-relaxed">{product.description}</p>
+            )}
+            {brandEnabled && <BrandItemMetaPanel item={product} />}
           </div>
         </div>
       </div>

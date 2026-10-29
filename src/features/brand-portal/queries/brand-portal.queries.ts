@@ -26,10 +26,11 @@ export const BRAND_PORTAL_KEYS = {
 };
 
 // Brand
-export const useGetMyBrands = () => {
+export const useGetMyBrands = (enabled = true) => {
   return useQuery({
     queryKey: BRAND_PORTAL_KEYS.myBrands(),
     queryFn: brandPortalApi.getMyBrands,
+    enabled,
   });
 };
 
@@ -41,6 +42,19 @@ export const useGetBrandProfile = (brandId: string) => {
   });
 };
 
+export const useCancelBrandRequest = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (brandId: string) => brandPortalApi.cancelBrandRequest(brandId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
+      toast.success('Đã hủy yêu cầu đăng ký thương hiệu');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể hủy yêu cầu đăng ký');
+    },
+  });
+};
 export const useCreateBrand = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -60,6 +74,21 @@ export const useUpdateBrandLogo = (brandId: string) => {
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.profile(brandId) });
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
       toast.success('Cập nhật thành công!');
+    },
+  });
+};
+
+export const useUpdateBrandProfile = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: { name?: string, description?: string }) => brandPortalApi.updateBrandProfile(brandId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.profile(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
+      toast.success('Cập nhật thông tin thương hiệu thành công!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể cập nhật thông tin thương hiệu.');
     },
   });
 };
@@ -222,7 +251,7 @@ export const useGetLoyaltyTierDetails = (brandId: string, tierId: string) => {
 };
 
 // Benefits
-export const useGetBenefits = (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string }) => {
+export const useGetBenefits = (brandId: string, params?: { page?: number; limit?: number; unlockType?: string; benefitType?: string; requiredTierId?: string; status?: string }) => {
   return useQuery({
     queryKey: ['benefits', brandId, params],
     queryFn: () => brandPortalApi.getBenefits(brandId, params),
@@ -236,7 +265,7 @@ export const useCreateBenefit = (brandId: string) => {
     mutationFn: (payload: any) => brandPortalApi.createBenefit(brandId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.benefits(brandId) });
-      toast.success('Tạo phúc lợi thành công');
+      toast.success('Tạo quyền lợi/voucher thành công');
     },
   });
 };
@@ -345,6 +374,39 @@ export const useAddBrandMembers = (brandId: string) => {
   });
 };
 
+export const useUpdateBrandMember = (brandId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ memberId, status }: { memberId: string; status: 'active' | 'disabled' }) =>
+      brandPortalApi.updateBrandMember(brandId, memberId, { status }),
+    onSuccess: () => {
+      toast.success('Đã cập nhật thành viên');
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.members(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể cập nhật thành viên');
+    },
+  });
+};
+
+export const useRemoveBrandMember = (brandId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (memberId: string) => brandPortalApi.removeBrandMember(brandId, memberId),
+    onSuccess: () => {
+      toast.success('Đã xóa thành viên');
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.members(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.myBrands() });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể xóa thành viên');
+    },
+  });
+};
+
 // Admin
 export const useGetAdminBrands = (params?: { page?: number; limit?: number; status?: string; q?: string }) => {
 
@@ -438,3 +500,36 @@ export const useRetryBrandItemAnalysis = (brandId: string) => {
   });
 };
 
+
+export const useConvertSampleToProduct = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, productCode }: { itemId: string; productCode: string }) => brandPortalApi.convertSampleToProduct(brandId, itemId, { productCode }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId) });
+      queryClient.invalidateQueries({ queryKey: ['brand-portal-items', brandId] });
+      if (data?.id) {
+        queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.itemDetail(brandId, data.id) });
+      }
+      toast.success('Đã chuyển mẫu thử thành sản phẩm');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Không thể chuyển mẫu thử thành sản phẩm');
+    },
+  });
+};
+
+export const useUpdateBrandItem = (brandId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, payload }: { itemId: string; payload: import('../types').UpdateBrandItemReq }) =>
+      brandPortalApi.updateBrandItem(brandId, itemId, payload),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.items(brandId) });
+      queryClient.invalidateQueries({ queryKey: BRAND_PORTAL_KEYS.itemDetail(brandId, variables.itemId) });
+      if (data?.id) {
+        queryClient.invalidateQueries({ queryKey: ['brand-portal-items', brandId] });
+      }
+    },
+  });
+};

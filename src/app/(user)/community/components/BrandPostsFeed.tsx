@@ -29,7 +29,7 @@ export function BrandPostsFeed() {
             {/* Header Section */}
             <div className="px-3 py-2.5 flex items-center justify-between bg-card">
               <Link
-                href={`/brands/${brand.id}`}
+                href={`/brands/${brand.slug || brand.id}`}
                 className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity"
               >
                 <Avatar className="w-8 h-8 rounded-full relative overflow-hidden flex-shrink-0 ring-1 ring-border bg-muted">
@@ -103,7 +103,7 @@ export function BrandPostsFeed() {
               {/* Title & Content */}
               <div className="mt-1 text-[13px] text-foreground leading-relaxed break-words line-clamp-2">
                 <Link
-                  href={`/brands/${brand.id}`}
+                  href={`/brands/${brand.slug || brand.id}`}
                   className="font-semibold mr-1.5 hover:underline cursor-pointer"
                 >
                   {brand.name}

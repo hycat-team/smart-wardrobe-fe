@@ -18,6 +18,7 @@ export interface OutfitCanvasBoardProps {
   hasAlternativesCheck?: (role: string) => boolean;
   onGhostItemClick?: (item: CanvasItem) => void;
   onBrandItemFeedbackClick?: (item: CanvasItem) => void;
+  showTips?: boolean;
 }
 
 export function OutfitCanvasBoard({
@@ -32,6 +33,7 @@ export function OutfitCanvasBoard({
   hasAlternativesCheck,
   onGhostItemClick,
   onBrandItemFeedbackClick,
+  showTips = true,
 }: OutfitCanvasBoardProps) {
   return (
     <div className="flex-1 bg-muted/30 border border-border rounded-xl relative overflow-hidden flex items-center justify-center">
@@ -178,10 +180,12 @@ export function OutfitCanvasBoard({
       </div>
 
       {/* Quick tips footer inside canvas */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] font-bold text-muted-foreground bg-card px-4 py-2 rounded-full border border-border z-20 pointer-events-none shadow-sm whitespace-nowrap uppercase tracking-widest">
-        <AlertCircle className="size-3.5 text-foreground" />
-        <span>KÉO ĐỂ DI CHUYỂN • RÊ CHUỘT ĐỂ ĐỔI KÍCH THƯỚC</span>
-      </div>
+      {showTips && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] font-bold text-muted-foreground bg-card px-4 py-2 rounded-full border border-border z-20 pointer-events-none shadow-sm whitespace-nowrap uppercase tracking-widest">
+          <AlertCircle className="size-3.5 text-foreground" />
+          <span>KÉO ĐỂ DI CHUYỂN • RÊ CHUỘT ĐỂ ĐỔI KÍCH THƯỚC</span>
+        </div>
+      )}
     </div>
   );
 }

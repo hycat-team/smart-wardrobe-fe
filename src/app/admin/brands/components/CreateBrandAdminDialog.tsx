@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -22,12 +22,19 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { useCreateBrandAdmin } from '@/features/brand-portal/queries/brand-portal.queries';
+import {
+  isReservedBrandSlug,
+  isValidBrandSlug,
+  normalizeBrandSlug,
+} from '@/features/brand-portal/utils/brand-slug';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Tên thương hiệu phải có ít nhất 2 ký tự').max(100, 'Tên quá dài'),
   slug: z.string()
     .min(2, 'Slug phải có ít nhất 2 ký tự')
-    .regex(/^[a-z0-9-]+$/, 'Slug chỉ chứa chữ cái thường, số và dấu gạch ngang'),
+    .max(100, 'Slug không vượt quá 100 ký tự')
+    .refine(isValidBrandSlug, 'Slug chỉ chứa chữ cái thường, số và dấu gạch ngang')
+    .refine((value) => !isReservedBrandSlug(value), 'Slug này là đường dẫn hệ thống, vui lòng chọn slug khác'),
   description: z.string().optional(),
 });
 
@@ -39,20 +46,16 @@ interface Props {
 }
 
 // Hàm hỗ trợ tạo slug từ tên
-const generateSlug = (text: string) => {
-  return text
-    .toString()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // remove diacritics
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '')
-    .replace(/--+/g, '-');
-};
+const generateSlug = (text: string) => normalizeBrandSlug(text);
 
 export default function CreateBrandAdminDialog({ open, onOpenChange }: Props) {
   const { mutateAsync: createBrand, isPending } = useCreateBrandAdmin();
+  const [appUrl, setAppUrl] = useState('');
+
+  useEffect(() => {
+    const fromEnv = process.env.NEXT_PUBLIC_APP_URL?.trim();
+    setAppUrl(fromEnv ? fromEnv.replace(/\/+$/, '') : window.location.origin);
+  }, []);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -92,7 +95,7 @@ export default function CreateBrandAdminDialog({ open, onOpenChange }: Props) {
         description: values.description,
       });
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       // Error is handled in the mutation
     }
   };
@@ -142,7 +145,7 @@ export default function CreateBrandAdminDialog({ open, onOpenChange }: Props) {
                   <FormControl>
                     <div className="flex items-center">
                       <span className="flex items-center justify-center h-11 px-3 text-sm text-muted-foreground bg-muted border border-r-0 border-input rounded-l-xl">
-                        closy.com/brand/
+                        {appUrl || '…'}/brands/
                       </span>
                       <Input 
                         placeholder="ten-thuong-hieu" 
@@ -150,7 +153,7 @@ export default function CreateBrandAdminDialog({ open, onOpenChange }: Props) {
                         {...field} 
                         onChange={(e) => {
                           // Cho phép nhập tay và biến isDirty thành true
-                          field.onChange(e.target.value.toLowerCase());
+                          field.onChange(normalizeBrandSlug(e.target.value));
                         }}
                       />
                     </div>

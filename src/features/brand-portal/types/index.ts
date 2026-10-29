@@ -37,7 +37,7 @@ export interface CustomerDetail extends BrandCustomer {
 export interface LoyaltyTransaction {
   id: string;
   transactionType: 'earn' | 'redeem' | 'expire' | 'refund' | 'adjust' | 'EARN' | 'REDEEM' | 'EXPIRE' | 'REFUND' | 'ADJUST';
-  points: number;
+  points?: number;
   pointsDelta?: number;
   balanceAfter?: number;
   reason: string;
@@ -54,16 +54,38 @@ export interface Benefit {
   requiredPoints?: number;
   requiredTierId?: string;
   requiredTierName?: string;
+  requiredTierRank?: number;
   requiredTier?: {
     id: string;
     name: string;
     rank: number;
   };
-  featureCode?: 'sample_mix_access' | 'brand_item_recommendation' | 'priority_brand_chat';
+  featureCode?: 'sample_mix_access';
   featureConfig?: {
     validDurationDays?: number;
     [key: string]: any;
   };
+}
+
+export interface MyBenefitRedemption {
+  id: string;
+  status: 'pending' | 'redeemed' | 'used' | 'cancelled' | 'expired';
+  pointsSpent: number;
+  redeemedAt: string;
+  usedAt?: string | null;
+  expiresAt?: string | null;
+}
+
+export interface MyBenefit extends Benefit {
+  /** Backend đã tính sẵn theo hạng/điểm hiện có; FE không tự tính lại. */
+  unlocked: boolean;
+  /** Lượt đổi gần nhất của user cho quyền lợi này. */
+  redemption?: MyBenefitRedemption | null;
+}
+
+export interface MyBenefitsResult extends PaginationResult<MyBenefit> {
+  currentTier: LoyaltyTierRes | null;
+  currentPoints: number;
 }
 
 export interface LoyaltyTierRes {
@@ -73,6 +95,7 @@ export interface LoyaltyTierRes {
   rank: number;
   minTotalSpend: number;
   description?: string;
+  benefitsCount?: number;
   benefits?: Benefit[];
   createdAt: string;
 }
@@ -134,14 +157,22 @@ export interface Conversation {
 
 export type BrandStatus = 'pending_review' | 'active' | 'suspended' | 'archived' | 'rejected';
 
+export interface BrandMemberUser {
+  username?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 export interface BrandMember {
   id: string;
   brandId: string;
   userId: string;
   role: 'owner' | 'staff';
-  status: 'active' | 'inactive';
+  status: 'active' | 'invited' | 'disabled';
   userEmail?: string;
   userFullName?: string;
+  user?: BrandMemberUser;
   createdAt: string;
 }
 
@@ -255,22 +286,22 @@ export interface BrandItemRes {
   productCode?: string,
   name?: string,
   description?: string,
-  price: number,
-  itemType?: string, 
+  price?: number | null,
+  itemType?: 'product' | 'sample' | string, 
   status: string,
   taskId?: string,
   reviewReason?: string,
   processingErrorReason?: string,
   fashionItem?: {
     id: string,
-    category: Category,
+    category?: Category,
     imageUrl?: string,
     imagePublicId?: string,
-    color: string,
-    colorHex: string,
-    colorHue: number,
-    colorSaturation: number,
-    colorLightness: number,
+    color?: string,
+    colorHex?: string,
+    colorHue?: number,
+    colorSaturation?: number,
+    colorLightness?: number,
     style?: string,
     material?: string,
     pattern?: string,
@@ -289,19 +320,22 @@ export interface BrandItemRes {
 export interface CreateBrandItemReq {
   name: string;
   productCode?: string;
-  sku?: string;
   description?: string;
-  price: number;
-  salePrice?: number;
+  price?: number;
   imageUrl: string;
   imagePublicId: string;
   categoryId?: string;
-  tags?: string[];
-  itemType: string;
+  itemType: 'product' | 'sample';
   status?: string;
 }
 
-export interface UpdateBrandItemReq extends Partial<CreateBrandItemReq> {}
+export interface UpdateBrandItemReq {
+  name?: string;
+  productCode?: string;
+  description?: string;
+  price?: number;
+  status?: string;
+}
 
 export type VoteType = 'like' | 'dislike' | 'would_buy' | 'not_interested';
 

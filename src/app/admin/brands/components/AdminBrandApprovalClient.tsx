@@ -10,6 +10,16 @@ import { Input } from '@/components/ui/input';
 import { Check, X, Building2, Store, Clock, MoreHorizontal, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BrandStatus } from '@/features/brand-portal/types';
 import CreateBrandAdminDialog from './CreateBrandAdminDialog';
@@ -20,6 +30,7 @@ export default function AdminBrandApprovalClient() {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [brandToReject, setBrandToReject] = useState<{ id: string; name: string } | null>(null);
   const limit = 10;
 
   const { data: brandsData, isLoading } = useGetAdminBrands({
@@ -38,7 +49,7 @@ export default function AdminBrandApprovalClient() {
   };
 
   const handleReject = (id: string) => {
-    updateStatusMutation.mutate({ brandId: id, status: 'rejected' });
+    setBrandToReject({ id, name: brands.find((brand) => brand.id === id)?.name || 'thương hiệu này' });
   };
 
   const handleSuspend = (id: string) => {
@@ -109,6 +120,12 @@ export default function AdminBrandApprovalClient() {
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${filterStatus === 'active' ? 'bg-emerald-50 text-emerald-700' : 'text-gray-500 hover:text-gray-900'}`}
               >
                 Đang hoạt động
+              </button>
+              <button
+                onClick={() => { setFilterStatus('rejected'); setPage(1); }}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${filterStatus === 'rejected' ? 'bg-red-50 text-red-700' : 'text-gray-500 hover:text-gray-900'}`}
+              >
+                Đã từ chối
               </button>
             </div>
           </div>
@@ -254,6 +271,41 @@ export default function AdminBrandApprovalClient() {
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog
+        open={Boolean(brandToReject)}
+        onOpenChange={(open) => {
+          if (!open) setBrandToReject(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Từ chối yêu cầu đăng ký?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {brandToReject
+                ? `Yêu cầu đăng ký "${brandToReject.name}" sẽ bị từ chối. Owner vẫn có thể xóa yêu cầu để đăng ký lại sau.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={updateStatusMutation.isPending}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={updateStatusMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(event) => {
+                event.preventDefault();
+                if (!brandToReject) return;
+                updateStatusMutation.mutate(
+                  { brandId: brandToReject.id, status: 'rejected' },
+                  { onSettled: () => setBrandToReject(null) },
+                );
+              }}
+            >
+              Từ chối
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <CreateBrandAdminDialog 
         open={isCreateDialogOpen} 

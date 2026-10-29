@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function WorkpageRedirect() {
-  redirect('/brand/dashboard');
+  redirect('/brand-portal');
 }

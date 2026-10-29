@@ -5,6 +5,7 @@ import { useB2BDemoStore } from '@/lib/mock-data/b2b/store';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useGetActiveBrandDetail, useGetBrandItemDetail } from '@/features/brands/queries/user-brands.queries';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 const getOrderStatusDisplay = (status: string) => {
   switch(status) {
@@ -27,11 +28,14 @@ const getReturnStatusDisplay = (status: string) => {
 
 function OrderBrandHeader({ brandId, order }: { brandId: string, order: any }) {
   const { data: brand } = useGetActiveBrandDetail(brandId);
+  const brandEnabled = isBrandFeatureEnabled();
   return (
     <div className="bg-muted/50 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-3">
-          <span className="font-bold text-sm uppercase tracking-widest">{brand?.name || brandId}</span>
+          <span className="font-bold text-sm uppercase tracking-widest">
+            {brandEnabled ? (brand?.name || brandId) : 'Đơn hàng'}
+          </span>
           <div className="w-1 h-1 bg-foreground rounded-full"></div>
           <span suppressHydrationWarning className="text-xs text-muted-foreground font-bold uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</span>
         </div>

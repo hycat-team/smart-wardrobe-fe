@@ -95,6 +95,7 @@ api.interceptors.response.use(
               window.location.pathname.startsWith('/privacy') ||
               window.location.pathname === '/delete-account' ||
               window.location.pathname.startsWith('/delete-account') ||
+              window.location.pathname.startsWith('/brands') ||
               window.location.pathname.startsWith('/auth'));
 
           if (!hasShownSessionExpiredToast && !silent && !isPublicPath) {

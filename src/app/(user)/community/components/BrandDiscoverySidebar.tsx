@@ -32,7 +32,7 @@ export function BrandDiscoverySidebar() {
         {filteredBrands.length > 0 ? (
           filteredBrands.map(brand => (
             <div key={brand.id} className="flex items-center justify-between group">
-              <Link href={`/brands/${brand.id}`} className="flex items-center gap-3">
+              <Link href={`/brands/${brand.slug || brand.id}`} className="flex items-center gap-3">
                 <Avatar className="w-10 h-10 ring-1 ring-border group-hover:ring-primary/50 transition-all rounded-full bg-muted">
                   <AvatarImage src={brand.logoUrl} className="object-cover" />
                   <AvatarFallback className="bg-muted text-foreground font-medium text-sm rounded-full">

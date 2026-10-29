@@ -28,6 +28,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLogout } from '@/features/auth/queries/auth.queries';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboardIcon },
@@ -39,7 +40,7 @@ const navItems = [
   { href: '/admin/wardrobe', label: 'Trang phục', icon: Shirt },
   { href: '/admin/category', label: 'Danh mục', icon: GridIcon },
   // { href: '/admin/trends', label: 'Xu hướng', icon: TrendingUp },
-  // { href: '/admin/brands', label: 'Duyệt thương hiệu', icon: Building },
+  { href: '/admin/brands', label: 'Duyệt thương hiệu', icon: Building, brand: true },
 ];
 
 export function AdminSidebar() {
@@ -48,6 +49,9 @@ export function AdminSidebar() {
   const user = useAuthStore((state) => state.user);
   const clearAuthStore = useAuthStore((state) => state.logout);
   const logoutMutation = useLogout();
+  const visibleNavItems = navItems.filter(
+    (item) => isBrandFeatureEnabled() || !('brand' in item),
+  );
 
   const handleLogout = () => {
     clearAuthStore();
@@ -112,7 +116,7 @@ export function AdminSidebar() {
 
       {/* Main Navigation (Minimalist List) */}
       <nav className="flex-1 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
           const Icon = item.icon;
 

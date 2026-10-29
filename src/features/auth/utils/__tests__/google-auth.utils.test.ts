@@ -13,6 +13,8 @@ describe('google-auth.utils', () => {
     sessionStorage.clear();
   });
 
+  afterEach(() => jest.restoreAllMocks());
+
   describe('isValidReturnUrl', () => {
     it('accepts valid relative internal paths', () => {
       expect(isValidReturnUrl('/wardrobe')).toBe(true);
@@ -113,9 +115,13 @@ describe('google-auth.utils', () => {
   });
 
   describe('buildGoogleAuthUrl', () => {
+    it('always initiates Google auth through the relative backend proxy', () => {
+      expect(getBackendApiBase()).toBe('/api/v1');
+    });
+
     it('constructs correct backend initiation URL', () => {
       const url = buildGoogleAuthUrl();
-      expect(url).toContain('/auth/google?redirectUrl=');
+      expect(url).toContain('/api/v1/auth/google?redirectUrl=');
       expect(url).toContain(encodeURIComponent('http://localhost/auth/callback'));
     });
   });

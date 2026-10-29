@@ -1,85 +1,5 @@
-// import { cookies } from 'next/headers';
-
-// const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
-
-// /**
-//  * Hàm fetch tùy chỉnh dành riêng cho Server Components.
-//  * Tự động gắn HttpOnly `accessToken` từ cookies vào Header.
-//  */
-// export async function serverFetch<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
-//   const cookieStore = await cookies();
-//   const token = cookieStore.get('accessToken')?.value;
-
-//   const headers = new Headers(options?.headers);
-//   // Cài đặt Content-Type mặc định nếu chưa có
-//   if (!headers.has('Content-Type')) {
-//     headers.set('Content-Type', 'application/json');
-//   }
-
-//   // Tự động gắn Token nếu có
-//   if (token) {
-//     headers.set('Authorization', `Bearer ${token}`);
-//   }
-
-//   console.log(`[serverFetch] BACKEND_URL=${BACKEND_URL}, token=${token ? "exists" : "missing"}, endpoint=${endpoint}`);
-
-//   try {
-//     // Strip quotes from BACKEND_URL if they exist
-//     const cleanBaseUrl = BACKEND_URL?.replace(/^'|'$/g, '')?.replace(/^"|"$/g, '');
-//     const url = `${cleanBaseUrl}${endpoint}`;
-//     console.log(`[serverFetch] Fetching: ${url}`);
-
-//     const res = await fetch(url, {
-//       ...options,
-//       headers,
-//     });
-
-//     if (!res.ok) {
-//       if (res.status === 401 || res.status === 403) {
-//         console.warn(`[ServerFetch Warning] ${endpoint}: ${res.status} ${res.statusText}`);
-//       } else {
-//         console.error(`[ServerFetch Error] ${endpoint}: ${res.status} ${res.statusText}`);
-//       }
-//       return null;
-//     }
-
-//     const data = await res.json();
-//     // API backend của bạn trả về { data: T, message: string }
-//     return data.data as T;
-//   } catch (error) {
-//     console.error(`[ServerFetch Exception] ${endpoint}:`, error);
-//     return null;
-//   }
-// }
-
-// =======================================================
-
 import { cookies, headers } from 'next/headers';
-
-let warnedMissingBackendUrl = false;
-
-function getBackendUrl(): string {
-  const raw = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL;
-  if (!raw) {
-    if (process.env.NODE_ENV === 'production' && !warnedMissingBackendUrl) {
-      warnedMissingBackendUrl = true;
-      console.error(
-        '[backend-url] Missing BACKEND_API_URL (or NEXT_PUBLIC_API_URL) in production. ' +
-          'Set it to the backend base, e.g. https://<backend-host>/api/v1, and redeploy.'
-      );
-    }
-    return 'http://127.0.0.1:8080/api/v1';
-  }
-  // Bỏ quote thừa + slash cuối để tránh `http://x//products`,
-  // đồng thời đảm bảo luôn có hậu tố /api/v1 (fix 500 do thiếu /v1 ở prod).
-  const cleaned = raw
-    .replace(/^['"]|['"]$/g, '')
-    .trim()
-    .replace(/\/+$/, '');
-  if (cleaned.endsWith('/api/v1')) return cleaned;
-  if (cleaned.endsWith('/api')) return `${cleaned}/v1`;
-  return `${cleaned}/api/v1`;
-}
+import { getBackendBaseUrl } from './backend-url';
 
 export interface ServerFetchOptions extends Omit<RequestInit, 'headers'> {
   headers?: HeadersInit;
@@ -144,7 +64,7 @@ export async function serverFetch<T>(
     if (token) reqHeaders.set('Authorization', `Bearer ${token}`);
   }
 
-  const url = `${getBackendUrl()}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const url = `${getBackendBaseUrl()}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
   try {
     const res = await fetch(url, {

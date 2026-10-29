@@ -31,7 +31,7 @@ export default function BrandsClient() {
             Thương Hiệu Nổi Bật
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base max-w-xl leading-relaxed">
-            Khám phá các nhãn hàng nội địa chất lượng cao, trở thành thành viên và tận hưởng các đặc quyền độc quyền dành riêng cho bạn.
+            Khám phá các nhãn hàng nội địa chất lượng cao, trở thành thành viên và tận hưởng quyền lợi cùng voucher dành riêng cho bạn.
           </p>
         </div>
       </div>
@@ -42,13 +42,13 @@ export default function BrandsClient() {
           {brands.map((brand) => (
             <Link 
               key={brand.id} 
-              href={`/brands/${brand.id}`}
+              href={`/brands/${brand.slug || brand.id}`}
               className="group flex flex-col bg-background border border-border/50 rounded-2xl overflow-hidden hover:border-border transition-colors hover:shadow-lg"
             >
               {/* Brand Cover / Logo Area */}
               <div className="relative h-48 bg-muted/20 flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent z-10" />
-                {brand.logoUrl ? (
+                {brand.backgroundUrl ? (
                   <img
                     src={brand.backgroundUrl}
                     alt={brand.name}
@@ -92,7 +92,7 @@ export default function BrandsClient() {
                 <div className="flex items-center justify-between text-xs font-medium uppercase tracking-wider">
                   <div className="flex items-center gap-1.5 text-muted-foreground">
                     <MapPin className="w-3.5 h-3.5" />
-                    <span>Việt Nam</span>
+                    <span>Thương hiệu Việt</span>
                   </div>
                   <span className="flex items-center gap-1 text-primary group-hover:gap-2 transition-all">
                     Vào cửa hàng <ArrowRight className="w-3.5 h-3.5" />

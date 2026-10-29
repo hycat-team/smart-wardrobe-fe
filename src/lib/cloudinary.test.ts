@@ -1,4 +1,4 @@
-import { uploadToCloudinary } from './cloudinary';
+import { applyCloudinaryTrim, uploadToCloudinary } from './cloudinary';
 
 function lastFormData(): FormData {
   const calls = (global.fetch as jest.Mock).mock.calls;
@@ -14,6 +14,10 @@ function formKeys(fd: FormData): string[] {
 
 describe('uploadToCloudinary form contract (Cloudinary signature)', () => {
   beforeEach(() => {
+    jest.replaceProperty(process, 'env', {
+      ...process.env,
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: 'test-cloud',
+    });
     global.fetch = jest.fn(async () => ({
       ok: true,
       json: async () => ({ secure_url: 'https://cdn/x.jpg', public_id: 'x' }),
@@ -51,6 +55,10 @@ describe('uploadToCloudinary form contract (Cloudinary signature)', () => {
     expect(fd.get('allowed_formats')).toBe('jpg,jpeg,png,webp,avif,gif');
     expect(fd.get('public_id')).toBeNull();
     expect(fd.get('publicId')).toBeNull();
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://api.cloudinary.com/v1_1/test-cloud/image/upload',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 
   it('gửi public_id và overwrite="true" khi có publicId, KHÔNG gửi field camelCase publicId', async () => {
@@ -97,5 +105,30 @@ describe('uploadToCloudinary form contract (Cloudinary signature)', () => {
     expect(fd.get('public_id')).toBeNull();
     expect(fd.get('overwrite')).toBeNull();
     expect(fd.get('allowed_formats')).toBeNull();
+  });
+
+  it('từ chối upload trước khi gọi mạng khi thiếu cloud name', async () => {
+    delete process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    delete process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2;
+
+    await expect(uploadToCloudinary({
+      file: new File(['a'], 'a.jpg', { type: 'image/jpeg' }),
+      signatureParams: { apiKey: 'key', timestamp: 1, signature: 'sig', folder: 'test' },
+    })).rejects.toThrow('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME');
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('giữ URL ảnh gốc khi thiếu cấu hình cho transformation bên ngoài', () => {
+    delete process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    delete process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_V2;
+    const url = 'https://images.example.test/item.jpg';
+    expect(applyCloudinaryTrim(url)).toBe(url);
+  });
+
+  it('dùng cloud name được cấu hình khi tạo URL transformation bên ngoài', () => {
+    const url = 'https://images.example.test/item.jpg';
+    expect(applyCloudinaryTrim(url)).toBe(
+      `https://res.cloudinary.com/test-cloud/image/fetch/t_fetch_trim/${encodeURIComponent(url)}`,
+    );
   });
 });
