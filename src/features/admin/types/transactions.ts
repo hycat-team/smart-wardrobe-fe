@@ -16,6 +16,15 @@ export type TransactionStatus =
 
 export type TransactionType = 'direct_purchase' | 'wallet_topup';
 
+// The four manual reconciliation decisions the admin detail screen can trigger.
+// Declared here (not in the component) because the enable/disable matrix in
+// `utils/transactions.ts` is keyed by this union.
+export type ReconciliationActionType =
+  | 'resolve-paid'
+  | 'resolve-cancelled'
+  | 'resolve-creation-failed'
+  | 'retry-investigation';
+
 // Buyer label carried by the DETAIL endpoint only (the list answers `user: null`).
 // Mirrors the backend `TransactionUserBriefRes`, which is deliberately narrower
 // than the identity contract: no roleSlug/isDeleted/gender/status/createdAt.

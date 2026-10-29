@@ -1,5 +1,8 @@
 import {
+  canRunReconciliationAction,
   formatVND,
+  getAllowedReconciliationActions,
+  getActionDisabledReason,
   getPlanKindLabel,
   getTransactionStatusConfig,
   getTransactionTypeLabel,
@@ -149,6 +152,114 @@ describe('transactions utils', () => {
       expect(values).toContain('success');
       expect(values).toContain('creating');
       expect(values).toContain('creation_failed');
+    });
+  });
+
+  // Ma trận nút thao tác: bản sao của `statusesForAction` bên BE
+  // (payment_resolution_uc.go). Viết lại đầy đủ ở đây thay vì import từ code
+  // đang test, để test là bản đặc tả chứ không phải bản sao của implementation.
+  describe('getAllowedReconciliationActions', () => {
+    const EXPECTED: Record<TransactionStatus, string[]> = {
+      pending: ['resolve-paid', 'resolve-cancelled', 'retry-investigation'],
+      creating: [
+        'resolve-paid',
+        'resolve-cancelled',
+        'retry-investigation',
+        'resolve-creation-failed',
+      ],
+      reconciling: ['resolve-paid', 'resolve-cancelled', 'retry-investigation'],
+      reconciliation_required: [
+        'resolve-paid',
+        'resolve-cancelled',
+        'retry-investigation',
+        'resolve-creation-failed',
+      ],
+      investigation_required: [
+        'resolve-paid',
+        'resolve-cancelled',
+        'retry-investigation',
+        'resolve-creation-failed',
+      ],
+      cancelled: ['resolve-paid'],
+      expired: ['resolve-paid'],
+      failed_legacy: ['resolve-paid'],
+      creation_failed: [],
+      refunded: [],
+      success: [],
+      unknown: [],
+    };
+
+    it.each(Object.entries(EXPECTED))('trạng thái %s bật đúng các nút', (status, actions) => {
+      expect(getAllowedReconciliationActions(status)).toEqual(actions);
+    });
+
+    it('trả rỗng khi chưa tải xong hoặc status null', () => {
+      expect(getAllowedReconciliationActions(null)).toEqual([]);
+      expect(getAllowedReconciliationActions(undefined)).toEqual([]);
+      expect(getAllowedReconciliationActions('')).toEqual([]);
+    });
+
+    it('trả rỗng với status lạ ngoài 11 giá trị', () => {
+      expect(getAllowedReconciliationActions('something_else')).toEqual([]);
+    });
+  });
+
+  describe('canRunReconciliationAction', () => {
+    it('chặn xác nhận thanh toán trên giao dịch đã hoàn tiền (tránh cấp quyền 2 lần)', () => {
+      expect(canRunReconciliationAction('refunded', 'resolve-paid')).toBe(false);
+    });
+
+    it('cho phép xác nhận thanh toán trên giao dịch đã huỷ/hết hạn (cứu tiền về muộn)', () => {
+      expect(canRunReconciliationAction('cancelled', 'resolve-paid')).toBe(true);
+      expect(canRunReconciliationAction('expired', 'resolve-paid')).toBe(true);
+      expect(canRunReconciliationAction('failed_legacy', 'resolve-paid')).toBe(true);
+    });
+
+    it('không cho huỷ/gửi lại đối soát trên giao dịch đã huỷ', () => {
+      expect(canRunReconciliationAction('cancelled', 'resolve-cancelled')).toBe(false);
+      expect(canRunReconciliationAction('cancelled', 'retry-investigation')).toBe(false);
+    });
+
+    it('chặn "tạo link thất bại" ngoài 3 trạng thái cho phép', () => {
+      expect(canRunReconciliationAction('creating', 'resolve-creation-failed')).toBe(true);
+      expect(canRunReconciliationAction('reconciliation_required', 'resolve-creation-failed')).toBe(true);
+      expect(canRunReconciliationAction('investigation_required', 'resolve-creation-failed')).toBe(true);
+      expect(canRunReconciliationAction('pending', 'resolve-creation-failed')).toBe(false);
+      expect(canRunReconciliationAction('reconciling', 'resolve-creation-failed')).toBe(false);
+    });
+
+    it('khoá toàn bộ nút với success/creation_failed/unknown', () => {
+      for (const status of ['success', 'creation_failed', 'unknown']) {
+        expect(canRunReconciliationAction(status, 'resolve-paid')).toBe(false);
+        expect(canRunReconciliationAction(status, 'resolve-cancelled')).toBe(false);
+        expect(canRunReconciliationAction(status, 'retry-investigation')).toBe(false);
+        expect(canRunReconciliationAction(status, 'resolve-creation-failed')).toBe(false);
+      }
+    });
+  });
+
+  describe('getActionDisabledReason', () => {
+    it('trả rỗng khi nút đang bật', () => {
+      expect(getActionDisabledReason('reconciliation_required', 'resolve-paid')).toBe('');
+    });
+
+    it('nêu lý do theo trạng thái khoá', () => {
+      expect(getActionDisabledReason('success', 'resolve-paid')).toContain('đã thành công');
+      expect(getActionDisabledReason('refunded', 'resolve-paid')).toContain('hoàn tiền');
+      expect(getActionDisabledReason('creation_failed', 'resolve-paid')).toContain('link thanh toán');
+      expect(getActionDisabledReason('cancelled', 'resolve-cancelled')).toContain('bị huỷ');
+      expect(getActionDisabledReason('expired', 'retry-investigation')).toContain('hết hạn');
+      expect(getActionDisabledReason('unknown', 'resolve-paid')).toContain('Không xác định');
+    });
+
+    it('nêu lý do riêng cho "tạo link thất bại" khi trạng thái khác vẫn cho thao tác', () => {
+      expect(getActionDisabledReason('pending', 'resolve-creation-failed')).toContain(
+        'đang tạo link',
+      );
+    });
+
+    it('báo đang tải khi chưa có trạng thái', () => {
+      expect(getActionDisabledReason(null, 'resolve-paid')).toContain('Đang tải');
     });
   });
 });

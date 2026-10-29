@@ -1,4 +1,5 @@
 import type {
+  ReconciliationActionType,
   TransactionStatus,
   TransactionUserBrief,
 } from '../types/transactions';
@@ -134,6 +135,94 @@ const PLAN_KIND_LABELS: Record<number, string> = {
 export const getPlanKindLabel = (planKind?: number | null): string => {
   if (planKind === undefined || planKind === null) return '—';
   return PLAN_KIND_LABELS[planKind] ?? '—';
+};
+
+/**
+ * Trạng thái nào được phép bắt đầu thao tác nào — bản sao của ma trận ở backend
+ * (`payment_resolution_uc.go`). Backend là nguồn chân lý; bảng này chỉ để nút
+ * hiển thị đúng, vì curl không đi qua nút bị disable.
+ *
+ * Lý do các trạng thái bị chặn:
+ * - `refunded`: đã hoàn tiền vào ví; xác nhận thanh toán lần nữa sẽ cấp quyền 2 lần.
+ * - `creation_failed`: chưa từng có link thanh toán nên không thể có tiền về.
+ * - `cancelled`/`expired`/`failed_legacy`: chỉ còn "đã thanh toán" là đường cứu
+ *   tiền về muộn; huỷ lại/gửi đối soát lại là vô nghĩa.
+ * - `success`: xong rồi. `unknown`: dữ liệu sửa tay, không thao tác.
+ */
+const RECONCILIATION_ACTIONS_BY_STATUS: Record<
+  TransactionStatus,
+  ReconciliationActionType[]
+> = {
+  pending: ['resolve-paid', 'resolve-cancelled', 'retry-investigation'],
+  creating: [
+    'resolve-paid',
+    'resolve-cancelled',
+    'retry-investigation',
+    'resolve-creation-failed',
+  ],
+  reconciling: ['resolve-paid', 'resolve-cancelled', 'retry-investigation'],
+  reconciliation_required: [
+    'resolve-paid',
+    'resolve-cancelled',
+    'retry-investigation',
+    'resolve-creation-failed',
+  ],
+  investigation_required: [
+    'resolve-paid',
+    'resolve-cancelled',
+    'retry-investigation',
+    'resolve-creation-failed',
+  ],
+  cancelled: ['resolve-paid'],
+  expired: ['resolve-paid'],
+  failed_legacy: ['resolve-paid'],
+  creation_failed: [],
+  refunded: [],
+  success: [],
+  unknown: [],
+};
+
+export const getAllowedReconciliationActions = (
+  status?: string | null,
+): ReconciliationActionType[] => {
+  if (!status) return [];
+  return RECONCILIATION_ACTIONS_BY_STATUS[status as TransactionStatus] ?? [];
+};
+
+export const canRunReconciliationAction = (
+  status: string | null | undefined,
+  action: ReconciliationActionType,
+): boolean => getAllowedReconciliationActions(status).includes(action);
+
+/** Lý do một trạng thái khoá toàn bộ 4 nút (rỗng khi trạng thái không khoá gì). */
+const STATUS_BLOCK_REASONS: Partial<Record<TransactionStatus, string>> = {
+  success: 'Giao dịch đã thành công.',
+  refunded: 'Giao dịch đã được hoàn tiền — xác nhận thanh toán lại sẽ cấp quyền lần hai.',
+  creation_failed: 'Giao dịch chưa từng tạo được link thanh toán nên không thể có tiền về.',
+  cancelled: 'Giao dịch đã bị huỷ.',
+  expired: 'Giao dịch đã hết hạn thanh toán.',
+  failed_legacy: 'Giao dịch thất bại theo luồng cũ.',
+  unknown: 'Không xác định được trạng thái giao dịch.',
+};
+
+/**
+ * Tooltip cho nút đang bị disable. Chỉ nên gọi khi `canRunReconciliationAction`
+ * trả `false`; nếu nút đang bật thì trả chuỗi rỗng.
+ */
+export const getActionDisabledReason = (
+  status: string | null | undefined,
+  action: ReconciliationActionType,
+): string => {
+  if (!status) return 'Đang tải thông tin giao dịch.';
+  if (canRunReconciliationAction(status, action)) return '';
+
+  const statusReason = STATUS_BLOCK_REASONS[status as TransactionStatus];
+  if (statusReason) return statusReason;
+
+  if (action === 'resolve-creation-failed') {
+    return 'Chỉ áp dụng cho giao dịch đang tạo link, cần đối soát hoặc cần điều tra.';
+  }
+  return 'Không áp dụng cho trạng thái hiện tại.';
 };
 
 export { formatVND } from './dashboard';

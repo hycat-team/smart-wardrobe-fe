@@ -224,6 +224,11 @@ export function TransactionsClient() {
 
       {/* Reconciliation Confirmation Dialog */}
       <ReconciliationActionDialog
+        // Remount on every open: the dialog owns its form state and is closed by
+        // the parent's setState (not by its own onOpenChange), so without a key the
+        // reason/reference typed for one transaction stayed in the fields for the
+        // next one.
+        key={`${dialogState.actionType ?? 'none'}-${dialogState.orderCode}`}
         isOpen={dialogState.isOpen}
         actionType={dialogState.actionType}
         orderCode={dialogState.orderCode}

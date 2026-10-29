@@ -14,12 +14,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import type { ReconciliationActionType } from '@/features/admin/types/transactions';
 
-export type ReconciliationActionType =
-  | 'resolve-paid'
-  | 'resolve-cancelled'
-  | 'resolve-creation-failed'
-  | 'retry-investigation';
+// Re-exported so the existing imports from this module keep working: the type
+// moved to the shared transaction types because `utils/transactions.ts` owns the
+// status matrix, and a util must not import from a component.
+export type { ReconciliationActionType };
 
 interface DialogConfig {
   title: string;

@@ -65,9 +65,11 @@ Loại bỏ hoàn toàn cơ chế `normalizeDashboardFilters` tự động thay 
   2. Bấm xác nhận -> thực hiện Mutation POST.
   3. Khi thành công: Đóng dialog -> Toast `message` thành công -> Gọi ngay `invalidateQueries(['admin-transactions'])` và refetch `['admin-transactions', 'detail', id]`.
   4. Nếu sau khi refetch trạng thái chưa đổi (do ghi bất đồng bộ phía backend), hẹn giờ 1000ms refetch lại 1 lần cuối.
-- Điều kiện bật/tắt nút hành động ở client:
-  - `resolve-paid`, `resolve-cancelled`, `retry-investigation`: Chỉ hiển thị/bật khi `status !== 'success'`.
-  - `resolve-creation-failed`: Chỉ hiển thị/bật khi `status ∈ { 'creating', 'reconciliation_required', 'investigation_required' }`.
+- Điều kiện bật/tắt nút hành động ở client (khớp ma trận BE trong `payment_resolution_uc.go`):
+  - `pending`, `creating`, `reconciling`, `reconciliation_required`, `investigation_required`: bật paid + cancelled + retry; riêng `resolve-creation-failed` chỉ bật với `creating`/`reconciliation_required`/`investigation_required`.
+  - `cancelled`, `expired`, `failed_legacy`: chỉ bật `resolve-paid` (cứu tiền về muộn).
+  - `creation_failed`, `refunded`, `success`, `unknown`: khoá cả 4 nút.
+  - Nút bị khoá kèm tooltip nêu lý do; backend trả 400 nếu gọi vượt ma trận.
 
 ---
 

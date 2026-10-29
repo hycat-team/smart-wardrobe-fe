@@ -26,12 +26,24 @@ import {
   formatVNDateTime,
 } from '@/features/admin/utils/dashboard';
 import {
+  canRunReconciliationAction,
+  getActionDisabledReason,
   getPlanKindLabel,
   getTransactionStatusConfig,
   getTransactionTypeLabel,
   getUserDisplayName,
 } from '@/features/admin/utils/transactions';
 import type { ReconciliationActionType } from './ReconciliationActionDialog';
+
+/**
+ * Placeholder cho ô luôn hiển thị nhưng chưa có giá trị ("Chưa có…" in nghiêng,
+ * xám mờ). Dùng cho các ô cặp để bố cục không nhảy giữa các giao dịch; không
+ * dùng cho "Lý do thất bại" (khung đỏ, nghĩa là có lỗi) hay "Gói mục tiêu" của
+ * giao dịch nạp ví (không áp dụng).
+ */
+function EmptyValue() {
+  return <p className="mt-1 text-xs italic text-muted-foreground/60">Chưa có…</p>;
+}
 
 export function TransactionDetailModal({
   transaction,
@@ -66,15 +78,17 @@ export function TransactionDetailModal({
   // into the copy handler's closure.
   const targetPlanId = transaction?.targetPlanId ?? null;
 
-  const isSuccess = transaction?.status === 'success';
-  const canResolvePaid = Boolean(transaction && !isSuccess);
-  const canResolveCancelled = Boolean(transaction && !isSuccess);
-  const canRetryInvestigation = Boolean(transaction && !isSuccess);
-  const canResolveCreationFailed = Boolean(
-    transaction &&
-      ['creating', 'reconciliation_required', 'investigation_required'].includes(
-        transaction.status,
-      ),
+  // Enable/disable comes from ONE table shared with the util tests, mirroring the
+  // backend matrix. The previous rule ("anything but success") lit up actions that
+  // are destructive (paying a refunded transaction again) or meaningless
+  // (cancelling an already cancelled one).
+  const status = transaction?.status;
+  const canResolvePaid = canRunReconciliationAction(status, 'resolve-paid');
+  const canResolveCancelled = canRunReconciliationAction(status, 'resolve-cancelled');
+  const canRetryInvestigation = canRunReconciliationAction(status, 'retry-investigation');
+  const canResolveCreationFailed = canRunReconciliationAction(
+    status,
+    'resolve-creation-failed',
   );
 
   return (
@@ -104,37 +118,61 @@ export function TransactionDetailModal({
         ) : (
           <div className="space-y-5 py-2 text-xs">
             {/* Header Highlight Card */}
-            <div className="flex items-center justify-between rounded-2xl border border-border bg-muted/40 p-4">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Số tiền thanh toán
-                </p>
-                <p className="mt-1 text-2xl font-bold text-foreground">
-                  {formatVND(transaction.amount)}
-                </p>
-                <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  Loại: <span className="font-medium text-foreground">{getTransactionTypeLabel(transaction.transactionType)}</span>
-                </p>
+            <div className="rounded-2xl border border-border bg-muted/40 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Số tiền thanh toán
+                  </p>
+                  <p className="mt-1 text-2xl font-bold text-foreground">
+                    {formatVND(transaction.amount)}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    Loại: <span className="font-medium text-foreground">{getTransactionTypeLabel(transaction.transactionType)}</span>
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-end gap-1.5">
+                  <Badge
+                    variant={statusConfig?.variant || 'outline'}
+                    className={`px-3 py-1 text-xs font-semibold ${statusConfig?.className}`}
+                  >
+                    {statusConfig?.label}
+                  </Badge>
+                  {transaction.paymentUrl && (
+                    <a
+                      href={transaction.paymentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
+                    >
+                      Mở cổng PayOS
+                      <ExternalLink className="size-3" />
+                    </a>
+                  )}
+                </div>
               </div>
 
-              <div className="flex flex-col items-end gap-1.5">
-                <Badge
-                  variant={statusConfig?.variant || 'outline'}
-                  className={`px-3 py-1 text-xs font-semibold ${statusConfig?.className}`}
+              {/* UUID lives here, not in the grid: as a half-width grid cell it left
+                  an empty half-row beside it, and the full string is too long to
+                  truncate. `break-all` keeps every character readable and copyable. */}
+              <div className="mt-3 flex items-start justify-between gap-2 border-t border-border/60 pt-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Mã giao dịch (UUID)
+                  </p>
+                  <p className="mt-0.5 break-all font-mono text-[11px] text-foreground">
+                    {transaction.id}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(transaction.id, 'mã giao dịch')}
+                  className="shrink-0 text-muted-foreground hover:text-foreground"
+                  title="Sao chép mã giao dịch"
                 >
-                  {statusConfig?.label}
-                </Badge>
-                {transaction.paymentUrl && (
-                  <a
-                    href={transaction.paymentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
-                  >
-                    Mở cổng PayOS
-                    <ExternalLink className="size-3" />
-                  </a>
-                )}
+                  <Copy className="size-3.5" />
+                </button>
               </div>
             </div>
 
@@ -194,23 +232,6 @@ export function TransactionDetailModal({
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Mã giao dịch (UUID)
-                </p>
-                <div className="mt-1 flex items-center justify-between">
-                  <span className="truncate font-mono text-xs">{transaction.id}</span>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard(transaction.id, 'mã giao dịch')}
-                    className="ml-1 text-muted-foreground hover:text-foreground"
-                    title="Sao chép"
-                  >
-                    <Copy className="size-3.5" />
-                  </button>
-                </div>
-              </div>
-
               {/* Target plan: hidden for a wallet top-up, which names no plan. */}
               {targetPlanId && (
                 <div className="col-span-2 rounded-xl border border-border p-3">
@@ -258,27 +279,34 @@ export function TransactionDetailModal({
                 </div>
               )}
 
-              {transaction.reference && (
-                <div className="rounded-xl border border-border p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Mã tham chiếu đối tác
-                  </p>
+              {/* The four paired cards below ALWAYS render. Missing values answer
+                  "Chưa có…" so the layout does not shift between transactions and an
+                  operator can tell "not there yet" apart from "not loaded". */}
+              <div className="rounded-xl border border-border p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Mã tham chiếu đối tác
+                </p>
+                {transaction.reference ? (
                   <p className="mt-1 font-mono text-xs font-semibold text-foreground">
                     {transaction.reference}
                   </p>
-                </div>
-              )}
+                ) : (
+                  <EmptyValue />
+                )}
+              </div>
 
-              {transaction.paymentLinkId && (
-                <div className="rounded-xl border border-border p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Payment Link ID
-                  </p>
+              <div className="rounded-xl border border-border p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Payment Link ID
+                </p>
+                {transaction.paymentLinkId ? (
                   <p className="mt-1 font-mono text-xs text-foreground">
                     {transaction.paymentLinkId}
                   </p>
-                </div>
-              )}
+                ) : (
+                  <EmptyValue />
+                )}
+              </div>
 
               {transaction.failureReason && (
                 <div className="col-span-2 rounded-xl border border-destructive/30 bg-destructive/5 p-3">
@@ -309,27 +337,31 @@ export function TransactionDetailModal({
                 </p>
               </div>
 
-              {transaction.cancelledAt && (
-                <div className="rounded-xl border border-border p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Thời điểm huỷ
-                  </p>
+              <div className="rounded-xl border border-border p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Thời điểm huỷ
+                </p>
+                {transaction.cancelledAt ? (
                   <p className="mt-1 text-xs text-foreground">
                     {formatVNDateTime(transaction.cancelledAt)}
                   </p>
-                </div>
-              )}
+                ) : (
+                  <EmptyValue />
+                )}
+              </div>
 
-              {transaction.nextReconciliationAt && (
-                <div className="rounded-xl border border-border p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Đối soát tự động kế tiếp
-                  </p>
+              <div className="rounded-xl border border-border p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Đối soát tự động kế tiếp
+                </p>
+                {transaction.nextReconciliationAt ? (
                   <p className="mt-1 text-xs text-foreground">
                     {formatVNDateTime(transaction.nextReconciliationAt)}
                   </p>
-                </div>
-              )}
+                ) : (
+                  <EmptyValue />
+                )}
+              </div>
             </div>
 
             {/* Reconciliation Actions Section */}
@@ -342,61 +374,99 @@ export function TransactionDetailModal({
               </p>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="default"
-                  disabled={!canResolvePaid}
-                  onClick={() =>
-                    onTriggerAction('resolve-paid', transaction.orderCode)
+                {/* Wrapper có title vì <button disabled> không phát sự kiện hover
+                    ở nhiều trình duyệt, nên tooltip gắn trực tiếp lên nút sẽ không hiện. */}
+                <span
+                  className="inline-flex"
+                  title={
+                    canResolvePaid
+                      ? undefined
+                      : getActionDisabledReason(status, 'resolve-paid')
                   }
-                  className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
-                  <CheckCircle className="mr-1.5 size-3.5" />
-                  Xác nhận đã thanh toán
-                </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="default"
+                    disabled={!canResolvePaid}
+                    onClick={() =>
+                      onTriggerAction('resolve-paid', transaction.orderCode)
+                    }
+                    className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                  >
+                    <CheckCircle className="mr-1.5 size-3.5" />
+                    Xác nhận đã thanh toán
+                  </Button>
+                </span>
 
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={!canRetryInvestigation}
-                  onClick={() =>
-                    onTriggerAction('retry-investigation', transaction.orderCode)
+                <span
+                  className="inline-flex"
+                  title={
+                    canRetryInvestigation
+                      ? undefined
+                      : getActionDisabledReason(status, 'retry-investigation')
                   }
-                  className="h-8 text-xs"
                 >
-                  <RotateCcw className="mr-1.5 size-3.5" />
-                  Gửi lại đối soát
-                </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={!canRetryInvestigation}
+                    onClick={() =>
+                      onTriggerAction('retry-investigation', transaction.orderCode)
+                    }
+                    className="h-8 text-xs"
+                  >
+                    <RotateCcw className="mr-1.5 size-3.5" />
+                    Gửi lại đối soát
+                  </Button>
+                </span>
 
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={!canResolveCreationFailed}
-                  onClick={() =>
-                    onTriggerAction('resolve-creation-failed', transaction.orderCode)
+                <span
+                  className="inline-flex"
+                  title={
+                    canResolveCreationFailed
+                      ? undefined
+                      : getActionDisabledReason(status, 'resolve-creation-failed')
                   }
-                  className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/20"
                 >
-                  <AlertTriangle className="mr-1.5 size-3.5" />
-                  Tạo link thất bại
-                </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={!canResolveCreationFailed}
+                    onClick={() =>
+                      onTriggerAction('resolve-creation-failed', transaction.orderCode)
+                    }
+                    className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/20"
+                  >
+                    <AlertTriangle className="mr-1.5 size-3.5" />
+                    Tạo link thất bại
+                  </Button>
+                </span>
 
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={!canResolveCancelled}
-                  onClick={() =>
-                    onTriggerAction('resolve-cancelled', transaction.orderCode)
+                <span
+                  className="inline-flex"
+                  title={
+                    canResolveCancelled
+                      ? undefined
+                      : getActionDisabledReason(status, 'resolve-cancelled')
                   }
-                  className="h-8 text-xs text-destructive hover:bg-destructive/10"
                 >
-                  <Ban className="mr-1.5 size-3.5" />
-                  Hủy giao dịch
-                </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={!canResolveCancelled}
+                    onClick={() =>
+                      onTriggerAction('resolve-cancelled', transaction.orderCode)
+                    }
+                    className="h-8 text-xs text-destructive hover:bg-destructive/10"
+                  >
+                    <Ban className="mr-1.5 size-3.5" />
+                    Hủy giao dịch
+                  </Button>
+                </span>
               </div>
             </div>
           </div>
