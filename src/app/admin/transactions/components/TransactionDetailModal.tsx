@@ -330,15 +330,6 @@ export function TransactionDetailModal({
 
               <div className="rounded-xl border border-border p-3">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Cập nhật lần cuối
-                </p>
-                <p className="mt-1 text-xs text-foreground">
-                  {formatVNDateTime(transaction.updatedAt)}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-border p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Thời điểm huỷ
                 </p>
                 {transaction.cancelledAt ? (
@@ -348,6 +339,15 @@ export function TransactionDetailModal({
                 ) : (
                   <EmptyValue />
                 )}
+              </div>
+
+              <div className="rounded-xl border border-border p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Cập nhật lần cuối
+                </p>
+                <p className="mt-1 text-xs text-foreground">
+                  {formatVNDateTime(transaction.updatedAt)}
+                </p>
               </div>
 
               <div className="rounded-xl border border-border p-3">
