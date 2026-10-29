@@ -15,9 +15,10 @@ function matchesPath(pathname: string, prefix: string) {
  *   trên Client kết hợp cùng Next.js rewrite proxy tới Backend.
  */
 export async function middleware(request: NextRequest) {
-  if (!isBrandFeatureEnabled()) {
-    const pathname = request.nextUrl.pathname;
+  const pathname = request.nextUrl.pathname;
+  const isStaticAsset = /\.[a-z0-9]+$/i.test(pathname);
 
+  if (!isBrandFeatureEnabled() && !isStaticAsset) {
     if (matchesPath(pathname, '/admin/brands')) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }

@@ -45,6 +45,13 @@ describe('brand route blocking', () => {
     expect(response?.headers.get('location')).toBeNull();
   });
 
+  it('serves brand static assets when disabled', async () => {
+    process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES = 'false';
+    const response = await middleware(request('/brand/logo-only.png'));
+    expect(response?.status).toBe(200);
+    expect(response?.headers.get('location')).toBeNull();
+  });
+
   it('does not block brand routes when enabled', async () => {
     process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES = 'true';
     const response = await middleware(request('/brands/demo-brand'));
