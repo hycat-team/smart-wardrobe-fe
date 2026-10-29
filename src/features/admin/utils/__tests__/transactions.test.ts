@@ -1,10 +1,15 @@
 import {
   formatVND,
+  getPlanKindLabel,
   getTransactionStatusConfig,
   getTransactionTypeLabel,
+  getUserDisplayName,
   TRANSACTION_STATUS_OPTIONS,
 } from '../transactions';
-import type { TransactionStatus } from '../../types/transactions';
+import type {
+  TransactionStatus,
+  TransactionUserBrief,
+} from '../../types/transactions';
 
 describe('transactions utils', () => {
   describe('getTransactionStatusConfig', () => {
@@ -69,6 +74,63 @@ describe('transactions utils', () => {
       expect(getTransactionTypeLabel('REFUND')).toBe('REFUND');
       expect(getTransactionTypeLabel('')).toBe('—');
       expect(getTransactionTypeLabel(undefined)).toBe('—');
+    });
+  });
+
+  describe('getUserDisplayName', () => {
+    const baseUser: TransactionUserBrief = {
+      id: 'user-1',
+      username: 'khachhang',
+      email: 'khachhang@example.com',
+      firstName: 'Nguyễn',
+      lastName: 'An',
+    };
+
+    it('ghép họ và tên khi có đủ', () => {
+      expect(getUserDisplayName(baseUser)).toBe('Nguyễn An');
+    });
+
+    it('chỉ có tên thì không để khoảng trắng thừa', () => {
+      expect(getUserDisplayName({ ...baseUser, lastName: null })).toBe('Nguyễn');
+      expect(getUserDisplayName({ ...baseUser, firstName: null, lastName: 'An' })).toBe('An');
+    });
+
+    it('fallback về username khi thiếu họ tên', () => {
+      expect(getUserDisplayName({ ...baseUser, firstName: null, lastName: null })).toBe('khachhang');
+    });
+
+    it('fallback về email khi thiếu cả họ tên và username', () => {
+      expect(
+        getUserDisplayName({ ...baseUser, firstName: null, lastName: null, username: '' }),
+      ).toBe('khachhang@example.com');
+    });
+
+    it('trả null khi không có nhãn người dùng (list item hoặc tài khoản đã xoá)', () => {
+      expect(getUserDisplayName(null)).toBeNull();
+      expect(getUserDisplayName(undefined)).toBeNull();
+      expect(
+        getUserDisplayName({
+          id: 'user-1',
+          username: '',
+          email: null,
+          firstName: null,
+          lastName: null,
+        }),
+      ).toBeNull();
+    });
+  });
+
+  describe('getPlanKindLabel', () => {
+    it('map đúng ba loại gói', () => {
+      expect(getPlanKindLabel(0)).toBe('Miễn phí');
+      expect(getPlanKindLabel(1)).toBe('Có thời hạn');
+      expect(getPlanKindLabel(2)).toBe('Vĩnh viễn');
+    });
+
+    it('fallback "—" cho giá trị lạ hoặc thiếu', () => {
+      expect(getPlanKindLabel(99)).toBe('—');
+      expect(getPlanKindLabel(null)).toBe('—');
+      expect(getPlanKindLabel(undefined)).toBe('—');
     });
   });
 

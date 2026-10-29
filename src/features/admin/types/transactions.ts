@@ -16,6 +16,34 @@ export type TransactionStatus =
 
 export type TransactionType = 'direct_purchase' | 'wallet_topup';
 
+// Buyer label carried by the DETAIL endpoint only (the list answers `user: null`).
+// Mirrors the backend `TransactionUserBriefRes`, which is deliberately narrower
+// than the identity contract: no roleSlug/isDeleted/gender/status/createdAt.
+export interface TransactionUserBrief {
+  id: string;
+  username: string;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  avatarUrl?: string | null;
+}
+
+// Target plan label carried by the DETAIL endpoint only (the list answers
+// `targetPlan: null`). Mirrors backend `SubscriptionPlanBriefRes`.
+export interface TransactionTargetPlanBrief {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  durationDays?: number | null;
+  planKind: number;
+  tierRank: number;
+  maxWardrobeItems?: number;
+  maxOutfits?: number;
+  aiOutfitDailyQuota?: number;
+  aiChatDailyQuota?: number;
+}
+
 export interface DepositTransaction {
   id: string;
   userId: string;
@@ -33,6 +61,10 @@ export interface DepositTransaction {
   nextReconciliationAt?: string | null;
   createdAt: string;
   updatedAt: string;
+  // Detail-only enrichment: present in `GET /transactions/{id}`, always null in
+  // the list. Optional so a list item stays a valid `DepositTransaction`.
+  user?: TransactionUserBrief | null;
+  targetPlan?: TransactionTargetPlanBrief | null;
 }
 
 export interface TransactionQuery {

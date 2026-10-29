@@ -1,4 +1,7 @@
-import type { TransactionStatus } from '../types/transactions';
+import type {
+  TransactionStatus,
+  TransactionUserBrief,
+} from '../types/transactions';
 
 export interface StatusConfig {
   label: string;
@@ -98,6 +101,39 @@ export const getTransactionTypeLabel = (type?: string | null): string => {
   if (type === 'direct_purchase') return 'Mua gói';
   if (type === 'wallet_topup') return 'Nạp ví';
   return type || '—';
+};
+
+/**
+ * Tên hiển thị của người mua trong chi tiết giao dịch.
+ *
+ * Thứ tự ưu tiên: họ + tên → username → email → null. Trả `null` (không phải
+ * chuỗi rỗng) để chỗ gọi tự quyết định hiển thị UUID dự phòng, thay vì render
+ * một dòng trắng trông như lỗi tải dữ liệu.
+ */
+export const getUserDisplayName = (
+  user?: TransactionUserBrief | null,
+): string | null => {
+  if (!user) return null;
+  const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+  if (fullName) return fullName;
+  if (user.username) return user.username;
+  if (user.email) return user.email;
+  return null;
+};
+
+const PLAN_KIND_LABELS: Record<number, string> = {
+  0: 'Miễn phí',
+  1: 'Có thời hạn',
+  2: 'Vĩnh viễn',
+};
+
+/**
+ * Nhãn loại gói. `planKind` là số nguyên trong API (`plankind.PlanKind`), nên
+ * giá trị lạ trả "—" thay vì rơi vào khoảng trắng.
+ */
+export const getPlanKindLabel = (planKind?: number | null): string => {
+  if (planKind === undefined || planKind === null) return '—';
+  return PLAN_KIND_LABELS[planKind] ?? '—';
 };
 
 export { formatVND } from './dashboard';

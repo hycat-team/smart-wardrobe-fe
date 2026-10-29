@@ -2,15 +2,14 @@
 
 import {
   AlertTriangle,
-  ArrowUpRight,
   Ban,
   CheckCircle,
-  Clock,
   Copy,
   ExternalLink,
   RotateCcw,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,8 +26,10 @@ import {
   formatVNDateTime,
 } from '@/features/admin/utils/dashboard';
 import {
+  getPlanKindLabel,
   getTransactionStatusConfig,
   getTransactionTypeLabel,
+  getUserDisplayName,
 } from '@/features/admin/utils/transactions';
 import type { ReconciliationActionType } from './ReconciliationActionDialog';
 
@@ -55,6 +56,15 @@ export function TransactionDetailModal({
   const statusConfig = transaction
     ? getTransactionStatusConfig(transaction.status)
     : null;
+
+  // Detail-only enrichment. The list answers both as null, so every block below
+  // falls back to the raw id rather than assuming a label exists.
+  const buyer = transaction?.user ?? null;
+  const buyerName = getUserDisplayName(buyer);
+  const targetPlan = transaction?.targetPlan ?? null;
+  // A `const` local (not `transaction.targetPlanId`) so the narrowing survives
+  // into the copy handler's closure.
+  const targetPlanId = transaction?.targetPlanId ?? null;
 
   const isSuccess = transaction?.status === 'success';
   const canResolvePaid = Boolean(transaction && !isSuccess);
@@ -130,6 +140,60 @@ export function TransactionDetailModal({
 
             {/* Information Grid */}
             <div className="grid grid-cols-2 gap-3">
+              {/* Buyer: the detail endpoint resolves it; the list answers null. */}
+              <div className="col-span-2 rounded-xl border border-border p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Người dùng
+                </p>
+                <div className="mt-2 flex items-start gap-3">
+                  <Avatar className="size-9 shrink-0">
+                    <AvatarImage
+                      src={buyer?.avatarUrl ?? undefined}
+                      alt={buyerName ?? 'Người dùng'}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="bg-muted text-xs font-semibold text-foreground">
+                      {(buyerName ?? '?').charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="min-w-0 flex-1">
+                    {buyer && buyerName ? (
+                      <>
+                        <p className="truncate text-xs font-semibold text-foreground">
+                          {buyerName}
+                        </p>
+                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
+                          {buyer.username && <span className="truncate">@{buyer.username}</span>}
+                          {buyer.email && <span className="truncate">{buyer.email}</span>}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-[11px] text-muted-foreground">
+                        Không tìm thấy tài khoản (có thể đã xoá). Tra theo User ID bên dưới.
+                      </p>
+                    )}
+
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <span
+                        className="truncate font-mono text-[10px] text-muted-foreground"
+                        title={transaction.userId}
+                      >
+                        {transaction.userId}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(transaction.userId, 'User ID')}
+                        className="shrink-0 text-muted-foreground hover:text-foreground"
+                        title="Sao chép User ID"
+                      >
+                        <Copy className="size-3" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="rounded-xl border border-border p-3">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Mã giao dịch (UUID)
@@ -147,22 +211,52 @@ export function TransactionDetailModal({
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Mã người dùng (User ID)
-                </p>
-                <div className="mt-1 flex items-center justify-between">
-                  <span className="truncate font-mono text-xs">{transaction.userId}</span>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard(transaction.userId, 'User ID')}
-                    className="ml-1 text-muted-foreground hover:text-foreground"
-                    title="Sao chép"
-                  >
-                    <Copy className="size-3.5" />
-                  </button>
+              {/* Target plan: hidden for a wallet top-up, which names no plan. */}
+              {targetPlanId && (
+                <div className="col-span-2 rounded-xl border border-border p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Gói đăng ký mục tiêu
+                  </p>
+                  {targetPlan ? (
+                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="text-xs font-semibold text-foreground">
+                        {targetPlan.name}
+                      </span>
+                      <Badge variant="secondary" className="font-mono text-[10px]">
+                        {targetPlan.slug}
+                      </Badge>
+                      <span className="text-[11px] text-muted-foreground">
+                        {getPlanKindLabel(targetPlan.planKind)}
+                      </span>
+                      {typeof targetPlan.price === 'number' && (
+                        <span className="text-[11px] text-muted-foreground">
+                          · {formatVND(targetPlan.price)}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      Không tìm thấy gói trong danh mục. Tra theo mã bên dưới.
+                    </p>
+                  )}
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span
+                      className="truncate font-mono text-[10px] text-muted-foreground"
+                      title={targetPlanId}
+                    >
+                      {targetPlanId}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(targetPlanId, 'mã gói')}
+                      className="shrink-0 text-muted-foreground hover:text-foreground"
+                      title="Sao chép mã gói"
+                    >
+                      <Copy className="size-3" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {transaction.reference && (
                 <div className="rounded-xl border border-border p-3">
@@ -182,17 +276,6 @@ export function TransactionDetailModal({
                   </p>
                   <p className="mt-1 font-mono text-xs text-foreground">
                     {transaction.paymentLinkId}
-                  </p>
-                </div>
-              )}
-
-              {transaction.targetPlanId && (
-                <div className="rounded-xl border border-border p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Gói đăng ký mục tiêu
-                  </p>
-                  <p className="mt-1 font-mono text-xs text-foreground truncate">
-                    {transaction.targetPlanId}
                   </p>
                 </div>
               )}
