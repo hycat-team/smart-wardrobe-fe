@@ -26,6 +26,7 @@ import { useDailyQuota, useMySubscription } from '@/features/subscription/querie
 import { useWardrobeStats } from '@/features/wardrobe/queries/wardrobe.queries';
 import { CurrentPlanCard } from '@/features/subscription/components/CurrentPlanCard';
 import { ClaimAccountTab } from './ClaimAccountTab';
+import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 import { profileApi } from '@/features/profile/api/profile.api';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import { toast } from 'sonner';
@@ -35,6 +36,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
+  const brandEnabled = isBrandFeatureEnabled();
 
   // Pass initialProfile to useProfile so React Query hydrates it immediately
   const { data: profile } = useProfile(initialProfile);
@@ -369,7 +371,7 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
               </div>
             </div>
           )} */}
-          <ClaimAccountTab />
+          {brandEnabled && <ClaimAccountTab />}
         </TabsContent>
 
         <TabsContent value="wallet" className="animate-in fade-in duration-500 mt-2">
