@@ -21,7 +21,6 @@ const registerSchema = z.object({
   email: z.string().min(1, "Vui lòng nhập email").email("Email không hợp lệ"),
   dateOfBirth: z.string().min(1, "Vui lòng chọn ngày sinh"),
   gender: z.number({ message: "Vui lòng chọn giới tính" }),
-  address: z.string().min(1, "Vui lòng nhập địa chỉ"),
   password: z.string().min(8, "Mật khẩu tối thiểu 8 ký tự"),
   confirmPassword: z.string().min(1, "Vui lòng nhập lại mật khẩu"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -49,7 +48,6 @@ export function RegisterClient() {
       username: "",
       email: "",
       dateOfBirth: "",
-      address: "",
       password: "",
       confirmPassword: "",
     },
@@ -359,17 +357,6 @@ export function RegisterClient() {
               />
               {errors.gender && <p className="text-red-500 text-xs ml-1">{errors.gender.message}</p>}
             </div>
-          </div>
-
-          <div className="flex flex-col gap-2 relative group">
-            <label className="font-inter text-[12px] font-bold text-muted-foreground uppercase tracking-[0.1em] group-focus-within:text-primary transition-colors duration-300 ml-1" htmlFor="address">Địa chỉ</label>
-            <input
-              id="address" placeholder="123 Đường ABC, Quận 1, TP.HCM"
-              {...registerField("address")}
-              onFocus={() => setFocusedInput('address')} onBlur={() => setFocusedInput(null)}
-              className={`w-full block font-inter text-[16px] text-foreground placeholder:text-muted-foreground/60 px-4 py-3 focus:outline-none focus:ring-1 focus:ring-primary border bg-muted/50 transition-all duration-300 rounded-2xl ${focusedInput === 'address' ? 'border-primary' : 'border-border'} ${errors.address ? 'border-red-500' : ''}`}
-            />
-            {errors.address && <p className="text-red-500 text-xs ml-1">{errors.address.message}</p>}
           </div>
 
           <div className="flex flex-col gap-2 relative group">

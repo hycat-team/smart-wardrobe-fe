@@ -13,7 +13,8 @@ export interface RegisterReq {
   firstName: string;
   lastName?: string;
   dateOfBirth: string; // YYYY-MM-DD
-  address: string;
+  /** Optional on the backend (`omitempty`); the registration form no longer collects it. */
+  address?: string;
   gender: Gender;
 }
 
