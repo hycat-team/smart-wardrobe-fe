@@ -272,7 +272,15 @@ function AIStylistContent() {
       router.push('/outfits');
     } catch (error: any) {
       console.error(error);
-      if (!error.isAxiosError) {
+      const status = error?.response?.status;
+      const message: string | undefined = error?.response?.data?.message;
+      const limitBlocked = status === 403 && typeof message === 'string';
+      if (limitBlocked) {
+        toast.error(message!, {
+          description: 'Nâng cấp gói để lưu thêm bộ phối và món đồ.',
+          action: { label: 'Nâng cấp', onClick: () => router.push('/pricing') },
+        });
+      } else if (!error.isAxiosError) {
         toast.error(error.message || 'Không thể lưu bộ phối đồ');
       }
     } finally {
