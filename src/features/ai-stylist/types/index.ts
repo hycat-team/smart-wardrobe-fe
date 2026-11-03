@@ -49,12 +49,36 @@ export interface AIOutfitProduct extends WardrobeItemRes {
   };
 }
 
+export interface AIOutfitSuggestion {
+  role: FashionRole | string;
+  reason: string;
+  fashionItem: {
+    id: string;
+    category?: { id?: string; name?: string; slug?: string };
+    imageUrl?: string;
+    color?: string;
+    colorHex?: string;
+    style?: string;
+  };
+}
+
 export interface AIOutfitRecommendationRes {
+  recommendationId: string;
   title: string;
   explanation: string;
   isFallback: boolean;
   remainingQuota: number;
   items: AIOutfitItem[];
+  suggestions?: AIOutfitSuggestion[];
+}
+
+export interface SubmitRecommendationFeedbackReq {
+  recommendationId: string;
+  action: 'like' | 'dislike' | 'saved';
+}
+
+export interface SubmitRecommendationFeedbackRes {
+  accepted: boolean;
 }
 
 export interface ChatMessage {

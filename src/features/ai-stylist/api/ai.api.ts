@@ -1,6 +1,6 @@
 import api from '@/lib/axios';
 import { APIResponse } from '@/types/api';
-import { AIOutfitRecommendationReq, AIOutfitRecommendationRes, CreateChatSessionReq, ChatSessionRes } from '../types';
+import { AIOutfitRecommendationReq, AIOutfitRecommendationRes, CreateChatSessionReq, ChatSessionRes, SubmitRecommendationFeedbackReq, SubmitRecommendationFeedbackRes } from '../types';
 
 export const aiApi = {
   getOutfitRecommendation: async (data: AIOutfitRecommendationReq): Promise<AIOutfitRecommendationRes> => {
@@ -9,6 +9,18 @@ export const aiApi = {
     const res = await api.post<APIResponse<AIOutfitRecommendationRes>>('/ai/outfit-recommendations', data, {
       timeout: 200000,
     });
+    return res.data.data!;
+  },
+
+  submitRecommendationFeedback: async (
+    data: SubmitRecommendationFeedbackReq
+  ): Promise<SubmitRecommendationFeedbackRes> => {
+    // The snapshot that backs a recommendation expires after 7 days, so a 404 here is normal and the
+    // caller must not block the UI on it.
+    const res = await api.post<APIResponse<SubmitRecommendationFeedbackRes>>(
+      '/ai/outfit-recommendations/feedback',
+      data
+    );
     return res.data.data!;
   },
 

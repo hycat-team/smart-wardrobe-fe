@@ -1,7 +1,8 @@
 'use client';
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Sparkles, Save, RefreshCw, Layers, X } from 'lucide-react';
+import Link from 'next/link';
+import { Sparkles, Save, RefreshCw, Layers, X, ThumbsUp, ThumbsDown, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 import { aiApi } from '@/features/ai-stylist/api/ai.api';
@@ -46,7 +47,7 @@ function AIStylistContent() {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
+  const [feedback, setFeedback] = useState<'like' | 'dislike' | null>(null);  const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
   const [outfitName, setOutfitName] = useState<string>('');
   const brandEnabled = isBrandFeatureEnabled();
 
@@ -250,6 +251,13 @@ function AIStylistContent() {
         })),
       });
 
+      // A light (0.25) extra signal on top of the `wardrobe.outfit.saved` event, on purpose.
+      if (outfitData.recommendationId) {
+        void aiApi
+          .submitRecommendationFeedback({ recommendationId: outfitData.recommendationId, action: 'saved' })
+          .catch(() => undefined);
+      }
+
       router.push('/outfits');
     } catch (error: any) {
       console.error(error);
@@ -259,6 +267,19 @@ function AIStylistContent() {
     } finally {
       setIsSaving(false);
       toast.dismiss('save_outfit');
+    }
+  };
+
+  const sendFeedback = async (action: 'like' | 'dislike') => {
+    if (!outfitData?.recommendationId) return;
+    const next = feedback === action ? null : action;
+    setFeedback(next);
+    if (!next) return;
+    try {
+      await aiApi.submitRecommendationFeedback({ recommendationId: outfitData.recommendationId, action });
+    } catch {
+      setFeedback(null);
+      toast.error('Không gửi được phản hồi');
     }
   };
 
@@ -425,6 +446,74 @@ function AIStylistContent() {
                     &ldquo;{outfitData.explanation}&rdquo;
                   </p>
                 )}
+                <div className="flex items-center gap-2 pt-1">
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Bộ này hợp gu bạn?
+                  </span>
+                  <button
+                    type="button"
+                    aria-label="Thích bộ đồ này"
+                    aria-pressed={feedback === 'like'}
+                    onClick={() => sendFeedback('like')}
+                    className={`inline-flex size-7 items-center justify-center rounded-full border transition-colors ${
+                      feedback === 'like'
+                        ? 'border-[#D9C5B2] bg-[#D9C5B2] text-[#111111]'
+                        : 'border-border text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <ThumbsUp className="size-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Không thích bộ đồ này"
+                    aria-pressed={feedback === 'dislike'}
+                    onClick={() => sendFeedback('dislike')}
+                    className={`inline-flex size-7 items-center justify-center rounded-full border transition-colors ${
+                      feedback === 'dislike'
+                        ? 'border-[#D9C5B2] bg-[#D9C5B2] text-[#111111]'
+                        : 'border-border text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <ThumbsDown className="size-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {outfitData && (outfitData.suggestions?.length ?? 0) > 0 && (
+              <div className="border-b border-border bg-muted/20 p-4 sm:p-5">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Tủ đồ còn thiếu
+                </p>
+                <ul className="mt-3 space-y-3">
+                  {outfitData.suggestions!.map((suggestion) => (
+                    <li key={`${suggestion.role}-${suggestion.fashionItem.id}`} className="flex items-start gap-3">
+                      {suggestion.fashionItem.imageUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={suggestion.fashionItem.imageUrl}
+                          alt={suggestion.fashionItem.style || suggestion.role}
+                          className="size-12 shrink-0 rounded-lg border border-border object-cover"
+                        />
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-semibold uppercase tracking-widest text-foreground">
+                          {suggestion.role}
+                        </p>
+                        <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                          {suggestion.reason}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/wardrobe/explore"
+                  className="mt-3 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-foreground underline underline-offset-4"
+                >
+                  Xem tủ đồ hệ thống
+                  <ArrowUpRight className="size-3" />
+                </Link>
               </div>
             )}
 
