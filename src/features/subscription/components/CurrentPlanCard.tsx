@@ -4,6 +4,7 @@ import React from 'react';
 import { DailyQuota, UserSubscription, WardrobeStats } from '../types';
 import { useToggleAutoRenewMutation } from '../queries/subscription.queries';
 import { Calendar, RefreshCw, Layers, ScanLine, Sparkles, MessageSquare } from 'lucide-react';
+import Link from 'next/link';
 import { formatQuotaItem } from '../utils/quota';
 
 interface CurrentPlanCardProps {
@@ -80,6 +81,20 @@ export const CurrentPlanCard = ({ subscription, quota, stats }: CurrentPlanCardP
                   <span className="block mt-1 text-background/50 lowercase tracking-normal">
                     Hết hạn: {new Date(expiresAtStr).toLocaleDateString('vi-VN')}
                   </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 text-background/70 font-bold text-[12px] uppercase tracking-wider">
+              <Sparkles size={18} className="text-primary shrink-0" />
+              <div className="flex items-center justify-between w-full max-w-[280px]">
+                <span>Đặc quyền cá nhân hoá gu</span>
+                {subscription.personalizationEnabled ? (
+                  <span className="text-background">Đã bật</span>
+                ) : (
+                  <Link href="/pricing" className="text-background underline underline-offset-4">
+                    Nâng cấp
+                  </Link>
                 )}
               </div>
             </div>

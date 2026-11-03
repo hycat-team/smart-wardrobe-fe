@@ -10,6 +10,7 @@ export interface SubscriptionPlan {
   maxOutfits?: number; MaxOutfits?: number;
   aiOutfitDailyQuota?: number; AiOutfitDailyQuota?: number;
   aiChatDailyQuota?: number; AiChatDailyQuota?: number;
+  personalizationEnabled?: boolean;
   features?: string[];
   isActive?: boolean; IsActive?: boolean;
 }
@@ -24,6 +25,7 @@ export interface UserSubscription {
   maxOutfits?: number; MaxOutfits?: number;
   aiOutfitDailyQuota?: number; AiOutfitDailyQuota?: number;
   aiChatDailyQuota?: number; AiChatDailyQuota?: number;
+  personalizationEnabled?: boolean;
   status?: string;
 }
 

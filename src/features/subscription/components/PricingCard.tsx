@@ -104,6 +104,12 @@ export const PricingCard = ({ plan, isPopular, currentPlanSlug }: PricingCardPro
             <span className="w-[6px] h-[6px] rounded-full bg-primary transition-transform duration-300 group-hover/item:scale-[2]"></span>
             <span className="opacity-70">CHAT VỚI AI: <strong className="font-bold opacity-100 text-[12px]">{plan.aiChatDailyQuota || plan.AiChatDailyQuota || '∞'}</strong> LẦN/NGÀY</span>
           </li>
+          {plan.personalizationEnabled && (
+            <li className="flex items-center gap-4 group/item">
+              <span className="w-[6px] h-[6px] rounded-full bg-[#D9C5B2] transition-transform duration-300 group-hover/item:scale-[2]"></span>
+              <span className="opacity-70">CÁ NHÂN HOÁ GU</span>
+            </li>
+          )}
           {plan.features?.map((feature, idx) => (
             <li key={idx} className="flex items-center gap-4 group/item">
               <span className="w-[6px] h-[6px] rounded-full bg-primary transition-transform duration-300 group-hover/item:scale-[2]"></span>
