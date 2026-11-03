@@ -1,7 +1,6 @@
-import { WardrobeItemRes } from '../../wardrobe/types';
-
 export interface SaveOutfitItemReq {
   fashionItemId: string;
+  itemContext?: "user_wardrobe" | "brand_item" | "system_catalog";
   positionX: number;
   positionY: number;
   scale: number;
@@ -13,15 +12,14 @@ export interface SaveOutfitReq {
   description?: string;
   coverImageUrl?: string;
   coverPublicId?: string;
-  status?: number;
   items: SaveOutfitItemReq[];
 }
 
 export interface OutfitItemRes {
   id: string;
   itemContext?: string;
-  wardrobeItem?: WardrobeItemRes;
   fashionItem?: any;
+  isAvailable?: boolean;
   positionX: number;
   positionY: number;
   scale: number;

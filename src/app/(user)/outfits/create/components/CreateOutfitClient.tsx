@@ -130,9 +130,9 @@ function CreateOutfitContent() {
         name: outfitName,
         description: customOccasion || occasion,
         coverImageUrl: coverImageUrl,
-        status: 0, // 0: Tạo thủ công
         items: selectedItems.map((item) => ({
           fashionItemId: item.fashionItem?.id || (item as any).fashionItemId || item.clothingItemId,
+          itemContext: item.itemContext as "user_wardrobe" | "brand_item" | "system_catalog" | undefined,
           positionX: Math.round(item.x || 0),
           positionY: Math.round(item.y || 0),
           scale: (item.scale || 100) / 100,

@@ -22,19 +22,11 @@ export function OutfitCardV2({ outfit, onDelete, index = 0 }: OutfitCardV2Props)
   const itemsInOutfit = outfit.items || [];
   const coverImage =
     outfit.coverImageUrl ||
-    itemsInOutfit[0]?.fashionItem?.imageUrl ||
-    itemsInOutfit[0]?.wardrobeItem?.fashionItem?.imageUrl ||
-    (itemsInOutfit[0]?.wardrobeItem as any)?.imageUrl;
+    itemsInOutfit[0]?.fashionItem?.imageUrl;
 
   // Trích xuất ảnh thumbnail của tối đa 3 món đồ trong bộ phối
   const previewItemImages = itemsInOutfit
-    .map((item) => {
-      return (
-        item.fashionItem?.imageUrl ||
-        item.wardrobeItem?.fashionItem?.imageUrl ||
-        (item.wardrobeItem as any)?.imageUrl
-      );
-    })
+    .map((item) => item.fashionItem?.imageUrl)
     .filter(Boolean)
     .slice(0, 3);
 

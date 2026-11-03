@@ -172,9 +172,9 @@ export function OutfitDetailClient({ outfitId, initialOutfit }: OutfitDetailClie
         name: outfitName,
         description: customOccasion || occasion,
         coverImageUrl: coverImageUrl,
-        status: outfit?.status ?? 0,
         items: selectedItems.map((item) => ({
           fashionItemId: item.fashionItem?.id || (item as any).fashionItemId || item.clothingItemId,
+          itemContext: item.itemContext as "user_wardrobe" | "brand_item" | "system_catalog" | undefined,
           positionX: Math.round(item.x || 0),
           positionY: Math.round(item.y || 0),
           scale: (item.scale || 100) / 100,

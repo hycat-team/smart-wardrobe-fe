@@ -1,14 +1,11 @@
 "use client";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Plus, Sparkles, Shirt, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Plus, Sparkles, Shirt } from "lucide-react";
 import { toast } from "sonner";
 import { useMyOutfits, useDeleteOutfit } from "@/features/outfits/queries/outfits.queries";
 import { OutfitRes as Outfit } from "@/features/outfits/types";
 import { OutfitCardV2 } from "./OutfitCardV2";
-import { OutfitFilterBarV2, OutfitSortOption } from "./OutfitFilterBarV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import {
   Pagination,
@@ -46,42 +43,25 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const filterParam = searchParams.get("filter") || "all";
-  const searchParam = searchParams.get("q") || "";
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
-  
+
   const { data, isLoading, isFetching } = useMyOutfits(pageParam);
-  
+
   const currentData = data || initialData;
   const outfits = currentData?.items || [];
   const metadata = currentData?.metadata;
 
   const deleteOutfitMutation = useDeleteOutfit();
 
-  const [searchInput, setSearchInput] = useState(searchParam);
-  const lastPushedQ = useRef(searchParam);
-
-  const [favorites, setFavorites] = useState<Record<string, boolean>>({});
-  const [sortParam, setSortParam] = useState<OutfitSortOption>("Mới Nhất");
   const [outfitToDelete, setOutfitToDelete] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 220);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Sync Search state with query params ONLY if changed externally
-  useEffect(() => {
-    if (searchParam !== lastPushedQ.current) {
-      setSearchInput(searchParam);
-      lastPushedQ.current = searchParam;
-    }
-  }, [searchParam]);
+  // The list endpoint only supports page/limit and always returns newest first
+  // (ORDER BY created_at DESC), so there is intentionally no client-side
+  // sort/filter/search here.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const updateParams = (newParams: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -95,25 +75,11 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  // Debounced Search effect
   useEffect(() => {
-    const handler = setTimeout(() => {
-      if (searchInput !== searchParam && searchInput !== lastPushedQ.current) {
-        lastPushedQ.current = searchInput;
-        updateParams({ q: searchInput, page: "1" });
-      }
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [searchInput, searchParam]);
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-
-  const toggleFavorite = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setFavorites(prev => ({ ...prev, [id]: !prev[id] }));
-    toast.success("Đã lưu vào bộ sưu tập.");
-  };
+    const handleScroll = () => setIsScrolled(window.scrollY > 220);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleDeleteOutfit = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -131,59 +97,18 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
     }
   };
 
-  const handleFilterChange = (filter: string) => {
-    updateParams({ filter: filter === "all" ? null : filter, page: "1" });
-  };
-
-  const filteredAndSortedOutfits = useMemo(() => {
-    const filtered = outfits.filter((o: Outfit) => {
-      const isFavorite = favorites[o.id] || false;
-      if (filterParam === "ai" && o.status !== 1) return false;
-      if (filterParam === "manual" && o.status !== 0 && o.status !== 2) return false;
-      if (filterParam === "saved" && !isFavorite) return false;
-
-      if (searchParam) {
-        const q = searchParam.toLowerCase();
-        const matchName = o.name?.toLowerCase().includes(q);
-        const matchDesc = o.description?.toLowerCase().includes(q);
-        if (!matchName && !matchDesc) return false;
-      }
-      return true;
-    });
-
-    return filtered.sort((a: Outfit, b: Outfit) => {
-      const dateA = new Date(a.createdAt || 0).getTime();
-      const dateB = new Date(b.createdAt || 0).getTime();
-      return sortParam === "Mới Nhất" ? dateB - dateA : dateA - dateB;
-    });
-  }, [outfits, filterParam, favorites, sortParam, searchParam]);
-
   useGSAP(() => {
-    if (filteredAndSortedOutfits.length > 0 && !isFetching) {
+    if (outfits.length > 0 && !isFetching) {
       gsap.fromTo(
         ".outfit-card",
         { opacity: 0, y: 30 },
         { opacity: 1, y: 0, stagger: 0.05, ease: "power3.out", duration: 0.6, clearProps: "all" }
       );
     }
-  }, { dependencies: [filteredAndSortedOutfits.length, isFetching], scope: containerRef });
+  }, { dependencies: [outfits.length, isFetching], scope: containerRef });
 
   const renderActions = () => (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        updateParams({ q: searchInput, page: "1" });
-      }} className="relative w-full sm:w-[240px]">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
-        <input
-          type="text"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full bg-muted border border-border focus:border-foreground focus:ring-0 pl-10 pr-4 py-3 rounded-xl outline-none transition-all duration-200 font-semibold text-[11px] text-foreground placeholder:text-muted-foreground uppercase tracking-widest"
-          placeholder="TÌM KIẾM..."
-        />
-      </form>
-
       <button
         onClick={() => router.push("/ai-stylist")}
         className="h-11 px-6 border border-border text-foreground font-semibold text-[11px] uppercase tracking-widest hover:border-foreground rounded-full transition-colors duration-200 flex items-center justify-center gap-2"
@@ -203,13 +128,13 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
   return (
     <>
       <div
-        className={cn(
-          "fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          isCollapsed ? "md:left-[88px]" : "md:left-[280px]",
+        className={`fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isCollapsed ? "md:left-[88px]" : "md:left-[280px]"
+        } ${
           isScrolled
             ? "translate-y-0 shadow-sm opacity-100"
-            : "-translate-y-full opacity-0 pointer-events-none",
-        )}
+            : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
       >
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="hidden md:flex items-center gap-2">
@@ -237,15 +162,6 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
             </div>
             {renderActions()}
           </div>
-
-          <OutfitFilterBarV2
-            filterParam={filterParam}
-            onFilterChange={handleFilterChange}
-            sortParam={sortParam}
-            onSortChange={setSortParam}
-            outfits={outfits}
-            totalItems={metadata?.totalItems ?? outfits.length}
-          />
         </div>
 
         {isLoading && !outfits.length ? (
@@ -266,12 +182,12 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
               </div>
             ))}
           </div>
-        ) : filteredAndSortedOutfits.length > 0 ? (
+        ) : outfits.length > 0 ? (
           <div
             ref={gridRef}
-            className={cn("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8 transition-all duration-300", isFetching && "opacity-60 blur-[1px]")}
+            className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-8 transition-all duration-300 ${isFetching ? "opacity-60 blur-[1px]" : ""}`}
           >
-            {filteredAndSortedOutfits.map((outfit: Outfit, index: number) => (
+            {outfits.map((outfit: Outfit, index: number) => (
               <div key={outfit.id} className="outfit-card h-full">
                 <OutfitCardV2
                   outfit={outfit}
@@ -288,29 +204,13 @@ export function OutfitsClient({ initialData }: OutfitsClientProps) {
             </div>
             <div className="space-y-4">
               <h3 className="font-semibold text-3xl text-foreground uppercase tracking-tight">
-                {searchParam
-                  ? "Không tìm thấy"
-                  : filterParam !== "all"
-                    ? "Không có bộ phối"
-                    : "Chưa có bộ phối"}
+                Chưa có bộ phối
               </h3>
               <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground leading-relaxed">
-                {searchParam
-                  ? `Không tìm thấy bộ phối nào phù hợp với từ khóa "${searchParam}".`
-                  : filterParam !== "all"
-                    ? "Không có bộ phối nào phù hợp với bộ lọc hiện tại. Hãy chọn tất cả hoặc tạo bộ phối mới."
-                    : "Kho trang phục của bạn đang trống. Hãy tạo bộ phối mới với AI Stylist hoặc tự phối thủ công."}
+                Kho trang phục của bạn đang trống. Hãy tạo bộ phối mới với AI Stylist hoặc tự phối thủ công.
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              {(filterParam !== "all" || searchParam) && (
-                <button
-                  onClick={() => updateParams({ filter: null, q: null, page: "1" })}
-                  className="h-11 px-8 border border-border text-foreground font-semibold text-[11px] uppercase tracking-widest hover:border-foreground rounded-full transition-colors duration-200"
-                >
-                  Xóa Bộ Lọc
-                </button>
-              )}
               <button
                 onClick={() => router.push("/ai-stylist")}
                 className="h-11 px-6 border border-border text-foreground font-semibold text-[11px] uppercase tracking-widest hover:border-foreground rounded-full transition-colors duration-200 flex items-center justify-center gap-2"
