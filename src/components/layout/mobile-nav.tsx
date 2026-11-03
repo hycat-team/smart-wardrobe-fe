@@ -105,7 +105,7 @@ export function MobileBottomNav() {
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              aria-label="Thêm chức năng thương hiệu"
+              aria-label="Thêm chức năng"
               className={cn(
                 "flex w-full items-center justify-center rounded-xl p-2",
                 moreItems.some((item) => pathname.startsWith(item.path))

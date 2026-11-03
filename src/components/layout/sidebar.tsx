@@ -31,6 +31,7 @@ import {
   type LucideIcon,
   Images,
   ShieldCheck,
+  Palette,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -55,6 +56,7 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: Shirt, label: 'Tủ Quần Áo', path: '/wardrobe' },
   { icon: Sparkles, label: 'AI Phối Đồ', path: '/ai-stylist' },
   { icon: Images, label: 'Trang Phục', path: '/outfits' },
+  { icon: Palette, label: 'Gu Của Tôi', path: '/style-profile' },
   { icon: Store, label: 'Kênh Thương Hiệu', path: '/brand-portal', brand: true },
 ];
 

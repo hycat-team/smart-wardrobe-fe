@@ -105,7 +105,7 @@ describe('brand navigation', () => {
       expect(screen.getByRole('link', { name: label }).getAttribute('href')).toBe(path);
     }
 
-    fireEvent.keyDown(screen.getByRole('button', { name: 'Thêm chức năng thương hiệu' }), { key: 'Enter' });
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Thêm chức năng' }), { key: 'Enter' });
     expect((await screen.findByRole('menuitem', { name: 'Khám Phá' })).getAttribute('href')).toBe('/brands');
     expect(screen.getByRole('menuitem', { name: 'Kênh Thương Hiệu' }).getAttribute('href')).toBe('/brand-portal');
   });
@@ -161,9 +161,10 @@ describe('brand navigation', () => {
       expect(screen.queryByRole('link', { name: 'Kênh Thương Hiệu' })).toBeNull();
     });
 
-    it('hides the More menu when no secondary destinations remain', () => {
+    it('keeps the More menu for non-brand destinations but hides brand ones', () => {
       render(<MobileBottomNav />);
-      expect(screen.queryByRole('button', { name: 'Thêm chức năng thương hiệu' })).toBeNull();
+      // "Gu Của Tôi" is a personalization destination, not a brand one, so the More menu stays.
+      expect(screen.getByRole('button', { name: 'Thêm chức năng' })).toBeTruthy();
       expect(screen.queryByRole('link', { name: 'Khám Phá' })).toBeNull();
       expect(screen.queryByRole('link', { name: 'Kênh Thương Hiệu' })).toBeNull();
     });

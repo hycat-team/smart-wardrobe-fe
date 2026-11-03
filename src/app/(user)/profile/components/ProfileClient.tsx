@@ -169,9 +169,12 @@ export function ProfileClient({ initialProfile }: { initialProfile: UserRes }) {
           <button className="flex-1 md:flex-none h-10 px-6 bg-primary text-white hover:bg-gray-800 rounded-xl text-xs font-mono font-medium transition-all">
             <Link href="/profile/update"> Chỉnh sửa</Link>
           </button>
-          {/* <button className="flex-1 md:flex-none h-10 px-6 bg-secondary text-foreground hover:bg-secondary/80 rounded-xl text-xs font-mono font-medium border border-border transition-all flex items-center justify-center gap-2">
-            <Settings className="size-4" /> Cài đặt
-          </button> */}
+          <Link
+            href="/style-profile"
+            className="flex-1 md:flex-none h-10 px-6 rounded-xl border border-border text-xs font-mono font-medium text-ink hover:border-foreground/40 transition-all flex items-center justify-center"
+          >
+            Gu của tôi
+          </Link>
         </div>
       </div>
 
