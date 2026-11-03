@@ -6,14 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Check, Sparkles } from 'lucide-react';
 import { usePurchaseDirectMutation, usePurchaseWithWalletMutation } from '@/features/billing/queries/billing.queries';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import Link from 'next/link';
 
 interface PricingCardProps {
   plan: SubscriptionPlan;
   isPopular?: boolean;
   currentPlanSlug?: string;
+  /** Guest view (public pricing): purchases require an account, so the CTA links to login instead. */
+  readOnly?: boolean;
 }
 
-export const PricingCard = ({ plan, isPopular, currentPlanSlug }: PricingCardProps) => {
+export const PricingCard = ({ plan, isPopular, currentPlanSlug, readOnly }: PricingCardProps) => {
   const purchaseDirect = usePurchaseDirectMutation();
   const purchaseWallet = usePurchaseWithWalletMutation();
 
@@ -118,7 +121,24 @@ export const PricingCard = ({ plan, isPopular, currentPlanSlug }: PricingCardPro
           ))}
         </ul>
 
-        {!shouldHideButton && (
+        {readOnly && (
+          <div className="mt-auto relative z-20">
+            <Button
+              className={`w-full h-16 rounded-full font-bold text-[11px] uppercase tracking-[0.25em] relative overflow-hidden group/btn ${isPopular
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'bg-transparent text-current border border-current hover:bg-foreground hover:text-background'
+                }`}
+              render={<Link href={`/auth/login?redirect=${encodeURIComponent('/pricing')}`} />}
+            >
+              <span className="relative z-10 flex items-center justify-between w-full px-6">
+                <span>ĐĂNG NHẬP ĐỂ MUA</span>
+                <span className="transform translate-x-4 opacity-0 transition-all duration-300 group-hover/btn:translate-x-0 group-hover/btn:opacity-100">→</span>
+              </span>
+            </Button>
+          </div>
+        )}
+
+        {!readOnly && !shouldHideButton && (
           <div className="mt-auto relative z-20">
             <Dialog>
               <DialogTrigger asChild>

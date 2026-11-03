@@ -409,7 +409,13 @@ export default function WardrobeClient({
                   return;
                 }
                 if (item.isLocked) {
-                  toast.error("Trang phục bị khóa do vượt quá hạn ngạch. Vui lòng nâng cấp gói cước!");
+                  toast.error("Trang phục bị khóa do vượt quá hạn ngạch.", {
+                    description: "Nâng cấp gói để mở khoá toàn bộ tủ đồ.",
+                    action: {
+                      label: "Nâng cấp",
+                      onClick: () => router.push("/pricing"),
+                    },
+                  });
                   return;
                 }
                 if (isProcessing) {

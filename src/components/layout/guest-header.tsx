@@ -95,6 +95,16 @@ export function GuestHeader() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
+            <Link
+              href="/pricing"
+              className={`
+                font-semibold text-[11px] uppercase tracking-[0.2em] transition-all duration-300
+                hover:opacity-100
+                ${scrolled ? "text-white/60 hover:text-white" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]"}
+              `}
+            >
+              Bảng giá
+            </Link>
             {isLoggedIn ? (
               <>
                 {brandEnabled && (
@@ -310,6 +320,9 @@ export function GuestHeader() {
             </MobileNavLink>
             <MobileNavLink href="/ai-stylist" onClick={() => setMobileMenuOpen(false)}>
               AI Stylist
+            </MobileNavLink>
+            <MobileNavLink href="/pricing" onClick={() => setMobileMenuOpen(false)}>
+              Bảng giá
             </MobileNavLink>
             {brandEnabled && (
               <MobileNavLink href="/brand-portal" onClick={() => setMobileMenuOpen(false)}>

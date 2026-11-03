@@ -125,9 +125,20 @@ function AIStylistContent() {
       setAlternativeIndices({});
       setOutfitName(res.title || `Outfit ${new Date().toLocaleDateString('vi-VN')}`);
       toast.success('Đã tạo bộ phối đồ thành công!');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error('Không thể tạo gợi ý phối đồ');
+      const status = error?.response?.status;
+      const message: string | undefined = error?.response?.data?.message;
+      const outOfQuota =
+        status === 400 && typeof message === 'string' && message.toLowerCase().includes('lượt');
+      if (outOfQuota) {
+        toast.error(message!, {
+          description: 'Nâng cấp gói để có thêm lượt phối đồ mỗi ngày.',
+          action: { label: 'Nâng cấp', onClick: () => router.push('/pricing') },
+        });
+      } else {
+        toast.error(message || 'Không thể tạo gợi ý phối đồ');
+      }
     } finally {
       setIsGenerating(false);
     }
