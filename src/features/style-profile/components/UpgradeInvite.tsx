@@ -52,9 +52,6 @@ export function UpgradeInvite({ hasExistingProfile = false }: UpgradeInviteProps
             Xem các gói
             <ArrowRight className="size-3.5" />
           </Link>
-          <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
-            Không tự động trừ tiền
-          </span>
         </div>
       </div>
     </div>

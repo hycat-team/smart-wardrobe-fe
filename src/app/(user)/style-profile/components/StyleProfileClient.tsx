@@ -20,6 +20,8 @@ import { StyleProfile } from '@/features/style-profile/types';
 
 type ListKey = 'styles' | 'excludedStyles';
 
+const SUGGESTION_PAGE_SIZE = 20;
+
 function normalise(value: string) {
   return value.trim().replace(/\s+/g, ' ');
 }
@@ -55,6 +57,7 @@ export function StyleProfileClient({ initialProfile }: { initialProfile?: StyleP
   const [adding, setAdding] = useState<ListKey | null>(null);
   const [draft, setDraft] = useState('');
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [visibleSuggestions, setVisibleSuggestions] = useState(SUGGESTION_PAGE_SIZE);
 
   useEffect(() => {
     if (!profile || hydrated) return;
@@ -316,7 +319,7 @@ export function StyleProfileClient({ initialProfile }: { initialProfile?: StyleP
             </p>
           ) : (
             <ul className="mt-6 divide-y divide-border">
-              {suggestionList.map((item) => {
+              {suggestionList.slice(0, visibleSuggestions).map((item) => {
                 const alreadyPicked = styles.some((value) => sameValue(value, item.value));
                 return (
                   <li key={item.value} className="flex items-center gap-4 py-3.5">
@@ -346,6 +349,17 @@ export function StyleProfileClient({ initialProfile }: { initialProfile?: StyleP
                 );
               })}
             </ul>
+          )}
+
+          {suggestionList.length > visibleSuggestions && (
+            <button
+              type="button"
+              onClick={() => setVisibleSuggestions((current) => current + SUGGESTION_PAGE_SIZE)}
+              className="mt-5 inline-flex h-10 items-center gap-2 rounded-full border border-border px-5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
+            >
+              <Plus className="size-3.5" />
+              Thêm…
+            </button>
           )}
         </section>
       )}
