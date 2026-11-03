@@ -14,9 +14,6 @@ export function PublicFooter() {
             : 'Nền tảng thời trang cá nhân.'}
         </p>
         <div className="flex items-center gap-4">
-          <Button variant="link" className="h-auto p-0 text-sm text-muted-foreground" render={<Link href="/pricing" />}>
-            Bảng giá
-          </Button>
           <Button variant="link" className="h-auto p-0 text-sm text-muted-foreground" render={<Link href="/privacy" />}>
             Chính sách bảo mật
           </Button>

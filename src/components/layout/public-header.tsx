@@ -36,9 +36,6 @@ export function PublicHeader() {
         </Link>
 
         <nav className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" className="rounded-full text-sm" render={<Link href="/pricing" />}>
-            Bảng giá
-          </Button>
           {brandEnabled && (
             <Button variant="ghost" className="rounded-full text-sm" render={<Link href="/brands" />}>
               Thương hiệu
