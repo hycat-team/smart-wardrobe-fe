@@ -47,6 +47,13 @@ export const CurrentPlanCard = ({ subscription, quota, stats }: CurrentPlanCardP
     'BỘ'
   );
 
+  // `stats` is optional; when it is missing (e.g. a caller forgot to fetch it) show "—" instead of a
+  // misleading "0 / max".
+  const wardrobeText = stats ? wardrobeItem.text : '—';
+  const wardrobeWidth = stats ? wardrobeItem.percentage : 0;
+  const outfitText = stats ? outfitItem.text : '—';
+  const outfitWidth = stats ? outfitItem.percentage : 0;
+
   const aiOutfitItem = formatQuotaItem(
     quota.outfitRecommendCount ?? quota.OutfitRecommendCount,
     quota.aiOutfitDailyQuota ?? quota.AiOutfitDailyQuota
@@ -137,12 +144,12 @@ export const CurrentPlanCard = ({ subscription, quota, stats }: CurrentPlanCardP
                 <span className="flex items-center gap-2 text-background/70">
                   <Layers size={14} /> SỨC CHỨA TỦ ĐỒ
                 </span>
-                <span className="font-medium text-background">{wardrobeItem.text}</span>
+                <span className="font-medium text-background">{wardrobeText}</span>
               </div>
               <div className="w-full bg-background/20 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-primary h-full transition-all duration-700 min-w-[4px] rounded-full"
-                  style={{ width: `${wardrobeItem.percentage}%` }}
+                  style={{ width: `${wardrobeWidth}%` }}
                 />
               </div>
             </div>
@@ -153,12 +160,12 @@ export const CurrentPlanCard = ({ subscription, quota, stats }: CurrentPlanCardP
                 <span className="flex items-center gap-2 text-background/70">
                   <ScanLine size={14} /> BỘ PHỐI ĐỒ (OUTFIT)
                 </span>
-                <span className="font-medium text-background">{outfitItem.text}</span>
+                <span className="font-medium text-background">{outfitText}</span>
               </div>
               <div className="w-full bg-background/20 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-primary h-full transition-all duration-700 min-w-[4px] rounded-full"
-                  style={{ width: `${outfitItem.percentage}%` }}
+                  style={{ width: `${outfitWidth}%` }}
                 />
               </div>
             </div>

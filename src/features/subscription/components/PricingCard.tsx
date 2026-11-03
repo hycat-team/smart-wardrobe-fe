@@ -6,17 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Check, Sparkles } from 'lucide-react';
 import { usePurchaseDirectMutation, usePurchaseWithWalletMutation } from '@/features/billing/queries/billing.queries';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import Link from 'next/link';
 
 interface PricingCardProps {
   plan: SubscriptionPlan;
   isPopular?: boolean;
   currentPlanSlug?: string;
-  /** Guest view (public pricing): purchases require an account, so the CTA links to login instead. */
-  readOnly?: boolean;
 }
 
-export const PricingCard = ({ plan, isPopular, currentPlanSlug, readOnly }: PricingCardProps) => {
+export const PricingCard = ({ plan, isPopular, currentPlanSlug }: PricingCardProps) => {
   const purchaseDirect = usePurchaseDirectMutation();
   const purchaseWallet = usePurchaseWithWalletMutation();
 
@@ -65,9 +62,16 @@ export const PricingCard = ({ plan, isPopular, currentPlanSlug, readOnly }: Pric
 
       <div className="flex-1 p-8 md:pl-12 md:pr-10 pt-14 flex flex-col relative z-10">
         <div className="mb-12">
-          <h3 className="text-4xl md:text-5xl italic font-semibold mb-5 tracking-tighter">
-            {plan.name || plan.Name}
-          </h3>
+          <div className="flex flex-wrap items-center gap-3 mb-5">
+            <h3 className="text-4xl md:text-5xl italic font-semibold tracking-tighter">
+              {plan.name || plan.Name}
+            </h3>
+            {isCurrentPlan && (
+              <span className="rounded-full border border-current/30 px-3 py-1 text-[9px] font-bold uppercase tracking-[0.2em]">
+                Đang dùng
+              </span>
+            )}
+          </div>
           <div className="w-12 h-[2px] bg-current/30 mb-6 transition-all duration-700 ease-out group-hover:w-full"></div>
           <p className="font-bold text-[11px] uppercase tracking-[0.15em] leading-loose opacity-60 min-h-[48px]">
             {plan.description || plan.Description || 'Quản lý tủ đồ thông minh mỗi ngày.'}
@@ -92,19 +96,19 @@ export const PricingCard = ({ plan, isPopular, currentPlanSlug, readOnly }: Pric
 
         <ul className="space-y-5 mb-14 flex-1 font-bold text-[11px] uppercase tracking-widest">
           <li className="flex items-center gap-4 group/item">
-            <span className="w-[6px] h-[6px] rounded-full bg-primary transition-transform duration-300 group-hover/item:scale-[2]"></span>
+            <span className="w-[6px] h-[6px] rounded-full bg-current transition-transform duration-300 group-hover/item:scale-[2]"></span>
             <span className="opacity-70">TỐI ĐA <strong className="font-bold opacity-100 text-[12px]">{plan.maxWardrobeItems}</strong> ITEMS</span>
           </li>
           <li className="flex items-center gap-4 group/item">
-            <span className="w-[6px] h-[6px] rounded-full bg-primary transition-transform duration-300 group-hover/item:scale-[2]"></span>
+            <span className="w-[6px] h-[6px] rounded-full bg-current transition-transform duration-300 group-hover/item:scale-[2]"></span>
             <span className="opacity-70">TỐI ĐA <strong className="font-bold opacity-100 text-[12px]">{plan.maxOutfits || plan.MaxOutfits}</strong> BỘ PHỐI ĐỒ</span>
           </li>
           <li className="flex items-center gap-4 group/item">
-            <span className="w-[6px] h-[6px] rounded-full bg-primary transition-transform duration-300 group-hover/item:scale-[2]"></span>
+            <span className="w-[6px] h-[6px] rounded-full bg-current transition-transform duration-300 group-hover/item:scale-[2]"></span>
             <span className="opacity-70">TẠO PHỐI ĐỒ AI: <strong className="font-bold opacity-100 text-[12px]">{plan.aiOutfitDailyQuota || plan.AiOutfitDailyQuota || '∞'}</strong> LẦN/NGÀY</span>
           </li>
           <li className="flex items-center gap-4 group/item">
-            <span className="w-[6px] h-[6px] rounded-full bg-primary transition-transform duration-300 group-hover/item:scale-[2]"></span>
+            <span className="w-[6px] h-[6px] rounded-full bg-current transition-transform duration-300 group-hover/item:scale-[2]"></span>
             <span className="opacity-70">CHAT VỚI AI: <strong className="font-bold opacity-100 text-[12px]">{plan.aiChatDailyQuota || plan.AiChatDailyQuota || '∞'}</strong> LẦN/NGÀY</span>
           </li>
           {plan.personalizationEnabled && (
@@ -115,30 +119,13 @@ export const PricingCard = ({ plan, isPopular, currentPlanSlug, readOnly }: Pric
           )}
           {plan.features?.map((feature, idx) => (
             <li key={idx} className="flex items-center gap-4 group/item">
-              <span className="w-[6px] h-[6px] rounded-full bg-primary transition-transform duration-300 group-hover/item:scale-[2]"></span>
+              <span className="w-[6px] h-[6px] rounded-full bg-current transition-transform duration-300 group-hover/item:scale-[2]"></span>
               <span className="opacity-70">{feature}</span>
             </li>
           ))}
         </ul>
 
-        {readOnly && (
-          <div className="mt-auto relative z-20">
-            <Button
-              className={`w-full h-16 rounded-full font-bold text-[11px] uppercase tracking-[0.25em] relative overflow-hidden group/btn ${isPopular
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'bg-transparent text-current border border-current hover:bg-foreground hover:text-background'
-                }`}
-              render={<Link href={`/auth/login?redirect=${encodeURIComponent('/pricing')}`} />}
-            >
-              <span className="relative z-10 flex items-center justify-between w-full px-6">
-                <span>ĐĂNG NHẬP ĐỂ MUA</span>
-                <span className="transform translate-x-4 opacity-0 transition-all duration-300 group-hover/btn:translate-x-0 group-hover/btn:opacity-100">→</span>
-              </span>
-            </Button>
-          </div>
-        )}
-
-        {!readOnly && !shouldHideButton && (
+        {!shouldHideButton && (
           <div className="mt-auto relative z-20">
             <Dialog>
               <DialogTrigger asChild>
