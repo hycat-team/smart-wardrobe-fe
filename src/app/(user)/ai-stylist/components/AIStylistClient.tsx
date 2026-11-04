@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sparkles, Save, RefreshCw, Layers, X, ThumbsUp, ThumbsDown, ArrowUpRight } from 'lucide-react';
+import { Sparkles, Save, RefreshCw, Layers, X, ThumbsUp, ThumbsDown, ArrowUpRight, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isBrandFeatureEnabled } from '@/lib/brand-feature';
 import { aiApi } from '@/features/ai-stylist/api/ai.api';
@@ -36,6 +36,9 @@ function isGhostItem(item: any): item is GhostItem {
   return item && item.isGhost === true;
 }
 
+type FeedbackStage = 'idle' | 'confirm' | 'submitting' | 'sent';
+type FeedbackAction = 'like' | 'dislike';
+
 function AIStylistContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -47,7 +50,10 @@ function AIStylistContent() {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [feedback, setFeedback] = useState<'like' | 'dislike' | null>(null);  const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
+  const [feedbackStage, setFeedbackStage] = useState<FeedbackStage>('idle');
+  const [pendingFeedback, setPendingFeedback] = useState<FeedbackAction | null>(null);
+  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
+  const [outfitData, setOutfitData] = useState<AIOutfitRecommendationRes | null>(null);
   const [outfitName, setOutfitName] = useState<string>('');
   const brandEnabled = isBrandFeatureEnabled();
 
@@ -108,6 +114,8 @@ function AIStylistContent() {
       setSelectedItems([]);
       setAlternativeIndices({});
       setOutfitName('');
+      setIsExplanationOpen(false);
+      resetFeedback();
 
       const res = await aiApi.getOutfitRecommendation({
         details: safeDetails,
@@ -289,15 +297,33 @@ function AIStylistContent() {
     }
   };
 
-  const sendFeedback = async (action: 'like' | 'dislike') => {
-    if (!outfitData?.recommendationId) return;
-    const next = feedback === action ? null : action;
-    setFeedback(next);
-    if (!next) return;
+  const resetFeedback = () => {
+    setFeedbackStage('idle');
+    setPendingFeedback(null);
+  };
+
+  const requestFeedback = (action: FeedbackAction) => {
+    if (feedbackStage === 'submitting' || feedbackStage === 'sent') return;
+    setPendingFeedback(action);
+    setFeedbackStage('confirm');
+  };
+
+  const cancelFeedback = () => {
+    if (feedbackStage === 'submitting') return;
+    setFeedbackStage('idle');
+    setPendingFeedback(null);
+  };
+
+  const confirmFeedback = async () => {
+    if (!outfitData?.recommendationId || !pendingFeedback) return;
+    const action = pendingFeedback;
+    setFeedbackStage('submitting');
     try {
       await aiApi.submitRecommendationFeedback({ recommendationId: outfitData.recommendationId, action });
+      setPendingFeedback(null);
+      setFeedbackStage('sent');
     } catch {
-      setFeedback(null);
+      resetFeedback();
       toast.error('Không gửi được phản hồi');
     }
   };
@@ -320,6 +346,7 @@ function AIStylistContent() {
                 <OutfitCanvasBoard
                   canvasRef={canvasRef}
                   showTips={false}
+                  autoFit
                   selectedItems={selectedItems}
                   updateScale={updateScale}
                   bringToFront={bringToFront}
@@ -402,6 +429,8 @@ function AIStylistContent() {
                         setOutfitData(null);
                         setSelectedItems([]);
                         setOutfitName('');
+                        setIsExplanationOpen(false);
+                        resetFeedback();
                       }}
                       className="flex-1 sm:flex-none px-4 py-2 border border-border text-foreground font-bold text-[11px] uppercase tracking-wider hover:bg-muted rounded-xl transition-colors flex items-center justify-center gap-1.5"
                     >
@@ -457,44 +486,87 @@ function AIStylistContent() {
                     </span>
                   )}
                 </div>
-                <h4 className="font-semibold text-sm sm:text-base text-foreground tracking-tight">
-                  {outfitData.title}
-                </h4>
-                {outfitData.explanation && (
+                <div className="flex items-start justify-between gap-2">
+                  <h4 className="font-semibold text-sm sm:text-base text-foreground tracking-tight">
+                    {outfitData.title}
+                  </h4>
+                  {outfitData.explanation && (
+                    <button
+                      type="button"
+                      onClick={() => setIsExplanationOpen((open) => !open)}
+                      aria-expanded={isExplanationOpen}
+                      aria-label={isExplanationOpen ? 'Thu gọn lý do gợi ý' : 'Xem lý do gợi ý'}
+                      title={isExplanationOpen ? 'Thu gọn lý do gợi ý' : 'Xem lý do gợi ý'}
+                      className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
+                    >
+                      {isExplanationOpen ? (
+                        <ChevronUp className="size-3.5" />
+                      ) : (
+                        <ChevronDown className="size-3.5" />
+                      )}
+                    </button>
+                  )}
+                </div>
+                {isExplanationOpen && outfitData.explanation && (
                   <p className="text-xs text-muted-foreground leading-relaxed italic border-l-2 border-primary/40 pl-3">
                     &ldquo;{outfitData.explanation}&rdquo;
                   </p>
                 )}
-                <div className="flex items-center gap-2 pt-1">
-                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                    Bộ này hợp gu bạn?
-                  </span>
-                  <button
-                    type="button"
-                    aria-label="Thích bộ đồ này"
-                    aria-pressed={feedback === 'like'}
-                    onClick={() => sendFeedback('like')}
-                    className={`inline-flex size-7 items-center justify-center rounded-full border transition-colors ${
-                      feedback === 'like'
-                        ? 'border-[#D9C5B2] bg-[#D9C5B2] text-[#111111]'
-                        : 'border-border text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <ThumbsUp className="size-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Không thích bộ đồ này"
-                    aria-pressed={feedback === 'dislike'}
-                    onClick={() => sendFeedback('dislike')}
-                    className={`inline-flex size-7 items-center justify-center rounded-full border transition-colors ${
-                      feedback === 'dislike'
-                        ? 'border-[#D9C5B2] bg-[#D9C5B2] text-[#111111]'
-                        : 'border-border text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <ThumbsDown className="size-3.5" />
-                  </button>
+                <div className="flex min-h-7 flex-wrap items-center gap-2 pt-1">
+                  {feedbackStage === 'sent' ? (
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      <Check className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                      Đã ghi nhận phản hồi
+                    </span>
+                  ) : feedbackStage === 'confirm' || feedbackStage === 'submitting' ? (
+                    <>
+                      <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                        {feedbackStage === 'submitting'
+                          ? 'Đang gửi phản hồi…'
+                          : pendingFeedback === 'like'
+                            ? 'Gửi phản hồi “Thích”?'
+                            : 'Gửi phản hồi “Không thích”?'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={confirmFeedback}
+                        disabled={feedbackStage === 'submitting'}
+                        className="inline-flex h-7 items-center rounded-full bg-primary px-3 text-[10px] font-bold uppercase tracking-widest text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+                      >
+                        Gửi
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelFeedback}
+                        disabled={feedbackStage === 'submitting'}
+                        className="inline-flex h-7 items-center rounded-full border border-border px-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+                      >
+                        Huỷ
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                        Bộ này hợp gu bạn?
+                      </span>
+                      <button
+                        type="button"
+                        aria-label="Thích bộ đồ này"
+                        onClick={() => requestFeedback('like')}
+                        className="inline-flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        <ThumbsUp className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Không thích bộ đồ này"
+                        onClick={() => requestFeedback('dislike')}
+                        className="inline-flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        <ThumbsDown className="size-3.5" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )}

@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ZoomIn, ZoomOut, MoveUp, X, RefreshCcw, AlertCircle, Star } from "lucide-react";
 import { CanvasItem } from "@/features/outfits/hooks/useOutfitCanvas";
 import { applyCloudinaryTrim } from "@/lib/cloudinary";
 import { GhostItemBadge } from "@/features/ghost-closet/components/GhostItemBadge";
-import { getItemBoundingBox } from "@/features/ai-stylist/utils/outfit-canvas-layout";
+import {
+  computeCanvasFitScale,
+  getItemBoundingBox,
+} from "@/features/ai-stylist/utils/outfit-canvas-layout";
 
 export interface OutfitCanvasBoardProps {
   canvasRef: React.RefObject<HTMLDivElement | null>;
@@ -19,6 +22,11 @@ export interface OutfitCanvasBoardProps {
   onGhostItemClick?: (item: CanvasItem) => void;
   onBrandItemFeedbackClick?: (item: CanvasItem) => void;
   showTips?: boolean;
+  /**
+   * Tự co toàn bộ bố cục theo khung canvas để không món nào bị cắt viền.
+   * Chỉ bật ở trang AI Stylist; dữ liệu toạ độ lưu vẫn giữ nguyên không gian thiết kế.
+   */
+  autoFit?: boolean;
 }
 
 export function OutfitCanvasBoard({
@@ -34,9 +42,42 @@ export function OutfitCanvasBoard({
   onGhostItemClick,
   onBrandItemFeedbackClick,
   showTips = true,
+  autoFit = false,
 }: OutfitCanvasBoardProps) {
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const [fitScale, setFitScale] = useState(1);
+
+  const updateFitScale = useCallback(() => {
+    const node = viewportRef.current;
+    if (!node) return;
+    setFitScale(computeCanvasFitScale(node.clientWidth, node.clientHeight));
+  }, []);
+
+  useEffect(() => {
+    if (!autoFit) return;
+
+    const node = viewportRef.current;
+    if (!node) return;
+
+    updateFitScale();
+
+    if (typeof ResizeObserver === "undefined") return;
+
+    const observer = new ResizeObserver(updateFitScale);
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [autoFit, updateFitScale]);
+
+  // Hệ số hiển thị: 1 với các trang dùng toạ độ tuyệt đối như cũ.
+  const renderScale = autoFit ? fitScale : 1;
+  const dragScale = renderScale > 0 ? renderScale : 1;
+
   return (
-    <div className="flex-1 bg-muted/30 border border-border rounded-xl relative overflow-hidden flex items-center justify-center">
+    <div
+      ref={viewportRef}
+      className="flex-1 bg-muted/30 border border-border rounded-xl relative overflow-hidden flex items-center justify-center"
+    >
       {/* CANVAS REF TARGET FOR HTML-TO-IMAGE */}
       <div
         ref={canvasRef}
@@ -46,16 +87,25 @@ export function OutfitCanvasBoard({
           selectedItems.map(item => {
             const hasAlternatives = item._role && hasAlternativesCheck ? hasAlternativesCheck(item._role) : false;
             const itemBox = getItemBoundingBox(item._role, item.scale || 100, item.category?.slug);
+            const displayX = item.x * renderScale;
+            const displayY = item.y * renderScale;
+            const displayWidth = Math.round(itemBox.width * renderScale);
+            const displayHeight = Math.round(itemBox.height * renderScale);
 
             return (
               <motion.div
                 layout
-                key={item._role || item.id}
+                key={`${item._role || item.id}-${renderScale.toFixed(4)}`}
                 drag
                 dragConstraints={canvasRef}
                 dragMomentum={false}
-                initial={{ x: item.x, y: item.y }}
-                onDragEnd={(e, info) => handleDragEnd(item.id, info)}
+                initial={{ x: displayX, y: displayY }}
+                onDragEnd={(e, info) =>
+                  handleDragEnd(item.id, {
+                    ...info,
+                    offset: { x: info.offset.x / dragScale, y: info.offset.y / dragScale },
+                  })
+                }
                 className="absolute cursor-grab active:cursor-grabbing group"
                 style={{ zIndex: item.zIndex }}
                 whileTap={{ scale: 1.02 }}
@@ -148,8 +198,8 @@ export function OutfitCanvasBoard({
                   <div
                     className="pointer-events-none drop-shadow-xl ring-1 ring-transparent group-hover:ring-black/10 transition-all rounded-sm relative flex items-center justify-center"
                     style={{
-                      width: `${itemBox.width}px`,
-                      height: `${itemBox.height}px`,
+                      width: `${displayWidth}px`,
+                      height: `${displayHeight}px`,
                     }}
                   >
                     <img

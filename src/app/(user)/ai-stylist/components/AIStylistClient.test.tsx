@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { toast } from 'sonner';
 import { AIStylistClient } from './AIStylistClient';
 import { aiApi } from '@/features/ai-stylist/api/ai.api';
 
@@ -7,7 +8,7 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
 jest.mock('@/features/ai-stylist/api/ai.api', () => ({
-  aiApi: { getOutfitRecommendation: jest.fn() },
+  aiApi: { getOutfitRecommendation: jest.fn(), submitRecommendationFeedback: jest.fn() },
 }));
 jest.mock('@/features/outfits/queries/outfits.queries', () => ({
   useCreateOutfit: () => ({ mutateAsync: jest.fn() }),
@@ -120,5 +121,86 @@ describe('AI stylist brand recommendations', () => {
         expect.objectContaining({ includeBrandItems: false }),
       );
     });
+  });
+});
+
+describe('AI stylist recommendation card', () => {
+  const recommendation = {
+    recommendationId: 'rec-1',
+    title: 'Bộ đi làm tối giản',
+    explanation: 'Vì bạn thích phong cách tối giản',
+    items: [],
+  };
+
+  async function generateRecommendation() {
+    render(<AIStylistClient />);
+    fireEvent.click(screen.getByRole('button', { name: 'Đi làm' }));
+    fireEvent.click(screen.getByRole('button', { name: 'TẠO TRANG PHỤC' }));
+    await screen.findByText(recommendation.title);
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    delete process.env.NEXT_PUBLIC_ENABLE_BRAND_FEATURES;
+    (aiApi.getOutfitRecommendation as jest.Mock).mockResolvedValue(recommendation);
+    (aiApi.submitRecommendationFeedback as jest.Mock).mockResolvedValue({ accepted: true });
+  });
+
+  it('keeps the AI explanation collapsed behind a chevron toggle by default', async () => {
+    await generateRecommendation();
+
+    expect(screen.queryByText(/Vì bạn thích phong cách tối giản/)).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Xem lý do gợi ý' }));
+    expect(screen.getByText(/Vì bạn thích phong cách tối giản/)).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Thu gọn lý do gợi ý' }));
+    expect(screen.queryByText(/Vì bạn thích phong cách tối giản/)).toBeNull();
+  });
+
+  it('asks for confirmation before sending feedback and then locks the controls', async () => {
+    await generateRecommendation();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Thích bộ đồ này' }));
+
+    expect(aiApi.submitRecommendationFeedback).not.toHaveBeenCalled();
+    expect(screen.getByText(/Gửi phản hồi/)).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Gửi' }));
+
+    await waitFor(() => {
+      expect(aiApi.submitRecommendationFeedback).toHaveBeenCalledTimes(1);
+      expect(aiApi.submitRecommendationFeedback).toHaveBeenCalledWith({
+        recommendationId: 'rec-1',
+        action: 'like',
+      });
+    });
+
+    expect(await screen.findByText(/Đã ghi nhận phản hồi/)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Thích bộ đồ này' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Không thích bộ đồ này' })).toBeNull();
+  });
+
+  it('cancels feedback without calling the API', async () => {
+    await generateRecommendation();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Không thích bộ đồ này' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Huỷ' }));
+
+    expect(aiApi.submitRecommendationFeedback).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Thích bộ đồ này' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Không thích bộ đồ này' })).toBeTruthy();
+  });
+
+  it('restores the feedback controls when sending fails', async () => {
+    (aiApi.submitRecommendationFeedback as jest.Mock).mockRejectedValueOnce(new Error('network'));
+    await generateRecommendation();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Thích bộ đồ này' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Gửi' }));
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    expect(await screen.findByRole('button', { name: 'Thích bộ đồ này' })).toBeTruthy();
+    expect(screen.queryByText(/Đã ghi nhận phản hồi/)).toBeNull();
   });
 });

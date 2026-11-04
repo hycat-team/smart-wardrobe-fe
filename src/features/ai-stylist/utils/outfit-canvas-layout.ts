@@ -96,6 +96,47 @@ export function getItemBoundingBox(
 }
 
 /**
+ * Không gian thiết kế (design space) mà bảng toạ độ giải phẫu được vẽ trên đó.
+ *
+ * Toạ độ trong ROLE_COORDINATES_* là px tuyệt đối tính từ tâm canvas. Với bộ đầy đủ
+ * (headwear → footwear) và mức FIT tối đa 130%, biên độ thực tế là:
+ * - đỉnh: headwear y=-330 - (112 * 1.3) / 2 ≈ -403
+ * - đáy: footwear y=+295 + (104 * 1.3) / 2 ≈ +363
+ * => cần khoảng 806px chiều cao để không cắt món nào; làm tròn lên 820 và chừa 700px bề ngang.
+ */
+export const CANVAS_DESIGN_BOUNDS = { width: 700, height: 820 } as const;
+
+export interface CanvasFitOptions {
+  /** Lề an toàn quanh bố cục (px). Mặc định 24. */
+  padding?: number;
+  /** Hệ số co nhỏ nhất, tránh món đồ teo không đọc được. Mặc định 0.3. */
+  minScale?: number;
+}
+
+/**
+ * Tính hệ số co để toàn bộ bố cục vừa khung canvas hiện tại.
+ *
+ * Chỉ co, không phóng to (tối đa 1) để ảnh món đồ không bị vỡ. Trả về 1 khi chưa đo
+ * được khung (SSR / frame đầu tiên) để không gây nhảy bố cục.
+ */
+export function computeCanvasFitScale(
+  viewportWidth: number,
+  viewportHeight: number,
+  options: CanvasFitOptions = {}
+): number {
+  const padding = options.padding ?? 24;
+  const minScale = options.minScale ?? 0.3;
+
+  if (!Number.isFinite(viewportWidth) || !Number.isFinite(viewportHeight)) return 1;
+  if (viewportWidth <= 0 || viewportHeight <= 0) return 1;
+
+  const widthScale = (viewportWidth - padding) / CANVAS_DESIGN_BOUNDS.width;
+  const heightScale = (viewportHeight - padding) / CANVAS_DESIGN_BOUNDS.height;
+
+  return Math.min(1, Math.max(minScale, Math.min(widthScale, heightScale)));
+}
+
+/**
  * Chuẩn hóa chuỗi vai trò từ API hoặc danh mục về FashionRole chuẩn
  */
 export function normalizeFashionRole(

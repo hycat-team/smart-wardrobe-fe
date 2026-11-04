@@ -4,6 +4,8 @@ import {
   resolveCanvasOutfitItems,
   swapCanvasItemByRole,
   getItemBoundingBox,
+  computeCanvasFitScale,
+  CANVAS_DESIGN_BOUNDS,
   ROLE_BOUNDING_BOX_RATIOS,
   ROLE_COORDINATES_SEPARATE,
   ROLE_COORDINATES_FULLBODY,
@@ -570,5 +572,45 @@ describe("restoreCanvasOutfitItems - Restoring and Sanitizing Coordinates for Ou
     const restored = restoreCanvasOutfitItems(customPositionItem);
     expect(restored[0].x).toBe(45);
     expect(restored[0].y).toBe(-125);
+  });
+});
+
+describe("computeCanvasFitScale - Auto-fit layout to the canvas viewport", () => {
+  const padding = 24;
+
+  it("keeps the design scale when the viewport is tall enough", () => {
+    expect(computeCanvasFitScale(1200, 1200)).toBe(1);
+  });
+
+  it("shrinks the layout when the viewport height is below the design height", () => {
+    // (560 - 24) / 820 = 0.6536...
+    const scale = computeCanvasFitScale(1000, 560);
+    expect(scale).toBeCloseTo((560 - padding) / CANVAS_DESIGN_BOUNDS.height, 5);
+    expect(scale).toBeLessThan(1);
+  });
+
+  it("shrinks the layout when the viewport width is the limiting dimension", () => {
+    const scale = computeCanvasFitScale(400, 1200);
+    expect(scale).toBeCloseTo((400 - padding) / CANVAS_DESIGN_BOUNDS.width, 5);
+  });
+
+  it("never upscales above 1 so item images stay sharp", () => {
+    expect(computeCanvasFitScale(4000, 4000)).toBe(1);
+  });
+
+  it("clamps to the minimum scale on absurdly small viewports", () => {
+    expect(computeCanvasFitScale(120, 120)).toBe(0.3);
+  });
+
+  it("falls back to 1 before the viewport is measured", () => {
+    expect(computeCanvasFitScale(0, 0)).toBe(1);
+    expect(computeCanvasFitScale(Number.NaN, 600)).toBe(1);
+  });
+
+  it("keeps the full headwear-to-footwear composition inside the design bounds", () => {
+    // Khi vùng canvas hẹp, hệ số fit phải bảo đảm biên độ thiết kế vừa khít.
+    const viewportHeight = 560;
+    const scale = computeCanvasFitScale(1000, viewportHeight);
+    expect(CANVAS_DESIGN_BOUNDS.height * scale).toBeLessThanOrEqual(viewportHeight - padding + 0.001);
   });
 });

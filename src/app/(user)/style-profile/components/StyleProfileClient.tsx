@@ -20,7 +20,7 @@ import { StyleProfile } from '@/features/style-profile/types';
 
 type ListKey = 'styles' | 'excludedStyles';
 
-const SUGGESTION_PAGE_SIZE = 20;
+const SUGGESTION_PAGE_SIZE = 10;
 
 function normalise(value: string) {
   return value.trim().replace(/\s+/g, ' ');
