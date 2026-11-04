@@ -30,10 +30,13 @@ export interface UserSubscriptionRes {
   planId?: string;
   planName?: string;
   planSlug?: string;
+  expiresAt?: string;
+  isAutoRenewEnabled?: boolean;
   maxWardrobeItems?: number;
   maxOutfits?: number;
   aiOutfitDailyQuota?: number;
   aiChatDailyQuota?: number;
+  personalizationEnabled?: boolean;
 }
 
 export interface UserRes {
@@ -57,6 +60,62 @@ export interface UserRes {
 export interface AdminUserListRes {
   items: UserRes[];
   metadata: PaginationMetadata;
+}
+
+/** Raw subscription row (GET /admin/subscriptions?userId=...). */
+export interface AdminUserSubscriptionRecord {
+  userId: string;
+  planId: string;
+  planName: string;
+  planSlug: string;
+  planKind?: number;
+  tierRank?: number;
+  startedAt: string;
+  expiresAt?: string | null;
+  isAutoRenewEnabled: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdminSubscriptionPlan {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  maxWardrobeItems: number;
+  maxOutfits: number;
+  aiOutfitDailyQuota: number;
+  aiChatDailyQuota: number;
+  durationDays?: number | null;
+  planKind?: number;
+  tierRank?: number;
+  isActive: boolean;
+  personalizationEnabled?: boolean;
+}
+
+export interface AdminGrantBatchItem {
+  userIdentifier: string;
+  planSlug: string;
+}
+
+export interface AdminGrantBatchResult {
+  index: number;
+  userIdentifier: string;
+  resolvedUserId?: string;
+  planSlug: string;
+  status: 'success' | 'skipped' | 'error';
+  planName?: string;
+  expiresAt?: string | null;
+  reason?: string;
+  message?: string;
+}
+
+export interface AdminGrantBatchRes {
+  total: number;
+  succeeded: number;
+  skipped: number;
+  failed: number;
+  results: AdminGrantBatchResult[];
 }
 
 export interface UpdateUserStatusReq {

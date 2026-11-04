@@ -1,27 +1,7 @@
 "use client";
-import { useState } from "react";
-import { Search, MoreHorizontal, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -32,168 +12,159 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { useAdminUsers, useUpdateUserStatus } from "@/features/admin/queries/admin.queries";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { isUuid } from "@/features/admin/utils/user-lookup";
+import {
+  UsersToolbar,
+  type RoleFilter,
+  type StatusFilter,
+} from "./UsersToolbar";
+import { UsersTable, type UserDialogMode } from "./UsersTable";
+import { UserDetailDialog } from "./UserDetailDialog";
 
 export function UsersClient() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>("user");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [page, setPage] = useState(1);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<{
+    id: string;
+    mode: UserDialogMode;
+  } | null>(null);
 
-  const { data, isLoading, isError } = useAdminUsers({ page, limit: 10, q: searchTerm });
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  const isSearchingById = isUuid(debouncedSearch);
+
+  const { data, isLoading, isError } = useAdminUsers({
+    page,
+    limit: 10,
+    ...(debouncedSearch
+      ? isSearchingById
+        ? { userId: debouncedSearch }
+        : { q: debouncedSearch }
+      : {}),
+    ...(roleFilter !== "all" ? { roleSlug: roleFilter } : {}),
+    ...(statusFilter !== "all" ? { isActive: statusFilter === "active" } : {}),
+  });
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateUserStatus();
+
+  const users = data?.items ?? [];
+  const metadata = data?.metadata;
 
   const toggleBan = (id: string, currentStatus: number | string) => {
     const isCurrentlyActive = currentStatus === 0 || currentStatus === "ACTIVE";
-    const newStatus = isCurrentlyActive ? 1 : 0;
-    updateStatus({ id, data: { status: newStatus } });
+    updateStatus({ id, data: { status: isCurrentlyActive ? 1 : 0 } });
   };
 
-  const users = data?.items.filter((user: any) => user.roleSlug !== "admin") || [];
+  const openUser = (id: string, mode: UserDialogMode) => {
+    setSelectedUser({ id, mode });
+  };
+
+  const emptyHint =
+    isSearchingById && roleFilter !== "all"
+      ? "Không thấy tài khoản với mã này trong nhóm đang lọc. Thử đổi bộ lọc vai trò sang “Tất cả vai trò”."
+      : undefined;
 
   return (
-    <div className="flex flex-col gap-10 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full pb-24 text-foreground">
-      <div className="flex flex-col gap-8 pt-6 border-b border-border pb-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-4 max-w-2xl">
-            {/* <h1 className="text-5xl md:text-6xl font-semibold font-medium text-foreground leading-[1.1] uppercase">
-              Người dùng
-            </h1> */}
-            <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-[0.1em] max-w-md leading-relaxed border-l-2 border-border pl-4">
-              Quản lý tài khoản và phân quyền truy cập hệ thống.
+    <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 pb-24 pt-6 text-foreground animate-in fade-in duration-500">
+      <div className="flex flex-col gap-6 border-b border-border pb-6">
+        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div className="max-w-2xl space-y-3">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-muted-foreground border-l-2 border-border pl-4 leading-relaxed max-w-md">
+              Quản lý tài khoản, gói hội viên và quyền truy cập hệ thống.
             </p>
-          </div>
-          <div className="flex gap-4 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="TÌM KIẾM TÊN, EMAIL..."
-                value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-                className="h-10 w-full pl-10 pr-4 bg-muted/50 border border-border focus:border-primary focus:ring-1 focus:ring-primary text-[11px] font-semibold uppercase tracking-widest transition-all outline-none rounded-2xl text-foreground placeholder:text-muted-foreground/60 shadow-sm"
-              />
-            </div>
+            {metadata && (
+              <p className="pl-4 text-[10px] uppercase tracking-widest text-muted-foreground">
+                {metadata.totalItems} tài khoản
+              </p>
+            )}
           </div>
         </div>
+
+        <UsersToolbar
+          search={searchTerm}
+          onSearchChange={(value) => {
+            setSearchTerm(value);
+            setPage(1);
+          }}
+          role={roleFilter}
+          onRoleChange={(value) => {
+            setRoleFilter(value);
+            setPage(1);
+          }}
+          status={statusFilter}
+          onStatusChange={(value) => {
+            setStatusFilter(value);
+            setPage(1);
+          }}
+          isSearchingById={isSearchingById}
+        />
       </div>
 
-      <div className="bg-card border border-border shadow-sm p-6 rounded-3xl overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent border-b border-border">
-              <TableHead className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.15em] py-4 h-auto w-[300px]">Tài khoản</TableHead>
-              <TableHead className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.15em] py-4 h-auto">Tên đăng nhập</TableHead>
-              <TableHead className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.15em] py-4 h-auto">Ngày tham gia</TableHead>
-              <TableHead className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.15em] py-4 h-auto">Trạng thái</TableHead>
-              <TableHead className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.15em] text-right py-4 h-auto">Thao tác</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow><TableCell colSpan={5} className="h-32 text-center border-b border-border"><Loader2 className="animate-spin text-muted-foreground mx-auto" /></TableCell></TableRow>
-            ) : isError ? (
-              <TableRow><TableCell colSpan={5} className="h-32 text-center text-foreground font-semibold uppercase text-[11px] border-b border-border">Lỗi tải dữ liệu.</TableCell></TableRow>
-            ) : users.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="h-32 text-center text-muted-foreground font-semibold uppercase text-[11px] tracking-widest border-b border-border">Không có dữ liệu.</TableCell></TableRow>
-            ) : users.map((user: any) => {
-              const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Người dùng';
-              const isActive = user.status === 0 || user.status === "ACTIVE";
+      <div className="overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm">
+        <UsersTable
+          users={users}
+          isLoading={isLoading}
+          isError={isError}
+          isUpdating={isUpdating}
+          emptyHint={emptyHint}
+          onOpenUser={openUser}
+          onToggleStatus={toggleBan}
+        />
 
-              return (
-                <TableRow key={user.id} className={cn("border-b border-border hover:bg-muted/50 transition-colors", !isActive && "opacity-60")}>
-                  <TableCell className="py-5">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="size-10 shrink-0">
-                        <AvatarImage src={user.avatarUrl || undefined} alt={displayName} className="object-cover" />
-                        <AvatarFallback className="font-semibold text-base text-foreground bg-muted">
-                          {displayName.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col overflow-hidden">
-                        <span className="font-semibold font-medium text-base text-foreground truncate">{displayName}</span>
-                        <span className="font-semibold text-[10px] text-muted-foreground truncate uppercase tracking-wider mt-0.5">{user.email}</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-semibold text-[12px] text-muted-foreground py-5">{user.username}</TableCell>
-                  <TableCell className="font-semibold text-[12px] text-muted-foreground py-5">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A'}
-                  </TableCell>
-                  <TableCell className="py-5">
-                    <span className={cn("font-semibold text-[10px] uppercase tracking-widest font-medium border px-3 py-1 rounded-full", isActive ? "text-foreground border-foreground bg-foreground/5" : "text-muted-foreground border-border bg-muted/50")}>
-                      {isActive ? "ACTIVE" : "BANNED"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right py-5">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-full h-8 w-8 shadow-sm">
-                          <MoreHorizontal className="size-4" strokeWidth={1.5} />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48 rounded-2xl border border-border bg-card p-2 shadow-lg font-semibold uppercase tracking-widest text-[10px]">
-                        <DropdownMenuItem className="cursor-pointer py-3 px-3 rounded-xl focus:bg-muted/50" onClick={() => setSelectedUser(user)}>
-                          XEM CHI TIẾT
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-black/10" />
-                        <DropdownMenuItem
-                          className="cursor-pointer py-3 px-3 rounded-xl focus:bg-muted/50"
-                          onClick={() => toggleBan(user.id, user.status)}
-                          disabled={isUpdating}
-                        >
-                          {isActive ? "KHÓA TÀI KHOẢN" : "MỞ KHÓA"}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-
-        {data?.metadata && data.metadata.totalPages > 1 && (
-          <Pagination className="mt-16 pb-12">
+        {metadata && metadata.totalPages > 1 && (
+          <Pagination className="mt-12 pb-6">
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
                   href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (page > 1) setPage((p) => p - 1);
+                  onClick={(event) => {
+                    event.preventDefault();
+                    if (page > 1) setPage((current) => current - 1);
                   }}
-                  className={page <= 1 ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest"}
+                  className={
+                    page <= 1
+                      ? "pointer-events-none text-[11px] font-semibold uppercase tracking-widest opacity-50"
+                      : "text-[11px] font-semibold uppercase tracking-widest"
+                  }
                   text="TRƯỚC"
                 />
               </PaginationItem>
 
-              {[...Array(data.metadata.totalPages)].map((_, i) => {
-                const pageNum = i + 1;
+              {[...Array(metadata.totalPages)].map((_, index) => {
+                const pageNumber = index + 1;
                 if (
-                  pageNum === 1 ||
-                  pageNum === data.metadata.totalPages ||
-                  (pageNum >= page - 1 && pageNum <= page + 1)
+                  pageNumber === 1 ||
+                  pageNumber === metadata.totalPages ||
+                  (pageNumber >= page - 1 && pageNumber <= page + 1)
                 ) {
                   return (
-                    <PaginationItem key={pageNum}>
+                    <PaginationItem key={pageNumber}>
                       <PaginationLink
                         href="#"
-                        isActive={page === pageNum}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPage(pageNum);
+                        isActive={page === pageNumber}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          setPage(pageNumber);
                         }}
-                        className="font-semibold text-[11px] uppercase tracking-widest rounded-full border-border"
+                        className="rounded-full border-border text-[11px] font-semibold uppercase tracking-widest"
                       >
-                        {pageNum}
+                        {pageNumber}
                       </PaginationLink>
                     </PaginationItem>
                   );
                 }
 
-                if (pageNum === page - 2 || pageNum === page + 2) {
+                if (pageNumber === page - 2 || pageNumber === page + 2) {
                   return (
-                    <PaginationItem key={pageNum}>
+                    <PaginationItem key={pageNumber}>
                       <PaginationEllipsis />
                     </PaginationItem>
                   );
@@ -205,64 +176,38 @@ export function UsersClient() {
               <PaginationItem>
                 <PaginationNext
                   href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (page < data.metadata.totalPages) setPage((p) => p + 1);
+                  onClick={(event) => {
+                    event.preventDefault();
+                    if (page < metadata.totalPages) setPage((current) => current + 1);
                   }}
-                  className={page >= data.metadata.totalPages ? "pointer-events-none opacity-50 font-semibold text-[11px] uppercase tracking-widest" : "font-semibold text-[11px] uppercase tracking-widest"}
+                  className={
+                    page >= metadata.totalPages
+                      ? "pointer-events-none text-[11px] font-semibold uppercase tracking-widest opacity-50"
+                      : "text-[11px] font-semibold uppercase tracking-widest"
+                  }
                   text="SAU"
                 />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
         )}
+
+        {isUpdating && (
+          <p className="mt-4 flex items-center justify-end gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+            <Loader2 className="size-3.5 animate-spin" />
+            Đang cập nhật
+          </p>
+        )}
       </div>
 
-      <Dialog open={!!selectedUser} onOpenChange={(open) => !open && setSelectedUser(null)}>
-        <DialogContent className="sm:max-w-[500px] rounded-3xl border border-border bg-card p-0 overflow-hidden shadow-xl">
-          {selectedUser && (
-            <div className="flex flex-col">
-              <div className="p-8 border-b border-border flex flex-col items-center gap-6">
-                <Avatar className="size-24 shrink-0">
-                  <AvatarImage src={selectedUser.avatarUrl || undefined} alt={selectedUser.username} className="object-cover" />
-                  <AvatarFallback className="font-semibold text-3xl text-foreground bg-muted">
-                    {(selectedUser.firstName?.[0] || selectedUser.username?.[0] || 'U').toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="text-center space-y-1">
-                  <h3 className="font-semibold text-3xl font-medium text-foreground">
-                    {`${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`.trim() || selectedUser.username || 'Người dùng'}
-                  </h3>
-                  <p className="font-semibold text-[11px] uppercase tracking-widest text-muted-foreground">{selectedUser.email}</p>
-                </div>
-              </div>
-
-              <div className="p-8 grid grid-cols-2 gap-8">
-                <div className="space-y-2">
-                  <p className="font-semibold text-[10px] uppercase tracking-widest text-muted-foreground">USERNAME</p>
-                  <p className="font-semibold text-[12px] text-foreground">{selectedUser.username || 'N/A'}</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="font-semibold text-[10px] uppercase tracking-widest text-muted-foreground">ĐIỆN THOẠI</p>
-                  <p className="font-semibold text-[12px] text-foreground">{selectedUser.phone || 'N/A'}</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="font-semibold text-[10px] uppercase tracking-widest text-muted-foreground">NGÀY THAM GIA</p>
-                  <p className="font-semibold text-[12px] text-foreground">
-                    {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A'}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="font-semibold text-[10px] uppercase tracking-widest text-muted-foreground">TRẠNG THÁI</p>
-                  <span className={cn("inline-block font-semibold text-[10px] uppercase tracking-widest font-medium border px-3 py-1 mt-1 rounded-full", (selectedUser.status === 0 || selectedUser.status === "ACTIVE") ? "text-foreground border-foreground bg-foreground/5" : "text-muted-foreground border-border bg-muted/50")}>
-                    {(selectedUser.status === 0 || selectedUser.status === "ACTIVE") ? "ACTIVE" : "BANNED"}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {selectedUser && (
+        <UserDetailDialog
+          key={`${selectedUser.id}-${selectedUser.mode}`}
+          userId={selectedUser.id}
+          initialMode={selectedUser.mode}
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
     </div>
   );
 }

@@ -2,8 +2,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '../api/admin.api';
 import { toast } from 'sonner';
 import { handleApiError } from '@/lib/api-error';
+import { summarizeGrantResult } from '../utils/subscription';
 
 export const ADMIN_USERS_KEY = ['admin-users'];
+export const ADMIN_USER_DETAIL_KEY = ['admin-user-detail'];
+export const ADMIN_USER_SUBSCRIPTION_KEY = ['admin-user-subscription'];
+export const ADMIN_SUBSCRIPTION_PLANS_KEY = ['admin-subscription-plans'];
 export const ADMIN_POSTS_KEY = ['admin-posts'];
 export const ADMIN_POST_ITEMS_KEY = ['admin-post-items'];
 export const ADMIN_CATALOG_KEY = ['admin-catalog'];
@@ -77,6 +81,65 @@ export const useUpdateUserStatus = () => {
     onError: (error) => {
       handleApiError(error, 'Có lỗi xảy ra khi cập nhật trạng thái');
     }
+  });
+};
+
+export const useAdminUserDetail = (userId: string | null) => {
+  return useQuery({
+    queryKey: [...ADMIN_USER_DETAIL_KEY, userId],
+    queryFn: () => adminApi.getUserDetail(userId as string),
+    enabled: !!userId,
+  });
+};
+
+/** Raw subscription row (start date, real expiry, auto-renew) for one account. */
+export const useAdminUserSubscription = (userId: string | null) => {
+  return useQuery({
+    queryKey: [...ADMIN_USER_SUBSCRIPTION_KEY, userId],
+    queryFn: () => adminApi.getUserSubscription(userId as string),
+    enabled: !!userId,
+  });
+};
+
+export const useAdminSubscriptionPlans = (enabled: boolean) => {
+  return useQuery({
+    queryKey: ADMIN_SUBSCRIPTION_PLANS_KEY,
+    queryFn: () => adminApi.getSubscriptionPlans(),
+    enabled,
+    staleTime: 60_000,
+  });
+};
+
+export const useGrantSubscription = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.grantSubscription,
+    onSuccess: (result, variables) => {
+      const userId = variables.items[0]?.userIdentifier;
+      queryClient.invalidateQueries({ queryKey: ADMIN_USERS_KEY });
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: [...ADMIN_USER_DETAIL_KEY, userId] });
+        queryClient.invalidateQueries({ queryKey: [...ADMIN_USER_SUBSCRIPTION_KEY, userId] });
+      }
+      const summary = summarizeGrantResult(result);
+      if (summary.ok) toast.success(summary.message);
+      else toast.error(summary.message);
+    },
+    onError: (error) => handleApiError(error, 'Cấp gói thất bại'),
+  });
+};
+
+export const useCancelUserSubscription = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: adminApi.cancelUserSubscription,
+    onSuccess: (_data, userId) => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_USERS_KEY });
+      queryClient.invalidateQueries({ queryKey: [...ADMIN_USER_DETAIL_KEY, userId] });
+      queryClient.invalidateQueries({ queryKey: [...ADMIN_USER_SUBSCRIPTION_KEY, userId] });
+      toast.success('Đã huỷ gói hội viên, tài khoản chuyển về gói Free');
+    },
+    onError: (error) => handleApiError(error, 'Huỷ gói thất bại'),
   });
 };
 
