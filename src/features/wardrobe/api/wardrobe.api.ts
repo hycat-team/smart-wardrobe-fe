@@ -101,7 +101,13 @@ export const wardrobeApi = {
         while (true) {
           const { value, done } = await reader.read();
           if (done) {
-            console.log(`[SSE Task ${taskId}] Stream closed by server -> calling onDone`);
+            // Tracing is development-only. `compiler.removeConsole` is not
+            // implemented for Turbopack (the Next 16 default), so the guard lives
+            // in the source: Next inlines NODE_ENV at build time and the whole
+            // branch disappears from the production bundle.
+            if (process.env.NODE_ENV !== 'production') {
+              console.log(`[SSE Task ${taskId}] Stream closed by server -> calling onDone`);
+            }
             onDone();
             break;
           }
@@ -150,7 +156,9 @@ export const wardrobeApi = {
               (parsedData as WardrobeTaskSSEPayload).eventId = eventId;
             }
 
-            console.log(`[SSE Task ${taskId}] Event:`, eventType, 'Data:', parsedData);
+            if (process.env.NODE_ENV !== 'production') {
+              console.log(`[SSE Task ${taskId}] Event:`, eventType, 'Data:', parsedData);
+            }
 
             if (parsedData && typeof parsedData === 'object') {
               if (typeof parsedData.total === 'number') {
@@ -184,7 +192,9 @@ export const wardrobeApi = {
                 (totalItems > 0 && terminalCount >= totalItems) ||
                 (isTerminalStatus && (!totalItems || totalItems <= 1))
               ) {
-                console.log(`[SSE Task ${taskId}] All ${totalItems || terminalCount} items processed.`);
+                if (process.env.NODE_ENV !== 'production') {
+                  console.log(`[SSE Task ${taskId}] All ${totalItems || terminalCount} items processed.`);
+                }
                 onDone();
                 return;
               }
