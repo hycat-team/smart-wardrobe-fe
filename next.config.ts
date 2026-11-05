@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Next's compression middleware wraps proxied responses, and gzip only flushes
+  // when its buffer fills. The SSE stream served through the /api/v1 rewrite
+  // therefore reaches the browser as a stuck gzip stream: the server relayed the
+  // analysis events, but no frame was delivered until the connection closed.
+  // Production is unaffected (nginx/Vercel terminate compression in front of the
+  // app), while local development needs the stream untouched.
+  compress: false,
   images: {
     remotePatterns: [
       {

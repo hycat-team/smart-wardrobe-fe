@@ -76,6 +76,16 @@ export const wardrobeApi = {
         throw new Error(`[Status: ${response.status}] ${errorMessage}`);
       }
 
+      const contentEncoding = response.headers.get('content-encoding');
+      if (contentEncoding && contentEncoding !== 'identity') {
+        // A compressed SSE stream is a broken SSE stream: the compressor buffers
+        // frames until the connection closes. Warn loudly so a misconfigured proxy
+        // is not mistaken for "the backend never sent anything".
+        console.warn(
+          `[SSE Task ${taskId}] Stream is ${contentEncoding}-encoded; a proxy is buffering it and events may never arrive.`,
+        );
+      }
+
       let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
 
       try {
