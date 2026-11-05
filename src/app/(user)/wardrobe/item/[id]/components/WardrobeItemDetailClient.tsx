@@ -31,9 +31,9 @@ import {
   WardrobeItemStatus,
   WardrobeItemRes as WardrobeItem,
 } from "@/features/wardrobe/types";
-import { applyCloudinaryTrim } from "@/lib/cloudinary";
+import { ItemImage } from "@/components/media/ItemImage";
+import { deriveOriginalImageCandidates } from "@/lib/cloudinary";
 import { getWardrobeItemTitle } from "@/features/wardrobe/utils";
-import Image from "next/image";
 import { isBrandFeatureEnabled } from "@/lib/brand-feature";
 
 interface WardrobeItemDetailClientProps {
@@ -211,11 +211,13 @@ export function WardrobeItemDetailClient({
                 </div>
               )}
 
-              <Image
+              <ItemImage
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl)}
+                src={item.fashionItem?.imageUrl || (item as any).imageUrl || ''}
                 alt={itemName}
+                sourceCandidates={deriveOriginalImageCandidates(item.fashionItem?.imageUrl || (item as any).imageUrl)}
+                retryKey={`${item.status}:${item.fashionItem?.updatedAt ?? ''}`}
                 className="h-full w-full object-contain drop-shadow-sm"
               />
 

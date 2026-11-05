@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ZoomIn, ZoomOut, MoveUp, X, RefreshCcw, AlertCircle, Star } from "lucide-react";
 import { CanvasItem } from "@/features/outfits/hooks/useOutfitCanvas";
-import { applyCloudinaryTrim } from "@/lib/cloudinary";
+import { ItemImage } from "@/components/media/ItemImage";
 import { GhostItemBadge } from "@/features/ghost-closet/components/GhostItemBadge";
 import {
   computeCanvasFitScale,
@@ -202,9 +202,10 @@ export function OutfitCanvasBoard({
                       height: `${displayHeight}px`,
                     }}
                   >
-                    <img
-                      src={item.isGhost ? (item.fashionItem?.imageUrl || item.imageUrl) : applyCloudinaryTrim(item.fashionItem?.imageUrl || item.imageUrl)}
+                    <ItemImage
+                      src={item.fashionItem?.imageUrl || item.imageUrl}
                       alt="Outfit Item"
+                      trim={!item.isGhost}
                       crossOrigin="anonymous"
                       className="max-w-full max-h-full w-auto h-auto object-contain filter drop-shadow-md select-none"
                       draggable={false}

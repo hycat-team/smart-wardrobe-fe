@@ -191,6 +191,12 @@ export interface WardrobeTaskSSEPayload {
   index: number;
   data?: WardrobeItemBriefRes | WardrobeItemRes | any;
   error?: string;
+  /**
+   * Server-assigned SSE event id. The replay buffer returns the original id on
+   * reconnect, so consumers can ignore frames they already applied instead of
+   * flashing a terminal state back to "processing".
+   */
+  eventId?: number;
   // Fallbacks for backward compatibility
   taskId?: string;
   progress?: number;

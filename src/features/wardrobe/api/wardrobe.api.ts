@@ -106,12 +106,16 @@ export const wardrobeApi = {
             if (!frame.trim()) continue;
 
             let eventType = 'message';
+            let eventId: number | undefined;
             const dataLines: string[] = [];
 
             for (const line of frame.split('\n')) {
               const trimmedLine = line.trim();
               if (trimmedLine.startsWith('event:')) {
                 eventType = trimmedLine.slice(6).trim();
+              } else if (trimmedLine.startsWith('id:')) {
+                const parsedId = Number(trimmedLine.slice(3).trim());
+                if (Number.isFinite(parsedId)) eventId = parsedId;
               } else if (trimmedLine.startsWith('data:')) {
                 dataLines.push(trimmedLine.slice(5).trim());
               }
@@ -129,6 +133,12 @@ export const wardrobeApi = {
 
             // Ignore heartbeat / ping
             if (eventType === 'ping') continue;
+
+            if (eventId !== undefined && parsedData && typeof parsedData === 'object') {
+              // Server-assigned id: the same event replayed after a reconnect keeps
+              // its id, so a client can discard frames it already applied.
+              (parsedData as WardrobeTaskSSEPayload).eventId = eventId;
+            }
 
             console.log(`[SSE Task ${taskId}] Event:`, eventType, 'Data:', parsedData);
 

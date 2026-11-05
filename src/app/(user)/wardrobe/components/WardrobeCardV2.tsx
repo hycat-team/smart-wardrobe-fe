@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Sparkles, Eye, Lock, AlertCircle, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { deriveOriginalImageCandidates } from '@/lib/cloudinary';
 import { WardrobeItemStatus, WardrobeItemRes as WardrobeItem } from '@/features/wardrobe/types';
-import { applyCloudinaryTrim } from '@/lib/cloudinary';
+import { ItemImage } from '@/components/media/ItemImage';
 import { isInvalidImageError } from '@/features/wardrobe/utils/analysis-status';
 
 export interface WardrobeCardV2Props {
@@ -92,12 +92,19 @@ export function WardrobeCardV2({
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-b from-stone-100/70 via-stone-50/40 to-stone-100/70 dark:from-stone-900/60 dark:via-stone-950/40 dark:to-stone-900/60 p-4 sm:p-5 flex items-center justify-center">
         {/* Ảnh trang phục đã tách nền */}
         <div className="relative w-full h-full">
-          <Image
+          <ItemImage
             fill
             priority={priority}
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             alt={rawTitle}
-            src={applyCloudinaryTrim(fashion?.imageUrl || (item as any).imageUrl || '')}
+            src={fashion?.imageUrl || (item as any).imageUrl || ''}
+            // The background-removal derivative does not exist for the first
+            // 10-25s after upload; the originals do, so show the real photo
+            // instead of an empty frame.
+            sourceCandidates={deriveOriginalImageCandidates(fashion?.imageUrl || (item as any).imageUrl)}
+            // A terminal analysis means the background-removal derivative now
+            // exists: retry the image immediately instead of waiting for an F5.
+            retryKey={`${item.status}:${fashion?.updatedAt ?? ''}`}
             unoptimized
             className={cn(
               'object-contain drop-shadow-md transition-transform duration-500 ease-out will-change-transform',

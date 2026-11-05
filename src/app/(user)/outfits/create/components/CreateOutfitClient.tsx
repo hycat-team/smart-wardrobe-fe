@@ -17,7 +17,8 @@ import { wardrobeApi } from "@/features/wardrobe/api/wardrobe.api";
 import * as htmlToImage from "html-to-image";
 import { useOutfitCanvas } from "@/features/outfits/hooks/useOutfitCanvas";
 import { OutfitCanvasBoard } from "@/features/outfits/components/OutfitCanvasBoard";
-import { uploadToCloudinary, applyCloudinaryTrim } from "@/lib/cloudinary";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { ItemImage } from "@/components/media/ItemImage";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useUserCategories } from "@/features/admin/queries/admin.queries";
@@ -261,7 +262,7 @@ function CreateOutfitContent() {
                               : "border-border hover:border-foreground"
                           )}
                         >
-                          <img src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl)} alt={getWardrobeItemName(item)} className="w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" />
+                          <ItemImage src={item.fashionItem?.imageUrl || (item as any).imageUrl} alt={getWardrobeItemName(item)} className="w-full h-full object-contain p-2 mix-blend-multiply group-hover:scale-105 transition-transform duration-300" />
                           {isSelected && (
                             <div className="absolute inset-0 border-[3px] border-foreground flex flex-col items-end justify-start p-1 pointer-events-none rounded-xl">
                               <div className="bg-foreground size-4 flex items-center justify-center rounded-sm">

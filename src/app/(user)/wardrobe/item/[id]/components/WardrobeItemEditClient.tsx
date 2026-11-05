@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
@@ -10,7 +9,8 @@ import {
   useCategories,
 } from "@/features/wardrobe/queries/wardrobe.queries";
 import { AlertCircle, Loader2, Save } from "lucide-react";
-import { applyCloudinaryTrim } from "@/lib/cloudinary";
+import { ItemImage } from "@/components/media/ItemImage";
+import { deriveOriginalImageCandidates } from "@/lib/cloudinary";
 import {
   UpdateWardrobeItemReq,
   WardrobeItemRes as WardrobeItem,
@@ -129,11 +129,13 @@ export function WardrobeItemEditClient({
         >
           {/* Left Column: Minimal Image Area */}
           <div className="image-frame lg:col-span-5 relative w-full aspect-[3/4] p-8 md:p-12 transition-all duration-200">
-            <Image
-              src={applyCloudinaryTrim(item.fashionItem?.imageUrl || (item as any).imageUrl)}
+            <ItemImage
+              src={item.fashionItem?.imageUrl || (item as any).imageUrl || ''}
               alt="Preview"
               fill
               sizes="(max-width: 1024px) 100vw, 42vw"
+              sourceCandidates={deriveOriginalImageCandidates(item.fashionItem?.imageUrl || (item as any).imageUrl)}
+              retryKey={`${item.status}:${item.fashionItem?.updatedAt ?? ''}`}
               className="object-contain drop-shadow-sm"
             />
             <div className="absolute top-6 left-6 flex flex-col gap-2 z-20">

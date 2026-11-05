@@ -195,3 +195,39 @@ export function applyCloudinaryTrim(url: string | undefined): string {
 
   return url;
 }
+
+/**
+ * Các đuôi ảnh gốc có thể có trên Cloudinary.
+ *
+ * Ảnh trong tủ luôn được nén sang WebP trước khi upload nên `.webp` gần như luôn
+ * đúng; `.png/.jpg/.jpeg` chỉ là lưới an toàn cho trường hợp nén thất bại và file
+ * gốc được đẩy thẳng lên.
+ */
+const ORIGINAL_IMAGE_EXTENSIONS = [".webp", ".png", ".jpg", ".jpeg"] as const;
+
+/**
+ * Suy ra URL ảnh GỐC (chưa xoá nền) từ URL ảnh đã transform `t_bg_remove`.
+ *
+ * Vì sao cần: Cloudinary sinh ảnh derived theo kiểu lazy, mất 10-25s sau upload
+ * và trả `423 Locked` trong lúc chờ. Ảnh gốc thì có sẵn ngay, nhưng account bật
+ * strict transformations nên CHỈ phục vụ đúng phần mở rộng thật của asset —
+ * `/upload/<path>` không đuôi bị 401 ("Transformation / is not allowed"), nên phải
+ * thử lần lượt từng đuôi.
+ *
+ * Trả về [] khi URL không phải Cloudinary hoặc không chứa `t_bg_remove`.
+ */
+export function deriveOriginalImageCandidates(url?: string | null): string[] {
+  if (!url || !url.includes("cloudinary.com") || !url.includes("/upload/t_bg_remove/")) {
+    return [];
+  }
+
+  const withoutTransform = url.replace("/upload/t_bg_remove/", "/upload/");
+
+  // Tách query/hash ra để chỉ thay phần mở rộng của path.
+  const suffixIndex = withoutTransform.search(/[?#]/);
+  const path = suffixIndex === -1 ? withoutTransform : withoutTransform.slice(0, suffixIndex);
+  const suffix = suffixIndex === -1 ? "" : withoutTransform.slice(suffixIndex);
+  const basePath = path.replace(/\.[^./]+$/, "");
+
+  return ORIGINAL_IMAGE_EXTENSIONS.map((extension) => `${basePath}${extension}${suffix}`);
+}
