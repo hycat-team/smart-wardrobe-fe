@@ -181,22 +181,9 @@ export function TransactionsTable({
         </Table>
       </div>
 
-      {/* Tổng theo BỘ LỌC (metadata.totalItems), không phải số dòng của trang
-          hiện tại — nên nó phải hiện cả khi kết quả chỉ có một trang. */}
-      {metadata && (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-2 pt-4">
-          <p className="text-xs text-muted-foreground">
-            Tổng cộng{' '}
-            <span className="font-semibold text-foreground">{metadata.totalItems}</span>{' '}
-            giao dịch
-            {metadata.totalPages > 1 && (
-              <span className="ml-1 text-muted-foreground">
-                · trang {metadata.page}/{metadata.totalPages}
-              </span>
-            )}
-          </p>
-
-          {metadata.totalPages > 1 && (
+      {/* Phân trang ở dưới bảng; tổng số theo bộ lọc nằm ở toolbar phía trên. */}
+      {metadata && metadata.totalPages > 1 && (
+        <div className="flex flex-wrap items-center justify-end gap-3 border-t border-border px-2 pt-4">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
@@ -246,7 +233,6 @@ export function TransactionsTable({
               </PaginationItem>
             </PaginationContent>
           </Pagination>
-          )}
         </div>
       )}
     </div>

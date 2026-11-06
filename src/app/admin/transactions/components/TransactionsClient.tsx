@@ -195,6 +195,7 @@ export function TransactionsClient() {
         fromDate={period.fromDate}
         toDate={period.toDate}
         limit={limitParam}
+        totalItems={listData?.metadata?.totalItems}
         onFilterChange={updateParams}
         onReset={handleReset}
         onRefresh={() => void refetchList()}

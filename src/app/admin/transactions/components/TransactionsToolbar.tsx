@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select';
 import { AdminPeriodNavigator } from '@/features/admin/components/AdminPeriodNavigator';
 import type { PeriodPreset } from '@/features/admin/types/period';
+import { formatNumber } from '@/features/admin/utils/dashboard';
 import {
   TRANSACTION_STATUS_OPTIONS,
   TRANSACTION_TYPE_OPTIONS,
@@ -42,6 +43,7 @@ export function TransactionsToolbar({
   fromDate,
   toDate,
   limit,
+  totalItems,
   onFilterChange,
   onReset,
   onRefresh,
@@ -54,6 +56,8 @@ export function TransactionsToolbar({
   fromDate: string;
   toDate: string;
   limit: number;
+  /** Tổng số giao dịch khớp bộ lọc (metadata.totalItems), hiển thị phía trên bảng. */
+  totalItems?: number;
   onFilterChange: (updates: {
     status?: string | null;
     transactionType?: string | null;
@@ -82,6 +86,15 @@ export function TransactionsToolbar({
             Theo dõi và đối soát thủ công các giao dịch thanh toán gói và nạp ví
             (Giờ Việt Nam).
           </p>
+          {typeof totalItems === 'number' && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Tổng cộng{' '}
+              <span className="font-semibold tabular-nums text-foreground">
+                {formatNumber(totalItems)}
+              </span>{' '}
+              giao dịch khớp bộ lọc
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-2">

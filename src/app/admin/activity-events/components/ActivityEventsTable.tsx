@@ -230,7 +230,7 @@ export function ActivityEventsTable({
         </Table>
       </div>
 
-      {/* Pagination Footer */}
+      {/* Pagination Footer — tổng số theo bộ lọc nằm ở toolbar phía trên. */}
       <div className="flex flex-col gap-4 border-t border-border px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">
           Hiển thị{' '}
@@ -240,9 +240,8 @@ export function ActivityEventsTable({
           đến{' '}
           <span className="font-medium text-foreground">
             {Math.min(currentPage * (metadata?.limit ?? 20), totalItems)}
-          </span>{' '}
-          trong tổng số{' '}
-          <span className="font-medium text-foreground">{totalItems}</span> hoạt động
+          </span>
+          {totalPages > 1 && <> / {totalPages} trang</>}
         </p>
 
         {totalPages > 1 && (

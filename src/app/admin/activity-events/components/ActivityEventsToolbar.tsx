@@ -21,6 +21,7 @@ import {
 import { AdminPeriodNavigator } from '@/features/admin/components/AdminPeriodNavigator';
 import type { PeriodPreset } from '@/features/admin/types/period';
 import { isValidUUID } from '@/features/admin/utils/activity';
+import { formatNumber } from '@/features/admin/utils/dashboard';
 
 // Base UI's Select resolves its trigger label from the `items` prop, not from
 // the SelectItems rendered in the popup. Without these the trigger printed the
@@ -45,6 +46,7 @@ export function ActivityEventsToolbar({
   fromDate,
   toDate,
   limit,
+  totalItems,
   onFilterChange,
   onReset,
   onRefresh,
@@ -57,6 +59,8 @@ export function ActivityEventsToolbar({
   fromDate: string;
   toDate: string;
   limit: number;
+  /** Tổng số hoạt động khớp bộ lọc (metadata.totalItems), hiển thị phía trên bảng. */
+  totalItems?: number;
   onFilterChange: (updates: {
     userId?: string | null;
     activityType?: string | null;
@@ -112,6 +116,15 @@ export function ActivityEventsToolbar({
             Tra cứu nhật ký đăng nhập và làm mới phiên xác thực người dùng theo
             thời gian thực (Giờ Việt Nam).
           </p>
+          {typeof totalItems === 'number' && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Tổng cộng{' '}
+              <span className="font-semibold tabular-nums text-foreground">
+                {formatNumber(totalItems)}
+              </span>{' '}
+              hoạt động khớp bộ lọc
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
