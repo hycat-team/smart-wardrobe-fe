@@ -6,10 +6,12 @@ import {
   DynamicQueryRequest,
 } from '../types';
 import {
+  createDateVN,
   daysAgoVN,
+  getDefaultPeriod,
   getPeriodDateRange as getCommonPeriodDateRange,
   parsePeriodFromParams,
-  startOfMonthVN,
+  parseVNDateParts,
   todayVN,
 } from './period';
 
@@ -34,9 +36,54 @@ export const getPresetDateRange = (
 };
 
 export const getDefaultDashboardDateRange = (now = new Date()) => {
+  const { fromDate, toDate } = getDefaultPeriod(now);
+  return { fromDate, toDate };
+};
+
+/**
+ * Số ngày lịch VN trong kỳ, tính cả hai đầu.
+ */
+export const countPeriodDays = (fromDate: string, toDate: string): number => {
+  const from = parseVNDateParts(fromDate);
+  const to = parseVNDateParts(toDate);
+  const fromD = createDateVN(from.year, from.month, from.day);
+  const toD = createDateVN(to.year, to.month, to.day);
+  return Math.round((toD.getTime() - fromD.getTime()) / 86400000) + 1;
+};
+
+/**
+ * Kỳ dài hơn một quý thì biểu đồ xu hướng gộp theo tháng: 365 điểm ngày trên
+ * một năm là nhiễu, 12 điểm tháng mới đọc được. Backend đã hỗ trợ `month`
+ * (và tự hạ `day` → `month` khi kỳ vượt 730 ngày).
+ */
+export const GRANULARITY_MONTH_THRESHOLD_DAYS = 92;
+
+export const resolveGranularity = (
+  fromDate: string,
+  toDate: string
+): 'day' | 'month' =>
+  countPeriodDays(fromDate, toDate) > GRANULARITY_MONTH_THRESHOLD_DAYS
+    ? 'month'
+    : 'day';
+
+/**
+ * Khoảng ngày để query biểu đồ doanh thu theo tháng: TRỌN NĂM của kỳ đang chọn.
+ *
+ * Biểu đồ nhóm theo tháng ở backend, nên nếu gửi đúng kỳ "Tháng này" thì chỉ có
+ * một cột — vô nghĩa với một biểu đồ chuỗi thời gian. Vì vậy panel doanh thu
+ * luôn lấy từ 01/01 của năm chứa kỳ, kết thúc ở hôm nay (hoặc 31/12 với năm đã
+ * qua). Sàn dữ liệu không áp ở đây: dữ liệu trước mốc đơn giản là không có.
+ */
+export const getRevenueChartRange = (
+  period: { fromDate: string },
+  now = new Date()
+): { fromDate: string; toDate: string } => {
+  const year = String(parseVNDateParts(period.fromDate).year).padStart(4, '0');
+  const yearEnd = `${year}-12-31`;
+  const today = todayVN(now);
   return {
-    fromDate: startOfMonthVN(now),
-    toDate: todayVN(now),
+    fromDate: `${year}-01-01`,
+    toDate: yearEnd < today ? yearEnd : today,
   };
 };
 
@@ -82,7 +129,7 @@ export const buildAdminAnalyticsRequest = (
     fromDate: filters.fromDate,
     toDate: filters.toDate,
   },
-  granularity: 'day',
+  granularity: resolveGranularity(filters.fromDate, filters.toDate),
   compareWithPrevious: false,
 });
 

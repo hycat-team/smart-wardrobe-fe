@@ -22,6 +22,22 @@ import { AdminPeriodNavigator } from '@/features/admin/components/AdminPeriodNav
 import type { PeriodPreset } from '@/features/admin/types/period';
 import { isValidUUID } from '@/features/admin/utils/activity';
 
+// Base UI's Select resolves its trigger label from the `items` prop, not from
+// the SelectItems rendered in the popup. Without these the trigger printed the
+// raw value (`all`, `login`, `20`).
+const ACTIVITY_TYPE_ITEMS = [
+  { value: 'all', label: 'Tất cả hoạt động' },
+  { value: 'login', label: 'Đăng nhập' },
+  { value: 'refresh', label: 'Làm mới phiên' },
+];
+
+const ACTIVITY_LIMIT_ITEMS = [
+  { value: '10', label: '10 / trang' },
+  { value: '20', label: '20 / trang' },
+  { value: '50', label: '50 / trang' },
+  { value: '100', label: '100 / trang' },
+];
+
 export function ActivityEventsToolbar({
   userId,
   activityType,
@@ -168,6 +184,7 @@ export function ActivityEventsToolbar({
 
         {/* Activity Type Dropdown */}
         <Select
+          items={ACTIVITY_TYPE_ITEMS}
           value={activityType || 'all'}
           onValueChange={(val) =>
             onFilterChange({
@@ -176,14 +193,16 @@ export function ActivityEventsToolbar({
             })
           }
         >
-          <SelectTrigger className="h-9 w-full sm:w-[180px] text-xs">
+          <SelectTrigger className="h-9 w-full sm:w-[180px] text-xs" aria-label="Lọc theo loại hoạt động">
             <Filter className="mr-2 size-3.5 text-muted-foreground" />
             <SelectValue placeholder="Tất cả hoạt động" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tất cả hoạt động</SelectItem>
-            <SelectItem value="login">Đăng nhập</SelectItem>
-            <SelectItem value="refresh">Làm mới phiên</SelectItem>
+            {ACTIVITY_TYPE_ITEMS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
@@ -205,17 +224,19 @@ export function ActivityEventsToolbar({
 
         {/* Limit Selector */}
         <Select
+          items={ACTIVITY_LIMIT_ITEMS}
           value={String(limit)}
           onValueChange={(val) => onFilterChange({ limit: Number(val), page: 1 })}
         >
-          <SelectTrigger className="h-9 w-[120px] text-xs">
+          <SelectTrigger className="h-9 w-[130px] text-xs" aria-label="Số bản ghi mỗi trang">
             <SelectValue placeholder="Số bản ghi" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="10">10 / trang</SelectItem>
-            <SelectItem value="20">20 / trang</SelectItem>
-            <SelectItem value="50">50 / trang</SelectItem>
-            <SelectItem value="100">100 / trang</SelectItem>
+            {ACTIVITY_LIMIT_ITEMS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

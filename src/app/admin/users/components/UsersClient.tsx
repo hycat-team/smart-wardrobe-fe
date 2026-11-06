@@ -11,7 +11,7 @@ import {
   PaginationLink,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { useAdminUsers, useUpdateUserStatus } from "@/features/admin/queries/admin.queries";
+import { useAdminUsers, useAdminSubscriptionPlans, useUpdateUserStatus } from "@/features/admin/queries/admin.queries";
 import { isUuid } from "@/features/admin/utils/user-lookup";
 import {
   UsersToolbar,
@@ -26,6 +26,7 @@ export function UsersClient() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("user");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [planFilter, setPlanFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<{
     id: string;
@@ -42,6 +43,14 @@ export function UsersClient() {
 
   const isSearchingById = isUuid(debouncedSearch);
 
+  // Gói hội viên: nguồn option là danh mục gói của BE (không hard-code), giữ cả
+  // gói Free/default. Bộ lọc chạy ở BE theo GÓI HIỆU LỰC của từng tài khoản —
+  // đúng cột "Gói" trong bảng — nên phải gửi planId, không lọc ở FE.
+  const { data: subscriptionPlans } = useAdminSubscriptionPlans(true);
+  const planOptions = (subscriptionPlans ?? [])
+    .filter((plan) => plan.isActive !== false)
+    .map((plan) => ({ value: plan.id, label: plan.name }));
+
   const { data, isLoading, isError } = useAdminUsers({
     page,
     limit: 10,
@@ -52,6 +61,7 @@ export function UsersClient() {
       : {}),
     ...(roleFilter !== "all" ? { roleSlug: roleFilter } : {}),
     ...(statusFilter !== "all" ? { isActive: statusFilter === "active" } : {}),
+    ...(planFilter !== "all" ? { planId: planFilter } : {}),
   });
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateUserStatus();
 
@@ -104,6 +114,12 @@ export function UsersClient() {
             setStatusFilter(value);
             setPage(1);
           }}
+          plan={planFilter}
+          onPlanChange={(value) => {
+            setPlanFilter(value);
+            setPage(1);
+          }}
+          planOptions={planOptions}
           isSearchingById={isSearchingById}
         />
       </div>

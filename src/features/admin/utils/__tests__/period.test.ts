@@ -21,11 +21,20 @@ describe('Admin Period Utilities', () => {
   });
 
   describe('getDefaultPeriod', () => {
-    it('defaults to "Tháng này" (this_month) from 01 to today', () => {
+    it('defaults to "Năm nay" starting at the data floor', () => {
       const def = getDefaultPeriod(refDate);
-      expect(def.preset).toBe('this_month');
-      expect(def.fromDate).toBe('2026-10-01');
+      expect(def.preset).toBe('this_year');
+      // 16/10/2026 là sàn dữ liệu, muộn hơn 01/01/2026 nên được chọn.
+      expect(def.fromDate).toBe('2026-10-16');
       expect(def.toDate).toBe('2026-10-20');
+    });
+
+    it('falls back to the start of the year once the year is past the floor', () => {
+      const nextYear = new Date('2027-02-01T10:00:00+07:00');
+      const def = getDefaultPeriod(nextYear);
+      expect(def.preset).toBe('this_year');
+      expect(def.fromDate).toBe('2027-01-01');
+      expect(def.toDate).toBe('2027-02-01');
     });
   });
 
@@ -221,10 +230,17 @@ describe('Admin Period Utilities', () => {
   });
 
   describe('parsePeriodFromParams', () => {
-    it('defaults to "this_month" when params are empty', () => {
+    it('defaults to "this_year" clamped to the data floor when params are empty', () => {
       const res = parsePeriodFromParams({}, refDate);
-      expect(res.preset).toBe('this_month');
-      expect(res.fromDate).toBe('2026-10-01');
+      expect(res.preset).toBe('this_year');
+      expect(res.fromDate).toBe('2026-10-16');
+      expect(res.toDate).toBe('2026-10-20');
+    });
+
+    it('respects an explicit preset without clamping it to the data floor', () => {
+      const res = parsePeriodFromParams({ preset: 'this_year' }, refDate);
+      expect(res.preset).toBe('this_year');
+      expect(res.fromDate).toBe('2026-01-01');
       expect(res.toDate).toBe('2026-10-20');
     });
 

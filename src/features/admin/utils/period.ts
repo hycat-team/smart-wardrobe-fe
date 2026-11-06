@@ -117,12 +117,38 @@ export const getPeriodDateRange = (
 };
 
 /**
- * Lấy kỳ mặc định khi không có tham số query (mặc định là 'this_month').
+ * Sàn dữ liệu của môi trường hiện tại, khớp `subscription.plan_history_meta.cutover`
+ * (031 FR-012) — migration ghi mốc này bằng `now()` lúc deploy, nên con số dưới
+ * đây là giá trị của lần deploy hiện tại.
+ *
+ * CHỈ dùng cho khoảng MẶC ĐỊNH: đây là "ngày sớm nhất mà bảng điều khiển mở ra",
+ * không phải min của bộ chọn ngày. Người dùng vẫn chọn được ngày cũ hơn; nếu
+ * DB được migrate lại thì phải cập nhật hằng số này.
  */
-export const getDefaultPeriod = (now = new Date()): PeriodRange => ({
-  preset: 'this_month',
-  ...getPeriodDateRange('this_month', now),
-});
+export const ADMIN_DATA_FLOOR_DATE = '2026-10-16';
+
+/**
+ * Kẹp một mốc ngày về sàn dữ liệu: không sớm hơn `ADMIN_DATA_FLOOR_DATE`.
+ */
+export const clampToDataFloor = (date: string): string =>
+  date < ADMIN_DATA_FLOOR_DATE ? ADMIN_DATA_FLOOR_DATE : date;
+
+/**
+ * Lấy kỳ mặc định khi không có tham số query: "Năm nay", bắt đầu không sớm hơn
+ * sàn dữ liệu (16/10/2026), kết thúc ở hôm nay.
+ */
+export const getDefaultPeriod = (now = new Date()): PeriodRange => {
+  const yearRange = getPeriodDateRange('this_year', now);
+  const fromDate = clampToDataFloor(yearRange.fromDate);
+  return {
+    preset: 'this_year',
+    // Nếu đồng hồ hệ thống đứng trước sàn dữ liệu (môi trường test, DB chưa
+    // migrate) thì sàn sẽ vượt quá hôm nay và tạo ra kỳ đảo ngược — BE trả 400.
+    // Kẹp về hôm nay để kỳ luôn hợp lệ.
+    fromDate: fromDate > yearRange.toDate ? yearRange.toDate : fromDate,
+    toDate: yearRange.toDate,
+  };
+};
 
 /**
  * Kiểm tra xem toDate đã chạm mốc hôm nay hay chưa (để vô hiệu hóa nút ▶).
@@ -413,15 +439,18 @@ export const parsePeriodFromParams = (
     'custom',
   ];
 
-  // Nếu cả 2 mốc ngày đều thiếu -> Mặc định 'this_month'
+  // Nếu cả 2 mốc ngày đều thiếu: preset có trong URL thì tôn trọng đúng preset
+  // (không áp sàn — sàn chỉ dành cho khoảng mặc định), không có preset thì dùng
+  // mặc định "Năm nay + sàn dữ liệu".
   if (!rawFrom && !rawTo) {
-    const matchedPreset = validPresets.includes(rawPreset as PeriodPreset)
-      ? (rawPreset as PeriodPreset)
-      : 'this_month';
-    return {
-      preset: matchedPreset,
-      ...getPeriodDateRange(matchedPreset, now),
-    };
+    if (validPresets.includes(rawPreset as PeriodPreset)) {
+      const matchedPreset = rawPreset as PeriodPreset;
+      return {
+        preset: matchedPreset,
+        ...getPeriodDateRange(matchedPreset, now),
+      };
+    }
+    return getDefaultPeriod(now);
   }
 
   const defaultRange = getPeriodDateRange('this_month', now);

@@ -16,6 +16,7 @@ export const transactionsApi = {
     // Only send parameters that have values
     const queryParams: Record<string, string | number> = {};
     if (params?.status) queryParams.status = params.status;
+    if (params?.transactionType) queryParams.transactionType = params.transactionType;
     if (params?.fromDate) queryParams.fromDate = params.fromDate;
     if (params?.toDate) queryParams.toDate = params.toDate;
     if (params?.page) queryParams.page = params.page;

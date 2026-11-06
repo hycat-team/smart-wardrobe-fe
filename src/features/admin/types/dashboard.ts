@@ -124,7 +124,11 @@ export interface DynamicQueryRequest {
   targetDashboard: 'admin';
   metrics: AdminMetricKey[];
   timeframe: DynamicQueryTimeframe;
-  granularity: 'day';
+  /**
+   * `day` cho kỳ ngắn, `month` khi kỳ dài hơn một quý (xem
+   * `resolveGranularity`). Backend nhận cả `week`/`year` nhưng FE chưa dùng.
+   */
+  granularity: 'day' | 'week' | 'month' | 'year';
   compareWithPrevious: false;
 }
 

@@ -22,6 +22,7 @@ import type { AdminPeriodNavigatorProps, PeriodPreset } from '../types/period';
 import {
   createDateVN,
   formatPeriodLabel,
+  getDefaultPeriod,
   getPeriodDateRange,
   isAtCurrentPeriod,
   navigatePeriod,
@@ -106,9 +107,11 @@ export function AdminPeriodNavigator({
     });
   };
 
-  // Đặt lại khoảng ngày tùy chọn
+  // Đặt lại khoảng ngày tùy chọn về kỳ mặc định của hệ thống ("Năm nay" + sàn
+  // dữ liệu), thay vì "Tháng này" — hai mặc định khác nhau sẽ khiến nút Đặt lại
+  // đưa người dùng về một kỳ không phải kỳ mà trang mở ra.
   const handleResetCustomRange = () => {
-    const defaultRange = getPeriodDateRange('this_month');
+    const defaultRange = getDefaultPeriod();
     const fp = parseVNDateParts(defaultRange.fromDate);
     const tp = parseVNDateParts(defaultRange.toDate);
     setRange({

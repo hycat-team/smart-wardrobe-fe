@@ -2,26 +2,17 @@
 
 import { useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   CategoryRes,
   WardrobeCategoryDistribution,
 } from "@/features/wardrobe/types";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export interface WardrobeFilterBarV2Props {
   categories?: CategoryRes[];
   selectedCategorySlug: string;
   onSelectCategory: (slug: string) => void;
-  sortParam: string;
-  onSortChange: (value: string) => void;
   distribution?: WardrobeCategoryDistribution | null;
   totalItems?: number;
 }
@@ -30,8 +21,6 @@ export function WardrobeFilterBarV2({
   categories = [],
   selectedCategorySlug,
   onSelectCategory,
-  sortParam,
-  onSortChange,
   distribution,
   totalItems,
 }: WardrobeFilterBarV2Props) {
@@ -239,51 +228,6 @@ export function WardrobeFilterBarV2({
               </>
             )}
           </AnimatePresence>
-        </div>
-      </div>
-
-      {/* ── 2. REFINED SORT PILL (Atelier Glass Control) ── */}
-      <div className="flex items-center justify-end shrink-0 self-end lg:self-center">
-        <div className="flex items-center gap-2 rounded-full border border-stone-200/90 dark:border-stone-800 bg-card dark:bg-stone-900/80 backdrop-blur-md px-4 py-2 shadow-xs hover:border-foreground/30 transition-all">
-          <ArrowUpDown className="size-3.5 text-muted-foreground shrink-0" />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground shrink-0">
-            Sắp xếp
-          </span>
-          <Select
-            value={sortParam}
-            onValueChange={(val) => {
-              if (val) onSortChange(val);
-            }}
-          >
-            <SelectTrigger className="border-none shadow-none focus-visible:ring-0 p-0 h-auto bg-transparent text-xs font-semibold uppercase tracking-widest text-foreground w-auto gap-1 cursor-pointer">
-              <SelectValue placeholder="Mới nhất" />
-            </SelectTrigger>
-            <SelectContent
-              alignItemWithTrigger={false}
-              align="end"
-              sideOffset={6}
-              className="rounded-2xl border-border bg-card shadow-lg"
-            >
-              <SelectItem
-                value="Mới nhất"
-                className="text-xs font-medium cursor-pointer rounded-xl"
-              >
-                Mới nhất
-              </SelectItem>
-              <SelectItem
-                value="Cũ nhất"
-                className="text-xs font-medium cursor-pointer rounded-xl"
-              >
-                Cũ nhất
-              </SelectItem>
-              <SelectItem
-                value="Tên"
-                className="text-xs font-medium cursor-pointer rounded-xl"
-              >
-                Theo tên (A-Z)
-              </SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
     </div>

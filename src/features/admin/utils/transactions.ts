@@ -1,6 +1,7 @@
 import type {
   ReconciliationActionType,
   TransactionStatus,
+  TransactionType,
   TransactionUserBrief,
 } from '../types/transactions';
 
@@ -98,11 +99,19 @@ export const TRANSACTION_STATUS_OPTIONS: { value: TransactionStatus; label: stri
   { value: 'refunded', label: 'Đã hoàn tiền' },
 ];
 
-export const getTransactionTypeLabel = (type?: string | null): string => {
-  if (type === 'direct_purchase') return 'Mua gói';
-  if (type === 'wallet_topup') return 'Nạp ví';
-  return type || '—';
-};
+export const TRANSACTION_TYPE_OPTIONS: { value: TransactionType; label: string }[] = [
+  { value: 'direct_purchase', label: 'Mua gói' },
+  { value: 'wallet_topup', label: 'Nạp ví' },
+];
+
+/**
+ * Nhãn loại giao dịch. Dùng chung một nguồn với `TRANSACTION_TYPE_OPTIONS` để
+ * bộ lọc và cột trong bảng không bao giờ lệch nhau; giá trị lạ (dữ liệu cũ)
+ * vẫn hiện nguyên chuỗi thay vì rỗng.
+ */
+export const getTransactionTypeLabel = (type?: string | null): string =>
+  TRANSACTION_TYPE_OPTIONS.find((option) => option.value === type)?.label ??
+  (type || '—');
 
 /**
  * Tên hiển thị của người mua trong chi tiết giao dịch.

@@ -16,6 +16,7 @@ import type {
 import {
   buildAdminAnalyticsRequest,
   DASHBOARD_AI_EVENTS_LIMIT,
+  getRevenueChartRange,
   normalizeDashboardFilters,
 } from '@/features/admin/utils/dashboard';
 import { DashboardClient } from './DashboardClient';
@@ -40,6 +41,14 @@ export default async function DashboardData({
   const marginParams = new URLSearchParams({
     fromDate: filters.fromDate,
     toDate: filters.toDate,
+  });
+
+  // Doanh thu nhóm theo tháng ở backend, nên panel doanh thu luôn xem trọn năm
+  // của kỳ đang chọn thay vì đúng khoảng ngày (xem getRevenueChartRange).
+  const revenueRange = getRevenueChartRange(filters);
+  const revenueParams = new URLSearchParams({
+    fromDate: revenueRange.fromDate,
+    toDate: revenueRange.toDate,
   });
 
   const [overview, analytics, aiEvents, aiMargin, payosReconciliation] =
@@ -80,7 +89,7 @@ export default async function DashboardData({
           { cache: 'no-store' },
         ),
         serverFetch<RevenueBreakdown>(
-          `/admin/dashboard/subscriptions/revenue-breakdown?${marginParams.toString()}`,
+          `/admin/dashboard/subscriptions/revenue-breakdown?${revenueParams.toString()}`,
           { cache: 'no-store' },
         ),
         serverFetch<RenewalStats>(

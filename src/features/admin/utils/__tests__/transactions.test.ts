@@ -8,6 +8,7 @@ import {
   getTransactionTypeLabel,
   getUserDisplayName,
   TRANSACTION_STATUS_OPTIONS,
+  TRANSACTION_TYPE_OPTIONS,
 } from '../transactions';
 import type {
   TransactionStatus,
@@ -77,6 +78,16 @@ describe('transactions utils', () => {
       expect(getTransactionTypeLabel('REFUND')).toBe('REFUND');
       expect(getTransactionTypeLabel('')).toBe('—');
       expect(getTransactionTypeLabel(undefined)).toBe('—');
+    });
+
+    it('mọi option của bộ lọc đều có nhãn và khớp cột trong bảng', () => {
+      expect(TRANSACTION_TYPE_OPTIONS).toEqual([
+        { value: 'direct_purchase', label: 'Mua gói' },
+        { value: 'wallet_topup', label: 'Nạp ví' },
+      ]);
+      for (const option of TRANSACTION_TYPE_OPTIONS) {
+        expect(getTransactionTypeLabel(option.value)).toBe(option.label);
+      }
     });
   });
 

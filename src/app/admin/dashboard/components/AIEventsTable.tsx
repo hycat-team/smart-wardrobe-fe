@@ -41,6 +41,13 @@ const visiblePages = (page: number, totalPages: number) => {
     .sort((a, b) => a - b);
 };
 
+// Base UI resolves the trigger label from `items`; without it the closed select
+// printed the raw `all` the status filter stores.
+const AI_STATUS_ITEMS = [
+  { value: 'all', label: 'Tất cả' },
+  { value: 'FAILED', label: 'FAILED' },
+];
+
 export function AIEventsTable({
   filters,
   data,
@@ -103,6 +110,7 @@ export function AIEventsTable({
           </p>
         </div>
         <Select
+          items={AI_STATUS_ITEMS}
           value={filters.aiStatus || 'all'}
           onValueChange={(value) =>
             onStatusChange(value === 'all' ? '' : String(value))
@@ -119,8 +127,11 @@ export function AIEventsTable({
             alignItemWithTrigger={false}
             sideOffset={8}
           >
-            <SelectItem value="all">Tất cả</SelectItem>
-            <SelectItem value="FAILED">FAILED</SelectItem>
+            {AI_STATUS_ITEMS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

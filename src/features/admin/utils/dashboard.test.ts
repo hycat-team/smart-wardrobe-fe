@@ -4,7 +4,9 @@ import {
   getDefaultDashboardDateRange,
   getPlanColor,
   getPresetDateRange,
+  getRevenueChartRange,
   normalizeDashboardFilters,
+  resolveGranularity,
   safePercentage,
   startOfMonthVN,
   todayVN,
@@ -13,11 +15,37 @@ import {
 describe('dashboard utils', () => {
   const now = new Date(2026, 6, 23, 12, 0, 0); // 2026-07-23 12:00:00
 
-  it('tạo khoảng ngày mặc định tháng này (01 đến hôm nay) theo giờ Việt Nam', () => {
+  it('tạo khoảng ngày mặc định "Năm nay" bắt đầu từ sàn dữ liệu', () => {
+    // Tháng 7/2026 nằm TRƯỚC sàn 16/10/2026, nên kỳ mặc định kẹp về hôm nay
+    // thay vì tạo ra khoảng đảo ngược (fromDate > toDate → BE trả 400).
     expect(getDefaultDashboardDateRange(now)).toEqual({
-      fromDate: '2026-07-01',
+      fromDate: '2026-07-23',
       toDate: '2026-07-23',
     });
+    const afterFloor = new Date('2026-11-06T10:00:00+07:00');
+    expect(getDefaultDashboardDateRange(afterFloor)).toEqual({
+      fromDate: '2026-10-16',
+      toDate: '2026-11-06',
+    });
+  });
+
+  it('getRevenueChartRange luôn trả trọn năm của kỳ đang chọn', () => {
+    // Năm hiện tại: từ 01/01 tới hôm nay.
+    expect(getRevenueChartRange({ fromDate: '2026-10-16' }, now)).toEqual({
+      fromDate: '2026-01-01',
+      toDate: '2026-07-23',
+    });
+    // Năm đã qua: trọn 12 tháng.
+    expect(getRevenueChartRange({ fromDate: '2025-03-01' }, now)).toEqual({
+      fromDate: '2025-01-01',
+      toDate: '2025-12-31',
+    });
+  });
+
+  it('resolveGranularity gộp theo tháng khi kỳ dài hơn một quý', () => {
+    expect(resolveGranularity('2026-01-01', '2026-03-31')).toBe('day');
+    expect(resolveGranularity('2026-01-01', '2026-04-30')).toBe('month');
+    expect(resolveGranularity('2026-01-01', '2026-12-31')).toBe('month');
   });
 
   describe('tiện ích ngày giờ Việt Nam & presets', () => {
@@ -80,15 +108,18 @@ describe('dashboard utils', () => {
     expect(result.toDate).toBe('2026-07-23');
   });
 
-  it('fallback về mặc định Tháng này khi không truyền fromDate hoặc toDate', () => {
+  it('fallback về mặc định "Năm nay" (kẹp sàn dữ liệu) khi không truyền fromDate hoặc toDate', () => {
     const emptyResult = normalizeDashboardFilters({}, now);
-    expect(emptyResult.preset).toBe('this_month');
-    expect(emptyResult.fromDate).toBe('2026-07-01');
+    expect(emptyResult.preset).toBe('this_year');
+    expect(emptyResult.fromDate).toBe('2026-07-23');
     expect(emptyResult.toDate).toBe('2026-07-23');
   });
 
   it('chỉ gửi 8 metric admin được backend hỗ trợ', () => {
-    const filters = normalizeDashboardFilters({}, now);
+    const filters = normalizeDashboardFilters(
+      { fromDate: '2026-07-01', toDate: '2026-07-23' },
+      now
+    );
     const request = buildAdminAnalyticsRequest(filters);
 
     expect(request).toEqual({

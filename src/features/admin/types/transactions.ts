@@ -78,6 +78,7 @@ export interface DepositTransaction {
 
 export interface TransactionQuery {
   status?: string;
+  transactionType?: TransactionType | string;
   fromDate?: string;
   toDate?: string;
   page?: number;

@@ -181,12 +181,22 @@ export function TransactionsTable({
         </Table>
       </div>
 
-      {metadata && metadata.totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-border pt-4 px-2">
+      {/* Tổng theo BỘ LỌC (metadata.totalItems), không phải số dòng của trang
+          hiện tại — nên nó phải hiện cả khi kết quả chỉ có một trang. */}
+      {metadata && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-2 pt-4">
           <p className="text-xs text-muted-foreground">
-            Tổng cộng: <span className="font-semibold text-foreground">{metadata.totalItems}</span> giao dịch
+            Tổng cộng{' '}
+            <span className="font-semibold text-foreground">{metadata.totalItems}</span>{' '}
+            giao dịch
+            {metadata.totalPages > 1 && (
+              <span className="ml-1 text-muted-foreground">
+                · trang {metadata.page}/{metadata.totalPages}
+              </span>
+            )}
           </p>
 
+          {metadata.totalPages > 1 && (
           <Pagination>
             <PaginationContent>
               <PaginationItem>
@@ -236,6 +246,7 @@ export function TransactionsTable({
               </PaginationItem>
             </PaginationContent>
           </Pagination>
+          )}
         </div>
       )}
     </div>

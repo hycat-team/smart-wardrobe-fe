@@ -21,6 +21,7 @@ import type {
   AdminInsightTab,
   RenewalStats,
   RevenueBreakdown,
+  RevenueBreakdownItem,
   SubscriptionDistribution,
 } from '@/features/admin/types';
 import {
@@ -155,24 +156,46 @@ function RevenuePanel({ query }: { query: QueryState<RevenueBreakdown> }) {
     data = data.data;
   }
 
-  const breakdown = data?.breakdown ?? [];
+  const breakdown: RevenueBreakdownItem[] = data?.breakdown ?? [];
   const totalRevenueVnd = data?.totalRevenueVnd ?? 0;
-  const plans = Array.from(new Set(breakdown.map((item: any) => item.planCode)));
-  const rows = Array.from(new Set(breakdown.map((item: any) => item.month)))
-    .sort()
-    .map((month: any) => {
-      const row: Record<string, string | number> = { month };
-      breakdown
-        .filter((item: any) => item.month === month)
-        .forEach((item: any) => {
-          row[item.planCode] = item.revenueVnd;
-        });
-      return row;
-    });
+  const plans = Array.from(new Set(breakdown.map((item) => item.planCode)));
+
+  // BE trả `month` dạng `YYYY-MM-DD` (DATE_TRUNC('month')). Panel này luôn đọc
+  // TRỌN NĂM của kỳ đang chọn, nên trục X là 12 tháng của năm đó — tháng nào
+  // không có giao dịch vẫn có cột 0, để biểu đồ tháng không bị co lại còn một
+  // cột khi người dùng chọn "Tháng này".
+  const monthKey = (value: unknown) => String(value ?? '').slice(0, 7);
+  const rangeFrom = typeof data?.fromDate === 'string' ? monthKey(data.fromDate) : '';
+  const rangeTo = typeof data?.toDate === 'string' ? monthKey(data.toDate) : '';
+  const year = (rangeFrom || monthKey(breakdown[0]?.month)).slice(0, 4);
+  const lastMonth =
+    rangeTo && rangeTo.slice(0, 4) === year ? Number(rangeTo.slice(5, 7)) : 12;
+  const slots =
+    year && Number.isFinite(lastMonth) && lastMonth > 0
+      ? Array.from({ length: lastMonth }, (_, index) => {
+          const month = String(index + 1).padStart(2, '0');
+          return { key: `${year}-${month}`, label: `T${Number(month)}` };
+        })
+      : Array.from(new Set(breakdown.map((item) => monthKey(item.month)))).map(
+          (key) => ({ key, label: key })
+        );
+
+  const rows = slots.map((slot) => {
+    const row: Record<string, string | number> = {
+      month: slot.key,
+      label: slot.label,
+    };
+    breakdown
+      .filter((item) => monthKey(item.month) === slot.key)
+      .forEach((item) => {
+        row[item.planCode] = item.revenueVnd;
+      });
+    return row;
+  });
 
   return (
     <Panel eyebrow="Doanh thu gói" title="Doanh thu theo gói và tháng" isFetching={query.isFetching}>
-      {!rows.length && !totalRevenueVnd ? (
+      {!breakdown.length && !totalRevenueVnd ? (
         <EmptyState label="Chưa có giao dịch subscription trong kỳ." />
       ) : (
         <>
@@ -180,21 +203,30 @@ function RevenuePanel({ query }: { query: QueryState<RevenueBreakdown> }) {
             <p className="text-3xl font-semibold tabular-nums text-foreground">
               {formatVND(totalRevenueVnd)}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">Tổng doanh thu theo kỳ đã chọn</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Tổng doanh thu năm {year} (từ 01/01 đến hôm nay)
+            </p>
           </div>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={rows} margin={{ left: 8, right: 8 }}>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => formatCompactNumber(Number(value))}
                 />
-                <Tooltip formatter={(value) => formatVND(Number(value))} />
+                <Tooltip
+                  labelFormatter={(_value, payload) =>
+                    payload?.[0]?.payload?.month
+                      ? `${payload[0].payload.month.slice(5, 7)}/${payload[0].payload.month.slice(0, 4)}`
+                      : ''
+                  }
+                  formatter={(value) => formatVND(Number(value))}
+                />
                 <Legend formatter={(value) => humanize(String(value))} />
-                {plans.map((plan: any, index: number) => (
+                {plans.map((plan, index) => (
                   <Bar
                     key={plan}
                     dataKey={plan}

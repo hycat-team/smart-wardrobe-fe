@@ -122,6 +122,13 @@ export function DashboardTrendChart({
         : ['total_users', 'new_users', 'active_users_dau'];
   const latest = chartData.at(-1);
   const hasRateAxis = visibleMetrics.some((metric) => metric.endsWith('_rate'));
+  // Với kỳ dài, backend gộp theo tháng; nhãn trục phải là MM/yyyy thay vì
+  // dd/MM (mọi điểm đều rơi vào ngày 01 nên dd/MM chỉ gây nhiễu).
+  const isMonthly = data.granularity === 'month';
+  const formatAxisDate = (value: unknown) => {
+    const text = formatVNDateString(String(value));
+    return isMonthly ? text.slice(3) : text.slice(0, 5);
+  };
 
   return (
     <section
@@ -167,7 +174,7 @@ export function DashboardTrendChart({
               tickLine={false}
               axisLine={false}
               minTickGap={28}
-              tickFormatter={(value) => formatVNDateString(String(value)).slice(0, 5)}
+              tickFormatter={formatAxisDate}
             />
             <YAxis
               yAxisId="left"
@@ -188,7 +195,7 @@ export function DashboardTrendChart({
               />
             )}
             <Tooltip
-              labelFormatter={(value) => formatVNDateString(String(value))}
+              labelFormatter={(value) => formatAxisDate(value)}
               formatter={(value, name) =>
                 formatMetric(String(name) as AdminMetricKey, Number(value))
               }

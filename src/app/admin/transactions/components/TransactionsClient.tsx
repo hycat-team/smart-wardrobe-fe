@@ -28,6 +28,7 @@ export function TransactionsClient() {
 
   // Read URL query params
   const statusParam = searchParams.get('status') || undefined;
+  const typeParam = searchParams.get('transactionType') || undefined;
   const rawPreset = searchParams.get('preset') || undefined;
   const rawFromDate = searchParams.get('fromDate') || undefined;
   const rawToDate = searchParams.get('toDate') || undefined;
@@ -43,6 +44,7 @@ export function TransactionsClient() {
 
   const queryParams: TransactionQuery = {
     status: statusParam,
+    transactionType: typeParam,
     fromDate: period.fromDate,
     toDate: period.toDate,
     page: pageParam,
@@ -106,6 +108,7 @@ export function TransactionsClient() {
   const handleReset = () => {
     updateParams({
       status: null,
+      transactionType: null,
       preset: null,
       fromDate: null,
       toDate: null,
@@ -187,6 +190,7 @@ export function TransactionsClient() {
     <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 pb-24 text-foreground animate-in fade-in duration-500">
       <TransactionsToolbar
         status={statusParam}
+        transactionType={typeParam}
         preset={period.preset}
         fromDate={period.fromDate}
         toDate={period.toDate}

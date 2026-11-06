@@ -31,6 +31,9 @@ export function UsersToolbar({
   onRoleChange,
   status,
   onStatusChange,
+  plan,
+  onPlanChange,
+  planOptions,
   isSearchingById,
 }: {
   search: string;
@@ -39,8 +42,16 @@ export function UsersToolbar({
   onRoleChange: (value: RoleFilter) => void;
   status: StatusFilter;
   onStatusChange: (value: StatusFilter) => void;
+  /** `all` hoặc id của gói (lấy từ /admin/subscriptions/plans). */
+  plan: string;
+  onPlanChange: (value: string) => void;
+  planOptions: { value: string; label: string }[];
   isSearchingById: boolean;
 }) {
+  // Base UI resolves the closed trigger's label from `items`, so the plan list
+  // is passed through instead of being spelled out in SelectItem children only.
+  const planItems = [{ value: "all", label: "Tất cả gói" }, ...planOptions];
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -93,6 +104,26 @@ export function UsersToolbar({
             </SelectTrigger>
             <SelectContent>
               {STATUS_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            items={planItems}
+            value={plan}
+            onValueChange={(value) => onPlanChange(String(value))}
+          >
+            <SelectTrigger
+              className="h-9 min-w-44 text-xs"
+              aria-label="Lọc theo gói hội viên"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {planItems.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>

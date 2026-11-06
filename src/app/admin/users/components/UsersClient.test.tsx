@@ -121,6 +121,41 @@ describe('UsersClient filters', () => {
   });
 });
 
+describe('UsersClient membership plan filter', () => {
+  beforeEach(() => {
+    mockedUseSubscriptionPlans.mockReturnValue({
+      data: [
+        { id: 'plan-free', name: 'Free', isActive: true },
+        { id: 'plan-premium', name: 'Premium Monthly', isActive: true },
+        { id: 'plan-retired', name: 'Retired Plan', isActive: false },
+      ],
+      isLoading: false,
+    });
+  });
+
+  it('shows "Tất cả gói" instead of the raw `all` value', () => {
+    render(<UsersClient />);
+
+    expect(screen.getByText('Tất cả gói')).toBeTruthy();
+  });
+
+  it('sends the selected plan id to the API instead of filtering client-side', async () => {
+    render(<UsersClient />);
+
+    fireEvent.click(screen.getByLabelText('Lọc theo gói hội viên'));
+    const option = await screen.findByRole('option', { name: 'Premium Monthly' });
+    fireEvent.pointerDown(option);
+    fireEvent.pointerUp(option);
+    fireEvent.click(option);
+
+    await waitFor(() =>
+      expect(mockedUseAdminUsers).toHaveBeenLastCalledWith(
+        expect.objectContaining({ planId: 'plan-premium', page: 1 }),
+      ),
+    );
+  });
+});
+
 describe('UsersClient plan column', () => {
   it('shows the effective plan with its expiry', () => {
     render(<UsersClient />);

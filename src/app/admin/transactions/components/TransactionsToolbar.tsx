@@ -11,10 +11,33 @@ import {
 } from '@/components/ui/select';
 import { AdminPeriodNavigator } from '@/features/admin/components/AdminPeriodNavigator';
 import type { PeriodPreset } from '@/features/admin/types/period';
-import { TRANSACTION_STATUS_OPTIONS } from '@/features/admin/utils/transactions';
+import {
+  TRANSACTION_STATUS_OPTIONS,
+  TRANSACTION_TYPE_OPTIONS,
+} from '@/features/admin/utils/transactions';
+
+// Base UI's Select resolves the trigger label from the `items` prop; the items
+// rendered inside SelectContent are not enough. Without this the trigger prints
+// the raw value (`all`, `reconciliation_required`, `20`).
+const STATUS_ITEMS = [
+  { value: 'all', label: 'Tất cả trạng thái' },
+  ...TRANSACTION_STATUS_OPTIONS,
+];
+
+const TYPE_ITEMS = [
+  { value: 'all', label: 'Tất cả loại' },
+  ...TRANSACTION_TYPE_OPTIONS,
+];
+
+const LIMIT_ITEMS = [
+  { value: '20', label: '20 / trang' },
+  { value: '50', label: '50 / trang' },
+  { value: '100', label: '100 / trang' },
+];
 
 export function TransactionsToolbar({
   status,
+  transactionType,
   preset,
   fromDate,
   toDate,
@@ -26,12 +49,14 @@ export function TransactionsToolbar({
   errorMessage,
 }: {
   status?: string;
+  transactionType?: string;
   preset?: PeriodPreset;
   fromDate: string;
   toDate: string;
   limit: number;
   onFilterChange: (updates: {
     status?: string | null;
+    transactionType?: string | null;
     preset?: string | null;
     fromDate?: string | null;
     toDate?: string | null;
@@ -91,6 +116,7 @@ export function TransactionsToolbar({
         {/* Status Filter */}
         <div className="w-full sm:w-56">
           <Select
+            items={STATUS_ITEMS}
             value={status || 'all'}
             onValueChange={(val) =>
               onFilterChange({
@@ -99,13 +125,38 @@ export function TransactionsToolbar({
               })
             }
           >
-            <SelectTrigger className="h-9 text-xs">
+            <SelectTrigger className="h-9 text-xs" aria-label="Lọc theo trạng thái">
               <Filter className="mr-2 size-3.5 text-muted-foreground" />
               <SelectValue placeholder="Tất cả trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tất cả trạng thái</SelectItem>
-              {TRANSACTION_STATUS_OPTIONS.map((opt) => (
+              {STATUS_ITEMS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Transaction Type Filter */}
+        <div className="w-full sm:w-48">
+          <Select
+            items={TYPE_ITEMS}
+            value={transactionType || 'all'}
+            onValueChange={(val) =>
+              onFilterChange({
+                transactionType: val === 'all' ? null : val,
+                page: 1,
+              })
+            }
+          >
+            <SelectTrigger className="h-9 text-xs" aria-label="Lọc theo loại giao dịch">
+              <Filter className="mr-2 size-3.5 text-muted-foreground" />
+              <SelectValue placeholder="Tất cả loại" />
+            </SelectTrigger>
+            <SelectContent>
+              {TYPE_ITEMS.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
                 </SelectItem>
@@ -134,16 +185,19 @@ export function TransactionsToolbar({
         <div className="ml-auto flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Hiển thị:</span>
           <Select
+            items={LIMIT_ITEMS}
             value={String(limit)}
             onValueChange={(val) => onFilterChange({ limit: Number(val), page: 1 })}
           >
-            <SelectTrigger className="h-9 w-24 text-xs">
+            <SelectTrigger className="h-9 w-28 text-xs" aria-label="Số bản ghi mỗi trang">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="20">20 / trang</SelectItem>
-              <SelectItem value="50">50 / trang</SelectItem>
-              <SelectItem value="100">100 / trang</SelectItem>
+              {LIMIT_ITEMS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

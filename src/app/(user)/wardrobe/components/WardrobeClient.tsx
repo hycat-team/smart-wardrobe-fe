@@ -100,7 +100,6 @@ export default function WardrobeClient({
   const categoryParam = searchParams.get("categorySlug") || "";
   const colorParam = searchParams.get("color") || "";
   const tagParam = searchParams.get("tag") || "";
-  const sortParam = searchParams.get("sort") || "Mới nhất";
   const searchParam = searchParams.get("q") || "";
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
 
@@ -195,10 +194,6 @@ export default function WardrobeClient({
     updateParams({ categorySlug: slug === "" ? null : slug, page: "1" });
   };
 
-  const handleSortChange = (sort: string) => {
-    updateParams({ sort });
-  };
-
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateParams({ q: searchInput, categorySlug: null, page: "1" });
@@ -232,16 +227,9 @@ export default function WardrobeClient({
     return matchesCategory && matchesColor && matchesTag && matchesSearch;
   });
 
-  const sortedItems = [...filteredItems].sort((a, b) => {
-    const timeA = new Date(a.createdAt || 0).getTime();
-    const timeB = new Date(b.createdAt || 0).getTime();
-
-    if (sortParam === "Mới nhất" || sortParam === "newest") return timeB - timeA;
-    if (sortParam === "Cũ nhất" || sortParam === "oldest") return timeA - timeB;
-    if (sortParam === "Tên" || sortParam === "name") return getWardrobeItemName(a).localeCompare(getWardrobeItemName(b));
-    
-    return 0;
-  });
+  // Danh sách giữ đúng thứ tự API trả về (mới nhất trước); sắp xếp phía client
+  // đã được bỏ cùng nút "Sắp xếp".
+  const sortedItems = filteredItems;
 
   useGSAP(() => {
     if (sortedItems.length > 0 && !isFetching) {
@@ -372,8 +360,6 @@ export default function WardrobeClient({
             categories={category}
             selectedCategorySlug={categoryParam}
             onSelectCategory={handleCategoryChange}
-            sortParam={sortParam}
-            onSortChange={(value) => handleSortChange(value)}
             distribution={distributionQuery.data}
             totalItems={stats?.activeItemsCount ?? metadata?.totalItems ?? items.length}
           />

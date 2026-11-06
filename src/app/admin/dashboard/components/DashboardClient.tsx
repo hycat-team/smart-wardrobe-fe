@@ -17,6 +17,7 @@ import {
   useDashboardRevenueBreakdown,
   useDashboardSubscriptionDistribution,
 } from '@/features/admin/queries/dashboard.queries';
+import { getRevenueChartRange } from '@/features/admin/utils/dashboard';
 import { DashboardToolbar } from './DashboardToolbar';
 import { DashboardKpiGrid } from './DashboardKpiGrid';
 import { AIMarginPanel } from './AIMarginPanel';
@@ -50,6 +51,9 @@ export function DashboardClient({
   const aiEventsQuery = useDashboardAIEvents(filters, initialData.aiEvents);
 
   const isSubscriptionTab = filters.insightTab === 'subscriptions';
+  // Panel doanh thu luôn đọc trọn năm của kỳ đang chọn, khớp với prefetch ở
+  // DashboardData; các panel còn lại giữ đúng kỳ.
+  const revenueFilters = { ...filters, ...getRevenueChartRange(filters) };
   const subscriptionDistributionQuery = useDashboardSubscriptionDistribution(
     filters,
     {
@@ -57,7 +61,7 @@ export function DashboardClient({
       initialData: initialData.subscriptionDistribution,
     },
   );
-  const revenueBreakdownQuery = useDashboardRevenueBreakdown(filters, {
+  const revenueBreakdownQuery = useDashboardRevenueBreakdown(revenueFilters, {
     enabled: isSubscriptionTab,
     initialData: initialData.revenueBreakdown,
   });
