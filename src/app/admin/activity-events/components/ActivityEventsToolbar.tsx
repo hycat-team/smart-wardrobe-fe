@@ -122,7 +122,7 @@ export function ActivityEventsToolbar({
               <span className="font-semibold tabular-nums text-foreground">
                 {formatNumber(totalItems)}
               </span>{' '}
-              hoạt động khớp bộ lọc
+              hoạt động
             </p>
           )}
         </div>

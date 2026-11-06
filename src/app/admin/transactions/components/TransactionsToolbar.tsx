@@ -92,7 +92,7 @@ export function TransactionsToolbar({
               <span className="font-semibold tabular-nums text-foreground">
                 {formatNumber(totalItems)}
               </span>{' '}
-              giao dịch khớp bộ lọc
+              giao dịch
             </p>
           )}
         </div>

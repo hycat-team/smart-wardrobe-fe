@@ -136,9 +136,6 @@ function DistributionPanel({ query }: { query: QueryState<SubscriptionDistributi
               </div>
             ))}
           </div>
-          <p className="mt-5 text-[11px] text-muted-foreground border-t border-border pt-3">
-            * Thống kê theo gói hiện tại của người dùng có hiệu lực giao với kỳ đã chọn.
-          </p>
         </>
       )}
     </Panel>
